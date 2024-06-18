@@ -1,0 +1,35 @@
+{
+  "type": "module",
+  "name": "captial-city-staging",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build && tsc -p tsconfig.scripts.json",
+    "start": "next start",
+    "lint": "next lint",
+    "update-theme": "yarn build-scripts && node dist/update/update_theme.js",
+    "build-scripts": "tsc -p tsconfig.scripts.json"
+  },
+  "dependencies": {
+    "@tailwindcss/typography": "^0.5.13",
+    "@types/inquirer": "^9.0.7",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.19",
+    "next": "^14.2.3",
+    "open": "^10.1.0",
+    "postcss": "^8.4.38",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.4",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@clack/prompts": "^0.6.1",
+    "@types/node": "20.11.30",
+    "esm": "latest",
+    "typescript": "5.4.3"
+  },
+  "types": "./src/types.d.ts"
+}
