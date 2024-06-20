@@ -19,11 +19,11 @@ import TestimonialsAndStatistics from './testimonials_and_statistics';
 
 const components = [
     { id: 'home', component: MainView },
-    { id: 'about', component: About },
     { id: 'portfolio', component: Portfolio },
     { id: 'where', component: WhereWeWork },
     { id: 'services', component: Services },
     { id: 'testimonials', component: TestimonialsAndStatistics },
+    { id: 'about', component: About },
 ];
 
 export default function Home() {
