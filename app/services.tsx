@@ -38,7 +38,7 @@ export default function Services() {
     ];
 
     return (
-        <div className="min-h-[calc(100vh-50px)] w-full flex flex-col items-center justify-center space-y-2 py-4">
+        <div className="min-h-[calc(100vh-50px)] h-[calc(100vh-50px)] w-full flex flex-col items-center justify-center space-y-2 py-4">
             <h1 className="text-4xl font-bold text-white text-center">Focus on your next moves,</h1>
             <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary from-10% via-secondary_light via-70% to-secondary_dark to-90% text-center">
                 we'll handle your history.
@@ -46,7 +46,7 @@ export default function Services() {
             <p className="text-lg text-white !mb-4 text-center px-12">
                 With a home staged by Mia, you can trust that every room tells your story.
             </p>
-            <div className="md:min-h-2/3 w-full px-4 flex md:flex-row md:space-x-4 flex-col space-y-4 md:space-y-0">
+            <div className="w-full px-4 flex md:flex-row md:space-x-4 flex-col space-y-4 md:space-y-0">
                 {services.map((service, index) => (
                     <div key={index} className="w-full md:w-1/3 flex flex-col ring-neutral-500 bg-neutral-800 ring-1 rounded-lg p-4">
                         <div className="flex justify-between items-center mb-4">

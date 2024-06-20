@@ -19,7 +19,7 @@ export default function Statistics() {
     }, []);
 
     return (
-        <div className="min-h-full max-h-full flex items-center justify-center relative p-4">
+        <div className="min-h-full max-h-full w-full flex items-center justify-center relative p-4">
             <button
                 onClick={prevStat}
                 className="absolute left-4 flex justify-center items-center text-secondary hover:text-secondary_light font-bold">

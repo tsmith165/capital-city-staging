@@ -20,16 +20,22 @@ const testimonials = [
 
 export default function Testimonials() {
     return (
-        <div className="min-h-full max-h-full flex flex-row justify-center items-center space-x-4 p-4">
-            {testimonials.map((testimonial, index) => (
-                <div key={index} className="w-full flex">
-                    <div className="relative flex flex-col h-full w-full max-h-full">
+        <>
+            <div className="w-full h-auto flex items-center justify-center">
+                <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary_light via-secondary_dark to-secondary_light text-center w-fit">
+                    Testimonials
+                </h1>
+            </div>
+
+            <div className="min-h-full flex flex-row justify-center items-center space-x-4 p-4">
+                {testimonials.map((testimonial, index) => (
+                    <div className="relative flex flex-col w-full h-full">
                         <Image
                             src={testimonial.image}
                             alt={testimonial.name}
                             width={testimonial.width}
                             height={testimonial.height}
-                            className="rounded-lg shadow-lg w-full h-auto"
+                            className="rounded-lg shadow-lg w-auto h-auto"
                         />
                         <div className="md:absolute md:top-[75%] lg:top-[80%] h-fit bg-secondary_dark text-white p-4 rounded-lg shadow-lg">
                             <p className="text-md md:text-lg">{`"${testimonial.text}"`}</p>
@@ -38,8 +44,8 @@ export default function Testimonials() {
                             </p>
                         </div>
                     </div>
-                </div>
-            ))}
-        </div>
+                ))}
+            </div>
+        </>
     );
 }

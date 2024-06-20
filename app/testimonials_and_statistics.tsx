@@ -4,11 +4,11 @@ import Statistics from './statistics';
 
 export default function TestimonialsAndStatistics() {
     return (
-        <div className="h-[calc(100vh-50px)] w-full flex flex-col">
-            <div className="w-full min-h-[65%] max-h-[65%]">
+        <div className="min-h-[calc(100vh-50px)] w-full flex flex-col">
+            <div className="w-full ">
                 <Testimonials />
             </div>
-            <div className="w-full min-h-[35%] max-h-[35%]">
+            <div className="w-full flex-grow flex ">
                 <Statistics />
             </div>
         </div>
