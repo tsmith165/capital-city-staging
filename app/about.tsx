@@ -12,7 +12,7 @@ export default function About() {
                     alt="Mia Dofflemyer"
                     width={936}
                     height={1248}
-                    className="rounded-lg shadow-lg w-fit h-1/3 md:h-[calc(100dvh-50px-2rem)] m-auto md:m-0 lg:m-auto"
+                    className="rounded-lg shadow-lg w-auto h-auto md:h-[calc(100dvh-50px-2rem)] md:h-fit m-auto md:m-0 lg:m-auto"
                 />
                 <div className="md:absolute md:top-[5%] md:right-0 lg:right-0 md:w-1/2 h-fit bg-secondary_dark text-white p-4 rounded-lg shadow-lg">
                     <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400">
