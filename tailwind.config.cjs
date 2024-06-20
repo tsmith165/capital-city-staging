@@ -18,6 +18,21 @@ export default {
         extend: {
             colors,
         },
+        listStyleType: {
+            none: 'none',
+            disc: 'disc',
+            decimal: 'decimal',
+            square: 'square',
+            roman: 'upper-roman',
+        },
+        screens: {
+            sm: '640px',
+            md: '768px',
+            lg: '1024px',
+            xl: '1280px',
+            '2xl': '1536px',
+            tm: '864px',
+        },
         project_name: 'Captial-City-Staging',
     },
     plugins: [typography],

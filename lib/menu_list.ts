@@ -5,7 +5,6 @@ export const menu_list: [string, string][] = [
     ['where', 'Where'],
     ['services', 'Services'],
     ['testimonials', 'Testimonials'],
-    ['contact', 'Contact'],
 ];
 
 export default { menu_list };

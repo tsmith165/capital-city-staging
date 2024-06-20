@@ -40,3 +40,7 @@ a {
 .react-datepicker-wrapper .react-datepicker__input-container input {
     width: 100%;
 }
+
+.leaflet-control-attribution {
+    display: none !important;
+}

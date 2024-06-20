@@ -1,67 +1,87 @@
 // File 1: /app/main_view.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const images = [
     { src: '/staging-stock-3.jpg', width: 2560, height: 1695 },
+    { src: '/staging-stock-7.jpg', width: 564, height: 705 },
     { src: '/staging-stock-1.png', width: 2048, height: 1366 },
-    { src: '/staging-stock-2.png', width: 2000, height: 1334 },
+    { src: '/staging-stock-4.png', width: 828, height: 984 },
+    { src: '/staging-stock-6.jpg', width: 1280, height: 960 },
 ];
 
-// Delay function
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function MainView() {
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isLogoVisible, setLogoVisible] = useState(true);
     const [isStagingImageVisible, setStagingImageVisible] = useState(false);
+    const currentImageIndexRef = useRef(0);
 
     useEffect(() => {
-        const animationSequence = async () => {
-            await delay(2000);
-            setLogoVisible(false);
-            await delay(2000);
-            setLogoVisible(true);
-            setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-            animationSequence();
-        };
-
-        const initialAnimationSequence = async () => {
-            await delay(2000);
+        const interval = setInterval(async () => {
+            setStagingImageVisible(false);
+            await delay(1500);
+            currentImageIndexRef.current = (currentImageIndexRef.current + 1) % images.length;
             setStagingImageVisible(true);
-            animationSequence();
-        };
+        }, 5500); // Total delay (3000ms + 1500ms + 1000ms)
 
-        initialAnimationSequence();
+        setTimeout(async () => {
+            await delay(1000);
+            setStagingImageVisible(true);
+        }, 1000);
+
+        return () => clearInterval(interval); // Cleanup interval on component unmount
     }, []);
 
-    console.log(
-        `currentImageIndex: ${currentImageIndex} | isLogoVisible: ${isLogoVisible} | isStagingImageVisible: ${isStagingImageVisible}`
-    );
+    const circularFadeVariants = {
+        hidden: {
+            background: 'radial-gradient(circle, transparent 0%, rgba(23, 23, 23, 0) 60%)',
+        },
+        visible: {
+            background: 'radial-gradient(circle, transparent 20%, rgba(23, 23, 23, 1) 100%)',
+            transition: { duration: 2 },
+        },
+    };
 
     return (
-        <div className="relative h-full">
-            <div className="absolute inset-0 bg-neutral-950 transition-opacity duration-2000 ease-in-out opacity-100"></div>
-            {isStagingImageVisible && (
-                <div
-                    key={currentImageIndex}
-                    className="absolute inset-0 w-full h-full transition-opacity duration-2000 ease-in-out opacity-100 scale-110">
-                    <Image
-                        src={images[currentImageIndex].src}
-                        width={images[currentImageIndex].width}
-                        height={images[currentImageIndex].height}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        alt="One of our recently staged homes"
-                    />
-                </div>
-            )}
+        <div className="relative h-[calc(100vh-50px)] w-full overflow-hidden">
+            <AnimatePresence>
+                {isStagingImageVisible && (
+                    <motion.div
+                        key={currentImageIndexRef.current}
+                        initial={{ opacity: 0, scale: 1 }}
+                        animate={{ opacity: 1, scale: 1.3 }}
+                        exit={{ opacity: 0, scale: 1 }}
+                        transition={{ duration: 3 }}
+                        className="absolute inset-0 w-full h-full">
+                        <Image
+                            src={images[currentImageIndexRef.current].src}
+                            width={images[currentImageIndexRef.current].width}
+                            height={images[currentImageIndexRef.current].height}
+                            className="absolute inset-0 w-full h-full object-cover"
+                            alt="One of our recently staged homes"
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            <motion.div
+                variants={circularFadeVariants}
+                initial="hidden"
+                animate={isStagingImageVisible ? 'visible' : 'hidden'}
+                transition={{ duration: 2 }}
+                className="absolute inset-0 bg-neutral-900"></motion.div>
             {isLogoVisible && (
-                <div className="absolute inset-0 flex justify-center items-center">
-                    <div className="relative bg-neutral-950 rounded-full w-[350px] h-[350px] flex justify-center items-center opacity-70">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 1 }}
+                    className="absolute inset-0 flex justify-center items-center">
+                    <div className="relative bg-neutral-900 rounded-full w-[350px] h-[350px] flex justify-center items-center opacity-70">
                         <Image src={require('/public/CCS_logo.png')} alt="Capital City Staging Logo" width={300} height={300} />
                     </div>
-                </div>
+                </motion.div>
             )}
         </div>
     );

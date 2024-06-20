@@ -1,26 +1,29 @@
+// File 1: /app/page.tsx
+
 'use client';
+
+import dynamic from 'next/dynamic';
+
+const WhereWeWork = dynamic(() => import('./where_we_work'), {
+    ssr: false,
+});
 
 import React, { useEffect, useRef } from 'react';
 import { useStore } from '../store/store';
 import PageLayout from '../components/layout/PageLayout';
 import MainView from './main_view';
-import WhereWeWork from './where_we_work';
-import AboutTheOwner from './about_the_owner';
+import About from './about';
 import Portfolio from './portfolio';
 import Services from './services';
-import Testimonials from './testimonials';
-import Statistics from './statistics';
-import Contact from './contact';
+import TestimonialsAndStatistics from './testimonials_and_statistics';
 
 const components = [
     { id: 'home', component: MainView },
-    { id: 'about', component: AboutTheOwner },
+    { id: 'about', component: About },
     { id: 'portfolio', component: Portfolio },
     { id: 'where', component: WhereWeWork },
     { id: 'services', component: Services },
-    { id: 'testimonials', component: Testimonials },
-    { id: 'statistics', component: Statistics },
-    { id: 'contact', component: Contact },
+    { id: 'testimonials', component: TestimonialsAndStatistics },
 ];
 
 export default function Home() {
@@ -29,7 +32,6 @@ export default function Home() {
 
     useEffect(() => {
         if (selectedComponent) {
-            console.log('useEffect: selectedComponent=', selectedComponent);
             const index = components.findIndex((item) => item.id === selectedComponent);
             if (index !== -1) {
                 refs.current[index].current?.scrollIntoView({
@@ -43,7 +45,7 @@ export default function Home() {
         <PageLayout page="home">
             <div className="flex flex-col overflow-y-auto h-full">
                 {components.map(({ id, component: Component }, index) => (
-                    <div key={id} ref={refs.current[index]} className="w-full min-h-full max-h-full">
+                    <div key={id} ref={refs.current[index]} className="w-full h-auto bg-neutral-900">
                         <Component />
                     </div>
                 ))}
