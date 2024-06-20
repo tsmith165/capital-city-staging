@@ -2,11 +2,13 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Polygon } from 'react-leaflet';
-import { LatLngExpression } from 'leaflet';
+import { LatLngExpression, LatLngTuple } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import cityBoundaries from '../lib/city_boundaries.json';
 
 const WhereWeWork: React.FC = () => {
+    const MAP_CENTER: LatLngTuple = [38.6171, -121.3283];
+
     const [selectedCity, setSelectedCity] = useState<string | null>(null);
     const [hoveredMap, setHoveredMap] = useState<boolean>(false);
     const [currentCityIndex, setCurrentCityIndex] = useState<number>(0);
@@ -50,7 +52,7 @@ const WhereWeWork: React.FC = () => {
                                     }, 500);
                                 });
 
-                                mapRef.current.flyTo([38.582, -121.495], 10, {
+                                mapRef.current.flyTo(MAP_CENTER, 9.5, {
                                     duration: 2,
                                     easeLinearity: 0.25,
                                 });
@@ -137,7 +139,7 @@ const WhereWeWork: React.FC = () => {
                 ))}
             </div>
             <div className="flex-grow relative w-full">
-                <MapContainer center={[38.582, -121.495]} zoom={isVisible ? 10 : 6} className="w-full h-full rounded-lg" ref={mapRef}>
+                <MapContainer center={MAP_CENTER} zoom={isVisible ? 10 : 6} className="w-full h-full rounded-lg" ref={mapRef}>
                     <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" subdomains="abcd" maxZoom={11} />
                     {zoomComplete && (
                         <>
