@@ -29,7 +29,7 @@ export default function Testimonials() {
 
             <div className="min-h-full flex flex-row justify-center items-center space-x-4 p-4">
                 {testimonials.map((testimonial, index) => (
-                    <div className="relative flex flex-col w-full h-full">
+                    <div className="relative flex flex-col w-full h-full" key={index}>
                         <Image
                             src={testimonial.image}
                             alt={testimonial.name}

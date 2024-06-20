@@ -46,7 +46,7 @@ export default function MainView() {
     };
 
     return (
-        <div className="relative h-[calc(100vh-50px)] w-full overflow-hidden">
+        <div className="relative h-[calc(100dvh-50px)] w-full overflow-hidden">
             <AnimatePresence>
                 {isStagingImageVisible && (
                     <motion.div

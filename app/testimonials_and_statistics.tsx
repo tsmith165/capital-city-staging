@@ -4,7 +4,7 @@ import Statistics from './statistics';
 
 export default function TestimonialsAndStatistics() {
     return (
-        <div className="min-h-[calc(100vh-50px)] w-full flex flex-col">
+        <div className="min-h-[calc(100dvh-50px)] w-full flex flex-col">
             <div className="w-full ">
                 <Testimonials />
             </div>

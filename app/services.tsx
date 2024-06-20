@@ -38,7 +38,7 @@ export default function Services() {
     ];
 
     return (
-        <div className="min-h-[calc(100vh-50px)] h-[calc(100vh-50px)] w-full flex flex-col items-center justify-center space-y-2 py-4">
+        <div className="min-h-[calc(100dvh-50px)] h-[calc(100dvh-50px)] w-full flex flex-col items-center justify-center space-y-2 py-4">
             <h1 className="text-4xl font-bold text-white text-center">Focus on your next moves,</h1>
             <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary from-10% via-secondary_light via-70% to-secondary_dark to-90% text-center">
                 we'll handle your history.
