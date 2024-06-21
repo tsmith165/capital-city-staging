@@ -35,7 +35,7 @@ export default function Testimonials() {
                             alt={testimonial.name}
                             width={testimonial.width}
                             height={testimonial.height}
-                            className="rounded-lg shadow-lg w-auto h-auto"
+                            className="rounded-lg shadow-lg w-auto h-auto md:max-h-[60%]"
                         />
                         <div className="md:absolute md:top-[75%] lg:top-[80%] h-fit bg-secondary_dark text-white p-4 rounded-lg shadow-lg">
                             <p className="text-md md:text-lg">{`"${testimonial.text}"`}</p>

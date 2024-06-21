@@ -40,8 +40,8 @@ export default function Services() {
     ];
 
     return (
-        <div className="h-auto md:min-h-[calc(100dvh-50px)] w-full flex flex-col">
-            <div className="h-full md:h-fit w-full flex flex-col items-center justify-center space-y-2 pb-4">
+        <div className="h-auto md:min-h-[calc(100dvh-50px)] w-full flex flex-col justify-evenly">
+            <div className="h-fit w-full flex flex-col items-center justify-center space-y-2 pb-4">
                 <h1 className="text-4xl px-4 font-bold text-white text-center">Focus on your next moves,</h1>
                 <h1 className="text-4xl px-4 font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary from-10% via-secondary_light via-70% to-secondary_dark to-90% text-center">
                     we'll handle your history.
@@ -85,7 +85,7 @@ export default function Services() {
                     ))}
                 </div>
             </div>
-            <div className="hidden h-auto flex-grow w-full md:flex flex-col items-center justify-center space-y-2 py-4 px-4">
+            <div className="hidden h-fit w-full md:flex flex-col items-center justify-center space-y-2 py-4 px-4">
                 <Statistics arrows={false}/>
             </div>  
         </div>
