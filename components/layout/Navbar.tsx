@@ -1,5 +1,3 @@
-// File 1: /components/layout/Navbar.tsx
-
 'use client';
 
 import React from 'react';
@@ -35,27 +33,25 @@ export default function Navbar({ page }: { page: string }) {
         );
     });
 
-    const halfLength = Math.floor(navbar.length / 2);
+    const halfLength = Math.ceil(navbar.length / 2);
     const leftNavbar = navbar.slice(0, halfLength);
     const rightNavbar = navbar.slice(halfLength);
 
     return (
-        <nav className="bg-neutral-900 p-0 flex flex-row h-[50px] w-full items-center justify-center">
-            <div className="hidden md:flex flex-row space-x-4 items-center justify-end">
+        <nav className="bg-neutral-900 p-0 flex flex-row h-[50px] w-full items-center justify-between">
+            <div className="hidden md:flex flex-row space-x-4 items-center justify-end flex-1">
                 {leftNavbar}
             </div>
-            <Link href="/" className="hidden md:block mx-4 pb-1">
-                <div className="flex flex-row space-x-4 items-center justify-end">
-                    <Image
-                        src="/logo/CCS_logo_text.png"
-                        alt="CCS Logo"
-                        width={247}
-                        height={88}
-                        className="object-contain max-h-[48px] w-fit pt-2 pb-1"
-                    />
-                </div>
+            <Link href="/" className="hidden md:flex mx-4 pb-1 items-center justify-center">
+                <Image
+                    src="/logo/CCS_logo_text.png"
+                    alt="CCS Logo"
+                    width={247}
+                    height={88}
+                    className="object-contain max-h-[48px] w-fit pt-2 pb-1"
+                />
             </Link>
-            <div className="hidden md:flex flex-row space-x-4 items-center justify-start">
+            <div className="hidden md:flex flex-row space-x-4 items-center justify-start flex-1">
                 {rightNavbar}
             </div>
             <div className="md:hidden flex flex-row space-x-4 items-center justify-center w-full">
