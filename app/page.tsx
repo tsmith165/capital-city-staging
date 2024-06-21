@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     },
 };
 
-export default async function Home({ searchParams }: { searchParams?: { component?: string } }) {=
+export default async function Home({ searchParams }: { searchParams?: { component?: string } }) {
     const hostname = process.env.NODE_ENV === 'production' ? 'https://www.capitalcitystaging.com' : 'http://localhost:3000';
     // console.log("Using API hostname:", hostname);
     const apiUrl = `${hostname}/api/distinct-id`;
