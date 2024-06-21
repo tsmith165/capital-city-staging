@@ -2,12 +2,8 @@ import React from 'react';
 import type { Metadata } from 'next';
 import PageLayout from '../components/layout/PageLayout';
 import MainView from './main_view';
-
-import { PostHog } from 'posthog-node'
-
-const posthog = new PostHog(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-  host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
-})
+import { captureEvent } from '../utils/posthog';
+import { headers } from 'next/headers';
 
 export const metadata: Metadata = {
     title: 'Capital City Staging',
@@ -40,11 +36,15 @@ export const metadata: Metadata = {
     },
 };
 
-export default function Home() {
-    posthog.capture({
-        distinctId: 'torreysmith165@gmail.com',
-        event: 'Home page was loaded'
-    })
+export default async function Home({ searchParams }: { searchParams?: { component?: string } }) {
+    const headersList = headers();
+    const hostname = headersList.get('host');
+    const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+    const apiUrl = `${protocol}://${hostname}/api/distinct-id`;
+    const response = await fetch(apiUrl);
+    const { distinctId } = await response.json();
+
+    captureEvent('Home page was loaded', { distinctId });
 
     return (
         <PageLayout page="home">
