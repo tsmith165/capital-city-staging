@@ -38,10 +38,9 @@ export const metadata: Metadata = {
 
 export default async function Home({ searchParams }: { searchParams?: { component?: string } }) {
     const headersList = headers();
-    const hostname = headersList.get('host');
-    const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+    const hostname = process.env.NODE_ENV === 'production' ? 'https://www.capitalcitystaging.com' : 'http://localhost:3000';
     console.log("Using API hostname:", hostname);
-    const apiUrl = `${protocol}://${hostname}/api/distinct-id`;
+    const apiUrl = `${hostname}/api/distinct-id`;
     console.log("Using API URL:", apiUrl);
     const response = await fetch(apiUrl);
 
