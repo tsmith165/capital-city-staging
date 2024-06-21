@@ -42,7 +42,15 @@ export default async function Home({ searchParams }: { searchParams?: { componen
     const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
     const apiUrl = `${protocol}://${hostname}/api/distinct-id`;
     const response = await fetch(apiUrl);
-    const { distinctId } = await response.json();
+
+    let distinctId = '';
+    try {
+        const data = await response.json();
+        distinctId = data.distinctId;
+    } catch (error) {
+        console.error('Error parsing JSON:', error);
+        // Handle the error appropriately, e.g., set a default value for distinctId
+    }
 
     captureEvent('Home page was loaded', { distinctId });
 
