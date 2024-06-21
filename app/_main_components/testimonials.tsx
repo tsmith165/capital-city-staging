@@ -20,7 +20,7 @@ const testimonials = [
 
 export default function Testimonials() {
     return (
-        <div className='flex flex-col w-full'>
+        <div className='flex flex-col w-full space-y-4'>
             <div className="w-full h-auto flex items-center justify-center">
                 <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary_light via-secondary_dark to-secondary_light text-center w-fit">
                     Testimonials
