@@ -1,88 +1,50 @@
-// File 1: /app/main_view.tsx
+'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useRef, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { useStore } from '../store/store';
 
-const images = [
-    { src: '/staging-stock-3.jpg', width: 2560, height: 1695 },
-    { src: '/staging-stock-7.jpg', width: 564, height: 705 },
-    { src: '/staging-stock-1.png', width: 2048, height: 1366 },
-    { src: '/staging-stock-4.png', width: 828, height: 984 },
-    { src: '/staging-stock-6.jpg', width: 1280, height: 960 },
+import Home from './_main_components/home';
+import About from './_main_components/about';
+import Portfolio from './_main_components/portfolio';
+import Services from './_main_components/services';
+import TestimonialsAndStatistics from './_main_components/testimonials_and_statistics';
+
+const WhereWeWork = dynamic(() => import('./_main_components/where_we_work'), {
+    ssr: false,
+});
+
+const components = [
+    { id: 'home', component: Home },
+    { id: 'portfolio', component: Portfolio },
+    { id: 'where', component: WhereWeWork },
+    { id: 'services', component: Services },
+    { id: 'testimonials', component: TestimonialsAndStatistics },
+    { id: 'about', component: About },
 ];
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export default function MainView() {
-    const [isLogoVisible, setLogoVisible] = useState(true);
-    const [isStagingImageVisible, setStagingImageVisible] = useState(false);
-    const currentImageIndexRef = useRef(0);
+    const selectedComponent = useStore((state) => state.selectedComponent);
+    const refs = useRef(components.map(() => React.createRef<HTMLDivElement>()));
 
     useEffect(() => {
-        const interval = setInterval(async () => {
-            setStagingImageVisible(false);
-            await delay(1500);
-            currentImageIndexRef.current = (currentImageIndexRef.current + 1) % images.length;
-            setStagingImageVisible(true);
-        }, 5500); // Total delay (3000ms + 1500ms + 1000ms)
-
-        setTimeout(async () => {
-            await delay(1000);
-            setStagingImageVisible(true);
-        }, 1000);
-
-        return () => clearInterval(interval); // Cleanup interval on component unmount
-    }, []);
-
-    const circularFadeVariants = {
-        hidden: {
-            background: 'radial-gradient(circle, transparent 0%, rgba(23, 23, 23, 0) 60%)',
-        },
-        visible: {
-            background: 'radial-gradient(circle, transparent 20%, rgba(23, 23, 23, 1) 100%)',
-            transition: { duration: 2 },
-        },
-    };
+        if (selectedComponent) {
+            const index = components.findIndex((item) => item.id === selectedComponent);
+            if (index !== -1) {
+                refs.current[index].current?.scrollIntoView({
+                    behavior: 'smooth',
+                });
+            }
+        }
+    }, [selectedComponent]);
 
     return (
-        <div className="relative h-[calc(100dvh-50px)] w-full overflow-hidden">
-            <AnimatePresence>
-                {isStagingImageVisible && (
-                    <motion.div
-                        key={currentImageIndexRef.current}
-                        initial={{ opacity: 0, scale: 1 }}
-                        animate={{ opacity: 1, scale: 1.3 }}
-                        exit={{ opacity: 0, scale: 1 }}
-                        transition={{ duration: 3 }}
-                        className="absolute inset-0 w-full h-full">
-                        <Image
-                            src={images[currentImageIndexRef.current].src}
-                            width={images[currentImageIndexRef.current].width}
-                            height={images[currentImageIndexRef.current].height}
-                            className="absolute inset-0 w-full h-full object-cover"
-                            alt="One of our recently staged homes"
-                        />
-                    </motion.div>
-                )}
-            </AnimatePresence>
-            <motion.div
-                variants={circularFadeVariants}
-                initial="hidden"
-                animate={isStagingImageVisible ? 'visible' : 'hidden'}
-                transition={{ duration: 2 }}
-                className="absolute inset-0 bg-neutral-900"></motion.div>
-            {isLogoVisible && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1 }}
-                    className="absolute inset-0 flex justify-center items-center">
-                    <div className="relative bg-neutral-900 rounded-full w-[350px] h-[350px] flex justify-center items-center opacity-70">
-                        <Image src={require('/public/CCS_logo.png')} alt="Capital City Staging Logo" width={300} height={300} />
-                    </div>
-                </motion.div>
-            )}
+        <div className="flex flex-col overflow-y-auto h-full">
+            {components.map(({ id, component: Component }, index) => (
+                <div key={id} ref={refs.current[index]} className="w-full h-auto bg-neutral-900">
+                    <Component />
+                </div>
+            ))}
         </div>
     );
 }

@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { useStore } from '../../store/store';
 import { menu_list } from '../../lib/menu_list';
