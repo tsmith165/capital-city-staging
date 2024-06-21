@@ -36,7 +36,7 @@ export default function Navbar({ page }: { page: string }) {
             <div className="hidden md:flex flex-row space-x-4 items-center justify-end flex-1">
                 {navbar.slice(0, halfLength)}
             </div>
-            <div className="hidden md:visible h-full w-auto relative mx-4">
+            <div className="hidden md:flex h-full w-auto relative mx-4">
                 <Image
                     src="/CCS_logo_text.png"
                     alt="CCS Logo"
