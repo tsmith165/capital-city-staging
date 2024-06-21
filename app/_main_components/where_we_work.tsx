@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Polygon } from 'react-leaflet';
 import { LatLngExpression, LatLngTuple } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import rawCityBoundaries from '../lib/city_boundaries.json';
+import rawCityBoundaries from '../../lib/city_boundaries.json';
 
 const cityOrder = [
     'Sacramento',
