@@ -2,8 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import PageLayout from '../components/layout/PageLayout';
 import MainView from './main_view';
-import { captureEvent } from '../utils/posthog';
-import { headers } from 'next/headers';
+import { captureEvent } from '@/utils/posthog';
 
 export const metadata: Metadata = {
     title: 'Capital City Staging',
@@ -36,22 +35,14 @@ export const metadata: Metadata = {
     },
 };
 
-export default async function Home({ searchParams }: { searchParams?: { component?: string } }) {
-    const headersList = headers();
+export default async function Home({ searchParams }: { searchParams?: { component?: string } }) {=
     const hostname = process.env.NODE_ENV === 'production' ? 'https://www.capitalcitystaging.com' : 'http://localhost:3000';
-    console.log("Using API hostname:", hostname);
+    // console.log("Using API hostname:", hostname);
     const apiUrl = `${hostname}/api/distinct-id`;
-    console.log("Using API URL:", apiUrl);
+    // console.log("Using API URL:", apiUrl);
     const response = await fetch(apiUrl);
 
-    let distinctId = '';
-    try {
-        const data = await response.json();
-        distinctId = data.distinctId;
-    } catch (error) {
-        console.error('Error parsing JSON:', error);
-        // Handle the error appropriately, e.g., set a default value for distinctId
-    }
+    let distinctId = await response.json() || '';
 
     captureEvent('Home page was loaded', { distinctId });
 
