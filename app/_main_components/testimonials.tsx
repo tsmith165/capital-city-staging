@@ -5,22 +5,22 @@ const testimonials = [
     {
         name: 'Alex M',
         text: 'Mia did a fantastic job staging our home. We sold it within a week!',
-        image: '/testimonials/homeowner-couple-3-square.jpg',
-        width: 418,
-        height: 418,
+        image: '/testimonials/homeowner-couple-6.jpg',
+        width: 1067,
+        height: 1067,
     },
     {
         name: 'Sarah S',
         text: 'The staging made our home look so beautiful. Highly recommend!',
-        image: '/testimonials/homeowner-couple-4-square.jpg',
-        width: 500,
-        height: 500,
+        image: '/testimonials/homeowner-couple-5.jpg',
+        width: 683,
+        height: 683,
     },
 ];
 
 export default function Testimonials() {
     return (
-        <div className='flex flex-col w-full space-y-4'>
+        <div className='flex flex-col w-full space-y-4 h-full'>
             <div className="w-full h-auto flex items-center justify-center">
                 <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary_light via-secondary_dark to-secondary_light text-center w-fit">
                     Testimonials
@@ -35,7 +35,7 @@ export default function Testimonials() {
                             alt={testimonial.name}
                             width={testimonial.width}
                             height={testimonial.height}
-                            className="rounded-lg shadow-lg w-auto h-auto md:h-[60vh] m-auto"
+                            className="rounded-lg shadow-lg w-auto md:h-[40vh] m-auto"
                         />
                         <div className="md:absolute md:top-[75%] lg:top-[80%] h-fit bg-secondary_dark text-white p-4 rounded-lg shadow-lg">
                             <p className="text-md md:text-lg">{`"${testimonial.text}"`}</p>
