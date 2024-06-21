@@ -5,14 +5,14 @@ const testimonials = [
     {
         name: 'Alex M',
         text: 'Mia did a fantastic job staging our home. We sold it within a week!',
-        image: '/homeowner-couple-3-square.jpg',
+        image: '/testimonials/homeowner-couple-3-square.jpg',
         width: 418,
         height: 418,
     },
     {
         name: 'Sarah S',
         text: 'The staging made our home look so beautiful. Highly recommend!',
-        image: '/homeowner-couple-4-square.jpg',
+        image: '/testimonials/homeowner-couple-4-square.jpg',
         width: 500,
         height: 500,
     },

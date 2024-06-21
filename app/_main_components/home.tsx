@@ -5,11 +5,11 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const images = [
-    { src: '/staging-stock-3.jpg', width: 2560, height: 1695 },
-    { src: '/staging-stock-7.jpg', width: 564, height: 705 },
-    { src: '/staging-stock-1.png', width: 2048, height: 1366 },
-    { src: '/staging-stock-4.png', width: 828, height: 984 },
-    { src: '/staging-stock-6.jpg', width: 1280, height: 960 },
+    { src: '/portfolio/staging-stock-3.jpg', width: 2560, height: 1695 },
+    { src: '/portfolio/staging-stock-7.jpg', width: 564, height: 705 },
+    { src: '/portfolio/staging-stock-1.png', width: 2048, height: 1366 },
+    { src: '/portfolio/staging-stock-4.png', width: 828, height: 984 },
+    { src: '/portfolio/staging-stock-6.jpg', width: 1280, height: 960 },
 ];
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -79,7 +79,7 @@ export default function Home() {
                     transition={{ duration: 1 }}
                     className="absolute inset-0 flex justify-center items-center">
                     <div className="relative bg-neutral-900 rounded-full w-[350px] h-[350px] flex justify-center items-center opacity-70">
-                        <Image src={require('/public/CCS_logo.png')} alt="Capital City Staging Logo" width={300} height={300} />
+                        <Image src={require('/public/logo/CCS_logo.png')} alt="Capital City Staging Logo" width={300} height={300} />
                     </div>
                 </motion.div>
             )}

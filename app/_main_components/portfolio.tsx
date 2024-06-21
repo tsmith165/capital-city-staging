@@ -2,12 +2,12 @@ import React from 'react';
 import Image from 'next/image';
 
 const images = [
-    { src: '/staging-stock-3.jpg', width: 2560, height: 1695, address: '123 Main St' },
-    { src: '/staging-stock-7.jpg', width: 564, height: 705, address: '456 Elm St' },
-    { src: '/staging-stock-1.png', width: 2048, height: 1366, address: '789 Oak St' },
-    { src: '/staging-stock-4.png', width: 828, height: 984, address: '101 Pine St' },
-    { src: '/staging-stock-6.jpg', width: 1280, height: 960, address: '202 Maple St' },
-    { src: '/staging-stock-2.png', width: 1024, height: 768, address: '303 Birch St' },
+    { src: '/portfolio/staging-stock-3.jpg', width: 2560, height: 1695, address: '123 Main St' },
+    { src: '/portfolio/staging-stock-7.jpg', width: 564, height: 705, address: '456 Elm St' },
+    { src: '/portfolio/staging-stock-1.png', width: 2048, height: 1366, address: '789 Oak St' },
+    { src: '/portfolio/staging-stock-4.png', width: 828, height: 984, address: '101 Pine St' },
+    { src: '/portfolio/staging-stock-6.jpg', width: 1280, height: 960, address: '202 Maple St' },
+    { src: '/portfolio/staging-stock-2.png', width: 1024, height: 768, address: '303 Birch St' },
 ];
 
 export default function Portfolio() {

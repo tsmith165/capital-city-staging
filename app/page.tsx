@@ -11,9 +11,9 @@ export const metadata: Metadata = {
         'Staging, Homestaging, Real Estate, Staging Services, Staging Software, Homestaging, Real Estate, Real Estate Staging, Real Estate Staging Services, Real Estate Staging Software, Mia, Mia Dofflemyer, Home Staging, Sacramento, Sacramento Home Staging, Sacramento Real Estate, Sacramento Real Estate Staging, Sacramento Real Estate Staging Services, Sacramento Real Estate Staging Software, Sacramento Staging, Sacramento Staging Services, Sacramento Staging Software',
     applicationName: 'JWS Fine Art',
     icons: {
-        icon: '/CCS_logo.png',
-        shortcut: '/CCS_logo.png',
-        apple: '/apple-touch-icon-152x152.png',
+        icon: '/logo/CCS_logo.png',
+        shortcut: '/logo/CCS_logo.png',
+        apple: '/ico/apple-touch-icon-152x152.png',
     },
     openGraph: {
         title: 'Capital City Staging',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
         url: 'https://www.capitalcitystaging.com',
         images: [
             {
-                url: '/CCS_og_image.png',
+                url: '/ico/CCS_og_image.png',
                 width: 1200,
                 height: 630,
                 alt: 'Capital City Staging',

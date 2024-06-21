@@ -24,7 +24,7 @@ const components = [
 ];
 
 export default function MainView() {
-    const selectedComponent = useStore((state) => state.selectedComponent);
+    const { selectedComponent, isScrolling, setScrolling } = useStore((state) => state);
     const refs = useRef(components.map(() => React.createRef<HTMLDivElement>()));
 
     useEffect(() => {
@@ -36,8 +36,22 @@ export default function MainView() {
                     block: 'start',
                 });
             }
+            setScrolling(false);
         }
     }, [selectedComponent]);
+
+    useEffect(() => {
+        if (isScrolling) {
+            const index = components.findIndex((item) => item.id === selectedComponent);
+            if (index !== -1) {
+                refs.current[index].current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                });
+            }
+            setScrolling(false);
+        }
+    }, [isScrolling]);
 
     return (
         <div className="flex flex-col overflow-y-auto h-full">
