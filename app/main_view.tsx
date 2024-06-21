@@ -33,6 +33,7 @@ export default function MainView() {
             if (index !== -1) {
                 refs.current[index].current?.scrollIntoView({
                     behavior: 'smooth',
+                    block: 'start',
                 });
             }
         }
