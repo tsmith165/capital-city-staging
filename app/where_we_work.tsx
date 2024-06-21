@@ -4,7 +4,30 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Polygon } from 'react-leaflet';
 import { LatLngExpression, LatLngTuple } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import cityBoundaries from '../lib/city_boundaries.json';
+import rawCityBoundaries from '../lib/city_boundaries.json';
+
+const cityOrder = [
+    'Sacramento',
+    'West Sacramento',
+    'Rancho Cordova',
+    'Carmichael',
+    'Rio Linda',
+    'North Highlands',
+    'Antelope',
+    'Citrus Heights',
+    'Gold River',
+    'Fair Oaks',
+    'Orangevale',
+    'Folsom',
+    'Granite Bay',
+    'Roseville',
+    'Rocklin',
+    'Loomis',
+];
+
+const cityBoundaries = cityOrder
+    .map((cityName) => rawCityBoundaries.find((city) => city.name === cityName))
+    .filter((city): city is NonNullable<typeof city> => city !== undefined);
 
 const WhereWeWork: React.FC = () => {
     const MAP_CENTER: LatLngTuple = [38.6171, -121.3283];
@@ -139,7 +162,17 @@ const WhereWeWork: React.FC = () => {
                 ))}
             </div>
             <div className="flex-grow relative w-full">
-                <MapContainer center={MAP_CENTER} zoom={isVisible ? 10 : 6} className="w-full h-full rounded-lg" ref={mapRef}>
+                <MapContainer
+                    center={MAP_CENTER}
+                    zoom={5}
+                    className="w-full h-full rounded-lg"
+                    ref={mapRef}
+                    dragging={false}
+                    zoomControl={false}
+                    scrollWheelZoom={false}
+                    doubleClickZoom={false}
+                    touchZoom={false}
+                    keyboard={false}>
                     <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" subdomains="abcd" maxZoom={11} />
                     {zoomComplete && (
                         <>

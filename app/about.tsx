@@ -19,9 +19,13 @@ export default function About() {
                         Mia Dofflemyer
                     </h1>
                     <p className="text-md md:text-lg">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nulla sit amet aliquam lacinia, nisl nisl
-                        aliquam nisl, nec aliquam nisl nisl sit amet nisl. Nullam euismod, nulla sit amet aliquam lacinia, nisl nisl aliquam
-                        nisl, nec aliquam nisl nisl sit amet nisl.
+                        Hello! I'm Mia Dofflemyer, the founder of Capital City Staging. Raised in the valley and educated at UC Davis, I
+                        later settled in Sacramento to pursue my passion for real estate. Obtaining my license in 2020, I've dedicated
+                        myself to assisting individuals in buying and selling homes ever since. My journey into real estate was driven by my
+                        love for home design and helping others. Through my experiences, I've come to understand the crucial role that home
+                        staging plays in the selling process. With my combined passion for real estate and design, founding a staging
+                        business felt like a natural progression. Let me elevate the appeal of your home with my staging expertise, ensuring
+                        a swift sale at top value!
                     </p>
                     <div className="mt-4">
                         <p className="text-md">mdofflemyer.realestate@gmail.com</p>

@@ -16,7 +16,7 @@ export default function Services() {
                 'Mia will make adjustments to your furniture and decor that will make your home ready to sell with minimal hassle.',
             price: 2000,
             includedItems: [
-                'Decor, Art, & Linnens updated',
+                'Decor, Art, & Linens updated',
                 'Items not fit for purpose removed',
                 'Furniture arranged to fit the room',
                 'Lighting adjusted as possible',
