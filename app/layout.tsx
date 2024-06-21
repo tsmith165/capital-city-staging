@@ -1,4 +1,4 @@
-// /templates/nextjs-tailwind-navbar/app/layout.tsx
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import React, { ReactNode } from 'react';
 import '../styles/globals.css';
 
