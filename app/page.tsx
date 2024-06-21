@@ -40,7 +40,9 @@ export default async function Home({ searchParams }: { searchParams?: { componen
     const headersList = headers();
     const hostname = headersList.get('host');
     const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+    console.log("Using API hostname:", hostname);
     const apiUrl = `${protocol}://${hostname}/api/distinct-id`;
+    console.log("Using API URL:", apiUrl);
     const response = await fetch(apiUrl);
 
     let distinctId = '';
