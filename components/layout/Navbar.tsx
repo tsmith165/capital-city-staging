@@ -41,7 +41,7 @@ export default function Navbar({ page }: { page: string }) {
                 {navbar.slice(0, halfLength)}
             </div>
             <Link href="/">
-                <div className="hidden md:flex h-full w-auto relative mx-4 cursor-pointer" onClick={() => handleSelectPage('home')}>
+                <div className="hidden md:flex max-h-[50px] w-auto relative mx-4 cursor-pointer" onClick={() => handleSelectPage('home')}>
                     <Image
                         src="/logo/CCS_logo_text.png"
                         alt="CCS Logo"
