@@ -3,6 +3,12 @@ import type { Metadata } from 'next';
 import PageLayout from '../components/layout/PageLayout';
 import MainView from './main_view';
 
+import { PostHog } from 'posthog-node'
+
+const posthog = new PostHog(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+  host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+})
+
 export const metadata: Metadata = {
     title: 'Capital City Staging',
     description:
@@ -35,6 +41,11 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
+    posthog.capture({
+        distinctId: 'torreysmith165@gmail.com',
+        event: 'Home page was loaded'
+    })
+
     return (
         <PageLayout page="home">
             <MainView />
