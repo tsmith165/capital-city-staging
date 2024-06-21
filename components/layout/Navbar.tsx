@@ -1,3 +1,5 @@
+// File 1: /components/layout/Navbar.tsx
+
 'use client';
 
 import React from 'react';
@@ -29,10 +31,14 @@ export default function Navbar({ page }: { page: string }) {
         );
     });
 
+    const halfLength = Math.ceil(navbar.length / 2);
+
     return (
-        <nav className="bg-neutral-900 p-0 flex flex-row h-[50px] w-full justify-center items-center">
-            <div className="flex flex-row space-x-4 px-4 flex-grow justify-end">{navbar.slice(0, navbar.length / 2)}</div>
-            <div className="h-full w-auto relative md:mx-4 hidden md:block">
+        <nav className="bg-neutral-900 p-0 flex flex-row h-[50px] w-full items-center justify-center">
+            <div className="hidden md:flex flex-row space-x-4 items-center justify-end flex-1">
+                {navbar.slice(0, halfLength)}
+            </div>
+            <div className="h-full w-auto relative mx-4">
                 <Image
                     src="/CCS_logo_text.png"
                     alt="CCS Logo"
@@ -41,7 +47,12 @@ export default function Navbar({ page }: { page: string }) {
                     className="object-contain max-h-full w-fit pt-2 pb-1"
                 />
             </div>
-            <div className="flex flex-row space-x-4 pr-4 md:pl-4 flex-grow">{navbar.slice(navbar.length / 2)}</div>
+            <div className="hidden md:flex flex-row space-x-4 items-center justify-start flex-1">
+                {navbar.slice(halfLength)}
+            </div>
+            <div className="md:hidden flex flex-row space-x-4 items-center justify-center w-full">
+                {navbar}
+            </div>
         </nav>
     );
 }

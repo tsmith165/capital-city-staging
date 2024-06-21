@@ -12,8 +12,8 @@ const images = [
 
 export default function Portfolio() {
     return (
-        <div className="min-h-full flex flex-col items-center justify-center p-4">
-            <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 from-10% via-amber-500 via-70% to-yellow-500 to-90% mb-8">
+        <div className="min-h-full flex flex-col items-center justify-center p-4 space-y-4">
+            <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary from-10% via-secondary_light via-70% to-secondary_dark to-90%">
                 Staged by Mia
             </h1>
             <div className="columns-2 md:columns-3 gap-4">
