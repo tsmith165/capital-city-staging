@@ -1,16 +1,14 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import PageLayout from '../components/layout/PageLayout';
-import MainView from './main_view';
-import { captureEvent } from '../utils/posthog';
-import { headers } from 'next/headers';
+import PageLayout from '../../components/layout/PageLayout';
+import Contact from './contact';
 
 export const metadata: Metadata = {
     title: 'Capital City Staging',
     description:
         "Capital City Staging allows you to focus on your next moves, we'll handle your history. With a home staged by Mia, you can trust that every room tells your story.",
     keywords:
-        'Staging, Homestaging, Real Estate, Staging Services, Staging Software, Homestaging, Real Estate, Real Estate Staging, Real Estate Staging Services, Real Estate Staging Software, Mia, Mia Dofflemyer, Home Staging, Sacramento, Sacramento Home Staging, Sacramento Real Estate, Sacramento Real Estate Staging, Sacramento Real Estate Staging Services, Sacramento Real Estate Staging Software, Sacramento Staging, Sacramento Staging Services, Sacramento Staging Software',
+        'Staging, Homestaging, Real Estate, Staging Services, Staging Software, Homestaging, Real Estate, Real Estate Staging, Real Estate Staging Services, Real Estate Staging Software, Mia, Mia Dofflemyer, Home Staging, Sacramento, Sacramento Home Staging, Sacramento Real Estate, Sacramento Real Estate Staging, Sacramento Real Estate Staging Services, Sacramento Real Estate Staging Software, Sacramento Staging, Sacramento Staging Services, Sacramento Staging Software, Contact',
     applicationName: 'Capital City Staging',
     icons: {
         icon: '/logo/CCS_logo.png',
@@ -36,19 +34,11 @@ export const metadata: Metadata = {
     },
 };
 
-export default async function Home({ searchParams }: { searchParams?: { component?: string } }) {
-    const headersList = headers();
-    const hostname = headersList.get('host');
-    const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-    const apiUrl = `${protocol}://${hostname}/api/distinct-id`;
-    const response = await fetch(apiUrl);
-    const { distinctId } = await response.json();
 
-    captureEvent('Home page was loaded', { distinctId });
-
+export default function ContactPage() {
     return (
-        <PageLayout page="home">
-            <MainView />
+        <PageLayout page="contact">
+            <Contact />
         </PageLayout>
     );
 }

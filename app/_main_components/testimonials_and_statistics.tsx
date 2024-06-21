@@ -9,7 +9,7 @@ export default function TestimonialsAndStatistics() {
                 <Testimonials />
             </div>
             <div className="w-full flex-grow flex ">
-                <Statistics />
+                <Statistics arrows={false}/>
             </div>
         </div>
     );
