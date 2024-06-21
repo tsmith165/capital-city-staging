@@ -18,13 +18,13 @@ export default function Navbar({ page }: { page: string }) {
         let is_selected = menu_class_name === selectedComponent;
 
         return (
-            <Link key={menu_class_name} href="/">
+            <Link key={menu_class_name} href="/" className={`${menu_class_name === 'testimonials' || menu_class_name === 'portfolio' ? 'hidden md:flex' : ''}`}>
                 <div
                     className={`h-full leading-[50px] font-bold cursor-pointer text-transparent bg-clip-text ${
                         is_selected
                             ? 'bg-gradient-to-r from-yellow-500 via-amber-600 to-yellow-500'
                             : 'bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400 hover:from-yellow-500 hover:via-amber-600 hover:to-yellow-500'
-                    } ${menu_class_name === 'testimonials' || menu_class_name === 'portfolio' ? 'hidden md:block' : ''}`}
+                    }`}
                     onClick={() => handleSelectPage(menu_class_name)}
                 >
                     {menu_full_name}
@@ -37,7 +37,7 @@ export default function Navbar({ page }: { page: string }) {
 
     return (
         <nav className="bg-neutral-900 p-0 flex flex-row h-[50px] w-full items-center justify-center">
-            <div className="hidden md:flex flex-row space-x-4 items-center justify-end flex-1">
+            <div className="hidden md:flex flex-row space-x-4 items-center justify-end">
                 {navbar.slice(0, halfLength)}
             </div>
             <Link href="/">
@@ -51,7 +51,7 @@ export default function Navbar({ page }: { page: string }) {
                     />
                 </div>
             </Link>
-            <div className="hidden md:flex flex-row space-x-4 items-center justify-start flex-1">
+            <div className="hidden md:flex flex-row space-x-4 items-center justify-start ">
                 {navbar.slice(halfLength)}
             </div>
             <div className="md:hidden flex flex-row space-x-4 items-center justify-center w-full">
