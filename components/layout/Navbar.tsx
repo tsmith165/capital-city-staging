@@ -1,5 +1,3 @@
-// File 1: /components/layout/Navbar.tsx
-
 'use client';
 
 import React from 'react';
