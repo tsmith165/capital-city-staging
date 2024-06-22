@@ -36,11 +36,9 @@ export const metadata: Metadata = {
     metadataBase: new URL('https://www.capitalcitystaging.com'),
 };
 
-export default async function Home({ searchParams }: { searchParams?: { component?: string } }) {
+export default async function Home() {
     const hostname = process.env.NODE_ENV === 'production' ? 'https://www.capitalcitystaging.com' : 'http://localhost:3000';
-    // console.log("Using API hostname:", hostname);
     const apiUrl = `${hostname}/api/distinct-id`;
-    // console.log("Using API URL:", apiUrl);
     const response = await fetch(apiUrl);
 
     let distinctId = await response.json() || '';

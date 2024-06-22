@@ -32,10 +32,6 @@ export const statistics = [
         attributor: `Zillow`,
     },
     {
-        text: `Staged homes spend 90% less time on the market.`,
-        attributor: `Real Estate Staging Association`,
-    },
-    {
         text: `Staging can increase the sale price of a home by up to 5%.`,
         attributor: `National Association of Realtors`,
     },

@@ -1,8 +1,9 @@
+// main_view.tsx
 'use client';
 
 import React, { useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { useStore } from '../store/store';
+import { useSearchParams } from 'next/navigation';
 
 import Home from './_main_components/home';
 import About from './_main_components/about';
@@ -24,7 +25,8 @@ const components = [
 ];
 
 export default function MainView() {
-    const { selectedComponent, isScrolling, setScrolling } = useStore((state) => state);
+    const searchParams = useSearchParams();
+    const selectedComponent = searchParams.get('component');
     const refs = useRef(components.map(() => React.createRef<HTMLDivElement>()));
 
     useEffect(() => {
@@ -36,27 +38,17 @@ export default function MainView() {
                     block: 'start',
                 });
             }
-            setScrolling(false);
         }
     }, [selectedComponent]);
-
-    useEffect(() => {
-        if (isScrolling) {
-            const index = components.findIndex((item) => item.id === selectedComponent);
-            if (index !== -1) {
-                refs.current[index].current?.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start',
-                });
-            }
-            setScrolling(false);
-        }
-    }, [isScrolling]);
 
     return (
         <div className="flex flex-col overflow-y-auto h-full">
             {components.map(({ id, component: Component }, index) => (
-                <div key={id} ref={refs.current[index]} className="w-full h-auto bg-neutral-900">
+                <div
+                    key={id}
+                    ref={refs.current[index]}
+                    className="w-full h-auto bg-neutral-900"
+                >
                     <Component />
                 </div>
             ))}

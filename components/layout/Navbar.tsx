@@ -1,34 +1,22 @@
+// Navbar.tsx
 'use client';
 
 import React from 'react';
-import { useStore } from '../../store/store';
 import { menu_list } from '../../lib/menu_list';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Navbar({ page }: { page: string }) {
-    const { selectedComponent, setSelectedComponent, isScrolling, setScrolling } = useStore((state) => state);
-
-    const handleSelectPage = (key: string) => {
-        setScrolling(true);
-        setSelectedComponent(key);
-    };
-
     const navbar = menu_list.map(([menu_class_name, menu_full_name]) => {
-        let is_selected = menu_class_name === selectedComponent;
-
         return (
-            <Link key={menu_class_name} href="/" className={`${menu_class_name === 'testimonials' || menu_class_name === 'portfolio' ? 'hidden md:flex' : ''}`}>
-                <div
-                    className={`h-full pb-1 font-bold cursor-pointer text-transparent bg-clip-text ${
-                        is_selected
-                            ? 'bg-gradient-to-r from-yellow-500 via-amber-600 to-yellow-500'
-                            : 'bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400 hover:from-yellow-500 hover:via-amber-600 hover:to-yellow-500'
-                    }`}
-                    onClick={() => handleSelectPage(menu_class_name)}
-                >
-                    {menu_full_name}
-                </div>
+            <Link
+                key={menu_class_name}
+                href={`/?component=${menu_class_name}`}
+                className={`h-full pb-1 font-bold cursor-pointer text-transparent bg-clip-text ${
+                    menu_class_name === 'testimonials' || menu_class_name === 'portfolio' ? 'hidden md:flex' : ''
+                } bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400 hover:from-yellow-500 hover:via-amber-600 hover:to-yellow-500`}
+            >
+                {menu_full_name}
             </Link>
         );
     });
