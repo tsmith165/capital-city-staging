@@ -17,6 +17,9 @@ export default {
     theme: {
         extend: {
             colors,
+            fontSize: {
+                '4xl': ['2.25rem', '2.75rem'], // Increase the line-height value as needed
+            },
         },
         listStyleType: {
             none: 'none',
