@@ -30,7 +30,7 @@ export default function Navbar({ page }: { page: string }) {
             <div className="hidden md:flex flex-row space-x-4 items-center justify-end flex-1">
                 {leftNavbar}
             </div>
-            <Link href="/" className="hidden md:flex mx-4 pb-1 items-center justify-center">
+            <Link href="/?component=home" className="hidden md:flex mx-4 pb-1 items-center justify-center">
                 <Image
                     src="/logo/CCS_logo_text.png"
                     alt="CCS Logo"
