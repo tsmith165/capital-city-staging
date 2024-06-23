@@ -126,7 +126,9 @@ const ContactForm = () => {
       ))}
       <button
         type="submit"
-        className="px-4 py-2 font-bold text-white bg-primary rounded-md hover:bg-primary_dark focus:outline-none focus:ring-2 focus:ring-primary"
+        className={'px-4 py-2 font-bold rounded-md ' + 
+          `bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 text-neutral-950` + 
+          `hover:bg-gradient-to-r hover:from-secondary hover:via-secondary_light hover:to-secondary hover:text-white`}
       >
         Submit
       </button>

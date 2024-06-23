@@ -20,18 +20,18 @@ const InputTextbox: React.FC<InputTextboxProps> = ({ name, value, placeholder, o
     return (
         <div className="m-0 flex h-full w-full max-w-full flex-row overflow-hidden p-0">
             <div 
-                className="flex h-8 min-w-28 max-w-28 items-center justify-center rounded-l-md bg-primary px-2.5 py-1.5"
+                className="flex h-8 min-w-28 max-w-28 items-center justify-center rounded-l-md bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 px-2.5 py-1.5"
                 data-tooltip-id={`tooltip-${id}`}
                 data-tooltip-content={formatted_name}
             >
-                <div className="text-secondary_dark font-bold">{formatted_name}</div>
+                <div className="text-neutral-950 font-bold">{formatted_name}</div>
             </div>
             <Tooltip id={`tooltip-${id}`} place="top" />
             {onChange ? (
                 <input
                     id={id}
                     name={id}
-                    className="flex h-8 w-full rounded-r-md border-none bg-secondary_light px-2 text-sm font-bold text-white placeholder-neutral-800"
+                    className="flex h-8 w-full rounded-r-md border-none bg-secondary_light px-2 text-sm font-bold text-neutral-950 placeholder-neutral-600"
                     value={value}
                     placeholder={placeholder || ''}
                     onChange={onChange}
@@ -40,7 +40,7 @@ const InputTextbox: React.FC<InputTextboxProps> = ({ name, value, placeholder, o
                 <input
                     id={id}
                     name={id}
-                    className="flex h-8 w-full rounded-r-md border-none bg-secondary_light px-2 text-sm font-bold text-white placeholder-netural-800"
+                    className="flex h-8 w-full rounded-r-md border-none bg-secondary_light px-2 text-sm font-bold text-neutral-950 placeholder-neutral-600"
                     defaultValue={value}
                     placeholder={placeholder || ''}
                 />

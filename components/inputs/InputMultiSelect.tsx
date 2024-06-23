@@ -30,15 +30,15 @@ const InputMultiSelect: React.FC<InputMultiSelectProps> = ({ defaultValue, name,
 
     return (
         <div className="m-0 flex w-full p-0">
-            <div className="flex min-w-28 max-w-28 items-center justify-center rounded-l-md bg-primary px-2.5 py-1.5">
-                <div className="text-secondary_dark font-bold">{formatted_name}</div>
+            <div className="flex min-w-28 max-w-28 items-center justify-center rounded-l-md bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 px-2.5 py-1.5">
+                <div className="text-neutral-950 font-bold">{formatted_name}</div>
             </div>
             <Select
                 defaultValue={defaultValue}
                 isMulti={true}
                 id={id}
                 name={id}
-                className="h-full flex-grow rounded-r-md border-none bg-primary text-sm font-bold text-secondary_dark"
+                className="h-full flex-grow rounded-r-md border-none bg-primary text-sm font-bold text-neutral-950"
                 classNamePrefix="select"
                 components={{
                     DropdownIndicator,
