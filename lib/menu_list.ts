@@ -3,7 +3,6 @@ export const menu_list: [string, string][] = [
     ['portfolio', 'Portfolio'],
     ['where', 'Where'],
     ['services', 'Services'],
-    ['testimonials', 'Testimonials'],
     ['about', 'About'],
 ];
 

@@ -29,7 +29,7 @@ const cityBoundaries = cityOrder
     .map((cityName) => rawCityBoundaries.find((city) => city.name === cityName))
     .filter((city): city is NonNullable<typeof city> => city !== undefined);
 
-const WhereWeWork: React.FC = () => {
+const Where: React.FC = () => {
     const MAP_CENTER: LatLngTuple = [38.6171, -121.3283];
 
     const [selectedCity, setSelectedCity] = useState<string | null>(null);
@@ -234,4 +234,4 @@ const WhereWeWork: React.FC = () => {
     );
 };
 
-export default WhereWeWork;
+export default Where;

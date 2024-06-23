@@ -27,22 +27,13 @@ export default function Testimonials() {
                 </h1>
             </div>
 
-            <div className="flex flex-row justify-center items-center space-x-4 px-4">
+            <div className="flex flex-col w-full md:flex-row flex-grow space-y-4 md:space-y-0 md:space-x-4 px-4">
                 {testimonials.map((testimonial, index) => (
-                    <div className="relative flex flex-col w-full h-full" key={index}>
-                        <Image
-                            src={testimonial.image}
-                            alt={testimonial.name}
-                            width={testimonial.width}
-                            height={testimonial.height}
-                            className="rounded-lg shadow-lg w-auto sm:h-[45vh] m-auto"
-                        />
-                        <div className="absolute top-[85%] sm:top-[75%] lg:top-[80%] h-fit bg-secondary_dark text-white p-4 rounded-lg shadow-lg">
-                            <p className="text-md md:text-lg">{`"${testimonial.text}"`}</p>
-                            <p className="mt-2 text-md font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400">
-                                {testimonial.name}
-                            </p>
-                        </div>
+                    <div className="h-fit bg-secondary_dark text-white p-4 rounded-lg shadow-lg">
+                        <p className="text-md md:text-lg">{`"${testimonial.text}"`}</p>
+                        <p className="mt-2 text-md font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400">
+                            {testimonial.name}
+                        </p>
                     </div>
                 ))}
             </div>

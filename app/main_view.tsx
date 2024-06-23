@@ -9,18 +9,18 @@ import Home from './_main_components/home';
 import About from './_main_components/about';
 import Portfolio from './_main_components/portfolio';
 import Services from './_main_components/services';
-import TestimonialsAndStatistics from './_main_components/testimonials_and_statistics';
+// import TestimonialsAndStatistics from './_main_components/testimonials_and_statistics';
 
-const WhereWeWork = dynamic(() => import('./_main_components/where_we_work'), {
+const Where = dynamic(() => import('./_main_components/where'), {
     ssr: false,
 });
 
 const components = [
     { id: 'home', component: Home },
     { id: 'portfolio', component: Portfolio },
-    { id: 'where', component: WhereWeWork },
+    { id: 'where', component: Where },
     { id: 'services', component: Services },
-    { id: 'testimonials', component: TestimonialsAndStatistics },
+    //{ id: 'testimonials', component: TestimonialsAndStatistics },
     { id: 'about', component: About },
 ];
 
