@@ -4,8 +4,8 @@ import ContactForm from './contact_form';
 
 export default function Contact() {
     return (
-        <div className="h-auto md:h-[calc(100dvh-50px)] w-full flex flex-row justify-center items-center p-4">
-            <div className="relative flex flex-col h-full w-full max-h-full">
+        <div className="h-[calc(100dvh-50px)] w-full flex first-line:justify-center items-center p-4">
+            <div className="relative flex flex-col h-full w-full max-h-full overflow-y-scroll ">
                 <Image
                     src="/bio/bio_pic.jpg"
                     alt="Mia Dofflemyer"
