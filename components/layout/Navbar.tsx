@@ -1,4 +1,3 @@
-// Navbar.tsx
 'use client';
 
 import React from 'react';
@@ -11,7 +10,7 @@ export default function Navbar({ page }: { page: string }) {
         return (
             <Link
                 key={menu_class_name}
-                href={`/?component=${menu_class_name}`}
+                href={menu_class_name === 'contact' ? '/contact' : `/?component=${menu_class_name}`}
                 className={`h-full pb-1 font-bold cursor-pointer text-transparent bg-clip-text ${
                     menu_class_name === 'testimonials' || menu_class_name === 'portfolio' ? 'hidden xs:flex' : ''
                 } bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400 hover:from-yellow-500 hover:via-amber-600 hover:to-yellow-500`}
