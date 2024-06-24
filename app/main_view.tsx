@@ -9,7 +9,7 @@ import Home from './_main_components/home';
 import About from './_main_components/about';
 import Portfolio from './_main_components/portfolio';
 import Services from './_main_components/services';
-// import TestimonialsAndStatistics from './_main_components/testimonials_and_statistics';
+// import Testimonials from './_main_components/testimonials';
 
 const Where = dynamic(() => import('./_main_components/where'), {
     ssr: false,
@@ -20,7 +20,7 @@ const components = [
     { id: 'portfolio', component: Portfolio },
     { id: 'where', component: Where },
     { id: 'services', component: Services },
-    //{ id: 'testimonials', component: TestimonialsAndStatistics },
+    //{ id: 'testimonials', component: Testimonials },
     { id: 'about', component: About },
 ];
 
