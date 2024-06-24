@@ -25,7 +25,7 @@ export async function sendContactFormEmail(formData: any) {
     for (const user of users_to_send_email_to) {
       console.log(`Sending email to ${user}`);
       await sendEmail({
-        to: user,
+        to: [user, formData.email],
         subject: 'New Contact Form Submission',
         html: emailHtml,
       });

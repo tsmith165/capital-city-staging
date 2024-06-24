@@ -1,16 +1,21 @@
 import { render } from '@react-email/render';
 import { NextResponse } from 'next/server';
 import ContactFormEmail from '@/utils/emails/templates/contactFormEmail';
-import { getEmailsSentToday } from '@/utils/emails/resend_utils';
+import { getEmailsSentToday, incrementEmailsSentToday } from '@/utils/emails/resend_utils';
 import 'dotenv/config';
 
+import { Resend } from 'resend';
+
+const resend = new Resend('re_123456789');
+
 interface EmailOptions {
-  to: string;
+  from: string;
+  to: string | string[];
   subject: string;
   html: string;
 }
 
-async function sendEmail({ to, subject, html }: EmailOptions): Promise<void> {
+async function sendEmail({ from, to, subject, html }: EmailOptions): Promise<void> {
   try {
     const emailsSentToday = await getEmailsSentToday();
 
@@ -18,24 +23,16 @@ async function sendEmail({ to, subject, html }: EmailOptions): Promise<void> {
       throw new Error('Daily email limit reached. Please try again tomorrow.');
     }
 
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'your-email@example.com',
-        to,
-        subject,
-        html,
-      }),
+    const response = await resend.emails.send({
+      from,
+      to, 
+      subject,
+      html,
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to send email');
-    }
-  } catch (error) {
+    await incrementEmailsSentToday();
+  }
+  catch (error) {
     console.error('Error sending email:', error);
     throw error;
   }
@@ -66,8 +63,9 @@ export async function sendContactFormEmail(formData: ContactFormData) {
     for (const user of users_to_send_email_to) {
       console.log(`Sending email to ${user}`);
       await sendEmail({
+        from: 'contact@capitalcitystaging.com',
         to: user,
-        subject: 'New Contact Form Submission',
+        subject: `${formData.name} would like to get in touch with you`,
         html: emailHtml,
       });
     }

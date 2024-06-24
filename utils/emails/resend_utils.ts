@@ -37,7 +37,7 @@ export async function incrementEmailsSentToday(): Promise<void> {
   }
 }
 
-export async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
+export async function sendEmail({ to, subject, html }: { to: string | string[]; subject: string; html: string }) {
   try {
     await resend.emails.send({
       from: 'mia@capitalcitystaging.com',
