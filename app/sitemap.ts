@@ -13,5 +13,11 @@ export default function sitemap(): SitemapEntry[] {
             changeFrequency: 'monthly',
             priority: 1,
         },
+        {
+            url: 'https://www.capitalcitystaging.com/contact',
+            lastModified: new Date(),
+            changeFrequency: 'monthly',
+            priority: 1,
+        },
     ];
 }
