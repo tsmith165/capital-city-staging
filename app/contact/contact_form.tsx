@@ -28,6 +28,7 @@ const ContactForm = () => {
     message: ''
   });
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -49,7 +50,7 @@ const ContactForm = () => {
         throw new Error('Failed to submit form');
       }
 
-      alert('Form submitted successfully');
+      setSubmitMessage({ type: 'success', message: 'Form submitted successfully' });
       setFormData({
         name: '',
         email: '',
@@ -69,7 +70,7 @@ const ContactForm = () => {
         setErrors(newErrors);
       } else {
         console.error('Error submitting form:', error);
-        alert('An error occurred while submitting the form');
+        setSubmitMessage({ type: 'error', message: 'An error occurred while submitting the form' });
       }
     }
   };
@@ -124,14 +125,21 @@ const ContactForm = () => {
       {Object.entries(errors).map(([key, value]) => (
         <p key={key} className="text-red-500 text-sm">{value}</p>
       ))}
-      <button
-        type="submit"
-        className={'px-4 py-2 font-bold rounded-md ' + 
-          `bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 text-neutral-950` + 
-          `hover:bg-gradient-to-r hover:from-secondary hover:via-secondary_light hover:to-secondary hover:text-white`}
-      >
-        Submit
-      </button>
+      <div className="flex items-center space-x-4">
+        <button
+          type="submit"
+          className={'px-4 py-2 font-bold rounded-md min-w-28 max-w-28 ' + 
+            `bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 text-neutral-950 ` + 
+            `hover:bg-gradient-to-r hover:from-secondary hover:via-secondary_light hover:to-secondary hover:text-white`}
+        >
+          Submit
+        </button>
+        {submitMessage && (
+          <p className={`text-sm ${submitMessage.type === 'success' ? 'text-green-500' : 'text-red-500'}`}>
+            {submitMessage.message}
+          </p>
+        )}
+      </div>
     </form>
   );
 };

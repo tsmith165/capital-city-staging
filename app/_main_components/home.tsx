@@ -5,11 +5,11 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const images = [
-    { src: '/portfolio/staging-stock-3.jpg', width: 2560, height: 1695 },
-    { src: '/portfolio/staging-stock-7.jpg', width: 564, height: 705 },
-    { src: '/portfolio/staging-stock-1.png', width: 2048, height: 1366 },
-    { src: '/portfolio/staging-stock-4.png', width: 828, height: 984 },
-    { src: '/portfolio/staging-stock-6.jpg', width: 1280, height: 960 },
+    { src: '/portfolio/stock/staging-stock-3.jpg', width: 2560, height: 1695 },
+    { src: '/portfolio/stock/staging-stock-7.jpg', width: 564, height: 705 },
+    { src: '/portfolio/stock/staging-stock-1.png', width: 2048, height: 1366 },
+    { src: '/portfolio/stock/staging-stock-4.png', width: 828, height: 984 },
+    { src: '/portfolio/stock/staging-stock-6.jpg', width: 1280, height: 960 },
 ];
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
