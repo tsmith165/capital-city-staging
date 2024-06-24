@@ -1,5 +1,3 @@
-// File: /utils/emails/resend_utils.ts
-
 import { db, resendCoreTable } from '@/db/db';
 import { eq } from 'drizzle-orm';
 import { Resend } from 'resend';
@@ -37,10 +35,11 @@ export async function incrementEmailsSentToday(): Promise<void> {
   }
 }
 
-export async function sendEmail({ to, subject, html }: { to: string | string[]; subject: string; html: string }) {
+export async function sendEmail({ from, to, subject, html }: { from: string; to: string | string[]; subject: string; html: string }) {
   try {
+    console.log('Sending email...');
     await resend.emails.send({
-      from: 'mia@capitalcitystaging.com',
+      from,
       to,
       subject,
       html,

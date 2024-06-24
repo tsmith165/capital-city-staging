@@ -6,13 +6,12 @@ import { getEmailsSentToday, sendEmail } from '@/utils/emails/resend_utils';
 import ContactFormEmail from '@/utils/emails/templates/contactFormEmail';
 
 export async function sendContactFormEmail(formData: any) {
-  const { square_ft: squareFt, ...rest } = formData;
-  const contactFormEmail = React.createElement(ContactFormEmail, { ...rest, square_ft: squareFt ?? 0 });
-  const emailHtml = render(contactFormEmail);
+  const contact_form_email_template = React.createElement(ContactFormEmail, formData);
+  const email_html = render(contact_form_email_template);
 
-  const users_to_send_email_to = [
+  const admin_emails = [
     'mdofflemyer.realestate@gmail.com',
-    'torreysmith165@gmail.com',
+    // 'torreysmith165@gmail.com',
   ];
 
   try {
@@ -22,12 +21,13 @@ export async function sendContactFormEmail(formData: any) {
       throw new Error('Daily email limit reached. Please try again tomorrow.');
     }
 
-    for (const user of users_to_send_email_to) {
-      console.log(`Sending email to ${user}`);
+    for (const admin_email of admin_emails) {
+      console.log(`Sending email to ${admin_email}`);
       await sendEmail({
-        to: [user, formData.email],
+        from: 'contact@capitalcitystaging.com',
+        to: [admin_email, formData.email],
         subject: 'New Contact Form Submission',
-        html: emailHtml,
+        html: email_html,
       });
     }
     return { success: true };
