@@ -133,7 +133,7 @@ const Where: React.FC = () => {
     };
 
     return (
-        <div ref={containerRef} className="w-full h-[calc(100dvh-50px)] p-4 pt-0 flex flex-col space-y-2">
+        <div ref={containerRef} className="w-full h-[calc(100dvh-50px)] p-4 flex flex-col space-y-2">
             <div className="w-full text-center items-center justify-center flex">
                 <h1 className="w-fit text-transparent bg-clip-text bg-gradient-to-r from-secondary from-10% via-secondary_light via-70% to-secondary_dark to-90% text-4xl font-bold">
                     Where We Work

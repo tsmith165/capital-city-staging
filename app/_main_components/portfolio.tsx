@@ -13,7 +13,7 @@ const images = [
 
 export default function Portfolio() {
     return (
-        <div className="min-h-[calc(100dvh-50px)] flex flex-col items-center justify-center p-4 pt-0 space-y-4">
+        <div className="min-h-[calc(100dvh-50px)] flex flex-col items-center justify-center p-4 space-y-4">
             <h1 className="h-fit text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary from-10% via-secondary_light via-70% to-secondary_dark to-90%">
                 Staged by Mia
             </h1>
