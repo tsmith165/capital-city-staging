@@ -19,7 +19,7 @@ export default function Services() {
             price: "Call Mia for a quote",
             includedItems: [
                 "Conduct a comprehensive walk-through of your home to assess overall space, room count, and available furniture and accessories.",
-                "Based on our discussion, your home's requirements, budget, and timeline, I'll create a tailored proposal outlining recommended services.",
+                "Tailored proposal created with recommended services based on your requirements, budget, and timeline.",
                 "Use marketing and design techniques to create an environment that buyers aspire to live in.",
                 "Transform each room to enhance appeal for a faster, more profitable sale.",
             ],
@@ -29,7 +29,7 @@ export default function Services() {
             description: 'Mia will bring in all the latest furniture and decor to your home to make it pop.',
             price: "Call Mia for a quote",
             includedItems: [
-                "Schedule a home visit to take measurements and develop the design blueprint",
+                "Schedule a home visit to take measurements and develop the design blueprint.",
                 "Choose furniture, artwork, and accessories that complement the home and appeal to the prospective buyer's lifestyle.",
                 "Skillfully arrange and set up furnishings to enhance the appeal and functionality of each room.",
                 "After the property sells, promptly remove staged items and complete inventory retrieval.",
@@ -39,12 +39,12 @@ export default function Services() {
 
     return (
         <div className="h-auto md:min-h-[calc(100dvh-50px)] w-full flex flex-col justify-evenly items-center">
-            <div className="h-fit w-full flex flex-col items-center justify-center space-y-2 p-4 lg:w-[90%]">
+            <div className="h-fit w-full flex flex-col items-center justify-center p-4 lg:w-[90%]">
                 <h1 className="text-4xl px-4 font-bold text-white text-center">Focus on your next moves,</h1>
                 <h1 className="text-4xl px-4 font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary from-10% via-secondary_light via-70% to-secondary_dark to-90% text-center">
                     we'll handle the rest.
                 </h1>
-                <p className="text-lg text-white !mb-4 text-center px-8">
+                <p className="text-lg text-white pb-4 text-center px-8">
                     With a home staged by Mia, you can trust that your home has reached its full potential.
                 </p>
                 <div className="w-full flex md:flex-row md:space-x-4 flex-col space-y-4 md:space-y-0 justify-center">
