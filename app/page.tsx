@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     icons: {
         icon: '/logo/CCS_logo_w_background.png',
         shortcut: '/logo/CCS_logo_w_background.png',
-        apple: '/ico/apple-touch-icon-152x152-background.png',
+        apple: '/favicon/apple-touch-icon-152x152-background.png',
     },
     openGraph: {
         title: 'Capital City Staging',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
         url: 'https://www.capitalcitystaging.com',
         images: [
             {
-                url: '/ico/CCS_og_image.png',
+                url: '/favicon/CCS_og_image.png',
                 width: 1200,
                 height: 630,
                 alt: 'Capital City Staging',

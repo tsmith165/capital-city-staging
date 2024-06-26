@@ -18,17 +18,22 @@ export default function Services() {
                 'Mia will make adjustments to your furniture and decor that will make your home ready to sell with minimal hassle.',
             price: "Call Mia for a quote",
             includedItems: [
-                'Thourough walkthrough of the home',
-                'Items not fit for purpose removed',
-                'Furniture arranged to fit the room',
-                'Bring in my ownn staging accessories to fill out the rest of the home',
+                "Conduct a comprehensive walk-through of your home to assess overall space, room count, and available furniture and accessories.",
+                "Based on our discussion, your home's requirements, budget, and timeline, I'll create a tailored proposal outlining recommended services.",
+                "Use marketing and design techniques to create an environment that buyers aspire to live in.",
+                "Transform each room to enhance appeal for a faster, more profitable sale.",
             ],
         },
         {
             title: 'Vacant Staging',
             description: 'Mia will bring in all the latest furniture and decor to your home to make it pop.',
             price: "Call Mia for a quote",
-            includedItems: ['Create a Staging Design specifically for your home', 'Bring in trending furniture and decor', 'Optimize the layout and showcase your homes best features'],
+            includedItems: [
+                "Schedule a home visit to take measurements and develop the design blueprint",
+                "Choose furniture, artwork, and accessories that complement the home and appeal to the prospective buyer's lifestyle.",
+                "Skillfully arrange and set up furnishings to enhance the appeal and functionality of each room.",
+                "After the property sells, promptly remove staged items and complete inventory retrieval.",
+            ]
         }
     ]
 
