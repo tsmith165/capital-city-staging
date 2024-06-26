@@ -17,7 +17,7 @@ export default function Portfolio() {
             <h1 className="h-fit text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary from-10% via-secondary_light via-70% to-secondary_dark to-90%">
                 Staged by Mia
             </h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4">
                 {images.map((image, index) => (
                     <div key={index} className="relative">
                         <Image
