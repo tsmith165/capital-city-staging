@@ -15,6 +15,7 @@ export default function RootLayout({ children }: LayoutProps) {
             <PHProvider>
                 <body className="w-full h-full">
                     <main>{children}</main>
+                    <SpeedInsights />
                 </body>
             </PHProvider>
         </html>
