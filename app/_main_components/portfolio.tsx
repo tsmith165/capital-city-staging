@@ -26,6 +26,7 @@ export default function Portfolio() {
                             width={image.width}
                             height={image.height}
                             className="object-cover w-full rounded-lg"
+                            priority={true}
                         />
                     </div>
                 ))}
