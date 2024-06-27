@@ -1,0 +1,13 @@
+{
+    "name": "Capital City Staging - Home Staging Services",
+    "short_name": "Capital City Staging",
+    "description": "Capital City Staging allows you to focus on your next moves, we'll handle your history. With a home staged by Mia, you can trust that every room tells your story.",
+    "start_url": "/",
+    "icons": [
+        {
+            "src": "/favicon.ico",
+            "sizes": "64x64 32x32 24x24 16x16",
+            "type": "image/x-icon"
+        }
+    ]
+}
