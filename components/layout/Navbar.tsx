@@ -4,19 +4,45 @@ import React from 'react';
 import { menu_list } from '../../lib/menu_list';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useStore } from '../../store/store';
 
 export default function Navbar({ page }: { page: string }) {
+    const router = useRouter();
+    const selectedComponent = useStore((state) => state.selectedComponent);
+    const setSelectedComponent = useStore((state) => state.setSelectedComponent);
+    const componentRefs = useStore((state) => state.componentRefs);
+
+    const handleClick = (menu_class_name: string) => {
+        setSelectedComponent(menu_class_name);
+        if (menu_class_name === 'contact') {
+            router.push('/contact');
+            return;
+        }
+        const index = componentRefs.findIndex((item) => item.current?.id === menu_class_name);
+        if (index !== -1) {
+            const ref = componentRefs[index];
+            if (ref && ref.current) {
+                ref.current.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                });
+            }
+        }
+        router.replace(`/?component=${menu_class_name}`);
+    };
+
     const navbar = menu_list.map(([menu_class_name, menu_full_name]) => {
         return (
-            <Link
+            <div
                 key={menu_class_name}
-                href={menu_class_name === 'contact' ? '/contact' : `/?component=${menu_class_name}`}
+                onClick={() => handleClick(menu_class_name)}
                 className={`h-full pb-1 font-bold cursor-pointer text-transparent bg-clip-text ${
                     menu_class_name === 'testimonials' || menu_class_name === 'portfolio' ? 'hidden xs:flex' : ''
                 } bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400 hover:from-yellow-500 hover:via-amber-600 hover:to-yellow-500`}
             >
                 {menu_full_name}
-            </Link>
+            </div>
         );
     });
 
@@ -26,7 +52,7 @@ export default function Navbar({ page }: { page: string }) {
 
     return (
         <nav className="bg-neutral-900 p-0 flex flex-row h-[50px] w-full items-center justify-between">
-            <Link href="/?component=home" className="flex md:hidden mx-4 pb-1">
+            <div className="flex md:hidden mx-4 pb-1" onClick={() => handleClick('home')}>
                 <Image
                     src="/logo/CCS_logo_text.png"
                     alt="CCS Logo"
@@ -34,11 +60,11 @@ export default function Navbar({ page }: { page: string }) {
                     height={88}
                     className="object-contain max-h-[48px] w-fit pt-2 pb-1"
                 />
-            </Link>
+            </div>
             <div className="hidden md:flex flex-row space-x-4 items-center justify-end flex-1">
                 {leftNavbar}
             </div>
-            <Link href="/?component=home" className="hidden md:flex mx-4 pb-1 items-center justify-center">
+            <div className="hidden md:flex mx-4 pb-1 items-center justify-center" onClick={() => handleClick('home')}>
                 <Image
                     src="/logo/CCS_logo_text.png"
                     alt="CCS Logo"
@@ -46,7 +72,7 @@ export default function Navbar({ page }: { page: string }) {
                     height={88}
                     className="object-contain max-h-[48px] w-fit pt-2 pb-1"
                 />
-            </Link>
+            </div>
             <div className="hidden md:flex flex-row space-x-4 items-center justify-start flex-1">
                 {rightNavbar}
             </div>

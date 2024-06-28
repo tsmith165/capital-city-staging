@@ -1,15 +1,16 @@
 import { create } from 'zustand';
+import { RefObject } from 'react';
 
 type Store = {
     selectedComponent: string;
-    isScrolling: boolean;
+    componentRefs: RefObject<HTMLDivElement>[];
     setSelectedComponent: (component: string) => void;
-    setScrolling: (scrolling: boolean) => void;
+    setComponentRefs: (refs: RefObject<HTMLDivElement>[]) => void;
 };
 
 export const useStore = create<Store>((set) => ({
     selectedComponent: 'home',
-    isScrolling: false,
+    componentRefs: [],
     setSelectedComponent: (component) => set({ selectedComponent: component }),
-    setScrolling: (scrolling) => set({ isScrolling: scrolling }),
+    setComponentRefs: (refs) => set({ componentRefs: refs }),
 }));

@@ -1,12 +1,11 @@
-// main_view.tsx
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useLayoutEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { useSearchParams } from 'next/navigation';
+import { useStore } from '../store/store';
 
 import Home from './_main_components/home';
-import About from './_main_components/about';
+import About from './_main_components/about'; 
 import Portfolio from './_main_components/portfolio';
 import Services from './_main_components/services';
 // import Testimonials from './_main_components/testimonials';
@@ -25,21 +24,12 @@ const components = [
 ];
 
 export default function MainView() {
-    const searchParams = useSearchParams();
-    const selectedComponent = searchParams.get('component');
+    const setComponentRefs = useStore((state) => state.setComponentRefs);
     const refs = useRef(components.map(() => React.createRef<HTMLDivElement>()));
 
-    useEffect(() => {
-        if (selectedComponent) {
-            const index = components.findIndex((item) => item.id === selectedComponent);
-            if (index !== -1) {
-                refs.current[index].current?.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start',
-                });
-            }
-        }
-    }, [selectedComponent]);
+    useLayoutEffect(() => {
+        setComponentRefs(refs.current);
+    }, [setComponentRefs]);
 
     return (
         <div className="flex flex-col overflow-y-auto h-full">
@@ -47,6 +37,7 @@ export default function MainView() {
                 <div
                     key={id}
                     ref={refs.current[index]}
+                    id={id}
                     className="w-full h-auto bg-neutral-900"
                 >
                     <Component />
