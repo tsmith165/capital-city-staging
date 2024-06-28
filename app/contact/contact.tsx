@@ -5,16 +5,18 @@ import ContactForm from './contact_form';
 export default function Contact() {
     return (
         <div className="h-[calc(100dvh-50px)] w-full flex first-line:justify-center items-center p-4">
-            <div className="relative flex flex-col h-full w-full max-h-full overflow-y-scroll ">
-                <Image
-                    src="/bio/bio_pic.jpg"
-                    alt="Mia Dofflemyer"
-                    width={936}
-                    height={1248}
-                    className="absolute rounded-lg shadow-lg w-auto h-[calc(45dvh-50px)] md:h-[calc(55dvh-50px)] lg:h-[calc(55dvh-50px)] m-auto left-0 right-0"
-                />
-                <div className="absolute top-[calc(40dvh-50px)] md:top-[calc(50dvh-50px)] lg:top-[calc(50dvh-50px)] w-full h-fit bg-secondary_dark text-white p-4 space-y-2 rounded-lg shadow-lg">
-                    <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400">
+            <div className="flex flex-col md:flex-row h-full w-full max-h-full overflow-y-scroll items-center justify-center">
+                <div className="flex flex-col md:flex-row w-full md:w-fit md:max-w-1/3 h-full md:h-auto items-center justify-center">
+                    <Image
+                        src="/bio/bio_pic.jpg"
+                        alt="Mia Dofflemyer"
+                        width={936}
+                        height={1248}
+                        className="rounded-lg shadow-lg w-auto h-[calc(45dvh-50px)] md:h-[calc(55dvh-50px)] lg:h-[calc(55dvh-50px)]"
+                    />
+                </div>
+
+                <div className="flex flex-col h-full w-full md:w-2/3 text-white p-4 space-y-2 rounded-lg shadow-lg justify-center">                      <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400">
                         Get in Touch with Mia
                     </h1>
                     <p className="text-md md:text-lg">
