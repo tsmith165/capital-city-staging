@@ -41,7 +41,13 @@ export default async function Home() {
     const apiUrl = `${hostname}/api/distinct-id`;
     const response = await fetch(apiUrl);
 
-    let distinctId = await response.json() || '';
+    let distinctId = '';
+    try {
+        const data = await response.json();
+        distinctId = data.distinctId || '';
+    } catch (error) {
+        console.error('Error parsing JSON:', error);
+    }
 
     captureEvent('Home page was loaded', { distinctId });
 

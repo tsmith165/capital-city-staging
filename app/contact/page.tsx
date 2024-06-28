@@ -45,7 +45,13 @@ export default async function ContactPage() {
     // console.log("Using API URL:", apiUrl);
     const response = await fetch(apiUrl);
 
-    let distinctId = await response.json() || '';
+    let distinctId = '';
+    try {
+        const data = await response.json();
+        distinctId = data.distinctId || '';
+    } catch (error) {
+        console.error('Error parsing JSON:', error);
+    }
 
     captureEvent('Contact page was loaded', { distinctId });
 
