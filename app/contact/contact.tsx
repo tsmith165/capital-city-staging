@@ -6,7 +6,7 @@ export default function Contact() {
     return (
         <div className="h-[calc(100dvh-50px)] w-full flex first-line:justify-center items-center p-4">
             <div className="flex flex-col md:flex-row h-full w-full max-h-full overflow-y-scroll items-center justify-center">
-                <div className="flex flex-col md:flex-row w-full md:w-fit md:max-w-1/3 h-full md:h-auto items-center justify-center">
+                <div className="flex w-full md:w-fit md:max-w-1/3 h-full md:h-auto items-center justify-center">
                     <Image
                         src="/bio/bio_pic.jpg"
                         alt="Mia Dofflemyer"
