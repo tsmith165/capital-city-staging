@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function About() {
     return (
-        <div className="h-[calc(100dvh-50px)] w-full flex p-4 flex-col md:flex-row items-center justify-center">
+        <div className="h-fit md:h-[calc(100dvh-50px)] w-full flex p-4 flex-col md:flex-row items-center justify-center">
             <div className="flex w-full md:w-fit md:max-w-1/3 h-full md:h-auto items-center justify-center">
                 <Image
                     src="/bio/bio_pic.jpg"
