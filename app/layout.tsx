@@ -4,7 +4,11 @@ import React, { ReactNode } from 'react';
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
 import { PHProvider } from './providers'
-import PostHogPageView from './PostHogPageView';
+import dynamic from 'next/dynamic'
+
+const PostHogPageView = dynamic(() => import('./PostHogPageView'), {
+  ssr: false,
+})
 
 type LayoutProps = {
     children: ReactNode;
