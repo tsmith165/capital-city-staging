@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@hookform/resolvers':
-        specifier: ^3.6.0
-        version: 3.6.0(react-hook-form@7.52.0(react@18.3.1))
       '@neondatabase/serverless':
         specifier: ^0.9.1
         version: 0.9.3
@@ -23,9 +20,6 @@ importers:
       '@tailwindcss/typography':
         specifier: ^0.5.13
         version: 0.5.13(tailwindcss@3.4.4)
-      '@types/inquirer':
-        specifier: ^9.0.7
-        version: 9.0.7
       '@types/react':
         specifier: ^18.3.3
         version: 18.3.3
@@ -86,9 +80,6 @@ importers:
       react-email:
         specifier: ^2.1.4
         version: 2.1.4(@swc/helpers@0.5.5)(eslint@9.5.0)
-      react-hook-form:
-        specifier: ^7.52.0
-        version: 7.52.0(react@18.3.1)
       react-icons:
         specifier: ^5.2.1
         version: 5.2.1(react@18.3.1)
@@ -123,6 +114,9 @@ importers:
       '@next/env':
         specifier: ^14.2.3
         version: 14.2.4
+      '@types/inquirer':
+        specifier: ^9.0.7
+        version: 9.0.7
       '@types/leaflet':
         specifier: ^1.9.12
         version: 1.9.12
@@ -629,11 +623,6 @@ packages:
     peerDependencies:
       hono: '>=3.9.0'
       zod: ^3.19.1
-
-  '@hookform/resolvers@3.6.0':
-    resolution: {integrity: sha512-UBcpyOX3+RR+dNnqBd0lchXpoL8p4xC21XP8H6Meb8uve5Br1GCnmg0PcBoKKqPKgGu9GHQ/oygcmPrQhetwqw==}
-    peerDependencies:
-      react-hook-form: ^7.0.0
 
   '@humanwhocodes/module-importer@1.0.1':
     resolution: {integrity: sha512-bxveV4V8v5Yb4ncFTT3rPSgZBOpCkjfK0y4oVVVJwIuDVBRMDXrPyXRL988i5ap9m9bnyEEjWfm5WkBmtffLfA==}
@@ -2841,12 +2830,6 @@ packages:
     engines: {node: '>=18.0.0'}
     hasBin: true
 
-  react-hook-form@7.52.0:
-    resolution: {integrity: sha512-mJX506Xc6mirzLsmXUJyqlAI3Kj9Ph2RhplYhUVffeOQSnubK2uVqBFOBJmvKikvbFV91pxVXmDiR+QMF19x6A==}
-    engines: {node: '>=12.22.0'}
-    peerDependencies:
-      react: ^16.8.0 || ^17 || ^18 || ^19
-
   react-icons@5.2.1:
     resolution: {integrity: sha512-zdbW5GstTzXaVKvGSyTaBalt7HSfuK5ovrzlpyiWHAFXndXTdd/1hdDHI4xBM1Mn7YriT6aqESucFl9kEXzrdw==}
     peerDependencies:
@@ -3803,10 +3786,6 @@ snapshots:
     dependencies:
       hono: 4.4.7
       zod: 3.23.8
-
-  '@hookform/resolvers@3.6.0(react-hook-form@7.52.0(react@18.3.1))':
-    dependencies:
-      react-hook-form: 7.52.0(react@18.3.1)
 
   '@humanwhocodes/module-importer@1.0.1': {}
 
@@ -5998,10 +5977,6 @@ snapshots:
       - uglify-js
       - utf-8-validate
       - webpack-cli
-
-  react-hook-form@7.52.0(react@18.3.1):
-    dependencies:
-      react: 18.3.1
 
   react-icons@5.2.1(react@18.3.1):
     dependencies:

@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import PageLayout from '../../components/layout/PageLayout';
 import Contact from './contact';
 
-import { captureEvent } from '@/utils/posthog';
+import { captureEvent, captureDistictId } from '@/utils/posthog';
 
 export const metadata: Metadata = {
     title: 'Capital City Staging',
@@ -39,20 +39,7 @@ export const metadata: Metadata = {
 
 
 export default async function ContactPage() {
-    const hostname = process.env.NODE_ENV === 'production' ? 'https://www.capitalcitystaging.com' : 'http://localhost:3000';
-    // console.log("Using API hostname:", hostname);
-    const apiUrl = `${hostname}/api/distinct-id`;
-    // console.log("Using API URL:", apiUrl);
-    const response = await fetch(apiUrl);
-
-    let distinctId = '';
-    try {
-        const data = await response.json();
-        distinctId = data.distinctId || '';
-    } catch (error) {
-        console.error('Error parsing JSON:', error);
-    }
-
+    const distinctId = await captureDistictId();
     captureEvent('Contact page was loaded', { distinctId });
 
     return (
