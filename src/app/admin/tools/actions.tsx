@@ -1,15 +1,11 @@
 'use server';
 
-import { db, piecesTable, extraImagesTable, progressImagesTable } from '@/db/db';
+import { db, inventoryTable, extraImagesTable } from '@/db/db';
 import { eq, isNull } from 'drizzle-orm';
-import { createSmallerImage } from '@/utils/imageUtils';
-import { fetchPieces } from '@/app/actions';
+import { createSmallerImage } from '@/utils/uploads/imageUtils';
+import { fetchInventory } from '@/app/actions';
 import ExcelJS from 'exceljs';
 import { Buffer } from 'buffer';
-import { sendEmail } from '@/utils/emails/resend_utils';
-import CheckoutSuccessEmail from '@/utils/emails/templates/checkoutSuccessEmail';
-import { render } from '@react-email/render';
-import React from 'react';
 import { utapi } from '@/server/uploadthing';
 import sharp from 'sharp';
 
@@ -25,74 +21,41 @@ const ourFileRouter = {
 
 export type OurFileRouter = typeof ourFileRouter;
 
-export async function exportPieces(): Promise<Buffer> {
-    const pieces = await fetchPieces();
+export async function exportInventory(): Promise<Buffer> {
+    const inventory = await fetchInventory();
 
-    if (pieces.length > 0) {
+    if (inventory.length > 0) {
         const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('Pieces');
+        const worksheet = workbook.addWorksheet('Inventory');
 
-        worksheet.columns = Object.keys(pieces[0]).map((key) => ({ header: key, key }));
-        pieces.forEach((piece) => worksheet.addRow(piece));
+        worksheet.columns = Object.keys(inventory[0]).map((key) => ({ header: key, key }));
+        inventory.forEach((item) => worksheet.addRow(item));
 
         const uint8Array = await workbook.xlsx.writeBuffer();
         const buffer = Buffer.from(uint8Array);
 
         return buffer;
     } else {
-        throw new Error('No pieces found to export');
+        throw new Error('No inventory found to export');
     }
 }
 
-export async function sendTestCheckoutEmail(testEmailData: {
-    to: string;
-    pieceTitle: string;
-    fullName: string;
-    address: string;
-    pricePaid: number;
-}): Promise<void> {
-    const { to, pieceTitle, fullName, address, pricePaid } = testEmailData;
-
-    const checkoutSuccessEmailTemplate = React.createElement(CheckoutSuccessEmail, {
-        piece_title: pieceTitle,
-        full_name: fullName,
-        address,
-        price_paid: pricePaid,
-    });
-    const emailHtml = render(checkoutSuccessEmailTemplate);
-
-    // Split the comma-separated email addresses into an array
-    const recipients = to.split(',').map((email) => email.trim());
-
-    await sendEmail({
-        from: 'contact@jwsfineart.com',
-        to: recipients,
-        subject: 'Test Purchase Confirmation - JWS Fine Art Gallery',
-        html: emailHtml,
-    });
-}
-
 export async function generateMissingSmallImages(progressCallback?: (piece: any, current: number, total: number) => Promise<boolean>) {
-    const piecesWithoutSmallImages = await db.select().from(piecesTable).where(isNull(piecesTable.small_image_path)).execute();
+    const piecesWithoutSmallImages = await db.select().from(inventoryTable).where(isNull(inventoryTable.small_image_path)).execute();
     const extraImagesWithoutSmallImages = await db
         .select()
         .from(extraImagesTable)
         .where(isNull(extraImagesTable.small_image_path))
         .execute();
-    const progressImagesWithoutSmallImages = await db
-        .select()
-        .from(progressImagesTable)
-        .where(isNull(progressImagesTable.small_image_path))
-        .execute();
 
-    const allImages = [...piecesWithoutSmallImages, ...extraImagesWithoutSmallImages, ...progressImagesWithoutSmallImages];
+    const allImages = [...piecesWithoutSmallImages, ...extraImagesWithoutSmallImages];
     let updatedPieces = 0;
     let updatedExtraImages = 0;
     let updatedProgressImages = 0;
 
     const updateImage = async (
         image: any,
-        table: typeof piecesTable | typeof extraImagesTable | typeof progressImagesTable,
+        table: typeof inventoryTable | typeof extraImagesTable,
         index: number,
     ) => {
         if (!image.image_path) return;
@@ -138,20 +101,20 @@ export async function generateMissingSmallImages(progressCallback?: (piece: any,
             })
             .where(eq(table.id, image.id));
 
-        if (table === piecesTable) updatedPieces++;
+        if (table === inventoryTable) updatedPieces++;
         else if (table === extraImagesTable) updatedExtraImages++;
-        else if (table === progressImagesTable) updatedProgressImages++;
     };
 
     for (let i = 0; i < allImages.length; i++) {
         const image = allImages[i];
         let table;
         if ('piece_type' in image) {
-            table = piecesTable;
+            table = inventoryTable;
         } else if ('extra_image_id' in image) {
             table = extraImagesTable;
         } else {
-            table = progressImagesTable;
+            console.error('Unknown table type for image:', image);
+            continue;
         }
         await updateImage(image, table, i);
     }
@@ -164,11 +127,10 @@ export async function generateMissingSmallImages(progressCallback?: (piece: any,
 }
 
 export async function getPiecesToVerify() {
-    const pieces = await db.select().from(piecesTable).execute();
+    const pieces = await db.select().from(inventoryTable).execute();
     const extraImages = await db.select().from(extraImagesTable).execute();
-    const progressImages = await db.select().from(progressImagesTable).execute();
 
-    return [...pieces, ...extraImages, ...progressImages];
+    return [...pieces, ...extraImages];
 }
 
 export async function verifyImageDimensions(image: any) {
@@ -199,11 +161,9 @@ export async function verifyImageDimensions(image: any) {
 
             let table;
             if ('piece_type' in image) {
-                table = piecesTable;
-            } else if ('extra_image_id' in image) {
+                table = inventoryTable;
+            } else  {
                 table = extraImagesTable;
-            } else {
-                table = progressImagesTable;
             }
 
             await db.update(table).set(updateFields).where(eq(table.id, image.id));
