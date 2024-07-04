@@ -35,12 +35,11 @@
         "next-env.d.ts",
         "**/*.ts",
         "**/*.tsx",
-        "src/**/*.ts",
-        "src/**/*.tsx",
-        "src/**/*.mts",
+        "**/*.mts",
         ".next/types/**/*.ts",
         "tailwind.config.cjs",
+        "middleware.js",
         "src/scripts/scripts/border_coord_capture.js"
     ],
-    "exclude": ["node_modules"]
+    "exclude": ["src/node_modules"]
 }
