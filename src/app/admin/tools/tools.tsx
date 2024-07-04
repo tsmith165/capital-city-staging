@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import DataBackup from './DataBackup';
-import TestEmail from './TestEmail';
 import GenerateSmallImages from './GenerateSmallImages';
 import VerifyImageDimensions from './VerifyImageDimensions';
 
@@ -61,7 +60,6 @@ const Tools: React.FC<ToolsProps> = ({ activeTab }) => {
                 </div>
                 <div className="rounded-b-lg bg-secondary p-4">
                     {activeTab === 'backup' && <DataBackup />}
-                    {activeTab === 'email' && <TestEmail />}
                     {activeTab === 'small-images' && <GenerateSmallImages />}
                     {activeTab === 'verify-dimensions' && <VerifyImageDimensions />}
                 </div>
