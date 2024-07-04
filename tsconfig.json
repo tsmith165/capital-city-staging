@@ -38,7 +38,6 @@
         "**/*.mts",
         ".next/types/**/*.ts",
         "tailwind.config.cjs",
-        "tsconfig.scripts.json",
         "middleware.js",
         "src/scripts/scripts/border_coord_capture.js",
 
