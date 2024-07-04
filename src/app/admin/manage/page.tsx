@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     },
 };
 
-import { getPieces, getDeletedPieces, getPrioritizedPieces } from './actions';
+import { getInventory } from './actions';
 
 import { SignedIn } from '@clerk/nextjs';
 
@@ -43,14 +43,12 @@ interface PageProps {
 
 export default async function ManagePage({ searchParams }: PageProps) {
     const tab = searchParams?.tab || 'manage';
-    const pieces = await getPieces();
-    const deletedPieces = await getDeletedPieces();
-    const prioritized_pieces = await getPrioritizedPieces();
+    const inventory = await getInventory();
 
     return (
         <SignedIn>
             <PageLayout page="/manage">
-                <Manage pieces={pieces} deletedPieces={deletedPieces} prioritized_pieces={prioritized_pieces} activeTab={tab} />
+                <Manage inventory={inventory} activeTab={tab} />
             </PageLayout>
         </SignedIn>
     );

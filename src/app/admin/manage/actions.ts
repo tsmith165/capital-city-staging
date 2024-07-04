@@ -7,10 +7,6 @@ export async function getInventory(): Promise<Inventory[]> {
     return await db.select().from(inventoryTable).orderBy(asc(inventoryTable.o_id));
 }
 
-export async function getDeletedPieces(): Promise<Inventory[]> {
-    return await db.select().from(inventoryTable).orderBy(asc(inventoryTable.o_id));
-}
-
 export async function changeOrder(currIdList: number[], nextIdList: number[]): Promise<void> {
     const [currId, currOrderId] = currIdList;
     const [nextId, nextOrderId] = nextIdList;
