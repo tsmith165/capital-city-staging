@@ -19,7 +19,7 @@
                 "name": "next"
             }
         ],
-        "baseUrl": ".",
+        "baseUrl": "./src",
         "paths": {
             "@/components/*": ["components/*"],
             "@/styles/*": ["styles/*"],
@@ -35,10 +35,11 @@
         "**/*.ts",
         "**/*.tsx",
         "src/**/*.ts",
+        "src/**/*.tsx",
         "src/**/*.mts",
         ".next/types/**/*.ts",
         "tailwind.config.cjs",
-        "scripts/scripts/border_coord_capture.js"
+        "src/scripts/scripts/border_coord_capture.js"
     ],
     "exclude": ["node_modules"]
 }
