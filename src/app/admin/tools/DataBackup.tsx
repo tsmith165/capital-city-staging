@@ -1,9 +1,7 @@
-// File: /src/app/admin/tools/DataBackup.tsx
-
 import { useState } from 'react';
 import { saveAs } from 'file-saver';
 import ExcelJS from 'exceljs';
-import { fetchPieces } from '@/app/actions';
+import { fetchInventory } from '@/app/actions';
 
 const DataBackup: React.FC = () => {
     const [isExporting, setIsExporting] = useState(false);
@@ -11,14 +9,14 @@ const DataBackup: React.FC = () => {
     const exportPiecesAsXLSX = async () => {
         setIsExporting(true);
         try {
-            const pieces = await fetchPieces();
+            const inventory = await fetchInventory();
 
-            if (pieces.length > 0) {
+            if (inventory.length > 0) {
                 const workbook = new ExcelJS.Workbook();
                 const worksheet = workbook.addWorksheet('Pieces');
 
-                worksheet.columns = Object.keys(pieces[0]).map((key) => ({ header: key, key }));
-                pieces.forEach((piece) => worksheet.addRow(piece));
+                worksheet.columns = Object.keys(inventory[0]).map((key) => ({ header: key, key }));
+                inventory.forEach((item) => worksheet.addRow(item));
 
                 const buffer = await workbook.xlsx.writeBuffer();
                 const data = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
