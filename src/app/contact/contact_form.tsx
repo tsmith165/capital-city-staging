@@ -79,13 +79,15 @@ const ContactForm = () => {
     <form onSubmit={handleSubmit} className="space-y-2 lg:space-y-2">
       <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
         <InputTextbox
-          name="name"
+          idName="name"
+          name="Name"
           value={formData.name}
           onChange={handleChange}
           placeholder="Enter full name"
         />
         <InputTextbox
-          name="email"
+          idName="email"
+          name="Email"
           value={formData.email}
           onChange={handleChange}
           placeholder="Enter email"
@@ -93,13 +95,15 @@ const ContactForm = () => {
       </div>
       <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
         <InputTextbox
-          name="phone"
+          idName="phone"
+          name="Phone"
           value={formData.phone}
           onChange={handleChange}
           placeholder="Enter phone number"
         />
         <InputTextbox
-          name="square_ft"
+          idName="square_ft"
+          name="Square Footage"
           value={formData.square_ft === null ? '' : `${formData.square_ft.toString()}`}
           onChange={handleChange}
           placeholder="Enter square footage"
@@ -107,7 +111,8 @@ const ContactForm = () => {
       </div>
       <div className="flex w-full">
         <InputSelect
-          name="type"
+          idName='type'
+          name="Type"
           value={formData.type}
           onChange={handleChange}
           select_options={[
@@ -117,7 +122,8 @@ const ContactForm = () => {
         />
       </div>
       <InputTextArea
-        name="message"
+        idName="message"
+        name="Message"
         value={formData.message}
         onChange={handleChange}
         rows={4}
