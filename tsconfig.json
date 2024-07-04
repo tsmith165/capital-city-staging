@@ -43,5 +43,5 @@
         "src/scripts/scripts/border_coord_capture.js",
 
     ],
-    "exclude": ["src/node_modules"]
+    "exclude": ["node_modules"]
 }
