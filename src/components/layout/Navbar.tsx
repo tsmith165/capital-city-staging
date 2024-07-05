@@ -11,26 +11,14 @@ export default function Navbar({ page }: { page: string }) {
     const router = useRouter();
     const searchParams = useSearchParams()
 
+    const selectedComponent = useStore((state) => state.selectedComponent);
     const setSelectedComponent = useStore((state) => state.setSelectedComponent);
-    const componentRefs = useStore((state) => state.componentRefs);
 
     const handleClick = (menu_class_name: string) => {
+        if (menu_class_name === selectedComponent) {
+            setSelectedComponent('');
+        }
         setSelectedComponent(menu_class_name);
-        if (menu_class_name === 'contact') {
-            router.push('/contact');
-            return;
-        }
-        const index = componentRefs.findIndex((item) => item.current?.id === menu_class_name);
-        if (index !== -1) {
-            const ref = componentRefs[index];
-            if (ref && ref.current) {
-                ref.current.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start',
-                });
-            }
-        }
-
         router.push(`/?component=${menu_class_name}`, {scroll: true});
     };
 
