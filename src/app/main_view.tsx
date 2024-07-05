@@ -33,6 +33,9 @@ export default function MainView() {
     useLayoutEffect(() => {
         setComponentRefs(refs.current);
         console.log("Selected Component: " + selectedComponent);
+    }, [setComponentRefs]);
+
+    useEffect(() => {
         // Check selected component exists and scroll to it
         const index = componentRefs.findIndex((item) => item.current?.id === selectedComponent);
         console.log("Selected Component Index: " + index);
@@ -45,7 +48,7 @@ export default function MainView() {
                 });
             }
         }
-    }, [setComponentRefs]);
+    }, [selectedComponent]);
 
     return (
         <div className="flex flex-col overflow-y-auto h-full">
