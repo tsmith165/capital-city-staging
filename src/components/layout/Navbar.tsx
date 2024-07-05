@@ -3,7 +3,6 @@
 import React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
 
 import { menu_list } from '@/lib/menu_list';
 import { useStore } from '@/stores/store';
@@ -33,6 +32,8 @@ export default function Navbar({ page }: { page: string }) {
 
         router.push(`/?component=${menu_class_name}`);
     };
+
+
 
     const navbar = menu_list.map(([menu_class_name, menu_full_name]) => {
         return (

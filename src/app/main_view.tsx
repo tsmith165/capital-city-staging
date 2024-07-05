@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useLayoutEffect } from 'react';
+import React, { useRef, useLayoutEffect, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useStore } from '@/stores/store';
 
@@ -9,6 +9,8 @@ import About from '@/app/_main_components/about';
 import Portfolio from '@/app/_main_components/portfolio';
 import Services from '@/app/_main_components/services';
 // import Testimonials from '@/app/_main_components/testimonials';
+
+import { useStore } from '@/stores/store';
 
 const Where = dynamic(() => import('@/app/_main_components/where'), {
     ssr: false,
@@ -24,11 +26,26 @@ const components = [
 ];
 
 export default function MainView() {
+    const componentRefs = useStore((state) => state.componentRefs);
     const setComponentRefs = useStore((state) => state.setComponentRefs);
     const refs = useRef(components.map(() => React.createRef<HTMLDivElement>()));
+    
+    const selectedComponent = useStore((state) => state.selectedComponent);
 
     useLayoutEffect(() => {
         setComponentRefs(refs.current);
+        
+        // Check selected component exists and scroll to it
+        const index = componentRefs.findIndex((item) => item.current?.id === selectedComponent);
+        if (index !== -1) {
+            const ref = componentRefs[index];
+            if (ref && ref.current) {
+                ref.current.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                });
+            }
+        }
     }, [setComponentRefs]);
 
     return (
