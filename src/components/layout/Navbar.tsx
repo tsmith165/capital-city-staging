@@ -31,7 +31,7 @@ export default function Navbar({ page }: { page: string }) {
             }
         }
 
-        router.push(`/?component=${menu_class_name}`);
+        router.push(`/?component=${menu_class_name}`, {scroll: true});
     };
 
     useEffect(() => {
