@@ -40,7 +40,13 @@ export default function Navbar({ page }: { page: string }) {
             // Force update by appending a timestamp
             const updatedComponent = `${menu_class_name}_${Date.now()}`;
             setSelectedComponent(updatedComponent);
-            updateUrlWithoutNavigation(menu_class_name);
+            if (page !== 'home') {
+                console.log("Navigating to homepage with component: " + menu_class_name);
+                router.push('/?component=' + menu_class_name);
+            } else {
+                console.log("Updating URL without navigation: " + menu_class_name);
+                updateUrlWithoutNavigation(menu_class_name);
+            }
         }
     };
 
