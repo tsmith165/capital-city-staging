@@ -32,7 +32,7 @@ export default function Navbar({ page }: { page: string }) {
             window.history.pushState(null, '', newUrl);
             
             // Notify Next.js of the URL change
-            router.refresh();
+            //router.refresh();
         });
     }, [searchParams, pathname, router]);
 
