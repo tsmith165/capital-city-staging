@@ -29,7 +29,7 @@ export default function Navbar({ page }: { page: string }) {
                 });
             }
         }
-        router.replace(`/?component=${menu_class_name}`);
+        // router.replace(`/?component=${menu_class_name}`);
     };
 
     const navbar = menu_list.map(([menu_class_name, menu_full_name]) => {
