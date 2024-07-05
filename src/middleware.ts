@@ -18,10 +18,7 @@ export default clerkMiddleware(async (auth, req) => {
             console.error("Error protecting route with ADMIN role:", error);
             return NextResponse.redirect(new URL('/', req.url));
         }
-
-    } else {
-        return NextResponse.next();
-    }
+    } 
     return NextResponse.next();
 });
 
