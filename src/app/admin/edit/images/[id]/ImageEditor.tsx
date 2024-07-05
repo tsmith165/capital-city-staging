@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { handleImageUpload } from '@/app/admin/edit/actions';
+import { storeUploadedImageDetails } from '@/app/admin/edit/actions';
 
 import ResizeUploader from '@/components/ResizeUploader';
 import InputTextbox from '@/components/inputs/InputTextbox';
@@ -58,7 +58,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
     };
 
     const handleSubmit = async () => {
-        await handleImageUpload({
+        await storeUploadedImageDetails({
             inventory_id: inventoryId,
             image_path: imageUrl,
             title: title,

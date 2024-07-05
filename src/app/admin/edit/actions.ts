@@ -1,7 +1,21 @@
 'use server';
+import { auth } from '@clerk/nextjs/server';
 import { db, inventoryTable, extraImagesTable } from '@/db/db';
+import { Inventory } from '@/db/schema';
+
 import { eq, and, desc } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+
+
+function checkUserRole(): { isAdmin: boolean; error?: string } {
+    const { orgRole } = auth();
+    console.log(`User organization Role: ${orgRole}`);
+    const isAdmin = orgRole === 'ADMIN';
+    if (!isAdmin) {
+        return { isAdmin: false, error: 'User does not have the "ADMIN" role. Cannot edit piece.' };
+    }
+    return { isAdmin: true };
+}
 
 interface SubmitFormData {
     inventory_id: string;
@@ -20,40 +34,53 @@ interface SubmitFormData {
     height: string;
 }
 
-export async function onSubmitEditForm(data: SubmitFormData) {
-    console.log('Form Data (Next Line):');
-    console.log(data);
-
-    if (!data.inventory_name) {
-        throw new Error('Name is required');
+export async function onSubmitEditForm(data: SubmitFormData): Promise<{ success: boolean; error?: string }> {
+    const { isAdmin, error: roleError } = checkUserRole();
+    if (!isAdmin) {
+        console.error(roleError);
+        return { success: false, error: roleError };
     }
 
-    if (data.inventory_id) {
-        // Update existing inventory
-        await db
-            .update(inventoryTable)
-            .set({
-                name: data.inventory_name?.toString(),
-                description: data.description || '',
-                category: data.category || '',
-                vendor: data.vendor || '',
-                price: parseInt(data.price || '0'),
-                real_width: parseInt(data.real_width || '0'),
-                real_height: parseInt(data.real_height || '0'),
-                real_depth: parseInt(data.real_depth || '0'),
-                location: data.location || '',
-                count: parseInt(data.count || '0'),
-                image_path: data.image_path || '',
-                width: parseInt(data.width || '0'),
-                height: parseInt(data.height || '0'),
-            })
-            .where(eq(inventoryTable.id, parseInt(data.inventory_id)));
-    } else {
-        console.log("Couldn't find inventory with id " + data.inventory_id);
-        console.log("Skipping inventory creation");
-        return;
+    try {
+        console.log('Form Data (Next Line):');
+        console.log(data);
+
+        if (!data.inventory_name) {
+            console.error('Name is required');
+            return { success: false, error: 'Name is required' };
+        }
+
+        if (data.inventory_id) {
+            // Update existing inventory
+            await db
+                .update(inventoryTable)
+                .set({
+                    name: data.inventory_name?.toString(),
+                    description: data.description || '',
+                    category: data.category || '',
+                    vendor: data.vendor || '',
+                    price: parseInt(data.price || '0'),
+                    real_width: parseInt(data.real_width || '0'),
+                    real_height: parseInt(data.real_height || '0'),
+                    real_depth: parseInt(data.real_depth || '0'),
+                    location: data.location || '',
+                    count: parseInt(data.count || '0'),
+                    image_path: data.image_path || '',
+                    width: parseInt(data.width || '0'),
+                    height: parseInt(data.height || '0'),
+                })
+                .where(eq(inventoryTable.id, parseInt(data.inventory_id)));
+        } else {
+            console.log("Couldn't find inventory with id " + data.inventory_id);
+            console.log("Skipping inventory creation");
+            return { success: false, error: 'Could not find inventory with id ' + data.inventory_id };
+        }
+        revalidatePath(`/admin/edit/${data.inventory_id}`);
+        return { success: true };
+    } catch (error) {
+        console.error('Error creating inventory:', error);
+        return { success: false, error: 'Error creating inventory' };
     }
-    revalidatePath(`/admin/edit/${data.inventory_id}`);
 }
 
 interface UploadFormData {
@@ -68,103 +95,153 @@ interface UploadFormData {
     inventory_type: string;
 }
 
-export async function handleImageUpload(data: UploadFormData) {
+export async function storeUploadedImageDetails(data: UploadFormData): Promise<{ success: boolean; imageUrl?: string; error?: string }> {
+    const { isAdmin, error: roleError } = checkUserRole();
+    if (!isAdmin) {
+        console.error(roleError);
+        return { success: false, error: roleError };
+    }
     console.log('Uploading Image...');
-    const inventoryId = parseInt(data.inventory_id?.toString() || '0');
-    const imageUrl = data.image_path?.toString() || '';
-    const width = parseInt(data.width?.toString() || '0');
-    const height = parseInt(data.height?.toString() || '0');
-    const title = data.title;
-    const imageType = data.inventory_type?.toString() || '';
-    const smallImageUrl = data.small_image_path?.toString() || '';
-    const smallWidth = parseInt(data.small_width?.toString() || '0');
-    const smallHeight = parseInt(data.small_height?.toString() || '0');
+    try {
+        const inventoryId = parseInt(data.inventory_id?.toString() || '0');
+        const imageUrl = data.image_path?.toString() || '';
+        const width = parseInt(data.width?.toString() || '0');
+        const height = parseInt(data.height?.toString() || '0');
+        const title = data.title;
+        const imageType = data.inventory_type?.toString() || '';
+        const smallImageUrl = data.small_image_path?.toString() || '';
+        const smallWidth = parseInt(data.small_width?.toString() || '0');
+        const smallHeight = parseInt(data.small_height?.toString() || '0');
 
-    const inventory = await db.select().from(inventoryTable).where(eq(inventoryTable.id, inventoryId)).limit(1);
-    if (!inventory.length) {
-        console.error(`Inventory with id ${inventoryId} not found`);
-        return;
-    }
-
-    if (imageType === 'main') {
-        console.log('Modifying main image');
-        await db
-            .update(inventoryTable)
-            .set({
-                image_path: imageUrl,
-                width: width,
-                height: height,
-                small_image_path: smallImageUrl,
-                small_width: smallWidth,
-                small_height: smallHeight,
-            })
-            .where(eq(inventoryTable.id, inventoryId));
-    } else {
-        if (imageType === 'extra') {
-            console.log('Adding extra image');
-            await db.insert(extraImagesTable).values({
-                inventory_id: inventoryId,
-                image_path: imageUrl,
-                title: title,
-                width: width,
-                height: height,
-                small_image_path: smallImageUrl,
-                small_width: smallWidth,
-                small_height: smallHeight,
-            });
+        const inventory = await db.select().from(inventoryTable).where(eq(inventoryTable.id, inventoryId)).limit(1);
+        if (!inventory.length) {
+            console.error(`Inventory with id ${inventoryId} not found`);
+            return { success: false, error: `Inventory with id ${inventoryId} not found` };
         }
+
+        if (imageType === 'main') {
+            console.log('Modifying main image');
+            await db
+                .update(inventoryTable)
+                .set({
+                    image_path: imageUrl,
+                    width: width,
+                    height: height,
+                    small_image_path: smallImageUrl,
+                    small_width: smallWidth,
+                    small_height: smallHeight,
+                })
+                .where(eq(inventoryTable.id, inventoryId));
+        } else {
+            if (imageType === 'extra') {
+                console.log('Adding extra image');
+                await db.insert(extraImagesTable).values({
+                    inventory_id: inventoryId,
+                    image_path: imageUrl,
+                    title: title,
+                    width: width,
+                    height: height,
+                    small_image_path: smallImageUrl,
+                    small_width: smallWidth,
+                    small_height: smallHeight,
+                });
+            }
+        }
+        revalidatePath(`/admin/edit/${inventory[0].id}`);
+        return { success: true, imageUrl: imageUrl };
+    } catch (error) {
+        console.error('Error creating inventory:', error);
+        return { success: false, error: 'Error creating inventory' };
+    }
+}
+
+export async function handleImageReorder(inventoryId: number, currentInventoryId: number, targetInventoryId: number): Promise<{ success: boolean; error?: string }> {
+    const { isAdmin, error: roleError } = checkUserRole();
+    if (!isAdmin) {
+        console.error(roleError);
+        return { success: false, error: roleError };
     }
 
-    revalidatePath(`/admin/edit/${inventory[0].id}`);
-    return imageUrl;
+    try {
+        const currentImage = await db.select().from(extraImagesTable).where(eq(extraImagesTable.id, currentInventoryId)).limit(1);
+        const targetImage = await db.select().from(extraImagesTable).where(eq(extraImagesTable.id, targetInventoryId)).limit(1);
+
+        if (currentImage.length === 0 || targetImage.length === 0) {
+            console.error(`No images found for reordering`);
+            return { success: false, error: `No images found for reordering` };
+        }
+
+        console.log(`Setting image path for ${currentInventoryId} to ${targetImage[0].image_path}`);
+        await db.update(extraImagesTable).set({ image_path: targetImage[0].image_path }).where(eq(extraImagesTable.id, currentInventoryId));
+
+        console.log(`Setting image path for ${targetInventoryId} to ${currentImage[0].image_path}`);
+        await db.update(extraImagesTable).set({ image_path: currentImage[0].image_path }).where(eq(extraImagesTable.id, targetInventoryId));
+
+        // Revalidate the path to refetch the data
+        revalidatePath(`/admin/edit/${inventoryId}`);
+        return { success: true };
+    } catch (error) {
+        console.error('Error reordering images:', error);
+        return { success: false, error: 'Error reordering images' };
+    }
 }
 
-export async function handleImageReorder(inventoryId: number, currentInventoryId: number, targetInventoryId: number) {
-    const currentImage = await db.select().from(extraImagesTable).where(eq(extraImagesTable.id, currentInventoryId)).limit(1);
-    const targetImage = await db.select().from(extraImagesTable).where(eq(extraImagesTable.id, targetInventoryId)).limit(1);
-
-    if (currentImage.length === 0 || targetImage.length === 0) {
-        console.error(`No images found for reordering`);
-        return;
+export async function handleImageTitleEdit(imageId: number, newTitle: string): Promise<{ success: boolean; error?: string }> {
+    const { isAdmin, error: roleError } = checkUserRole();
+    if (!isAdmin) {
+        console.error(roleError);
+        return { success: false, error: roleError };
     }
 
-    console.log(`Setting image path for ${currentInventoryId} to ${targetImage[0].image_path}`);
-    await db.update(extraImagesTable).set({ image_path: targetImage[0].image_path }).where(eq(extraImagesTable.id, currentInventoryId));
-
-    console.log(`Setting image path for ${targetInventoryId} to ${currentImage[0].image_path}`);
-    await db.update(extraImagesTable).set({ image_path: currentImage[0].image_path }).where(eq(extraImagesTable.id, targetInventoryId));
-
-    // Revalidate the path to refetch the data
-    revalidatePath(`/admin/edit/${inventoryId}`);
+    try {
+        await db.update(extraImagesTable).set({ title: newTitle }).where(eq(extraImagesTable.id, imageId));
+        revalidatePath(`/admin/edit/${imageId}`);
+        return { success: true };
+    } catch (error) {
+        console.error('Error editing image title:', error);
+        return { success: false, error: 'Error editing image title' };
+    }
 }
 
-export async function handleImageTitleEdit(imageId: number, newTitle: string) {
-    await db.update(extraImagesTable).set({ title: newTitle }).where(eq(extraImagesTable.id, imageId));
-
-    // Revalidate the path to refetch the data
-    revalidatePath(`/admin/edit/${imageId}`);
+export async function handleImageDelete(inventoryId: number, imagePath: string): Promise<{ success: boolean; error?: string }> {
+    const { isAdmin, error: roleError } = checkUserRole();
+    if (!isAdmin) {
+        console.error(roleError);
+        return { success: false, error: roleError };
+    }
+    try {
+        await db.delete(extraImagesTable).where(and(eq(extraImagesTable.inventory_id, inventoryId), eq(extraImagesTable.image_path, imagePath)));
+        revalidatePath(`/admin/edit/${inventoryId}`);
+        return { success: true };
+    } catch (error) {
+        console.error('Error deleting image:', error);
+        return { success: false, error: 'Error deleting image' };
+    }
 }
 
-export async function handleImageDelete(inventoryId: number, imagePath: string) {
-    await db.delete(extraImagesTable).where(and(eq(extraImagesTable.inventory_id, inventoryId), eq(extraImagesTable.image_path, imagePath)));
-
-    // Revalidate the path to refetch the data
-    revalidatePath(`/admin/edit/${inventoryId}`);
-}
-
-export async function handleTitleUpdate(formData: FormData) {
-    const inventoryId = Number(formData.get('inventoryId'));
-    const newTitle = formData.get('newTitle')?.toString();
-
-    if (!inventoryId || !newTitle) {
-        console.error('Required form data missing. Cannot update title.');
-        return;
+export async function handleTitleUpdate(formData: FormData): Promise<{ success: boolean; error?: string }> {
+    const { isAdmin, error: roleError } = checkUserRole();
+    if (!isAdmin) {
+        console.error(roleError);
+        return { success: false, error: roleError };
     }
 
-    await db.update(inventoryTable).set({ name: newTitle }).where(eq(inventoryTable.id, inventoryId));
+    try {
+        const inventoryId = Number(formData.get('inventoryId'));
+        const newTitle = formData.get('newTitle')?.toString();
 
-    // Revalidate the path to refetch the data
-    revalidatePath(`/admin/edit/${inventoryId}`);
+        if (!inventoryId || !newTitle) {
+            console.error('Required form data missing. Cannot update title.');
+            return { success: false, error: 'Required form data missing. Cannot update title.' };
+        }
+
+        await db.update(inventoryTable).set({ name: newTitle }).where(eq(inventoryTable.id, inventoryId));
+        revalidatePath(`/admin/edit/${inventoryId}`);
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating title:', error);
+        return { success: false, error: 'Error updating title' };
+    }
 }
 
 async function getMostRecentId() {
@@ -182,45 +259,66 @@ interface NewInventoryData {
     smallHeight: number;
 }
 
-export async function createInventory(newInventoryData: NewInventoryData) {
-    const { name, imagePath, width, height, smallImagePath, smallWidth, smallHeight } = newInventoryData;
+export async function createInventory(newInventoryData: NewInventoryData): Promise<{ success: boolean; inventory?: Inventory; error?: string }> {
+    const { isAdmin, error: roleError } = checkUserRole();
+    if (!isAdmin) {
+        console.error(roleError);
+        return { success: false, error: roleError };
+    }
 
-    const maxOId = await getMostRecentId();
-    console.log('Max OId:', maxOId);
-    const newOId = maxOId ? maxOId + 1 : 1;
-    console.log('New OId:', newOId);
+    try {
+        const { name, imagePath, width, height, smallImagePath, smallWidth, smallHeight } = newInventoryData;
 
-    const data = {
-        name: name,
-        image_path: imagePath,
-        width: width,
-        height: height,
-        small_image_path: smallImagePath,
-        small_width: smallWidth,
-        small_height: smallHeight,
-        description: '',
-        category: '',
-        vendor: '',
-        price: 0,
-        real_width: 0,
-        real_height: 0,
-        real_depth: 0,
-        location: '',
-        count: 0,
-        o_id: newOId,
-    };
-    console.log('New Inventory Data:', data);
+        const maxOId = await getMostRecentId();
+        console.log('Max OId:', maxOId);
+        const newOId = maxOId ? maxOId + 1 : 1;
+        console.log('New OId:', newOId);
 
-    const newInventory = await db.insert(inventoryTable).values(data).returning();
-    return newInventory[0];
+        const data = {
+            name: name,
+            image_path: imagePath,
+            width: width,
+            height: height,
+            small_image_path: smallImagePath,
+            small_width: smallWidth,
+            small_height: smallHeight,
+            description: '',
+            category: '',
+            vendor: '',
+            price: 0,
+            real_width: 0,
+            real_height: 0,
+            real_depth: 0,
+            location: '',
+            count: 0,
+            o_id: newOId,
+        };
+        console.log('New Inventory Data:', data);
+
+        const newInventory = await db.insert(inventoryTable).values(data).returning();
+        return { success: true, inventory: newInventory[0] };
+    } catch (error) {
+        console.error('Error creating inventory:', error);
+        return { success: false, error: 'Error creating inventory' };
+    }
 }
 
 import { redirect } from 'next/navigation';
 
 export async function createNewInventory(newInventoryData: NewInventoryData) {
     console.log('Creating new inventory:', newInventoryData);
-    const newInventory = await createInventory(newInventoryData);
+    const newInventoryOutput = await createInventory(newInventoryData);
+
+    if (!newInventoryOutput.success) {
+        console.error('Error creating new piece:', newInventoryOutput.error);
+        return { success: false, error: 'Error creating new piece.' };
+    }
+    if (!newInventoryOutput.inventory) {
+        console.error('No piece returned from createPiece:', newInventoryOutput.error);
+        return { success: false, error: 'Error creating new piece.' };
+    }
+
     revalidatePath('/admin/edit');
-    redirect(`/admin/edit/${newInventory.id}`);
+    redirect(`/admin/edit/${newInventoryOutput.inventory.id}`);
 }
 
