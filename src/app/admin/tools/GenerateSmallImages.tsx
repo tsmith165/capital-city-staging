@@ -6,11 +6,10 @@ const GenerateSmallImages: React.FC = () => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [status, setStatus] = useState<'success' | 'error' | null>(null);
     const [result, setResult] = useState<{
-        updatedPieces: number;
+        updatedItems: number;
         updatedExtraImages: number;
-        updatedProgressImages: number;
     } | null>(null);
-    const [currentPiece, setCurrentPiece] = useState<any | null>(null);
+    const [currentItem, setCurrentItem] = useState<any | null>(null);
     const [progress, setProgress] = useState({ current: 0, total: 0 });
     const [generateTimeout, setGenerateTimeout] = useState(1000); // Default to 1 second
     const generateTimeoutRef = useRef(generateTimeout); // Create a ref to store the current timeout value
@@ -24,23 +23,33 @@ const GenerateSmallImages: React.FC = () => {
         stopGenerationRef.current = false;
 
         try {
-            const result = await generateMissingSmallImages(async (piece, current, total) => {
-                if (stopGenerationRef.current) return true; // Signal to stop
+            const result = await generateMissingSmallImages(async (updatedItem, current, total) => {
+                if (stopGenerationRef.current) return true;
                 console.log(`Generating small image for piece ${current} of ${total} with timeout ${generateTimeoutRef.current}ms`);
-                setCurrentPiece(piece);
+                setCurrentItem(updatedItem);
                 setProgress({ current, total });
-                await new Promise((resolve) => setTimeout(resolve, generateTimeoutRef.current)); // Use the ref value
-                return false; // Signal to continue
+                await new Promise((resolve) => setTimeout(resolve, generateTimeoutRef.current));
+                return false;
             });
+            if (!result.success) {
+                console.error('Failed to generate small images:', result.error);
+                setStatus('error');
+                return;
+            }
+            if (!result.updatedItem) {
+                console.error('No pieces returned from generateMissingSmallImages:', result.error);
+                setStatus('error');
+                return;
+            }
             setStatus('success');
-            setResult(result);
+            setResult(result.updatedItem);
         } catch (error) {
             console.error('Failed to generate small images:', error);
             setStatus('error');
         }
 
         setIsGenerating(false);
-        setCurrentPiece(null);
+        setCurrentItem(null);
     }, []);
 
     const handleStopGeneration = () => {
@@ -95,9 +104,9 @@ const GenerateSmallImages: React.FC = () => {
                     )}
                 </div>
             </div>
-            {isGenerating && currentPiece && (
+            {isGenerating && currentItem && (
                 <div className="text-center text-stone-900">
-                    <p>Generating small image for: {currentPiece.title}</p>
+                    <p>Generating small image for: {currentItem.title}</p>
                     <p>
                         Progress: {progress.current} of {progress.total}
                     </p>
@@ -106,21 +115,20 @@ const GenerateSmallImages: React.FC = () => {
             {status === 'success' && result && (
                 <div className="text-center text-green-500">
                     <p>Small images generated successfully!</p>
-                    <p>Updated pieces: {result.updatedPieces}</p>
+                    <p>Updated inventory items: {result.updatedItems}</p>
                     <p>Updated extra images: {result.updatedExtraImages}</p>
-                    <p>Updated progress images: {result.updatedProgressImages}</p>
                 </div>
             )}
             {status === 'error' && <p className="text-center text-red-500">Failed to generate small images.</p>}
-            {currentPiece && (
+            {currentItem && (
                 <div className="mt-4 text-stone-900">
                     <p>
-                        <strong className="font-bold text-stone-900">{currentPiece.title}</strong>
+                        <strong className="font-bold text-stone-900">{currentItem.title}</strong>
                     </p>
-                    {currentPiece.piece_type && <p className="text-stone-900">Type: {currentPiece.piece_type}</p>}
-                    {currentPiece.width && currentPiece.height && (
+                    {currentItem.piece_type && <p className="text-stone-900">Type: {currentItem.piece_type}</p>}
+                    {currentItem.width && currentItem.height && (
                         <p className="text-stone-900">
-                            Dimensions: {currentPiece.width}" x {currentPiece.height}"
+                            Dimensions: {currentItem.width}" x {currentItem.height}"
                         </p>
                     )}
                 </div>

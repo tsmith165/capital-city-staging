@@ -32,10 +32,10 @@ function checkUserRole(): { isAdmin: boolean; error?: string } {
 }
 
 export async function generateMissingSmallImages(
-    progressCallback?: (piece: any, current: number, total: number) => Promise<boolean>,
+    progressCallback?: (item: any, current: number, total: number) => Promise<boolean>,
 ): Promise<{
     success: boolean;
-    updatedPeces?: { updatedPieces: number; updatedExtraImages: number; updatedProgressImages: number };
+    updatedItem?: { updatedItems: number; updatedExtraImages: number; };
     error?: string;
 }> {
     const { isAdmin, error: roleError } = checkUserRole();
@@ -45,17 +45,16 @@ export async function generateMissingSmallImages(
     }
 
     try {
-        const piecesWithoutSmallImages = await db.select().from(inventoryTable).where(isNull(inventoryTable.small_image_path)).execute();
+        const inventoryWithoutSmallImages = await db.select().from(inventoryTable).where(isNull(inventoryTable.small_image_path)).execute();
         const extraImagesWithoutSmallImages = await db
             .select()
             .from(extraImagesTable)
             .where(isNull(extraImagesTable.small_image_path))
             .execute();
 
-        const allImages = [...piecesWithoutSmallImages, ...extraImagesWithoutSmallImages];
-        let updatedPieces = 0;
+        const allImages = [...inventoryWithoutSmallImages, ...extraImagesWithoutSmallImages];
+        let updatedItems = 0;
         let updatedExtraImages = 0;
-        let updatedProgressImages = 0;
 
         const updateImage = async (
             image: any,
@@ -105,7 +104,7 @@ export async function generateMissingSmallImages(
                 })
                 .where(eq(table.id, image.id));
 
-            if (table === inventoryTable) updatedPieces++;
+            if (table === inventoryTable) updatedItems++;
             else if (table === extraImagesTable) updatedExtraImages++;
         };
 
@@ -125,10 +124,9 @@ export async function generateMissingSmallImages(
 
         return {
             success: true,
-            updatedPeces: {
-                updatedPieces,
+            updatedItem: {
+                updatedItems,
                 updatedExtraImages,
-                updatedProgressImages,
             },
         };
     } catch (error) {
