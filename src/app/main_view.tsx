@@ -10,8 +10,6 @@ import Portfolio from '@/app/_main_components/portfolio';
 import Services from '@/app/_main_components/services';
 // import Testimonials from '@/app/_main_components/testimonials';
 
-import { useStore } from '@/stores/store';
-
 const Where = dynamic(() => import('@/app/_main_components/where'), {
     ssr: false,
 });
@@ -37,6 +35,7 @@ export default function MainView() {
         
         // Check selected component exists and scroll to it
         const index = componentRefs.findIndex((item) => item.current?.id === selectedComponent);
+        console.log("Index: " + index);
         if (index !== -1) {
             const ref = componentRefs[index];
             if (ref && ref.current) {

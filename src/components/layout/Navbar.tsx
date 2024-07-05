@@ -1,14 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { menu_list } from '@/lib/menu_list';
 import { useStore } from '@/stores/store';
 
 export default function Navbar({ page }: { page: string }) {
     const router = useRouter();
+    const searchParams = useSearchParams()
 
     const setSelectedComponent = useStore((state) => state.setSelectedComponent);
     const componentRefs = useStore((state) => state.componentRefs);
@@ -33,7 +34,12 @@ export default function Navbar({ page }: { page: string }) {
         router.push(`/?component=${menu_class_name}`);
     };
 
-
+    useEffect(() => {
+        if (page === 'home') {
+            console.log("Current homepage component: " + searchParams.get('component'));
+            setSelectedComponent(searchParams.get('component') || '');
+        }
+    }, []);
 
     const navbar = menu_list.map(([menu_class_name, menu_full_name]) => {
         return (
