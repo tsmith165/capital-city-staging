@@ -138,7 +138,7 @@ export async function generateMissingSmallImages(
     }
 }
 
-export async function getPiecesToVerify(): Promise<{ success: boolean; inventory?: InventoryWithImages[]; error?: string }> {
+export async function getInventoryToVerify(): Promise<{ success: boolean; inventory?: InventoryWithImages[]; error?: string }> {
     const { isAdmin, error: roleError } = checkUserRole();
     if (!isAdmin) {
         console.error(roleError);

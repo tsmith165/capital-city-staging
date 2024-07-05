@@ -1,15 +1,16 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { getPiecesToVerify, verifyImageDimensions } from './actions';
+import { getInventoryToVerify, verifyImageDimensions } from './actions';
 import { IoIosSpeedometer } from 'react-icons/io';
+import { InventoryWithImages } from '@/db/schema';
 
 const VerifyImageDimensions: React.FC = () => {
     const [isVerifying, setIsVerifying] = useState(false);
     const [status, setStatus] = useState<'success' | 'error' | null>(null);
-    const [currentPiece, setCurrentPiece] = useState<any | null>(null);
+    const [currentItem, setCurrentItem] = useState<InventoryWithImages | null>(null);
     const [progress, setProgress] = useState({ current: 0, total: 0 });
     const [results, setResults] = useState<any[]>([]);
-    const [verifyTimeout, setVerifyTimeout] = useState(1000); // Default to 1 second
-    const verifyTimeoutRef = useRef(verifyTimeout); // Create a ref to store the current timeout value
+    const [verifyTimeout, setVerifyTimeout] = useState(1000);
+    const verifyTimeoutRef = useRef(verifyTimeout);
     const [showSlider, setShowSlider] = useState(false);
     const stopVerificationRef = useRef(false);
 
@@ -20,21 +21,31 @@ const VerifyImageDimensions: React.FC = () => {
         stopVerificationRef.current = false;
 
         try {
-            const pieces = await getPiecesToVerify();
-            setProgress({ current: 0, total: pieces.length });
+            const inventoryResult = await getInventoryToVerify();
+            if (!inventoryResult.success || !inventoryResult.inventory) {
+                throw new Error(inventoryResult.error || 'Failed to get pieces to verify');
+            }
 
-            for (let i = 0; i < pieces.length; i++) {
+            const items = inventoryResult.inventory;
+            if (!items) {
+                console.error('No pieces returned from getInventoryToVerify:', inventoryResult.error);
+                setStatus('error');
+                return;
+            }
+            setProgress({ current: 0, total: items.length });
+
+            for (let i = 0; i < items.length; i++) {
                 if (stopVerificationRef.current) break;
-                console.log(`Verifying piece ${i + 1} of ${pieces.length} with timeout ${verifyTimeoutRef.current}ms`);
+                console.log(`Verifying piece ${i + 1} of ${items.length} with timeout ${verifyTimeoutRef.current}ms`);
 
-                const piece = pieces[i];
-                setCurrentPiece(piece);
+                const item = items[i];
+                setCurrentItem(item);
                 setProgress((prev) => ({ ...prev, current: i + 1 }));
 
-                const result = await verifyImageDimensions(piece);
+                const result = await verifyImageDimensions(item);
                 setResults((prev) => [...prev, result]);
 
-                await new Promise((resolve) => setTimeout(resolve, verifyTimeoutRef.current)); // Use the ref value
+                await new Promise((resolve) => setTimeout(resolve, verifyTimeoutRef.current));
             }
 
             setStatus('success');
@@ -44,7 +55,7 @@ const VerifyImageDimensions: React.FC = () => {
         }
 
         setIsVerifying(false);
-        setCurrentPiece(null);
+        setCurrentItem(null);
     }, []);
 
     const handleStopVerification = () => {
@@ -99,9 +110,9 @@ const VerifyImageDimensions: React.FC = () => {
                     )}
                 </div>
             </div>
-            {isVerifying && currentPiece && (
+            {isVerifying && currentItem && (
                 <div className="text-center text-stone-900">
-                    <p className="text-stone-900">Verifying: {currentPiece.title}</p>
+                    <p className="text-stone-900">Verifying: {currentItem.name}</p>
                     <p className="text-stone-900">
                         Progress: {progress.current} of {progress.total}
                     </p>
@@ -113,20 +124,20 @@ const VerifyImageDimensions: React.FC = () => {
                 </p>
             )}
             {status === 'error' && <p className="text-center text-red-500">Failed to verify image dimensions.</p>}
-            {currentPiece && (
+            {currentItem && (
                 <div className="mt-4 text-stone-900">
                     <p>
-                        <strong className="font-bold text-stone-900">{currentPiece.title}</strong>
+                        <strong className="font-bold text-stone-900">{currentItem.name}</strong>
                     </p>
-                    {currentPiece.piece_type && <p className="text-stone-900">Type: {currentPiece.piece_type}</p>}
-                    {currentPiece.width && currentPiece.height && (
+                    {currentItem.category && <p className="text-stone-900">Type: {currentItem.category}</p>}
+                    {currentItem.width && currentItem.height && (
                         <p className="text-stone-900">
-                            Dimensions: {currentPiece.width}" x {currentPiece.height}"
+                            Dimensions: {currentItem.width}" x {currentItem.height}"
                         </p>
                     )}
-                    {currentPiece.small_width && currentPiece.small_height && (
+                    {currentItem.small_width && currentItem.small_height && (
                         <p className="text-stone-900">
-                            Small Dimensions: {currentPiece.small_width}" x {currentPiece.small_height}"
+                            Small Dimensions: {currentItem.small_width}" x {currentItem.small_height}"
                         </p>
                     )}
                 </div>
