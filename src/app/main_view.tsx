@@ -32,10 +32,10 @@ export default function MainView() {
 
     useLayoutEffect(() => {
         setComponentRefs(refs.current);
-        
+        console.log("Selected Component: " + selectedComponent);
         // Check selected component exists and scroll to it
         const index = componentRefs.findIndex((item) => item.current?.id === selectedComponent);
-        console.log("Index: " + index);
+        console.log("Selected Component Index: " + index);
         if (index !== -1) {
             const ref = componentRefs[index];
             if (ref && ref.current) {
