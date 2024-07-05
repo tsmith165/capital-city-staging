@@ -30,18 +30,16 @@ export default function Navbar({ page }: { page: string }) {
             
             // Update the URL without navigation
             window.history.pushState(null, '', newUrl);
-            
-            // Notify Next.js of the URL change
-            //router.refresh();
         });
-    }, [searchParams, pathname, router]);
+    }, [searchParams, pathname]);
 
     const handleClick = (menu_class_name: string) => {
-        if (menu_class_name === selectedComponent) {
-            setSelectedComponent('');
-            updateUrlWithoutNavigation('');
+        if (menu_class_name === 'contact') {
+            router.push('/contact');
         } else {
-            setSelectedComponent(menu_class_name);
+            // Force update by appending a timestamp
+            const updatedComponent = `${menu_class_name}_${Date.now()}`;
+            setSelectedComponent(updatedComponent);
             updateUrlWithoutNavigation(menu_class_name);
         }
     };

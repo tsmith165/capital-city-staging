@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useLayoutEffect, useEffect } from 'react';
+import React, { useRef, useLayoutEffect, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useStore } from '@/stores/store';
 
@@ -24,6 +24,7 @@ const components = [
 ];
 
 export default function MainView() {
+    const [layoutLoaded, setLayoutLoaded] = useState(false);
     const componentRefs = useStore((state) => state.componentRefs);
     const setComponentRefs = useStore((state) => state.setComponentRefs);
     const refs = useRef(components.map(() => React.createRef<HTMLDivElement>()));
@@ -31,24 +32,35 @@ export default function MainView() {
     const selectedComponent = useStore((state) => state.selectedComponent);
 
     useLayoutEffect(() => {
-        setComponentRefs(refs.current);
-        console.log("Selected Component: " + selectedComponent);
+        setTimeout(() => {
+            setComponentRefs(refs.current);
+            console.log("Selected Component: " + selectedComponent);
+            setLayoutLoaded(true);
+        }, 500);
     }, [setComponentRefs]);
 
     useEffect(() => {
-        // Check selected component exists and scroll to it
-        const index = componentRefs.findIndex((item) => item.current?.id === selectedComponent);
+        if (!layoutLoaded) return;
+
+        // Extract the base component name (remove the timestamp)
+        const baseComponent = selectedComponent.split('_')[0];
+
+        console.log("Component refs: ", componentRefs);
+        
+        // Check if the base component exists and scroll to it
+        const index = componentRefs.findIndex((item) => item.current?.id === baseComponent);
         console.log("Selected Component Index: " + index);
         if (index !== -1) {
             const ref = componentRefs[index];
             if (ref && ref.current) {
+                console.log("Scrolling to ref: ", ref.current);
                 ref.current.scrollIntoView({
                     behavior: 'smooth',
                     block: 'start',
                 });
             }
         }
-    }, [selectedComponent]);
+    }, [selectedComponent, componentRefs, layoutLoaded]);
 
     return (
         <div className="flex flex-col overflow-y-auto h-full">
