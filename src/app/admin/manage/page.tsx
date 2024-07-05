@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 
 import { getInventory } from './actions';
 
-import { SignedIn } from '@clerk/nextjs';
+import { Protect } from '@clerk/nextjs';
 
 import PageLayout from '@/components/layout/PageLayout';
 import { Manage } from '@/app/admin/manage/Manage';
@@ -46,10 +46,10 @@ export default async function ManagePage({ searchParams }: PageProps) {
     const inventory = await getInventory();
 
     return (
-        <SignedIn>
+        <Protect role="org:ADMIN">
             <PageLayout page="/manage">
                 <Manage inventory={inventory} activeTab={tab} />
             </PageLayout>
-        </SignedIn>
+        </Protect>
     );
 }

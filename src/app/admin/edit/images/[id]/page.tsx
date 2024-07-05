@@ -34,17 +34,17 @@ export const metadata: Metadata = {
     metadataBase: new URL('https://www.capitalcitystaging.com'),
 };
 
-import { SignedIn } from '@clerk/nextjs';
+import { Protect } from '@clerk/nextjs';
 
 import PageLayout from '@/components/layout/PageLayout';
 import ImageEditor from '@/app/admin/edit/images/[id]/ImageEditor';
 
 export default async function Page({ params }: { params: { id: string } }) {
     return (
-        <PageLayout page={`/edit/${params.id}`}>
-            <SignedIn>
+        <Protect role="org:ADMIN">
+            <PageLayout page={`/edit/${params.id}`}>
                 <ImageEditor inventoryId={params.id} />
-            </SignedIn>
-        </PageLayout>
+            </PageLayout>
+        </Protect>
     );
 }

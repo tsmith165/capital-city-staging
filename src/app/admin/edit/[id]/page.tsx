@@ -52,13 +52,14 @@ export default function Page({ params }: { params: { id: string } }) {
     const inventoryDataPromise = fetchInventoryData(id);
 
     return (
-        <PageLayout page={`/edit/${id}`}>
-            <Protect role="org:ADMIN">
-                <Suspense fallback={<LoadingSpinner page="Edit" />}>
-                    <Edit inventoryDataPromise={inventoryDataPromise} current_id={id} />
-                </Suspense>
-            </Protect>
-        </PageLayout>
+        <Protect role="org:ADMIN">
+            <PageLayout page={`/edit/${id}`}>
+                    <Suspense fallback={<LoadingSpinner page="Edit" />}>
+                        <Edit inventoryDataPromise={inventoryDataPromise} current_id={id} />
+                    </Suspense>
+            </PageLayout>
+        </Protect>
+
     );
 }
 

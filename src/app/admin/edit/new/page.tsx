@@ -34,18 +34,18 @@ export const metadata: Metadata = {
 };
 
 
-import { SignedIn } from '@clerk/nextjs';
+import { Protect } from '@clerk/nextjs';
 
 import PageLayout from '@/components/layout/PageLayout';
 import CreateInventory from '@/app/admin/edit/new/CreateInventory';
 
 export default function NewInventoryPage() {
     return (
-        <SignedIn>
+        <Protect role="org:ADMIN">
             <PageLayout page="/edit/new">
                 <CreateInventory />
             </PageLayout>
-        </SignedIn>
+        </Protect>
     );
 }
 
