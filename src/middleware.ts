@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 
 const isPrivateRoute = createRouteMatcher([
     '/admin(.*)',
+    '/admin/inventory(.*)',
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
@@ -18,7 +19,9 @@ export default clerkMiddleware(async (auth, req) => {
             console.error("Error protecting route with ADMIN role:", error);
             return NextResponse.redirect(new URL('/', req.url));
         }
-    } 
+    } else {
+        return NextResponse.next();
+    }
     return NextResponse.next();
 });
 

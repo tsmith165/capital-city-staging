@@ -1,6 +1,11 @@
-import type { Metadata } from 'next';
+import { Metadata } from 'next';
+import React, { Suspense } from 'react';
+import PageLayout from '@/components/layout/PageLayout';
+import InventoryPage from './InventoryPage';
+import Image from 'next/image';
+
 export const metadata: Metadata = {
-    title: 'Capital City Staging - Manage Images',
+    title: 'Capital City Staging - Inventory Management',
     description:
         "Capital City Staging allows you to focus on your next moves, we'll handle your history. With a home staged by Mia, you can trust that every room tells your story.",
     keywords:
@@ -12,7 +17,7 @@ export const metadata: Metadata = {
         apple: '/logo/apple-touch-icon-152x152.png',
     },
     openGraph: {
-        title: 'Capital City Staging - Manage Images',
+        title: 'Capital City Staging - Inventory Management',
         description:
             "Capital City Staging allows you to focus on your next moves, we'll handle your history. With a home staged by Mia, you can trust that every room tells your story.",
         siteName: 'Capital City Staging',
@@ -31,28 +36,22 @@ export const metadata: Metadata = {
     metadataBase: new URL('https://www.capitalcitystaging.com'),
 };
 
-import { getInventory } from './actions';
-
-import { Protect } from '@clerk/nextjs';
-
-import PageLayout from '@/components/layout/PageLayout';
-import { Manage } from '@/app/admin/manage/Manage';
-
-interface PageProps {
-    searchParams?: {
-        tab?: string;
-    };
-}
-
-export default async function ManagePage({ searchParams }: PageProps) {
-    const tab = searchParams?.tab || 'manage';
-    const inventory = await getInventory();
-
+export default async function Page() {
     return (
-        <Protect role="org:ADMIN">
-            <PageLayout page="/manage">
-                <Manage inventory={inventory} activeTab={tab} />
-            </PageLayout>
-        </Protect>
+        <PageLayout page="/admin/inventory">
+            <Suspense
+                fallback={
+                    <div className="inset-0 flex h-full w-full items-center justify-center">
+                        <div className="relative flex h-[250px] w-[250px] items-center justify-center rounded-full bg-stone-900 p-6 opacity-70 xxs:h-[300px] xxs:w-[300px] xs:h-[350px] xs:w-[350px]">
+                            <Image src="/logo/admin_logo.png" alt="Admin Logo" width={370} height={150} />
+                        </div>
+                    </div>
+                }
+            >
+                <InventoryPage />
+            </Suspense>
+        </PageLayout>
     );
 }
+
+export const revalidate = 60; // Revalidate this page every 60 seconds
