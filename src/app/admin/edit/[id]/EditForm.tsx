@@ -49,12 +49,10 @@ const EditForm: React.FC<EditFormProps> = ({ current_inventory }) => {
                         value={formData.category}
                         onChange={handleChange}
                         select_options={[
-                            ['Living Room', 'Living Room'],
-                            ['Bedroom', 'Bedroom'],
-                            ['Dining Room', 'Dining Room'],
-                            ['Office', 'Office'],
-                            ['Kitchen', 'Kitchen'],
-                            ['Bathroom', 'Bathroom'],
+                            ['Couch', 'Couch'],
+                            ['Table', 'Table'],
+                            ['Chair', 'Chair'],
+                            ['Bed', 'Bed'],
                             ['Other', 'Other'],
                         ]}
                     />

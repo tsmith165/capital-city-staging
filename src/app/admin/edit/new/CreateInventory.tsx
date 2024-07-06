@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { createNewInventory } from '@/app/admin/edit/actions';
-import ResizeUploader from '@/components/ResizeUploader';
+import ResizeUploader from '@/app/admin/edit/ResizeUploader';
 import InputTextbox from '@/components/inputs/InputTextbox';
 
 interface NewInventoryData {
