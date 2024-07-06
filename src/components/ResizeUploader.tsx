@@ -10,8 +10,15 @@ interface ResizeUploaderProps {
     handleResetInputs: () => void;
 }
 
+// New interface for typing the upload response
+interface UploadResponse {
+    name: string;
+    url: string;
+}
+
 const ResizeUploader: React.FC<ResizeUploaderProps> = ({ onFilesSelected, handleUploadComplete, handleResetInputs }) => {
-    const [files, setFiles] = useState<File[]>([]);
+    const [largeFile, setLargeFile] = useState<File | null>(null);
+    const [smallFile, setSmallFile] = useState<File | null>(null);
     const [isFileSelected, setIsFileSelected] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [isUploading, setIsUploading] = useState(false);
@@ -20,9 +27,18 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ onFilesSelected, handle
     const { startUpload } = useUploadThing('imageUploader', {
         onClientUploadComplete: (res) => {
             console.log('Upload complete:', res);
-            const originalImageUrl = res && res[0] ? (res[0] as any).url : '';
-            const smallImageUrl = res && res[1] ? (res[1] as any).url : '';
-            handleUploadComplete(originalImageUrl, smallImageUrl);
+            if (res && res.length === 2) {
+                const smallImage = res.find((file: UploadResponse) => file.name.startsWith('small-'));
+                const largeImage = res.find((file: UploadResponse) => !file.name.startsWith('small-'));
+                
+                if (smallImage && largeImage) {
+                    handleUploadComplete(largeImage.url, smallImage.url);
+                } else {
+                    console.error('Could not identify small and large images from the response');
+                }
+            } else {
+                console.error('Unexpected response format');
+            }
             setIsUploading(false);
         },
         onUploadError: (error: Error) => {
@@ -84,7 +100,8 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ onFilesSelected, handle
                 const smallResizedFile = await resizeImage(originalFile, 450, 450);
 
                 setIsFileSelected(true);
-                setFiles([originalResizedFile, smallResizedFile]);
+                setLargeFile(originalResizedFile);
+                setSmallFile(smallResizedFile);
                 onFilesSelected(originalResizedFile, smallResizedFile);
             }
         },
@@ -98,18 +115,20 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ onFilesSelected, handle
         }
     };
 
-    const handleUploadClick = async () => {
-        if (files.length === 0) return;
-        
-        // Log file sizes
-        files.forEach(async (file, index) => {
-            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-            console.log(`File ${index + 1} size: ${fileSizeMB} MB`);
+    const getFileSizeMB = (file: File) => {
+        return (file.size / (1024 * 1024)).toFixed(2);
+    };
 
-        });
+    const handleUploadClick = async () => { 
+        if (!largeFile || !smallFile) return;
 
-        // Start upload
-        await startUpload(files);   
+        console.log(`Uploading large file with size: ${getFileSizeMB(largeFile)} MB`);
+        console.log(`Uploading small file with size: ${getFileSizeMB(smallFile)} MB`);
+
+        // Create a new File object for the small file with the "small-" prefix
+        const smallFileWithPrefix = new File([smallFile], `small-${smallFile.name}`, { type: smallFile.type });
+
+        await startUpload([smallFileWithPrefix, largeFile]);
     };
 
     return (
@@ -122,7 +141,7 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ onFilesSelected, handle
                 >
                     Select File
                 </button>
-                {files.length > 0 && (
+                {largeFile && smallFile && (
                     <button
                         onClick={handleUploadClick}
                         className={`group relative overflow-hidden rounded-md ${

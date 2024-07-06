@@ -10,6 +10,7 @@ import sharp from 'sharp';
 
 import { createUploadthing, type FileRouter } from 'uploadthing/next';
 import { Inventory, InventoryWithImages, ExtraImages } from '@/db/schema';
+import { isClerkUserIdAdmin } from '@/utils/auth/ClerkUtils';
 
 const f = createUploadthing();
 
@@ -21,12 +22,16 @@ const ourFileRouter = {
 
 export type OurFileRouter = typeof ourFileRouter;
 
-function checkUserRole(): { isAdmin: boolean; error?: string } {
-    const { orgRole } = auth();
-    console.log(`User organization Role: ${orgRole}`);
-    const isAdmin = orgRole === 'ADMIN';
-    if (!isAdmin) {
-        return { isAdmin: false, error: 'User does not have the "ADMIN" role. Cannot edit piece.' };
+async function checkUserRole(): Promise<{ isAdmin: boolean; error?: string | undefined; }> {
+    const { userId } = auth();
+    if (!userId) {
+        return { isAdmin: false, error: 'User is not authenticated. Cannot edit piece.' };
+    }
+    console.log(`User ID: ${userId}`);
+    const hasAdminRole = await isClerkUserIdAdmin(userId);
+    console.log(`User hasAdminRole: ${hasAdminRole}`);
+    if (!hasAdminRole) {
+        return { isAdmin: false, error: 'User does not have the admin role. Cannot edit piece.' };
     }
     return { isAdmin: true };
 }
@@ -38,7 +43,7 @@ export async function generateMissingSmallImages(
     updatedItem?: { updatedItems: number; updatedExtraImages: number; };
     error?: string;
 }> {
-    const { isAdmin, error: roleError } = checkUserRole();
+    const { isAdmin, error: roleError } = await checkUserRole();
     if (!isAdmin) {
         console.error(roleError);
         return { success: false, error: roleError };
@@ -139,7 +144,7 @@ export async function generateMissingSmallImages(
 }
 
 export async function getInventoryToVerify(): Promise<{ success: boolean; inventory?: InventoryWithImages[]; error?: string }> {
-    const { isAdmin, error: roleError } = checkUserRole();
+    const { isAdmin, error: roleError } = await checkUserRole();
     if (!isAdmin) {
         console.error(roleError);
         return { success: false, error: roleError };
@@ -161,7 +166,7 @@ export async function getInventoryToVerify(): Promise<{ success: boolean; invent
 export async function verifyImageDimensions(
     image: any
 ): Promise<{ success: boolean; verifyResult?: { id: number; title: string; mainImage?: any; smallImage?: any }; error?: string }> {
-    const { isAdmin, error: roleError } = checkUserRole();
+    const { isAdmin, error: roleError } = await checkUserRole();
     if (!isAdmin) {
         console.error(roleError);
         return { success: false, error: roleError };
