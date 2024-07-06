@@ -111,7 +111,7 @@ const Inventory = ({ items }: { items: InventoryWithImages[] }) => {
         setSelectedItemIndex(index);
         const newSearchParams = new URLSearchParams(searchParams);
         newSearchParams.set('item', `${id}`);
-        router.replace(`/inventory?${newSearchParams.toString()}`);
+        router.replace(`/admin/inventory?${newSearchParams.toString()}`);
         setImageLoadStates({});
         selectedImageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
