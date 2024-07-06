@@ -1,4 +1,4 @@
-import '../styles/globals.css';
+import '../styles/globals.scss';
 
 import React, { ReactNode } from 'react';
 import { SpeedInsights } from "@vercel/speed-insights/next"
