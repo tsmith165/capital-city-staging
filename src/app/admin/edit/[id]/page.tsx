@@ -33,7 +33,6 @@ export const metadata: Metadata = {
 
 
 import React, { Suspense } from 'react';
-import { Protect } from '@clerk/nextjs';
 
 import { fetchInventoryById, fetchAdjacentInventoryIds } from '@/app/actions';
 
@@ -52,14 +51,11 @@ export default function Page({ params }: { params: { id: string } }) {
     const inventoryDataPromise = fetchInventoryData(id);
 
     return (
-        <Protect role="org:ADMIN">
-            <PageLayout page={`/edit/${id}`}>
-                    <Suspense fallback={<LoadingSpinner page="Edit" />}>
-                        <Edit inventoryDataPromise={inventoryDataPromise} current_id={id} />
-                    </Suspense>
-            </PageLayout>
-        </Protect>
-
+        <PageLayout page={`/edit/${id}`}>
+                <Suspense fallback={<LoadingSpinner page="Edit" />}>
+                    <Edit inventoryDataPromise={inventoryDataPromise} current_id={id} />
+                </Suspense>
+        </PageLayout>
     );
 }
 

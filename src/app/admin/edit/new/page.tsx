@@ -33,19 +33,14 @@ export const metadata: Metadata = {
     metadataBase: new URL('https://www.capitalcitystaging.com'),
 };
 
-
-import { Protect } from '@clerk/nextjs';
-
 import PageLayout from '@/components/layout/PageLayout';
 import CreateInventory from '@/app/admin/edit/new/CreateInventory';
 
 export default function NewInventoryPage() {
     return (
-        <Protect role="org:ADMIN">
-            <PageLayout page="/edit/new">
-                <CreateInventory />
-            </PageLayout>
-        </Protect>
+        <PageLayout page="/edit/new">
+            <CreateInventory />
+        </PageLayout>
     );
 }
 
