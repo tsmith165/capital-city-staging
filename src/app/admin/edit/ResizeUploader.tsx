@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { generateReactHelpers } from '@uploadthing/react';
 import type { OurFileRouter } from '@/app/api/uploadthing/core';
+import { set } from 'zod';
 
 const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
@@ -153,6 +154,11 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ onFilesSelected, handle
         const smallFileWithPrefix = new File([smallFile], `small-${smallFile.name}`, { type: smallFile.type });
 
         await startUpload([smallFileWithPrefix, largeFile]);
+
+        setIsUploading(false);
+        setUploadProgress(0);
+        setLargeFile(null);
+        setSmallFile(null);
     };
 
     return (
