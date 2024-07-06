@@ -38,6 +38,8 @@ const Inventory = ({ items }: { items: InventoryWithImages[] }) => {
     const [isFullScreenImage, setIsFullScreenImage] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [imageLoadStates, setImageLoadStates] = useState<{ [key: number]: boolean }>({});
+    const [isPlaying, setIsPlaying] = useState(true);
+    const [speed, setSpeed] = useState(3000);
 
     const selectedItem = selectedItemIndex !== null ? items[selectedItemIndex] : null;
     const selectedImageRef = useRef<HTMLDivElement>(null);
@@ -76,6 +78,22 @@ const Inventory = ({ items }: { items: InventoryWithImages[] }) => {
         const initialSelectedIndex = items.findIndex((item) => item.id.toString() === selectedItemId);
         setSelectedItemIndex(initialSelectedIndex !== -1 ? initialSelectedIndex : null);
     }, [searchParams]);
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+
+        if (isPlaying && selectedItem) {
+            interval = setInterval(() => {
+                setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imageList.length);
+            }, speed);
+        }
+
+        return () => {
+            if (interval) {
+                clearInterval(interval);
+            }
+        };
+    }, [speed, isPlaying, imageList, selectedItem]);
 
     const createInventory = async (item_list: InventoryWithImages[], selected_category: string) => {
         setInventoryItems(() => []);
@@ -116,6 +134,25 @@ const Inventory = ({ items }: { items: InventoryWithImages[] }) => {
         selectedImageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
+    const handleImageLoad = () => {
+        setImageLoadStates((prevLoadStates) => ({
+            ...prevLoadStates,
+            [currentImageIndex]: true,
+        }));
+    };
+
+    const handleNext = () => {
+        setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imageList.length);
+    };
+
+    const handlePrev = () => {
+        setCurrentImageIndex((prevIndex) => (prevIndex - 1 + imageList.length) % imageList.length);
+    };
+
+    const togglePlayPause = () => {
+        setIsPlaying((prevState) => !prevState);
+    };
+
     return (
         <>
             <motion.div
@@ -131,9 +168,16 @@ const Inventory = ({ items }: { items: InventoryWithImages[] }) => {
                         currentImageIndex={currentImageIndex}
                         imageList={imageList}
                         imageLoadStates={imageLoadStates}
+                        handleImageLoad={handleImageLoad}
                         setIsFullScreenImage={setIsFullScreenImage}
                         selectedItemIndex={selectedItemIndex}
                         selectedImageRef={selectedImageRef}
+                        handleNext={handleNext}
+                        handlePrev={handlePrev}
+                        togglePlayPause={togglePlayPause}
+                        isPlaying={isPlaying}
+                        speed={speed}
+                        setSpeed={setSpeed}
                     />
                 )}
                 <motion.div
@@ -164,8 +208,12 @@ const Inventory = ({ items }: { items: InventoryWithImages[] }) => {
                     currentImageIndex={currentImageIndex}
                     setCurrentImageIndex={setCurrentImageIndex}
                     imageList={imageList}
+                    isPlaying={isPlaying}
+                    setIsPlaying={setIsPlaying}
                     setIsFullScreenImage={setIsFullScreenImage}
                     selectedItemIndex={selectedItemIndex}
+                    setSpeed={setSpeed}
+                    speed={speed}
                 />
             )}
         </>

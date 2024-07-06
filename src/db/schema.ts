@@ -1,3 +1,5 @@
+// File 1: /src/db/schema.ts
+
 import { pgTable, text, integer, date, serial } from 'drizzle-orm/pg-core';
 import { type InferInsertModel, type InferSelectModel } from 'drizzle-orm';
 
@@ -20,7 +22,6 @@ export const inventoryTable = pgTable('inventory', {
     small_image_path: text('small_image_path').notNull(),
     small_width: integer('small_width').notNull(),
     small_height: integer('small_height').notNull(),
-    
 });
 
 export type Inventory = InferSelectModel<typeof inventoryTable>;
@@ -31,7 +32,7 @@ export const extraImagesTable = pgTable('ExtraImages', {
     inventory_id: integer('piece_id')
         .notNull()
         .references(() => inventoryTable.id),
-        title: text('title').default(''),
+    title: text('title').default(''),
     image_path: text('image_path').notNull(),
     width: integer('width').notNull(),
     height: integer('height').notNull(),
