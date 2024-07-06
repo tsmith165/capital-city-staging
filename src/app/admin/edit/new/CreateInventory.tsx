@@ -57,9 +57,21 @@ export default function CreateInventory() {
             setSmallHeight(smallHeight);
         };
     };
-    const handleUploadComplete = (originalImageUrl: string, smallImageUrl: string) => {
+
+    const handleUploadComplete = (
+        originalImageUrl: string, 
+        smallImageUrl: string, 
+        originalWidth: number, 
+        originalHeight: number, 
+        smallWidth: number, 
+        smallHeight: number
+    ) => {
         setImageUrl(originalImageUrl);
         setSmallImageUrl(smallImageUrl);
+        setWidth(originalWidth);
+        setHeight(originalHeight);
+        setSmallWidth(smallWidth);
+        setSmallHeight(smallHeight);
     };
 
     const handleCreateInventory = async () => {

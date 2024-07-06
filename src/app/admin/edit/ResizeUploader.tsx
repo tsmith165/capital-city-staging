@@ -1,3 +1,5 @@
+// File: /src/app/admin/edit/ResizeUploader.tsx
+
 import React, { useState, useCallback, useRef } from 'react';
 import { generateReactHelpers } from '@uploadthing/react';
 import type { OurFileRouter } from '@/app/api/uploadthing/core';
@@ -6,7 +8,14 @@ const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
 interface ResizeUploaderProps {
     onFilesSelected: (originalFile: File, smallFile: File) => void;
-    handleUploadComplete: (originalImageUrl: string, smallImageUrl: string) => void;
+    handleUploadComplete: (
+        originalImageUrl: string, 
+        smallImageUrl: string, 
+        originalWidth: number, 
+        originalHeight: number, 
+        smallWidth: number, 
+        smallHeight: number
+    ) => void;
     handleResetInputs: () => void;
 }
 
@@ -32,7 +41,22 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ onFilesSelected, handle
                 const largeImage = res.find((file: UploadResponse) => !file.name.startsWith('small-'));
                 
                 if (smallImage && largeImage) {
-                    handleUploadComplete(largeImage.url, smallImage.url);
+                    const img = new Image();
+                    img.onload = function() {
+                        const smallImg = new Image();
+                        smallImg.onload = function() {
+                            handleUploadComplete(
+                                largeImage.url, 
+                                smallImage.url, 
+                                img.naturalWidth, 
+                                img.naturalHeight, 
+                                smallImg.naturalWidth, 
+                                smallImg.naturalHeight
+                            );
+                        };
+                        smallImg.src = smallImage.url;
+                    };
+                    img.src = largeImage.url;
                 } else {
                     console.error('Could not identify small and large images from the response');
                 }

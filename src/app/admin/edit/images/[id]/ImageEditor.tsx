@@ -1,6 +1,6 @@
-'use client';
+// File: /src/app/admin/edit/images/[id]/ImageEditor.tsx
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { storeUploadedImageDetails } from '@/app/admin/edit/actions';
 
@@ -22,6 +22,8 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
     const [smallImageUrl, setSmallImageUrl] = useState('Not yet uploaded');
     const [smallWidth, setSmallWidth] = useState(0);
     const [smallHeight, setSmallHeight] = useState(0);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
     const handleFilesSelected = (originalFile: File, smallFile: File) => {
         setFiles([originalFile, smallFile]);
@@ -48,9 +50,22 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
         };
     };
 
-    const handleUploadComplete = (originalImageUrl: string, smallImageUrl: string) => {
+    const handleUploadComplete = (
+        originalImageUrl: string, 
+        smallImageUrl: string, 
+        originalWidth: number, 
+        originalHeight: number, 
+        smallWidth: number, 
+        smallHeight: number
+    ) => {
         setImageUrl(originalImageUrl);
         setSmallImageUrl(smallImageUrl);
+        setWidth(originalWidth);
+        setHeight(originalHeight);
+        setSmallWidth(smallWidth);
+        setSmallHeight(smallHeight);
+        setIsSubmitted(false);
+        setStatusMessage(null);
     };
 
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -58,19 +73,24 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
     };
 
     const handleSubmit = async () => {
-        await storeUploadedImageDetails({
-            inventory_id: inventoryId,
-            image_path: imageUrl,
-            title: title,
-            inventory_type: selectedOption,
-            width: width.toString(),
-            height: height.toString(),
-            small_image_path: smallImageUrl,
-            small_width: smallWidth.toString(),
-            small_height: smallHeight.toString(),
-        });
-        // Redirect to the inventory details page after submitting the changes
-        window.location.href = `/admin/edit/${inventoryId}`;
+        try {
+            await storeUploadedImageDetails({
+                inventory_id: inventoryId,
+                image_path: imageUrl,
+                title: title,
+                inventory_type: selectedOption,
+                width: width.toString(),
+                height: height.toString(),
+                small_image_path: smallImageUrl,
+                small_width: smallWidth.toString(),
+                small_height: smallHeight.toString(),
+            });
+            setIsSubmitted(true);
+            setStatusMessage({ type: 'success', message: 'Changes submitted successfully. You can upload another image.' });
+        } catch (error) {
+            console.error('Error submitting changes:', error);
+            setStatusMessage({ type: 'error', message: 'Failed to submit changes. Please try again.' });
+        }
     };
 
     const handleResetInputs = () => {
@@ -82,9 +102,17 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
         setSmallImageUrl('Not yet uploaded');
         setSmallWidth(0);
         setSmallHeight(0);
+        setIsSubmitted(false);
+        setStatusMessage(null);
     };
 
-    const isFormValid = files.length > 0;
+    useEffect(() => {
+        if (isSubmitted) {
+            handleResetInputs();
+        }
+    }, [isSubmitted]);
+
+    const isFormValid = files.length > 0 && !isSubmitted;
 
     return (
         <div className="flex h-full w-full flex-col items-center justify-center bg-secondary_dark">
@@ -132,6 +160,11 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
                     >
                         Submit Changes
                     </button>
+                    {statusMessage && (
+                        <div className={`mt-4 p-2 rounded ${statusMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            {statusMessage.message}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
