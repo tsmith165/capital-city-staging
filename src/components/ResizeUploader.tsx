@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react';
-
 import { generateReactHelpers } from '@uploadthing/react';
 import type { OurFileRouter } from '@/app/api/uploadthing/core';
+
 const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
 interface ResizeUploaderProps {
@@ -100,7 +100,16 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ onFilesSelected, handle
 
     const handleUploadClick = async () => {
         if (files.length === 0) return;
-        await startUpload(files);
+        
+        // Log file sizes
+        files.forEach(async (file, index) => {
+            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            console.log(`File ${index + 1} size: ${fileSizeMB} MB`);
+
+        });
+
+        // Start upload
+        await startUpload(files);   
     };
 
     return (

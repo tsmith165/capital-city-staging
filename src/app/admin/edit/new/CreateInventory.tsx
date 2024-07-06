@@ -1,9 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-
 import { createNewInventory } from '@/app/admin/edit/actions';
-
 import ResizeUploader from '@/components/ResizeUploader';
 import InputTextbox from '@/components/inputs/InputTextbox';
 
@@ -31,6 +29,12 @@ export default function CreateInventory() {
         setFiles([originalFile, smallFile]);
         setTitle(originalFile.name.split('.')[0]);
 
+        // Log file sizes in MB
+        const originalSizeMB = (originalFile.size / (1024 * 1024)).toFixed(2);
+        const smallSizeMB = (smallFile.size / (1024 * 1024)).toFixed(2);
+        console.log(`Original file size: ${originalSizeMB} MB`);
+        console.log(`Small file size: ${smallSizeMB} MB`);
+
         const img = document.createElement('img');
         img.src = URL.createObjectURL(originalFile);
         img.onload = function () {
@@ -53,7 +57,6 @@ export default function CreateInventory() {
             setSmallHeight(smallHeight);
         };
     };
-
     const handleUploadComplete = (originalImageUrl: string, smallImageUrl: string) => {
         setImageUrl(originalImageUrl);
         setSmallImageUrl(smallImageUrl);
