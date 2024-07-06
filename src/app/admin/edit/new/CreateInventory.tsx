@@ -85,6 +85,7 @@ export default function CreateInventory() {
             smallHeight,
         };
         createNewInventory(data);
+        handleResetInputs();
     };
 
     const handleResetInputs = () => {
@@ -112,13 +113,13 @@ export default function CreateInventory() {
                         handleUploadComplete={handleUploadComplete}
                         handleResetInputs={handleResetInputs}
                     />
+                    <InputTextbox idName="title" name="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
                     <InputTextbox idName="image_path" name="Image Path" value={imageUrl} />
                     <InputTextbox idName="px_width" name="Width (px)" value={width.toString()} />
                     <InputTextbox idName="px_height" name="Height (px)" value={height.toString()} />
                     <InputTextbox idName="small_image_path" name="Small Path" value={smallImageUrl} />
                     <InputTextbox idName="small_px_width" name="Sm Width" value={smallWidth.toString()} />
                     <InputTextbox idName="small_px_height" name="Sm Height" value={smallHeight.toString()} />
-                    <InputTextbox idName="title" name="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
                     {imageUrl === '' || imageUrl === null ? null : width < 800 && height < 800 ? (
                         <div className="text-red-700">Warning: Image width and height are less than 800px.</div>
                     ) : width < 800 ? (
