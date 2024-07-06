@@ -1,4 +1,4 @@
-// File: /src/app/admin/edit/images/[id]/ImageEditor.tsx
+'use client';
 
 import { useState, useEffect } from 'react';
 
