@@ -86,6 +86,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
                 small_height: smallHeight.toString(),
             });
             setIsSubmitted(true);
+            handleResetInputs();
             setStatusMessage({ type: 'success', message: 'Changes submitted successfully. You can upload another image.' });
         } catch (error) {
             console.error('Error submitting changes:', error);
@@ -103,7 +104,6 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
         setSmallWidth(0);
         setSmallHeight(0);
         setIsSubmitted(false);
-        setStatusMessage(null);
     };
 
     useEffect(() => {
