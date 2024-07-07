@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { createNewInventory } from '@/app/admin/edit/actions';
 import ResizeUploader from '@/app/admin/edit/ResizeUploader';
 import InputTextbox from '@/components/inputs/InputTextbox';
@@ -23,8 +24,13 @@ export default function CreateInventory() {
     const [smallImageUrl, setSmallImageUrl] = useState('Not yet uploaded');
     const [smallWidth, setSmallWidth] = useState(0);
     const [smallHeight, setSmallHeight] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-    const handleUploadComplete = (
+    const router = useRouter();
+
+    const handleUploadComplete = useCallback((
+        fileName: string,
         originalImageUrl: string, 
         smallImageUrl: string, 
         originalWidth: number, 
@@ -32,35 +38,48 @@ export default function CreateInventory() {
         smallWidth: number, 
         smallHeight: number
     ) => {
+        console.log('handleUploadComplete', fileName, originalImageUrl, smallImageUrl, originalWidth, originalHeight, smallWidth, smallHeight);
+        setTitle(fileName.split('.')[0]);
         setImageUrl(originalImageUrl);
         setSmallImageUrl(smallImageUrl);
         setWidth(originalWidth);
         setHeight(originalHeight);
         setSmallWidth(smallWidth);
         setSmallHeight(smallHeight);
+        setStatusMessage(null);
         
-        // Set the title based on the original file name
-        const fileName = originalImageUrl.split('/').pop();
         if (fileName) {
             setTitle(fileName.split('.')[0]);
         }
-    };
+    }, []);
 
     const handleCreateInventory = async () => {
-        const data: NewInventoryData = {
-            name: title,
-            imagePath: imageUrl,
-            width,
-            height,
-            smallImagePath: smallImageUrl,
-            smallWidth,
-            smallHeight,
-        };
-        createNewInventory(data);
-        handleResetInputs();
+        setIsSubmitting(true);
+        try {
+            const data: NewInventoryData = {
+                name: title,
+                imagePath: imageUrl,
+                width,
+                height,
+                smallImagePath: smallImageUrl,
+                smallWidth,
+                smallHeight,
+            };
+            const inventory_data = await createNewInventory(data);
+            setStatusMessage({ type: 'success', message: 'Inventory created successfully.' });
+            handleResetInputs();
+            if (inventory_data.inventory?.id) {
+                router.push(`/admin/edit/${inventory_data.inventory?.id}`);
+            }
+        } catch (error) {
+            console.error('Error creating inventory:', error);
+            setStatusMessage({ type: 'error', message: 'Failed to create inventory. Please try again.' });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
-    const handleResetInputs = () => {
+    const handleResetInputs = useCallback(() => {
         setImageUrl('Not yet uploaded');
         setWidth(0);
         setHeight(0);
@@ -68,14 +87,15 @@ export default function CreateInventory() {
         setSmallImageUrl('Not yet uploaded');
         setSmallWidth(0);
         setSmallHeight(0);
-    };
+        setStatusMessage(null);
+    }, []);
 
-    const isFormValid = imageUrl !== 'Not yet uploaded' && title !== 'Not yet uploaded';
+    const isFormValid = imageUrl !== 'Not yet uploaded' && title !== 'Not yet uploaded' && !isSubmitting;
 
     return (
-        <div className="flex h-full w-full flex-col items-center justify-center bg-secondary_dark">
-            <div className="flex w-4/5 flex-col items-center justify-center rounded-lg bg-secondary_light">
-                <div id="header" className="w-full rounded-t-lg bg-secondary p-4 text-center text-4xl font-bold text-primary">
+        <div className="flex h-full w-full flex-col items-center justify-center bg-stone-900">
+            <div className="flex w-4/5 flex-col items-center justify-center rounded-lg bg-stone-900">
+                <div id="header" className="w-full rounded-t-lg text-center text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary via-secondary_light to-secondary">
                     Create New Inventory
                 </div>
                 <div className="flex w-full flex-col items-center space-y-2 p-2">
@@ -90,12 +110,12 @@ export default function CreateInventory() {
                     <InputTextbox idName="small_image_path" name="Small Path" value={smallImageUrl} />
                     <InputTextbox idName="small_px_width" name="Sm Width" value={smallWidth.toString()} />
                     <InputTextbox idName="small_px_height" name="Sm Height" value={smallHeight.toString()} />
-                    {imageUrl === '' || imageUrl === null ? null : width < 800 && height < 800 ? (
-                        <div className="text-red-700">Warning: Image width and height are less than 800px.</div>
+                    {imageUrl !== '' && imageUrl !== null ? null : width < 800 && height < 800 ? (
+                        <div className="text-red-500">Warning: Image width and height are less than 800px.</div>
                     ) : width < 800 ? (
-                        <div className="text-red-700">Warning: Image width is less than 800px.</div>
+                        <div className="text-red-500">Warning: Image width is less than 800px.</div>
                     ) : height < 800 ? (
-                        <div className="text-red-700">Warning: Image height is less than 800px.</div>
+                        <div className="text-red-500">Warning: Image height is less than 800px.</div>
                     ) : null}
 
                     <button
@@ -103,14 +123,19 @@ export default function CreateInventory() {
                         disabled={!isFormValid}
                         onClick={handleCreateInventory}
                         className={
-                            'relative rounded-md border-2 px-4 py-1 text-lg font-bold ' +
+                            'relative rounded-md px-4 py-1 text-lg font-bold ' +
                             (isFormValid
-                                ? 'border-primary bg-primary_dark text-primary hover:border-primary_dark hover:bg-primary hover:text-primary_dark'
-                                : 'cursor-not-allowed border-gray-400 bg-gray-300 text-gray-500')
+                                ? ' bg-secondary_dark text-stone-300 hover:bg-secondary'
+                                : 'cursor-not-allowed bg-stone-300 text-secondary_dark')
                         }
                     >
-                        <span className="relative z-10">Create Inventory</span>
+                        {isSubmitting ? 'Creating...' : 'Create Inventory'}
                     </button>
+                    {statusMessage && (
+                        <div className={`mt-4 p-2 rounded ${statusMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            {statusMessage.message}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

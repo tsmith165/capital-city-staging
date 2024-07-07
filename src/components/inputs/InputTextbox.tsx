@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Tooltip } from 'react-tooltip';
 
 interface InputTextboxProps {
@@ -12,6 +12,18 @@ interface InputTextboxProps {
 }
 
 const InputTextbox: React.FC<InputTextboxProps> = ({ idName, name, value, placeholder, onChange }) => {
+    const inputRef = useRef<HTMLInputElement>(null);
+    const prevValueRef = useRef<string | undefined>(value);
+
+    useEffect(() => {
+        if (value !== prevValueRef.current) {
+            prevValueRef.current = value;
+            if (inputRef.current && !onChange) {
+                inputRef.current.value = value || '';
+            }
+        }
+    }, [idName, value, onChange]);
+
     const formatted_name = name
         .split('_')
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -27,24 +39,16 @@ const InputTextbox: React.FC<InputTextboxProps> = ({ idName, name, value, placeh
                 <div className="text-stone-400 font-bold">{formatted_name}</div>
             </div>
             <Tooltip id={`tooltip-${idName}`} place="top" />
-            {onChange ? (
-                <input
-                    id={idName}
-                    name={idName}
-                    className="flex h-8 w-full rounded-r-md border-none bg-stone-400 px-2 text-sm font-bold text-stone-950 placeholder-stone-700"
-                    value={value}
-                    placeholder={placeholder || ''}
-                    onChange={onChange}
-                />
-            ) : (
-                <input
-                    id={idName}
-                    name={idName}
-                    className="flex h-8 w-full rounded-r-md border-none bg-stone-400 px-2 text-sm font-bold text-stone-950 placeholder-stone-700"
-                    defaultValue={value}
-                    placeholder={placeholder || ''}
-                />
-            )}
+            <input
+                ref={inputRef}
+                id={idName}
+                name={idName}
+                className="flex h-8 w-full rounded-r-md border-none bg-stone-400 px-2 text-sm font-bold text-stone-950 placeholder-stone-700"
+                value={onChange ? value : undefined}
+                defaultValue={!onChange ? value : undefined}
+                placeholder={placeholder || ''}
+                onChange={onChange}
+            />
         </div>
     );
 };

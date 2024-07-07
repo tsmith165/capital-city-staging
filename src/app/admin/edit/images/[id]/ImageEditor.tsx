@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { storeUploadedImageDetails } from '@/app/admin/edit/actions';
 import ResizeUploader from '@/app/admin/edit/ResizeUploader';
 import InputTextbox from '@/components/inputs/InputTextbox';
@@ -22,7 +22,27 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-    const handleUploadComplete = (
+    useEffect(() => {
+        console.log('ImageEditor mounted or inventoryId changed:', inventoryId);
+        resetInputs();
+    }, [inventoryId]);
+
+    const resetInputs = useCallback(() => {
+        console.log('Resetting inputs');
+        setImageUrl('Not yet uploaded');
+        setTitle('Not yet uploaded');
+        setSelectedOption('main');
+        setWidth(0);
+        setHeight(0);
+        setSmallImageUrl('Not yet uploaded');
+        setSmallWidth(0);
+        setSmallHeight(0);
+        setIsSubmitted(false);
+        setStatusMessage(null);
+    }, []);
+
+    const handleUploadComplete = useCallback((
+        fileName: string,
         originalImageUrl: string, 
         smallImageUrl: string, 
         originalWidth: number, 
@@ -30,6 +50,11 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
         smallWidth: number, 
         smallHeight: number
     ) => {
+        console.log('handleUploadComplete called with:', {
+            fileName, originalImageUrl, smallImageUrl, originalWidth, originalHeight, smallWidth, smallHeight
+        });
+
+        setTitle(fileName.split('.')[0] || 'Not yet uploaded');
         setImageUrl(originalImageUrl);
         setSmallImageUrl(smallImageUrl);
         setWidth(originalWidth);
@@ -38,13 +63,17 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
         setSmallHeight(smallHeight);
         setIsSubmitted(false);
         setStatusMessage(null);
-        
-        // Set the title based on the original file name
-        const fileName = originalImageUrl.split('/').pop();
-        if (fileName) {
-            setTitle(fileName.split('.')[0]);
-        }
-    };
+
+        console.log('State after update:', {
+            title: fileName.split('.')[0] || 'Not yet uploaded',
+            imageUrl: originalImageUrl,
+            smallImageUrl,
+            width: originalWidth,
+            height: originalHeight,
+            smallWidth,
+            smallHeight
+        });
+    }, []);
 
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedOption(e.target.value);
@@ -64,7 +93,6 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
                 small_height: smallHeight.toString(),
             });
             setIsSubmitted(true);
-            handleResetInputs();
             setStatusMessage({ type: 'success', message: 'Changes submitted successfully. You can upload another image.' });
         } catch (error) {
             console.error('Error submitting changes:', error);
@@ -72,38 +100,23 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
         }
     };
 
-    const handleResetInputs = () => {
-        setImageUrl('Not yet uploaded');
-        setWidth(0);
-        setHeight(0);
-        setTitle('Not yet uploaded');
-        setSmallImageUrl('Not yet uploaded');
-        setSmallWidth(0);
-        setSmallHeight(0);
-        setIsSubmitted(false);
-    };
-
-    useEffect(() => {
-        if (isSubmitted) {
-            handleResetInputs();
-        }
-    }, [isSubmitted]);
-
     const isFormValid = imageUrl !== 'Not yet uploaded' && !isSubmitted;
 
+    console.log('Current state:', { imageUrl, title, width, height, smallImageUrl, smallWidth, smallHeight });
+
     return (
-        <div className="flex h-full w-full flex-col items-center justify-center bg-secondary_dark">
-            <div className="flex w-2/5 flex-col items-center justify-center rounded-lg bg-secondary_light">
+        <div className="flex h-full w-full flex-col items-center justify-center bg-stone-900">
+            <div className="flex w-4/5 flex-col items-center justify-center rounded-lg bg-stone-900">
                 <div
                     id="header"
-                    className="flex w-full items-center justify-center rounded-t-lg bg-secondary p-4 text-center text-4xl font-bold text-primary"
+                    className="w-full rounded-t-lg text-center text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary via-secondary_light to-secondary"
                 >
                     Edit Images
                 </div>
                 <div className="flex w-full flex-col items-center space-y-2 p-2">
                     <ResizeUploader
                         handleUploadComplete={handleUploadComplete}
-                        handleResetInputs={handleResetInputs}
+                        handleResetInputs={resetInputs}
                     />
                     <InputSelect
                         idName='inventory_type'
@@ -116,22 +129,34 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
                         ]}
                         onChange={handleSelectChange}
                     />
-                    <InputTextbox idName="title" name="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+                    <InputTextbox 
+                        idName="title" 
+                        name="Title" 
+                        value={title} 
+                        onChange={(e) => setTitle(e.target.value)} 
+                    />
                     <InputTextbox idName="image_path" name="Image Path" value={imageUrl} />
                     <InputTextbox idName="px_width" name="Width (px)" value={width.toString()} />
                     <InputTextbox idName="px_height" name="Height (px)" value={height.toString()} />
                     <InputTextbox idName="small_image_path" name="Small Path" value={smallImageUrl} />
                     <InputTextbox idName="small_px_width" name="Sm Width" value={smallWidth.toString()} />
                     <InputTextbox idName="small_px_height" name="Sm Height" value={smallHeight.toString()} />
+                    {imageUrl !== '' && imageUrl !== null ? null : width < 800 && height < 800 ? (
+                        <div className="text-red-500">Warning: Image width and height are less than 800px.</div>
+                    ) : width < 800 ? (
+                        <div className="text-red-500">Warning: Image width is less than 800px.</div>
+                    ) : height < 800 ? (
+                        <div className="text-red-500">Warning: Image height is less than 800px.</div>
+                    ) : null}
                     <button
                         type="button"
                         onClick={handleSubmit}
                         disabled={!isFormValid}
                         className={
-                            'rounded-md border-2 px-4 py-1 text-lg font-bold ' +
+                            'relative rounded-md px-4 py-1 text-lg font-bold ' +
                             (isFormValid
-                                ? 'border-primary bg-primary_dark text-primary hover:border-primary_dark hover:bg-primary hover:text-primary_dark'
-                                : 'cursor-not-allowed border-gray-400 bg-gray-300 text-gray-500')
+                                ? ' bg-secondary_dark text-stone-300 hover:bg-secondary'
+                                : 'cursor-not-allowed bg-stone-300 text-secondary_dark')
                         }
                     >
                         Submit Changes

@@ -324,6 +324,6 @@ export async function createNewInventory(newInventoryData: NewInventoryData) {
     }
 
     revalidatePath('/admin/edit');
-    redirect(`/admin/edit/${newInventoryOutput.inventory.id}`);
+    return { success: true, inventory: newInventoryOutput.inventory };
 }
 
