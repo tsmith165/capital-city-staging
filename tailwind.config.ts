@@ -55,13 +55,13 @@ export default withUt({
             // Custom gradeint utility classes
             const newUtilities = {
                 '.gradient-primary-main': {
-                    '@apply text-transparent bg-gradient-to-r bg-clip-text bg-gradient-to-r from-primary via-primary_dark to-primary': {},
+                    '@apply text-transparent bg-gradient-to-r bg-clip-text bg-gradient-to-r from-primary from-15% via-primary_dark via-50% to-primary to-85%': {},
                 },
                 '.gradient-secondary-main': {
-                    '@apply text-transparent bg-gradient-to-r bg-clip-text bg-gradient-to-r from-secondary via-50% via-secondary_light to-90% to-secondary': {},
+                    '@apply text-transparent bg-gradient-to-r bg-clip-text bg-gradient-to-r from-secondary from-15% via-secondary_light via-50% to-secondary to-85%': {},
                 },
                 '.gradient-gold-main': {
-                    '@apply text-transparent bg-gradient-to-r bg-clip-text bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400': {},
+                    '@apply text-transparent bg-gradient-to-r bg-clip-text bg-gradient-to-r from-yellow-500 from-15% via-amber-500 via-50% to-yellow-400 to-85%': {},
                 },
             };
 
