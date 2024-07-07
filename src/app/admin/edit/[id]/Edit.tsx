@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io';
@@ -17,35 +17,58 @@ interface EditProps {
 
 const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
     const [inventoryData, setInventoryData] = useState<any>(null);
+    const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+    const fetchData = useCallback(async () => {
+        try {
+            const data = await inventoryDataPromise;
+            setInventoryData(data);
+            console.log(`LOADING EDIT DETAILS PAGE - Inventory ID: ${current_id}`);
+        } catch (error) {
+            console.error("Error fetching inventory data:", error);
+            setSubmitMessage({ type: 'error', text: 'Failed to load inventory data.' });
+        }
+    }, [inventoryDataPromise, current_id]);
 
     useEffect(() => {
-        inventoryDataPromise.then((data) => {
-            setInventoryData(data);
-        });
-    }, [inventoryDataPromise]);
+        fetchData();
+    }, [fetchData]);
+
+    const handleTitleUpdateSubmit = async (formData: FormData) => {
+        setSubmitMessage(null);
+        try {
+            const result = await handleTitleUpdate(formData);
+            if (result.success) {
+                setSubmitMessage({ type: 'success', text: 'Title updated successfully!' });
+                // Refresh the inventory data to reflect the new title
+                fetchData();
+            } else {
+                setSubmitMessage({ type: 'error', text: result.error || 'An error occurred while updating the title.' });
+            }
+        } catch (error) {
+            setSubmitMessage({ type: 'error', text: 'An unexpected error occurred.' });
+        }
+    };
 
     const next_id = inventoryData?.next_id ?? -1;
     const last_id = inventoryData?.last_id ?? -1;
     const inventory_name = inventoryData?.name ?? '';
-    const price = inventoryData?.price ?? '';
 
-    console.log(`LOADING EDIT DETAILS PAGE - Inventory ID: ${current_id}`);
+    if (!inventoryData) {
+        return <LoadingSpinner page="Edit Details" />;
+    }
 
     return (
         <div className="flex h-full w-full flex-col md:flex-row bg-stone-800">
             <div className="h-1/3 md:h-full md:w-2/5 lg:w-1/2 p-8 rounded-md flex items-center justify-center">
-                {inventoryData ? (
-                    <Image
-                        src={inventoryData.image_path}
-                        alt={inventoryData.name}
-                        width={inventoryData.width}
-                        height={inventoryData.height}
-                        quality={100}
-                        className="object-contain rounded-md"
-                    />
-                ) : (
-                    <LoadingSpinner page="Edit Details" />
-                )}
+                <Image
+                    src={inventoryData.image_path}
+                    alt={inventoryData.name}
+                    width={inventoryData.width}
+                    height={inventoryData.height}
+                    quality={100}
+                    className="object-contain rounded-md"
+                />
             </div>
             <div className="h-2/3 overflow-y-auto md:h-full md:w-3/5 lg:w-1/2">
                 <div className="flex h-fit flex-row items-center space-x-2 p-2">
@@ -60,7 +83,7 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
                     <Link href={`/details/${current_id}`}>
                         <MdPageview className="h-[48px] w-[48px] cursor-pointer rounded-lg bg-secondary fill-stone-400 p-1 hover:bg-primary hover:fill-secondary_dark" />
                     </Link>
-                    <form action={handleTitleUpdate} className="flex w-full flex-grow flex-row rounded-lg bg-secondary_dark">
+                    <form action={handleTitleUpdateSubmit} className="flex w-full flex-grow flex-row rounded-lg bg-secondary_dark">
                         <input type="hidden" name="inventoryId" value={current_id} />
                         <input
                             type="text"
@@ -76,14 +99,13 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
                         </button>
                     </form>
                 </div>
-                {inventoryData ? (
-                    <>
-                        <EditForm current_inventory={inventoryData} />
-                        <InventoryOrderPanel current_inventory={inventoryData} />
-                    </>
-                ) : (
-                    <LoadingSpinner page="" />
+                {submitMessage && (
+                    <div className={`mt-2 p-2 rounded-md ${submitMessage.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`}>
+                        {submitMessage.text}
+                    </div>
                 )}
+                <EditForm current_inventory={inventoryData} />
+                <InventoryOrderPanel current_inventory={inventoryData} />
             </div>
         </div>
     );
