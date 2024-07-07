@@ -1,14 +1,10 @@
-// File: /src/app/admin/edit/ResizeUploader.tsx
-
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { generateReactHelpers } from '@uploadthing/react';
 import type { OurFileRouter } from '@/app/api/uploadthing/core';
-import { set } from 'zod';
 
 const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
 interface ResizeUploaderProps {
-    onFilesSelected: (originalFile: File, smallFile: File) => void;
     handleUploadComplete: (
         originalImageUrl: string, 
         smallImageUrl: string, 
@@ -20,19 +16,14 @@ interface ResizeUploaderProps {
     handleResetInputs: () => void;
 }
 
-// New interface for typing the upload response
 interface UploadResponse {
     name: string;
     url: string;
 }
 
-const ResizeUploader: React.FC<ResizeUploaderProps> = ({ onFilesSelected, handleUploadComplete, handleResetInputs }) => {
-    const [largeFile, setLargeFile] = useState<File | null>(null);
-    const [smallFile, setSmallFile] = useState<File | null>(null);
-    const [isFileSelected, setIsFileSelected] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState(0);
+const ResizeUploader: React.FC<ResizeUploaderProps> = ({ handleUploadComplete, handleResetInputs }) => {
     const [isUploading, setIsUploading] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     const { startUpload } = useUploadThing('imageUploader', {
         onClientUploadComplete: (res) => {
@@ -65,15 +56,15 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ onFilesSelected, handle
                 console.error('Unexpected response format');
             }
             setIsUploading(false);
+            setUploadProgress(0);
         },
         onUploadError: (error: Error) => {
             alert(`ERROR! ${error.message}`);
+            setIsUploading(false);
+            setUploadProgress(0);
         },
         onUploadProgress: (progress: number) => {
             setUploadProgress(progress);
-            if (progress < 100 && !isUploading && isFileSelected) {
-                setIsUploading(true);
-            }
         },
     });
 
@@ -115,79 +106,49 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ onFilesSelected, handle
         });
     };
 
-    const handleFileChange = useCallback(
-        async (e: React.ChangeEvent<HTMLInputElement>) => {
-            const selectedFiles = e.target.files;
-            if (selectedFiles && selectedFiles.length > 0) {
-                const originalFile = selectedFiles[0];
+    const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFiles = e.target.files;
+        if (selectedFiles && selectedFiles.length > 0) {
+            const originalFile = selectedFiles[0];
 
-                const originalResizedFile = await resizeImage(originalFile, 1920, 1920);
-                const smallResizedFile = await resizeImage(originalFile, 450, 450);
+            setIsUploading(true);
+            handleResetInputs();
 
-                setIsFileSelected(true);
-                setLargeFile(originalResizedFile);
-                setSmallFile(smallResizedFile);
-                onFilesSelected(originalResizedFile, smallResizedFile);
-            }
-        },
-        [onFilesSelected],
-    );
+            const originalResizedFile = await resizeImage(originalFile, 1920, 1920);
+            const smallResizedFile = await resizeImage(originalFile, 450, 450);
 
-    const handleSelectFilesClick = () => {
-        handleResetInputs();
-        if (fileInputRef.current) {
-            fileInputRef.current.click();
+            const smallFileWithPrefix = new File([smallResizedFile], `small-${smallResizedFile.name}`, { type: smallResizedFile.type });
+
+            await startUpload([smallFileWithPrefix, originalResizedFile]);
         }
-    };
-
-    const getFileSizeMB = (file: File) => {
-        return (file.size / (1024 * 1024)).toFixed(2);
-    };
-
-    const handleUploadClick = async () => { 
-        if (!largeFile || !smallFile) return;
-
-        console.log(`Uploading large file with size: ${getFileSizeMB(largeFile)} MB`);
-        console.log(`Uploading small file with size: ${getFileSizeMB(smallFile)} MB`);
-
-        // Create a new File object for the small file with the "small-" prefix
-        const smallFileWithPrefix = new File([smallFile], `small-${smallFile.name}`, { type: smallFile.type });
-
-        await startUpload([smallFileWithPrefix, largeFile]);
-
-        setIsUploading(false);
-        setUploadProgress(0);
-        setLargeFile(null);
-        setSmallFile(null);
-    };
+    }, [handleResetInputs, startUpload]);
 
     return (
-        <>
-            <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-            <div className="flex space-x-2">
-                <button
-                    onClick={handleSelectFilesClick}
-                    className="h-full rounded-md bg-primary_dark px-4 py-1 text-lg font-bold text-stone-300 hover:bg-secondary_dark hover:text-primary"
-                >
-                    Select File
-                </button>
-                {largeFile && smallFile && (
-                    <button
-                        onClick={handleUploadClick}
-                        className={`group relative overflow-hidden rounded-md ${
-                            isUploading ? 'bg-secondary_dark' : 'bg-primary_dark'
-                        } px-4 py-1 text-lg font-bold shadow-xl ring-2 ring-primary_dark hover:bg-secondary_dark`}
-                    >
-                        {isUploading && (
-                            <div className="absolute left-0 top-0 z-0 h-full bg-primary" style={{ width: `${uploadProgress}%` }} />
-                        )}
-                        <span className={`relative z-10 text-stone-300 ${isUploading ? '' : 'group-hover:text-primary'}`}>
-                            {isUploading ? 'Uploading...' : 'Upload'}
-                        </span>
-                    </button>
+        <div className="flex space-x-2">
+            <label
+                htmlFor="file-upload"
+                className={`cursor-pointer rounded-md px-4 py-1 text-lg font-bold shadow-xl ring-2 ring-primary_dark ${
+                    isUploading ? 'bg-secondary_dark' : 'bg-primary_dark hover:bg-secondary_dark'
+                }`}
+            >
+                <input
+                    id="file-upload"
+                    type="file"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    disabled={isUploading}
+                />
+                <span className="relative z-10 text-stone-300">
+                    {isUploading ? 'Uploading...' : 'Select and Upload File'}
+                </span>
+                {isUploading && (
+                    <div
+                        className="absolute left-0 top-0 h-full bg-primary"
+                        style={{ width: `${uploadProgress}%`, transition: 'width 0.3s ease-in-out' }}
+                    />
                 )}
-            </div>
-        </>
+            </label>
+        </div>
     );
 };
 

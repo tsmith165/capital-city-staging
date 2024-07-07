@@ -16,7 +16,6 @@ interface NewInventoryData {
 }
 
 export default function CreateInventory() {
-    const [files, setFiles] = useState<File[]>([]);
     const [imageUrl, setImageUrl] = useState('Not yet uploaded');
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
@@ -24,39 +23,6 @@ export default function CreateInventory() {
     const [smallImageUrl, setSmallImageUrl] = useState('Not yet uploaded');
     const [smallWidth, setSmallWidth] = useState(0);
     const [smallHeight, setSmallHeight] = useState(0);
-
-    const handleFilesSelected = (originalFile: File, smallFile: File) => {
-        setFiles([originalFile, smallFile]);
-        setTitle(originalFile.name.split('.')[0]);
-
-        // Log file sizes in MB
-        const originalSizeMB = (originalFile.size / (1024 * 1024)).toFixed(2);
-        const smallSizeMB = (smallFile.size / (1024 * 1024)).toFixed(2);
-        console.log(`Original file size: ${originalSizeMB} MB`);
-        console.log(`Small file size: ${smallSizeMB} MB`);
-
-        const img = document.createElement('img');
-        img.src = URL.createObjectURL(originalFile);
-        img.onload = function () {
-            const width = img.naturalWidth;
-            const height = img.naturalHeight;
-            console.log('Original Image width:', width, 'height:', height);
-            console.log('Original Image URL:', img.src);
-            setWidth(width);
-            setHeight(height);
-        };
-
-        const smallImg = document.createElement('img');
-        smallImg.src = URL.createObjectURL(smallFile);
-        smallImg.onload = function () {
-            const smallWidth = smallImg.naturalWidth;
-            const smallHeight = smallImg.naturalHeight;
-            console.log('Small Image width:', smallWidth, 'height:', smallHeight);
-            console.log('Small Image URL:', smallImg.src);
-            setSmallWidth(smallWidth);
-            setSmallHeight(smallHeight);
-        };
-    };
 
     const handleUploadComplete = (
         originalImageUrl: string, 
@@ -72,6 +38,12 @@ export default function CreateInventory() {
         setHeight(originalHeight);
         setSmallWidth(smallWidth);
         setSmallHeight(smallHeight);
+        
+        // Set the title based on the original file name
+        const fileName = originalImageUrl.split('/').pop();
+        if (fileName) {
+            setTitle(fileName.split('.')[0]);
+        }
     };
 
     const handleCreateInventory = async () => {
@@ -89,7 +61,6 @@ export default function CreateInventory() {
     };
 
     const handleResetInputs = () => {
-        setFiles([]);
         setImageUrl('Not yet uploaded');
         setWidth(0);
         setHeight(0);
@@ -99,7 +70,7 @@ export default function CreateInventory() {
         setSmallHeight(0);
     };
 
-    const isFormValid = files.length > 0 && title !== '';
+    const isFormValid = imageUrl !== 'Not yet uploaded' && title !== 'Not yet uploaded';
 
     return (
         <div className="flex h-full w-full flex-col items-center justify-center bg-secondary_dark">
@@ -109,7 +80,6 @@ export default function CreateInventory() {
                 </div>
                 <div className="flex w-full flex-col items-center space-y-2 p-2">
                     <ResizeUploader
-                        onFilesSelected={handleFilesSelected}
                         handleUploadComplete={handleUploadComplete}
                         handleResetInputs={handleResetInputs}
                     />

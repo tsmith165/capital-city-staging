@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
 import { storeUploadedImageDetails } from '@/app/admin/edit/actions';
-
 import ResizeUploader from '@/app/admin/edit/ResizeUploader';
 import InputTextbox from '@/components/inputs/InputTextbox';
 import InputSelect from '@/components/inputs/InputSelect';
@@ -13,7 +11,6 @@ interface ImageEditorProps {
 }
 
 const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
-    const [files, setFiles] = useState<File[]>([]);
     const [imageUrl, setImageUrl] = useState('Not yet uploaded');
     const [title, setTitle] = useState('Not yet uploaded');
     const [selectedOption, setSelectedOption] = useState('main');
@@ -24,31 +21,6 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
     const [smallHeight, setSmallHeight] = useState(0);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-
-    const handleFilesSelected = (originalFile: File, smallFile: File) => {
-        setFiles([originalFile, smallFile]);
-        setTitle(originalFile.name.split('.')[0]);
-
-        const img = document.createElement('img');
-        img.src = URL.createObjectURL(originalFile);
-        img.onload = function () {
-            const width = img.naturalWidth;
-            const height = img.naturalHeight;
-            console.log('Original Image width:', width, 'height:', height);
-            setWidth(width);
-            setHeight(height);
-        };
-
-        const smallImg = document.createElement('img');
-        smallImg.src = URL.createObjectURL(smallFile);
-        smallImg.onload = function () {
-            const smallWidth = smallImg.naturalWidth;
-            const smallHeight = smallImg.naturalHeight;
-            console.log('Small Image width:', smallWidth, 'height:', smallHeight);
-            setSmallWidth(smallWidth);
-            setSmallHeight(smallHeight);
-        };
-    };
 
     const handleUploadComplete = (
         originalImageUrl: string, 
@@ -66,6 +38,12 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
         setSmallHeight(smallHeight);
         setIsSubmitted(false);
         setStatusMessage(null);
+        
+        // Set the title based on the original file name
+        const fileName = originalImageUrl.split('/').pop();
+        if (fileName) {
+            setTitle(fileName.split('.')[0]);
+        }
     };
 
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -95,7 +73,6 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
     };
 
     const handleResetInputs = () => {
-        setFiles([]);
         setImageUrl('Not yet uploaded');
         setWidth(0);
         setHeight(0);
@@ -112,7 +89,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
         }
     }, [isSubmitted]);
 
-    const isFormValid = files.length > 0 && !isSubmitted;
+    const isFormValid = imageUrl !== 'Not yet uploaded' && !isSubmitted;
 
     return (
         <div className="flex h-full w-full flex-col items-center justify-center bg-secondary_dark">
@@ -125,7 +102,6 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
                 </div>
                 <div className="flex w-full flex-col items-center space-y-2 p-2">
                     <ResizeUploader
-                        onFilesSelected={handleFilesSelected}
                         handleUploadComplete={handleUploadComplete}
                         handleResetInputs={handleResetInputs}
                     />
