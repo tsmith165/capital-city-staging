@@ -26,6 +26,8 @@ export function Manage({ inventory, activeTab }: ManageProps) {
             console.log(`Handle Order Change: currId: ${currId} (${currOrderId}) | nextId: ${nextId} (${nextOrderId})`);
             await changeOrder([currId, currOrderId], [nextId, nextOrderId]);
             revalidatePath(`/admin/manage`);
+            revalidatePath(`/admin/inventory`);
+            // revalidatePath(`/admin/edit`);  // We dont have a default /edit page without query param for inventory id yet
         }
     }
 
@@ -38,7 +40,7 @@ export function Manage({ inventory, activeTab }: ManageProps) {
                     <div className="flex pt-1">
                         {inventory.length > 0 && (
                             <Link
-                                href="/manage?tab=manage"
+                                href="/admin/manage?tab=manage"
                                 className={`rounded-t-md px-2 py-1 ${
                                     activeTab === 'manage'
                                         ? 'bg-secondary_dark text-primary'

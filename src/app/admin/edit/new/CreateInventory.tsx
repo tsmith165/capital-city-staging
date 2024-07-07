@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createNewInventory } from '@/app/admin/edit/actions';
 import ResizeUploader from '@/app/admin/edit/ResizeUploader';
 import InputTextbox from '@/components/inputs/InputTextbox';
+import { revalidatePath } from 'next/cache';
 
 interface NewInventoryData {
     name: string;
@@ -67,6 +68,9 @@ export default function CreateInventory() {
             };
             const inventory_data = await createNewInventory(data);
             setStatusMessage({ type: 'success', message: 'Inventory created successfully.' });
+            // revalidatePath(`/admin/edit`);  // We dont have a default /edit page without query param for inventory id yet
+            revalidatePath(`/admin/inventory`);
+            revalidatePath(`/admin/manage`)
             handleResetInputs();
             if (inventory_data.inventory?.id) {
                 switch(action) {

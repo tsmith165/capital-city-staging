@@ -6,6 +6,7 @@ import { storeUploadedImageDetails } from '@/app/admin/edit/actions';
 import ResizeUploader from '@/app/admin/edit/ResizeUploader';
 import InputTextbox from '@/components/inputs/InputTextbox';
 import InputSelect from '@/components/inputs/InputSelect';
+import { revalidatePath } from 'next/cache';
 
 interface ImageEditorProps {
     inventoryId: string;
@@ -96,6 +97,9 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
                 small_height: smallHeight.toString(),
             });
             setStatusMessage({ type: 'success', message: 'Changes submitted successfully. You can upload another image.' });
+            revalidatePath(`/admin/edit/${inventoryId}`);  
+            revalidatePath(`/admin/inventory`);
+            revalidatePath(`/admin/manage`)
             if (shouldNavigate) {
                 router.push(`/admin/edit/${inventoryId}`);
             } else {
