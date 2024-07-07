@@ -59,7 +59,7 @@ const InventoryOrderPanel: React.FC<InventoryOrderPanelProps> = ({ current_inven
             elements.push(
                 <div
                     key={index}
-                    className="flex h-[70px] flex-row items-center space-x-2 rounded-b-lg px-2 py-2 hover:bg-primary_dark hover:text-secondary_light"
+                    className="flex h-[70px] flex-row items-center space-x-2 rounded-b-lg px-2 py-2 hover:bg-stone-600 hover:text-secondary_light"
                 >
                     <Image
                         src={image.image_path}
@@ -74,7 +74,7 @@ const InventoryOrderPanel: React.FC<InventoryOrderPanelProps> = ({ current_inven
                             <input type="hidden" name="currentInventoryId" value={currentInventoryId.toString()} />
                             <input type="hidden" name="targetInventoryId" value={prevInventoryId.toString()} />
                             <button type="submit">
-                                <IoIosArrowUp className="h-6 w-6 cursor-pointer rounded-sm bg-secondary_light fill-primary_dark p-1 hover:bg-primary hover:fill-secondary_dark" />
+                                <IoIosArrowUp className="h-6 w-6 cursor-pointer rounded-sm bg-secondary_dark fill-stone-400 p-1 hover:bg-primary hover:fill-secondary_dark" />
                             </button>
                         </form>
                         <form action={handleImageReorderAction}>
@@ -82,7 +82,7 @@ const InventoryOrderPanel: React.FC<InventoryOrderPanelProps> = ({ current_inven
                             <input type="hidden" name="currentInventoryId" value={currentInventoryId.toString()} />
                             <input type="hidden" name="targetInventoryId" value={nextInventoryId.toString()} />
                             <button type="submit">
-                                <IoIosArrowDown className="h-6 w-6 cursor-pointer rounded-sm bg-secondary_light fill-primary_dark p-1 hover:bg-primary hover:fill-secondary_dark" />
+                                <IoIosArrowDown className="h-6 w-6 cursor-pointer rounded-sm bg-secondary_dark fill-stone-400 p-1 hover:bg-primary hover:fill-secondary_dark" />
                             </button>
                         </form>
                     </div>
@@ -92,11 +92,11 @@ const InventoryOrderPanel: React.FC<InventoryOrderPanelProps> = ({ current_inven
                             <input type="hidden" name="inventoryId" value={current_inventory.id.toString()} />
                             <input type="hidden" name="imagePath" value={image.image_path} />
                             <button type="submit">
-                                <IoIosTrash className="h-6 w-6 cursor-pointer rounded-sm bg-red-800 fill-primary_dark p-1 hover:bg-red-600 hover:fill-secondary_dark" />
+                                <IoIosTrash className="h-6 w-6 cursor-pointer rounded-sm bg-red-800 fill-stone-400 p-1 hover:bg-red-600" />
                             </button>
                         </form>
                     </div>
-                    <div className="flex h-[58px] items-center justify-center">{image.title || image.image_path}</div>
+                    <div className="flex h-[58px] items-center justify-center text-stone-400">{image.title || image.image_path}</div>
                 </div>,
             );
         }
@@ -105,10 +105,10 @@ const InventoryOrderPanel: React.FC<InventoryOrderPanelProps> = ({ current_inven
 
     return (
         <div className="flex h-fit w-full flex-col p-2 pt-0">
-            <div className="rounded-lg bg-secondary_dark">
+            <div className="rounded-lg bg-stone-700">
                 {extra_images.length > 0 && (
                     <div>
-                        <h3 className="rounded-t-lg bg-primary px-2 py-2 text-lg font-semibold text-secondary_dark">Extra Images</h3>
+                        <h3 className="rounded-t-lg bg-secondary_dark px-2 py-2 text-lg font-semibold text-stone-400">Extra Images</h3>
                         <div className="flex h-fit flex-col">{renderImages(extra_images)}</div>
                     </div>
                 )}

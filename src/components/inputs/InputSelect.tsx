@@ -32,11 +32,11 @@ const InputSelect: React.FC<InputSelectProps> = ({ defaultValue, idName, name, s
     return (
         <div className="m-0 flex w-full p-0">
             <div 
-                className="flex min-w-28 max-w-28 items-center justify-center rounded-l-md bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 px-2.5 py-1.5"
+                className="flex min-w-28 max-w-28 items-center justify-center rounded-l-md bg-secondary_dark px-2.5 py-1.5"
                 data-tooltip-id={`tooltip-${idName}`}
                 data-tooltip-content={formatted_name}
             >
-                <div className="text-neutral-950 font-bold">{formatted_name}</div>
+                <div className="text-stone-400 font-bold">{formatted_name}</div>
             </div>
             <Tooltip id={`tooltip-${idName}`} place="top" />
             {onChange === undefined ? (
@@ -46,7 +46,7 @@ const InputSelect: React.FC<InputSelectProps> = ({ defaultValue, idName, name, s
                     isMulti={false}
                     id={idName}
                     name={idName}
-                    className="h-full flex-grow rounded-r-md border-none bg-secondary_light text-sm font-bold text-neutral-950"
+                    className="h-full flex-grow rounded-r-md border-none bg-stone-400 text-sm font-bold text-stone-950"
                     classNamePrefix="select"
                     components={{
                         DropdownIndicator,
@@ -55,7 +55,7 @@ const InputSelect: React.FC<InputSelectProps> = ({ defaultValue, idName, name, s
                         control: (baseStyles, state) => ({
                             ...baseStyles,
                             borderColor: '',
-                            backgroundColor: '#498352',
+                            backgroundColor: 'var(--tw-bg-stone-400)',
                         }),
                     }}
                     options={react_select_options}
@@ -67,7 +67,7 @@ const InputSelect: React.FC<InputSelectProps> = ({ defaultValue, idName, name, s
                     isMulti={false}
                     id={idName}
                     name={idName}
-                    className="h-full flex-grow rounded-r-md border-none bg-secondary_light text-sm font-bold text-neutral-950"
+                    className="h-full flex-grow rounded-r-md border-none bg-stone-400 text-sm font-bold text-stone-950"
                     classNamePrefix="select"
                     components={{
                         DropdownIndicator,
@@ -76,7 +76,7 @@ const InputSelect: React.FC<InputSelectProps> = ({ defaultValue, idName, name, s
                         control: (baseStyles, state) => ({
                             ...baseStyles,
                             borderColor: '',
-                            backgroundColor: '#498352',
+                            backgroundColor: 'var(--tw-bg-stone-400)',
                         }),
                     }}
                     options={react_select_options}

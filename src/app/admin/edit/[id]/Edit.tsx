@@ -32,8 +32,8 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
     console.log(`LOADING EDIT DETAILS PAGE - Inventory ID: ${current_id}`);
 
     return (
-        <div className="flex h-full w-full flex-col md:flex-row">
-            <div className="h-1/3 bg-secondary_dark md:h-full md:w-2/5 lg:w-1/2">
+        <div className="flex h-full w-full flex-col md:flex-row bg-stone-800">
+            <div className="h-1/3 md:h-full md:w-2/5 lg:w-1/2 p-8 rounded-md flex items-center justify-center">
                 {inventoryData ? (
                     <Image
                         src={inventoryData.image_path}
@@ -41,24 +41,24 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
                         width={inventoryData.width}
                         height={inventoryData.height}
                         quality={100}
-                        className="h-full w-full object-contain"
+                        className="object-contain rounded-md"
                     />
                 ) : (
                     <LoadingSpinner page="Edit Details" />
                 )}
             </div>
-            <div className="h-2/3 overflow-y-auto bg-secondary md:h-full md:w-3/5 lg:w-1/2">
-                <div className="flex h-fit flex-row items-center space-x-2 bg-primary p-2">
+            <div className="h-2/3 overflow-y-auto md:h-full md:w-3/5 lg:w-1/2">
+                <div className="flex h-fit flex-row items-center space-x-2 p-2">
                     <div className="flex h-[48px] flex-col space-y-1">
                         <Link href={`/admin/edit/${next_id}`}>
-                            <IoIosArrowUp className="h-[22px] w-8 cursor-pointer rounded-lg bg-secondary fill-secondary_dark hover:bg-secondary_dark hover:fill-primary" />
+                            <IoIosArrowUp className="h-[22px] w-8 cursor-pointer rounded-lg bg-secondary fill-stone-400 hover:bg-primary hover:fill-secondary_dark" />
                         </Link>
                         <Link href={`/admin/edit/${last_id}`}>
-                            <IoIosArrowDown className="h-[22px] w-8 cursor-pointer rounded-lg bg-secondary fill-secondary_dark hover:bg-secondary_dark hover:fill-primary" />
+                            <IoIosArrowDown className="h-[22px] w-8 cursor-pointer rounded-lg bg-secondary fill-stone-400 hover:bg-primary hover:fill-secondary_dark" />
                         </Link>
                     </div>
                     <Link href={`/details/${current_id}`}>
-                        <MdPageview className="h-[48px] w-[48px] cursor-pointer rounded-lg bg-secondary fill-secondary_dark p-1 hover:bg-secondary_dark hover:fill-primary" />
+                        <MdPageview className="h-[48px] w-[48px] cursor-pointer rounded-lg bg-secondary fill-stone-400 p-1 hover:bg-primary hover:fill-secondary_dark" />
                     </Link>
                     <form action={handleTitleUpdate} className="flex w-full flex-grow flex-row rounded-lg bg-secondary_dark">
                         <input type="hidden" name="inventoryId" value={current_id} />
@@ -66,11 +66,11 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
                             type="text"
                             name="newTitle"
                             defaultValue={inventory_name}
-                            className="m-0 flex w-full flex-grow rounded-lg border-none bg-secondary_dark px-3 py-1 text-2xl font-bold text-primary outline-none"
+                            className="m-0 flex w-full flex-grow rounded-lg border-none bg-secondary_dark px-3 py-1 text-2xl font-bold text-stone-400 outline-none"
                         />
                         <button
                             type="submit"
-                            className="ml-2 rounded-md bg-secondary px-3 py-1 font-bold text-primary hover:bg-primary_dark hover:text-secondary_dark"
+                            className="ml-2 rounded-md bg-secondary px-3 py-1 font-bold text-stone-400 hover:bg-primary_dark hover:text-secondary_dark"
                         >
                             Save
                         </button>

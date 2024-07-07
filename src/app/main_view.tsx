@@ -69,7 +69,7 @@ export default function MainView() {
                     key={id}
                     ref={refs.current[index]}
                     id={id}
-                    className="w-full h-auto bg-neutral-900"
+                    className="w-full h-auto bg-stone-900"
                 >
                     <Component />
                 </div>

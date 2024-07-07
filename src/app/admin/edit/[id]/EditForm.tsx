@@ -125,8 +125,8 @@ const EditForm: React.FC<EditFormProps> = ({ current_inventory }) => {
                     <button
                         type="submit"
                         className={
-                            'rounded-md border-2 border-primary_dark bg-primary px-3 py-1 text-center font-bold text-secondary_dark ' +
-                            'hover:border-primary hover:bg-secondary_dark hover:text-primary'
+                            'rounded-md bg-secondary px-3 py-1 text-center font-bold text-stone-400 ' +
+                            'hover:bg-primary hover:text-secondary_dark'
                         }
                     >
                         Submit Changes
@@ -134,8 +134,8 @@ const EditForm: React.FC<EditFormProps> = ({ current_inventory }) => {
                     <Link
                         href="/admin/edit/new"
                         className={
-                            'rounded-md border-2 border-primary_dark bg-primary px-3 py-1 text-center font-bold text-secondary_dark ' +
-                            'hover:border-primary hover:bg-secondary_dark hover:text-primary'
+                            'rounded-md bg-secondary px-3 py-1 text-center font-bold text-stone-400 ' +
+                            ' hover:bg-primary hover:text-secondary_dark'
                         }
                     >
                         Create New Inventory
@@ -143,8 +143,8 @@ const EditForm: React.FC<EditFormProps> = ({ current_inventory }) => {
                     <Link
                         href={`/admin/edit/images/${formData.id}`}
                         className={
-                            'rounded-md border-2 border-primary_dark bg-primary px-3 py-1 text-center font-bold text-secondary_dark ' +
-                            'hover:border-primary hover:bg-secondary_dark hover:text-primary'
+                            'rounded-md bg-secondary px-3 py-1 text-center font-bold text-stone-400 ' +
+                            'hover:bg-primary hover:text-secondary_dark'
                         }
                     >
                         Edit Images

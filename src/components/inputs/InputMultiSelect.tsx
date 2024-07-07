@@ -35,7 +35,7 @@ const InputMultiSelect: React.FC<InputMultiSelectProps> = ({ defaultValue, idNam
                 data-tooltip-id={`tooltip-${idName}`}
                 data-tooltip-content={formatted_name}
             >
-                <div className="text-neutral-950 font-bold">{formatted_name}</div>
+                <div className="text-stone-950 font-bold">{formatted_name}</div>
             </div>
             <Tooltip id={`tooltip-${idName}`} place="top" />
             <Select
@@ -43,7 +43,7 @@ const InputMultiSelect: React.FC<InputMultiSelectProps> = ({ defaultValue, idNam
                 isMulti={true}
                 id={idName}
                 name={idName}
-                className="h-full flex-grow rounded-r-md border-none bg-primary text-sm font-bold text-neutral-950"
+                className="h-full flex-grow rounded-r-md border-none bg-primary text-sm font-bold text-stone-950"
                 classNamePrefix="select"
                 components={{
                     DropdownIndicator,
@@ -52,15 +52,15 @@ const InputMultiSelect: React.FC<InputMultiSelectProps> = ({ defaultValue, idNam
                     control: (baseStyles, state) => ({
                         ...baseStyles,
                         borderColor: '',
-                        backgroundColor: '#54786d',
+                        backgroundColor: 'var(--color-secondary)',
                     }),
                     multiValue: (styles) => ({
                         ...styles,
-                        backgroundColor: '#616c63',
+                        backgroundColor: 'var(--color-secondary-light)',
                     }),
                     option: (provided, state) => ({
                         ...provided,
-                        color: '#54786d',
+                        color: 'var(--color-secondary)',
                     }),
                 }}
                 options={react_select_options}

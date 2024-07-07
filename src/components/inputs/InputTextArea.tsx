@@ -20,17 +20,17 @@ const InputTextArea: React.FC<InputTextAreaProps> = ({ idName, name, rows, value
     return (
         <div className="m-0 flex w-full p-0">
             <div 
-                className="flex min-w-28 max-w-28 items-center justify-center rounded-l-md bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 px-2.5 py-1.5"
+                className="flex min-w-28 max-w-28 items-center justify-center rounded-l-md bg-secondary_dark px-2.5 py-1.5"
                 data-tooltip-id={`tooltip-${idName}`}
                 data-tooltip-content={formatted_name}
             >
-                <div className="text-neutral-950 font-bold">{formatted_name}</div>
+                <div className="text-stone-400 font-bold">{formatted_name}</div>
             </div>
             <Tooltip id={`tooltip-${idName}`} place="top" />
             <textarea
                 id={idName}
                 name={idName}
-                className="h-full w-full whitespace-pre-wrap rounded-r-md border-none bg-secondary_light py-1.5 pl-2.5 text-sm font-bold text-neutral-950 placeholder-neutral-600"
+                className="h-full w-full whitespace-pre-wrap rounded-r-md border-none bg-stone-400 py-1.5 pl-2.5 text-sm font-bold text-stone-950 placeholder-stone-700"
                 value={value}
                 rows={rows}
                 onChange={onChange}

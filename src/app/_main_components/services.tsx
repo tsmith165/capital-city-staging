@@ -50,7 +50,7 @@ export default function Services() {
                 </p>
                 <div className="w-full flex md:flex-row md:space-x-4 flex-col space-y-4 md:space-y-0 justify-center">
                     {services.map((service, index) => (
-                        <div key={index} className="w-full md:w-1/3 flex flex-col ring-neutral-500 bg-neutral-800 ring-1 rounded-lg p-4">
+                        <div key={index} className="w-full md:w-1/3 flex flex-col ring-stone-500 bg-stone-800 ring-1 rounded-lg p-4">
                             <div className="flex justify-between items-center mb-4">
                                 <div className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 text-lg font-bold">
                                     {service.title}

@@ -51,8 +51,8 @@ const ContactFormEmail: React.FC<ContactFormEmailProps> = ({
         }}
       >
         <Body className="w-full h-full">
-          <Container className="bg-neutral-300 w-full h-full">
-            <Heading className="text-2xl font-bold text-neutral-950 bg-secondary_light w-full h-fit p-4">
+          <Container className="bg-stone-300 w-full h-full">
+            <Heading className="text-2xl font-bold text-stone-950 bg-secondary_light w-full h-fit p-4">
               {`${name} reached out`}
             </Heading>
             <Section className="p-2 flex-col space-y-0.5 px-4">

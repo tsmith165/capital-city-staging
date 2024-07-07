@@ -74,7 +74,7 @@ export default function Navbar({ page }: { page: string }) {
     const rightNavbar = navbar.slice(halfLength);
 
     return (
-        <nav className="bg-neutral-900 p-0 flex flex-row h-[50px] w-full items-center justify-between">
+        <nav className="bg-stone-900 p-0 flex flex-row h-[50px] w-full items-center justify-between">
             <div className="flex md:hidden mx-4 pb-1" onClick={() => handleClick('home')}>
                 <Image
                     src="/logo/CCS_logo_text.png"

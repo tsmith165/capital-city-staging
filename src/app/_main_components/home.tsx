@@ -71,14 +71,14 @@ export default function Home() {
                 initial="hidden"
                 animate={isStagingImageVisible ? 'visible' : 'hidden'}
                 transition={{ duration: 2 }}
-                className="absolute inset-0 bg-neutral-900"></motion.div>
+                className="absolute inset-0 bg-stone-900"></motion.div>
             {isLogoVisible && (
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 1 }}
                     className="absolute inset-0 flex justify-center items-center">
-                    <div className="relative bg-neutral-900 rounded-full w-[350px] h-[350px] flex justify-center items-center opacity-70">
+                    <div className="relative bg-stone-900 rounded-full w-[350px] h-[350px] flex justify-center items-center opacity-70">
                         <Image src={require('/public/logo/CCS_logo.png')} alt="Capital City Staging Logo" width={300} height={300} />
                     </div>
                 </motion.div>

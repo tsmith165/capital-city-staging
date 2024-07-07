@@ -1,6 +1,6 @@
-// https://coolors.co/b99727-d4af37-498352-355e3b-2c4e31
-
 import typography from '@tailwindcss/typography';
+const plugin = require('tailwindcss/plugin')
+import { withUt } from 'uploadthing/tw';
 
 const colors = {
     primary: '#b99727',
@@ -12,7 +12,7 @@ const colors = {
     grey: '#D3D3D3',
 };
 
-export default {
+export default withUt({
     content: ['./src/app/**/*.{js,ts,jsx,tsx}', './src/components/**/*.{js,ts,jsx,tsx}'],
     theme: {
         extend: {
@@ -39,6 +39,16 @@ export default {
         },
         project_name: 'Captial-City-Staging',
     },
-    plugins: [typography],
+    plugins: [typography, plugin(function ({ addBase, theme }: { addBase: any, theme: any }) {
+        addBase({
+          ':root': {
+            '--color-primary': theme('colors.primary'),
+            '--color-primary-dark': theme('colors.primary_dark'),
+            '--color-secondary-light': theme('colors.secondary_light'),
+            '--color-secondary': theme('colors.secondary'),
+            '--color-secondary-dark': theme('colors.secondary_dark'),
+          }
+        })
+      })],
     mode: 'jit',
-};
+});
