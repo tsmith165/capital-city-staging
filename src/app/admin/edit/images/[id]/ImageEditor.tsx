@@ -13,7 +13,7 @@ interface ImageEditorProps {
 const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
     const [imageUrl, setImageUrl] = useState('Not yet uploaded');
     const [title, setTitle] = useState('Not yet uploaded');
-    const [selectedOption, setSelectedOption] = useState('main');
+    const [selectedOption, setSelectedOption] = useState('extra');
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
     const [smallImageUrl, setSmallImageUrl] = useState('Not yet uploaded');
@@ -31,7 +31,6 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
         console.log('Resetting inputs');
         setImageUrl('Not yet uploaded');
         setTitle('Not yet uploaded');
-        setSelectedOption('main');
         setWidth(0);
         setHeight(0);
         setSmallImageUrl('Not yet uploaded');
