@@ -126,6 +126,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
                     <ResizeUploader
                         handleUploadComplete={handleUploadComplete}
                         handleResetInputs={resetInputs}
+                        backToEditLink={`/admin/edit/${inventoryId}`}
                     />
                     <InputSelect
                         idName='inventory_type'

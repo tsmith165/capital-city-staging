@@ -112,6 +112,7 @@ export default function CreateInventory() {
                     <ResizeUploader
                         handleUploadComplete={handleUploadComplete}
                         handleResetInputs={handleResetInputs}
+                        backToEditLink={`/admin/edit`}
                     />
                     <InputTextbox idName="title" name="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
                     <InputTextbox idName="image_path" name="Image Path" value={imageUrl} />
