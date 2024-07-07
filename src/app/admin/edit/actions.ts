@@ -307,7 +307,6 @@ export async function createInventory(newInventoryData: NewInventoryData): Promi
     }
 }
 
-import { redirect } from 'next/navigation';
 import { isClerkUserIdAdmin } from '@/utils/auth/ClerkUtils';
 
 export async function createNewInventory(newInventoryData: NewInventoryData) {
