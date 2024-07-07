@@ -8,7 +8,6 @@ import InputSelect from '@/components/inputs/InputSelect';
 import InputTextArea from '@/components/inputs/InputTextArea';
 
 import { onSubmitEditForm } from '../actions';
-import { revalidatePath } from 'next/cache';
 
 interface EditFormProps {
     current_inventory: any;
@@ -37,9 +36,6 @@ const EditForm: React.FC<EditFormProps> = ({ current_inventory }) => {
         console.log('Form Data (Next Line):');
         console.log(formData);
         await onSubmitEditForm(formData);
-        revalidatePath(`/admin/edit/${current_inventory.id}`);  
-        revalidatePath(`/admin/inventory`);
-        revalidatePath(`/admin/manage`)
     };
 
     return (

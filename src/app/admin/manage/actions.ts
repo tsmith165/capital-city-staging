@@ -16,4 +16,5 @@ export async function changeOrder(currIdList: number[], nextIdList: number[]): P
     await db.update(inventoryTable).set({ o_id: currOrderId }).where(eq(inventoryTable.id, nextId));
 
     revalidatePath(`/admin/manage`);
+    revalidatePath(`/admin/inventory`);
 }

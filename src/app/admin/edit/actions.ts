@@ -80,6 +80,8 @@ export async function onSubmitEditForm(data: SubmitFormData): Promise<{ success:
             return { success: false, error: 'Could not find inventory with id ' + data.inventory_id };
         }
         revalidatePath(`/admin/edit/${data.inventory_id}`);
+        revalidatePath(`/admin/inventory`);
+        revalidatePath(`/admin/manage`);
         return { success: true };
     } catch (error) {
         console.error('Error creating inventory:', error);
@@ -152,6 +154,8 @@ export async function storeUploadedImageDetails(data: UploadFormData): Promise<{
             }
         }
         revalidatePath(`/admin/edit/${inventory[0].id}`);
+        revalidatePath(`/admin/inventory`);
+        revalidatePath(`/admin/manage`);
         return { success: true, imageUrl: imageUrl };
     } catch (error) {
         console.error('Error creating inventory:', error);
@@ -182,7 +186,10 @@ export async function handleImageReorder(inventoryId: number, currentInventoryId
         await db.update(extraImagesTable).set({ image_path: currentImage[0].image_path }).where(eq(extraImagesTable.id, targetInventoryId));
 
         // Revalidate the path to refetch the data
-        revalidatePath(`/admin/edit/${inventoryId}`);
+        revalidatePath(`/admin/edit/${currentInventoryId}`);
+        revalidatePath(`/admin/edit/${targetInventoryId}`);
+        revalidatePath(`/admin/inventory`);
+        revalidatePath(`/admin/manage`);
         return { success: true };
     } catch (error) {
         console.error('Error reordering images:', error);
@@ -200,6 +207,8 @@ export async function handleImageTitleEdit(imageId: number, newTitle: string): P
     try {
         await db.update(extraImagesTable).set({ title: newTitle }).where(eq(extraImagesTable.id, imageId));
         revalidatePath(`/admin/edit/${imageId}`);
+        revalidatePath(`/admin/inventory`);
+        revalidatePath(`/admin/manage`);
         return { success: true };
     } catch (error) {
         console.error('Error editing image title:', error);
@@ -216,6 +225,8 @@ export async function handleImageDelete(inventoryId: number, imagePath: string):
     try {
         await db.delete(extraImagesTable).where(and(eq(extraImagesTable.inventory_id, inventoryId), eq(extraImagesTable.image_path, imagePath)));
         revalidatePath(`/admin/edit/${inventoryId}`);
+        revalidatePath(`/admin/inventory`);
+        revalidatePath(`/admin/manage`);
         return { success: true };
     } catch (error) {
         console.error('Error deleting image:', error);
@@ -241,6 +252,8 @@ export async function handleTitleUpdate(formData: FormData): Promise<{ success: 
 
         await db.update(inventoryTable).set({ name: newTitle }).where(eq(inventoryTable.id, inventoryId));
         revalidatePath(`/admin/edit/${inventoryId}`);
+        revalidatePath(`/admin/inventory`);
+        revalidatePath(`/admin/manage`);
         return { success: true };
     } catch (error) {
         console.error('Error updating title:', error);
@@ -300,6 +313,9 @@ export async function createInventory(newInventoryData: NewInventoryData): Promi
         console.log('New Inventory Data:', data);
 
         const newInventory = await db.insert(inventoryTable).values(data).returning();
+        // revalidatePath(`/admin/edit`);
+        revalidatePath(`/admin/inventory`);
+        revalidatePath(`/admin/manage`);
         return { success: true, inventory: newInventory[0] };
     } catch (error) {
         console.error('Error creating inventory:', error);
@@ -322,7 +338,9 @@ export async function createNewInventory(newInventoryData: NewInventoryData) {
         return { success: false, error: 'Error creating new piece.' };
     }
 
-    revalidatePath('/admin/edit');
+    // revalidatePath(`/admin/edit`);
+    revalidatePath(`/admin/inventory`);
+    revalidatePath(`/admin/manage`);
     return { success: true, inventory: newInventoryOutput.inventory };
 }
 

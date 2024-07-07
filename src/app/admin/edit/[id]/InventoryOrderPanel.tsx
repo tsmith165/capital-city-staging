@@ -1,11 +1,8 @@
-// File 1: /src/app/admin/edit/[id]/InventoryOrderPanel.tsx
-
 import React from 'react';
 import { IoIosArrowUp, IoIosArrowDown, IoIosTrash } from 'react-icons/io';
 import { handleImageReorder, handleImageDelete, handleImageTitleEdit } from '../actions';
 import { InventoryWithImages, ExtraImages } from '@/db/schema';
 import Image from 'next/image';
-import { revalidatePath } from 'next/cache';
 
 interface InventoryOrderPanelProps {
     current_inventory: InventoryWithImages;
@@ -26,9 +23,6 @@ const InventoryOrderPanel: React.FC<InventoryOrderPanelProps> = ({ current_inven
         }
 
         await handleImageReorder(inventoryId, currentInventoryId, targetInventoryId);
-        revalidatePath(`/admin/edit/${current_inventory.id}`);
-        revalidatePath(`/admin/inventory`);
-        revalidatePath(`/admin/manage`);
     }
 
     async function handleImageDeleteAction(formData: FormData) {
@@ -42,9 +36,6 @@ const InventoryOrderPanel: React.FC<InventoryOrderPanelProps> = ({ current_inven
         }
 
         await handleImageDelete(inventoryId, imagePath);
-        revalidatePath(`/admin/edit/${current_inventory.id}`);
-        revalidatePath(`/admin/inventory`);
-        revalidatePath(`/admin/manage`);
     }
 
     async function handleImageTitleEditAction(formData: FormData) {
@@ -58,9 +49,6 @@ const InventoryOrderPanel: React.FC<InventoryOrderPanelProps> = ({ current_inven
         }
 
         await handleImageTitleEdit(imageId, newTitle);
-        revalidatePath(`/admin/edit/${current_inventory.id}`);
-        revalidatePath(`/admin/inventory`);
-        revalidatePath(`/admin/manage`);
     }
 
     const renderImages = (images: ExtraImages[], imageType: string) => {

@@ -3,11 +3,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { IoIosArrowForward } from 'react-icons/io';
-import { MdDeleteForever, MdRestore } from 'react-icons/md';
 import { FaEdit } from 'react-icons/fa';
 import { changeOrder } from './actions';
 import { Inventory } from '@/db/schema';
-import { revalidatePath } from 'next/cache';
 
 interface ManageProps {
     inventory: Inventory[];
@@ -25,9 +23,6 @@ export function Manage({ inventory, activeTab }: ManageProps) {
         if (nextId !== null && nextOrderId !== null) {
             console.log(`Handle Order Change: currId: ${currId} (${currOrderId}) | nextId: ${nextId} (${nextOrderId})`);
             await changeOrder([currId, currOrderId], [nextId, nextOrderId]);
-            revalidatePath(`/admin/manage`);
-            revalidatePath(`/admin/inventory`);
-            // revalidatePath(`/admin/edit`);  // We dont have a default /edit page without query param for inventory id yet
         }
     }
 
