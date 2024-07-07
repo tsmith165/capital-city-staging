@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IoIosArrowForward, IoIosArrowBack, IoIosSpeedometer } from 'react-icons/io';
-import { FaPlay, FaPause } from 'react-icons/fa';
+import { FaPlay, FaPause, FaEdit } from 'react-icons/fa';
 import { InventoryWithImages } from '@/db/schema';
+import Link from 'next/link';
 
 interface SelectedItemViewProps {
     selectedItem: InventoryWithImages;
@@ -101,6 +102,9 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
                 <div className="flex h-7 w-full items-center justify-center space-x-4 pb-1">
                     <div className="flex w-full flex-row">
                         <div className="flex w-full flex-grow justify-end pr-1">
+                            <Link href={`/admin/edit/images/${selectedItem.id}`} className="ml-2 flex justify-center items-center">
+                                <FaEdit className="fill-stone-600 text-xl hover:fill-primary" />
+                            </Link>
                             {imageList.length > 1 && (
                                 <button aria-label={isPlaying ? 'Pause' : 'Play'} onClick={togglePlayPause} className="ml-2">
                                     {isPlaying ? (
