@@ -57,6 +57,12 @@ export default withUt({
                 '.gradient-primary-main': {
                     '@apply text-transparent bg-gradient-to-r bg-clip-text bg-gradient-to-r from-primary via-primary_dark to-primary': {},
                 },
+                '.gradient-secondary-main': {
+                    '@apply text-transparent bg-gradient-to-r bg-clip-text bg-gradient-to-r from-secondary via-50% via-secondary_light to-90% to-secondary': {},
+                },
+                '.gradient-gold-main': {
+                    '@apply text-transparent bg-gradient-to-r bg-clip-text bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400': {},
+                },
             };
 
             addUtilities(newUtilities);

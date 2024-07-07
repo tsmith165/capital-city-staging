@@ -90,7 +90,7 @@ const ContactForm = () => {
           name="Email"
           value={formData.email}
           onChange={handleChange}
-          placeholder="Enter email"
+          placeholder="Enter your email address"
         />
       </div>
       <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
@@ -99,14 +99,14 @@ const ContactForm = () => {
           name="Phone"
           value={formData.phone}
           onChange={handleChange}
-          placeholder="Enter phone number"
+          placeholder="Enter your contact number"
         />
         <InputTextbox
           idName="square_ft"
-          name="Square Footage"
+          name="Sq Footage"
           value={formData.square_ft === null ? '' : `${formData.square_ft.toString()}`}
           onChange={handleChange}
-          placeholder="Enter square footage"
+          placeholder="Enter your home's square footage"
         />
       </div>
       <div className="flex w-full">
@@ -134,11 +134,11 @@ const ContactForm = () => {
       <div className="flex items-center space-x-4">
         <button
           type="submit"
-          className={'px-4 py-2 font-bold rounded-md min-w-28 max-w-28 ' + 
+          className={'px-4 py-2 font-bold rounded-md ' + 
             `bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 text-stone-950 ` + 
             `hover:bg-gradient-to-r hover:from-secondary hover:via-secondary_light hover:to-secondary hover:text-white`}
         >
-          Submit
+          Send details to Mia!
         </button>
         {submitMessage && (
           <p className={`text-sm ${submitMessage.type === 'success' ? 'text-green-500' : 'text-red-500'}`}>

@@ -37,10 +37,10 @@ export default function Statistics({ arrows }: { arrows?: boolean }) {
                 </button>
             )}
             <div className="text-center flex-grow px-2 md:px-16">
-                <div className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 text-3xl md:text-4xl font-bold">
+                <div className="text-3xl md:text-4xl font-bold gradient-gold-main">
                     {`"${shuffledStats[current].text}"`}
                 </div>
-                <div className="text-transparent bg-clip-text bg-gradient-to-r from-secondary from-10% via-secondary_light via-70% to-secondary_dark to-90% text-lg mt-2">
+                <div className="text-lg mt-2 gradient-secondary-main">
                     {`- ${shuffledStats[current].attributor}`}
                 </div>
             </div>

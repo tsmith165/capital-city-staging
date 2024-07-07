@@ -16,7 +16,7 @@ export default function About() {
             </div>
 
             <div className="flex flex-col h-full w-full md:w-2/3 text-white p-4 space-y-2 rounded-lg shadow-lg justify-center">                    
-                <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400">
+                <h1 className="text-2xl font-bold gradient-gold-main">
                     Mia Dofflemyer
                 </h1>
                 <p className="text-md md:text-lg">
@@ -34,11 +34,10 @@ export default function About() {
                 </div>
                 <Link href="/contact" className='flex'>
                     <div className={
-                        `flex group items-center justify-center w-fit py-2 font-bold rounded-md px-8 text-md ` +
-                        `bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 `
+                        `flex group items-center justify-center w-fit py-2 font-bold rounded-md px-8 text-md gradient-gold-main ` +
                         + `hover:from-secondary hover:via-secondary_light hover:to-secondary`
                     }>
-                        <div className="group-hover:text-white text-transparent bg-clip-text bg-gradient-to-r from-secondary via-secondary_light to-secondary">
+                        <div className="group-hover:text-white gradient-secondary-main">
                             {`Send me a message`}
                         </div>
                     </div>

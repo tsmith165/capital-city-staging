@@ -40,7 +40,7 @@ export default function Portfolio() {
 
     return (
         <div className="min-h-[calc(100dvh-50px)] flex flex-col items-center justify-center p-4 space-y-4">
-            <h1 className="h-fit text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary from-10% via-secondary_light via-70% to-secondary_dark to-90%">
+            <h1 className="h-fit text-4xl font-bold gradient-secondary-main">
                 Staged by Mia
             </h1>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 px-8 lg:px-24 x2l:px-48">

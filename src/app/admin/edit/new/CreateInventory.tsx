@@ -105,7 +105,7 @@ export default function CreateInventory() {
     return (
         <div className="flex h-full w-full flex-col items-center justify-center bg-stone-900">
             <div className="flex w-4/5 flex-col items-center justify-center rounded-lg bg-stone-900">
-                <div id="header" className="w-full rounded-t-lg text-center text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary via-secondary_light to-secondary">
+                <div id="header" className="w-fit rounded-t-lg text-center text-4xl font-bold gradient-secondary-main">
                     Create New Inventory
                 </div>
                 <div className="flex w-full flex-col items-center space-y-2 p-2">
@@ -137,8 +137,8 @@ export default function CreateInventory() {
                             className={
                                 'relative rounded-md px-4 py-1 text-lg font-bold ' +
                                 (isFormValid
-                                    ? ' bg-blue-500 text-white hover:bg-blue-600'
-                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark')
+                                    ? ' bg-primary_dark text-stone-300 hover:bg-primary hover:text-stone-950'
+                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark hover:bg-stone-300 hover:text-red-600')
                             }
                         >
                             {isSubmitting ? 'Creating...' : 'Create & Edit'}
@@ -150,8 +150,8 @@ export default function CreateInventory() {
                             className={
                                 'relative rounded-md px-4 py-1 text-lg font-bold ' +
                                 (isFormValid
-                                    ? ' bg-green-500 text-white hover:bg-green-600'
-                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark')
+                                    ? ' bg-primary_dark text-stone-300 hover:bg-primary hover:text-stone-950'
+                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark hover:bg-stone-300 hover:text-red-600')
                             }
                         >
                             {isSubmitting ? 'Creating...' : 'Create & Add Images'}
@@ -163,8 +163,8 @@ export default function CreateInventory() {
                             className={
                                 'relative rounded-md px-4 py-1 text-lg font-bold ' +
                                 (isFormValid
-                                    ? ' bg-purple-500 text-white hover:bg-purple-600'
-                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark')
+                                    ? ' bg-primary_dark text-stone-300 hover:bg-primary hover:text-stone-950'
+                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark hover:bg-stone-300 hover:text-red-600')
                             }
                         >
                             {isSubmitting ? 'Creating...' : 'Create & View'}

@@ -118,7 +118,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
             <div className="flex w-4/5 flex-col items-center justify-center rounded-lg bg-stone-900">
                 <div
                     id="header"
-                    className="w-full rounded-t-lg text-center text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary via-secondary_light to-secondary"
+                    className="w-full rounded-t-lg text-center text-4xl font-bold gradient-secondary-main"
                 >
                     Edit Images
                 </div>
@@ -166,8 +166,8 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
                             className={
                                 'relative rounded-md px-4 py-1 text-lg font-bold ' +
                                 (isFormValid
-                                    ? ' bg-secondary_dark text-stone-300 hover:bg-secondary'
-                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark')
+                                    ? ' bg-primary_dark text-stone-300 hover:bg-primary hover:text-stone-950'
+                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark hover:bg-stone-300 hover:text-red-600')
                             }
                         >
                             {isSubmitting ? 'Submitting...' : 'Submit'}
@@ -179,8 +179,8 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
                             className={
                                 'relative rounded-md px-4 py-1 text-lg font-bold ' +
                                 (isFormValid
-                                    ? ' bg-blue-500 text-white hover:bg-blue-600'
-                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark')
+                                    ? ' bg-primary_dark text-stone-300 hover:bg-primary hover:text-stone-950'
+                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark hover:bg-stone-300 hover:text-red-600')
                             }
                         >
                             {isSubmitting ? 'Submitting...' : 'Submit & Edit'}

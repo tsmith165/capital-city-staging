@@ -22,7 +22,7 @@ export default function Testimonials() {
     return (
         <div className='flex flex-col w-full space-y-4 h-full justify-center items-center'>
             <div className="w-full h-auto flex items-center justify-center">
-                <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary_light via-secondary_dark to-secondary_light text-center">
+                <h1 className="text-4xl font-bold text-center gradient-secondary-main">
                     Testimonials
                 </h1>
             </div>
@@ -31,7 +31,7 @@ export default function Testimonials() {
                 {testimonials.map((testimonial, index) => (
                     <div className="h-fit bg-secondary_dark text-white p-4 rounded-lg shadow-lg">
                         <p className="text-md md:text-lg">{`"${testimonial.text}"`}</p>
-                        <p className="mt-2 text-md font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400">
+                        <p className="mt-2 text-md font-bold text-transparent gradient-gold-main">
                             {testimonial.name}
                         </p>
                     </div>

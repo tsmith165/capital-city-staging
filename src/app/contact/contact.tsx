@@ -16,16 +16,16 @@ export default function Contact() {
                     />
                 </div>
 
-                <div className="flex flex-col h-full w-full md:w-2/3 text-white p-4 space-y-2 rounded-lg shadow-lg justify-center">                      
-                    <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400">
-                        Get in Touch with Mia
+                <div className="flex flex-col h-full w-full md:w-2/3 p-4 space-y-2 rounded-lg shadow-lg justify-center">                      
+                    <h1 className="text-2xl font-bold gradient-gold-main">
+                        Get in touch with Mia
                     </h1>
-                    <p className="text-md md:text-lg">
+                    <p className="text-md md:text-lg text-stone-100">
                         Reach out to Mia for a personalized home staging consultation. Discuss your needs, budget, and timeline to create a tailored staging plan that showcases your home's best features and attracts potential buyers.
                     </p>
                     <div className="mt-4">
-                        <p className="text-md">mdofflemyer.realestate@gmail.com</p>
-                        <p className="text-md">1 (209) 817-4240</p>
+                        <p className="text-md text-stone-100">mdofflemyer.realestate@gmail.com</p>
+                        <p className="text-md text-stone-100">1 (209) 817-4240</p>
                     </div>
                     <div className="mt-4">
                         <ContactForm />
