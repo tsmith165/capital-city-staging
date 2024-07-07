@@ -39,16 +39,28 @@ export default withUt({
         },
         project_name: 'Captial-City-Staging',
     },
-    plugins: [typography, plugin(function ({ addBase, theme }: { addBase: any, theme: any }) {
-        addBase({
-          ':root': {
-            '--color-primary': theme('colors.primary'),
-            '--color-primary-dark': theme('colors.primary_dark'),
-            '--color-secondary-light': theme('colors.secondary_light'),
-            '--color-secondary': theme('colors.secondary'),
-            '--color-secondary-dark': theme('colors.secondary_dark'),
-          }
-        })
-      })],
+    plugins: [
+        typography, 
+        plugin(function ({ addBase, theme, addUtilities }: { addBase: any; theme: any; addUtilities: any }) {
+            addBase({
+                ':root': {
+                    '--color-primary': theme('colors.primary'),
+                    '--color-primary-dark': theme('colors.primary_dark'),
+                    '--color-secondary-light': theme('colors.secondary_light'),
+                    '--color-secondary': theme('colors.secondary'),
+                    '--color-secondary-dark': theme('colors.secondary_dark'),
+                },
+            });
+
+            // Custom gradeint utility classes
+            const newUtilities = {
+                '.gradient-primary-main': {
+                    '@apply text-transparent bg-gradient-to-r bg-clip-text bg-gradient-to-r from-primary via-primary_dark to-primary': {},
+                },
+            };
+
+            addUtilities(newUtilities);
+        }),
+    ],
     mode: 'jit',
 });
