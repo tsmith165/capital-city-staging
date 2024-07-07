@@ -53,7 +53,7 @@ export default function CreateInventory() {
         }
     }, []);
 
-    const handleCreateInventory = async () => {
+    const handleCreateInventory = async (action: 'edit' | 'images' | 'view') => {
         setIsSubmitting(true);
         try {
             const data: NewInventoryData = {
@@ -69,7 +69,17 @@ export default function CreateInventory() {
             setStatusMessage({ type: 'success', message: 'Inventory created successfully.' });
             handleResetInputs();
             if (inventory_data.inventory?.id) {
-                router.push(`/admin/edit/${inventory_data.inventory?.id}`);
+                switch(action) {
+                    case 'edit':
+                        router.push(`/admin/edit/${inventory_data.inventory.id}`);
+                        break;
+                    case 'images':
+                        router.push(`/admin/edit/images/${inventory_data.inventory.id}`);
+                        break;
+                    case 'view':
+                        router.push(`/admin/inventory/?item=${inventory_data.inventory.id}`);
+                        break;
+                }
             }
         } catch (error) {
             console.error('Error creating inventory:', error);
@@ -118,19 +128,47 @@ export default function CreateInventory() {
                         <div className="text-red-500">Warning: Image height is less than 800px.</div>
                     ) : null}
 
-                    <button
-                        type="submit"
-                        disabled={!isFormValid}
-                        onClick={handleCreateInventory}
-                        className={
-                            'relative rounded-md px-4 py-1 text-lg font-bold ' +
-                            (isFormValid
-                                ? ' bg-secondary_dark text-stone-300 hover:bg-secondary'
-                                : 'cursor-not-allowed bg-stone-300 text-secondary_dark')
-                        }
-                    >
-                        {isSubmitting ? 'Creating...' : 'Create Inventory'}
-                    </button>
+                    <div className="flex space-x-4">
+                        <button
+                            type="button"
+                            disabled={!isFormValid}
+                            onClick={() => handleCreateInventory('edit')}
+                            className={
+                                'relative rounded-md px-4 py-1 text-lg font-bold ' +
+                                (isFormValid
+                                    ? ' bg-blue-500 text-white hover:bg-blue-600'
+                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark')
+                            }
+                        >
+                            {isSubmitting ? 'Creating...' : 'Create & Edit'}
+                        </button>
+                        <button
+                            type="button"
+                            disabled={!isFormValid}
+                            onClick={() => handleCreateInventory('images')}
+                            className={
+                                'relative rounded-md px-4 py-1 text-lg font-bold ' +
+                                (isFormValid
+                                    ? ' bg-green-500 text-white hover:bg-green-600'
+                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark')
+                            }
+                        >
+                            {isSubmitting ? 'Creating...' : 'Create & Add Images'}
+                        </button>
+                        <button
+                            type="button"
+                            disabled={!isFormValid}
+                            onClick={() => handleCreateInventory('view')}
+                            className={
+                                'relative rounded-md px-4 py-1 text-lg font-bold ' +
+                                (isFormValid
+                                    ? ' bg-purple-500 text-white hover:bg-purple-600'
+                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark')
+                            }
+                        >
+                            {isSubmitting ? 'Creating...' : 'Create & View'}
+                        </button>
+                    </div>
                     {statusMessage && (
                         <div className={`mt-4 p-2 rounded ${statusMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                             {statusMessage.message}
