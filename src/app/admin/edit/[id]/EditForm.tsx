@@ -141,6 +141,13 @@ const EditForm: React.FC<EditFormProps> = ({ current_inventory }) => {
                             ['Table', 'Table'],
                             ['Chair', 'Chair'],
                             ['Bed', 'Bed'],
+                            ['Bathroom', 'Bathroom'],
+                            ['Kitchen', 'Kitchen'],
+                            ['Lamp', 'Lamp'],
+                            ['Art', 'Art'],
+                            ['Decor', 'Decor'],
+                            ['Bench', 'Bench'],
+                            ['Barstool', 'Barstool'],
                             ['Other', 'Other'],
                         ]}
                     />
