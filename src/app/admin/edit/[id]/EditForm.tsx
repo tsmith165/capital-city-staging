@@ -22,6 +22,7 @@ interface SubmitFormData {
     category: string;
     vendor: string;
     price: string;
+    cost: string;
     real_width: string;
     real_height: string;
     real_depth: string;
@@ -40,6 +41,7 @@ const EditForm: React.FC<EditFormProps> = ({ current_inventory }) => {
         category: current_inventory.category || '',
         vendor: current_inventory.vendor || '',
         price: current_inventory.price?.toString() || '',
+        cost: current_inventory.cost?.toString() || '',
         real_width: current_inventory.real_width?.toString() || '',
         real_height: current_inventory.real_height?.toString() || '',
         real_depth: current_inventory.real_depth?.toString() || '',
@@ -63,6 +65,7 @@ const EditForm: React.FC<EditFormProps> = ({ current_inventory }) => {
             category: current_inventory.category || '',
             vendor: current_inventory.vendor || '',
             price: current_inventory.price?.toString() || '',
+            cost: current_inventory.cost?.toString() || '',
             real_width: current_inventory.real_width?.toString() || '',
             real_height: current_inventory.real_height?.toString() || '',
             real_depth: current_inventory.real_depth?.toString() || '',
@@ -158,10 +161,16 @@ const EditForm: React.FC<EditFormProps> = ({ current_inventory }) => {
                     <InputTextbox idName="vendor" name="Vendor" value={formData.vendor} onChange={handleChange} />
                 </div>
 
-                {/* Row 4.) Price Textbox */}
-                <div className="flex h-fit w-full">
-                    <InputTextbox idName="price" name="Price" value={formData.price} onChange={handleChange} />
+                {/* Row 4.) Price / Cost Text Box */}
+                <div className="flex h-fit w-full flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+                    <div className="w-full md:w-1/2">
+                        <InputTextbox idName="price" name="Price" value={formData.price} onChange={handleChange} />
+                    </div>
+                    <div className="w-full md:w-1/2">
+                        <InputTextbox idName="cost" name="Cost" value={formData.cost} onChange={handleChange} />
+                    </div>
                 </div>
+                
 
                 {/* Row 5.) Real Width / Height / Depth Text Boxes */}
                 <div className="flex h-fit w-full flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">

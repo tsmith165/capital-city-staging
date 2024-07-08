@@ -7,6 +7,7 @@ export const inventoryTable = pgTable('inventory', {
     id: serial('id').notNull().primaryKey(),
     o_id: integer('o_id').notNull().unique(),
     name: text('name').notNull(),
+    cost: integer('cost'),
     price: integer('price').notNull(),
     vendor: text('vendor').notNull(),
     category: text('category').notNull(),

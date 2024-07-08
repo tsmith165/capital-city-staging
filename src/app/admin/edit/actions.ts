@@ -28,6 +28,7 @@ interface SubmitFormData {
     category: string;
     vendor: string;
     price: string;
+    cost: string;
     real_width: string;
     real_height: string;
     real_depth: string;
@@ -64,6 +65,7 @@ export async function onSubmitEditForm(data: SubmitFormData): Promise<{ success:
                     category: data.category || '',
                     vendor: data.vendor || '',
                     price: parseInt(data.price || '0'),
+                    cost: parseInt(data.cost || '0'),
                     real_width: parseInt(data.real_width || '0'),
                     real_height: parseInt(data.real_height || '0'),
                     real_depth: parseInt(data.real_depth || '0'),
@@ -303,6 +305,7 @@ export async function createInventory(newInventoryData: NewInventoryData): Promi
             category: '',
             vendor: '',
             price: 0,
+            cost: 0,
             real_width: 0,
             real_height: 0,
             real_depth: 0,

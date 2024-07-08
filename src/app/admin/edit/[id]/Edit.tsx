@@ -80,7 +80,7 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
                             <IoIosArrowDown className="h-[22px] w-8 cursor-pointer rounded-lg bg-secondary fill-stone-400 hover:bg-primary hover:fill-secondary_dark" />
                         </Link>
                     </div>
-                    <Link href={`/details/${current_id}`}>
+                    <Link href={`/admin/inventory/?item=${current_id}`}>
                         <MdPageview className="h-[48px] w-[48px] cursor-pointer rounded-lg bg-secondary fill-stone-400 p-1 hover:bg-primary hover:fill-secondary_dark" />
                     </Link>
                     <form action={handleTitleUpdateSubmit} className="flex w-full flex-grow flex-row rounded-lg bg-secondary_dark">
