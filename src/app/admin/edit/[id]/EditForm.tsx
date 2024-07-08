@@ -171,6 +171,15 @@ const EditForm: React.FC<EditFormProps> = ({ current_inventory }) => {
                     </div>
                 </div>
                 
+                {/* Row 8.) Width / Height Text Box */}
+                <div className="flex h-fit w-full flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+                    <div className="w-full md:w-1/2">
+                        <InputTextbox idName="width" name="Width (px)" value={formData.width} onChange={handleChange} />
+                    </div>
+                    <div className="w-full md:w-1/2">
+                        <InputTextbox idName="height" name="Height (PX)" value={formData.height} onChange={handleChange} />
+                    </div>
+                </div>
 
                 {/* Row 5.) Real Width / Height / Depth Text Boxes */}
                 <div className="flex h-fit w-full flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
@@ -208,16 +217,6 @@ const EditForm: React.FC<EditFormProps> = ({ current_inventory }) => {
                 {/* Row 7.) Count Textbox */}
                 <div className="flex h-fit w-full">
                     <InputTextbox idName="count" name="Count" value={formData.count} onChange={handleChange} />
-                </div>
-
-                {/* Row 8.) Width / Height Text Box */}
-                <div className="flex h-fit w-full flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
-                    <div className="w-full md:w-1/2">
-                        <InputTextbox idName="width" name="Width (px)" value={formData.width} onChange={handleChange} />
-                    </div>
-                    <div className="w-full md:w-1/2">
-                        <InputTextbox idName="height" name="Height (PX)" value={formData.height} onChange={handleChange} />
-                    </div>
                 </div>
 
                 {/* Row 9.) Description Text Area */}
