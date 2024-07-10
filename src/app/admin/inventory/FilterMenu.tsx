@@ -2,9 +2,7 @@ import React from 'react';
 import { Tooltip } from 'react-tooltip';
 import { FaSlidersH, FaCouch, FaTable, FaChair, FaBed, FaBan, FaToilet, FaPaintBrush } from 'react-icons/fa';
 import { FaRug } from "react-icons/fa6";
-import { LuLamp } from "react-icons/lu";
-import { GiCandles, GiParkBench, GiBarStool } from "react-icons/gi";
-import { TbToolsKitchen3 } from "react-icons/tb";
+import { GiCandles, GiParkBench, GiBarStool, GiForkKnifeSpoon, GiBedLamp } from "react-icons/gi";
 
 import useInventoryStore from '@/stores/inventory_store';
 
@@ -14,8 +12,8 @@ const CATEGORY_FILTERS: [string, string, React.ComponentType<{ className?: strin
     ['Chair', 'chair', FaChair],
     ['Bed', 'bed', FaBed],
     ['Bathroom', 'bathroom', FaToilet],
-    ['Kitchen', 'kitchen', TbToolsKitchen3],
-    ['Lamp', 'lamp', LuLamp],
+    ['Kitchen', 'kitchen', GiForkKnifeSpoon],
+    ['Lamp', 'lamp', GiBedLamp],
     ['Art', 'art', FaPaintBrush],
     ['Decor', 'decor', GiCandles],
     ['Bench', 'bench', GiParkBench],
@@ -37,14 +35,14 @@ const FilterMenu: React.FC = () => {
             <div
                 className={
                     `group absolute bottom-0 right-0 z-10 flex flex-row p-[5px] ` +
-                    `${filterMenuOpen ? 'bg-primary_dark ' : 'rounded-tl-lg bg-primary'}`
+                    `${filterMenuOpen ? 'bg-secondary' : 'rounded-tl-lg bg-secondary_light'}`
                 }
                 onClick={(e) => {
                     e.preventDefault();
                     setFilterMenuOpen(!filterMenuOpen);
                 }}
             >
-                <FaSlidersH className={`${filterMenuOpen ? 'fill-primary' : 'fill-primary_dark '} h-[30px] w-[30px] p-0.5`} />
+                <FaSlidersH className={`${filterMenuOpen ? 'fill-stone-300' : 'fill-stone-950 '} h-[30px] w-[30px] p-0.5`} />
             </div>
             {filterMenuOpen === true && (
                 <div className="absolute bottom-0 right-[40px] flex h-[40px] w-fit flex-row rounded-tl-lg md:rounded-bl-none md:rounded-tl-lg">
@@ -52,7 +50,7 @@ const FilterMenu: React.FC = () => {
                         <div
                             key={i}
                             className={`group p-[5px] first:rounded-tl-lg ${
-                                filter === category ? 'bg-primary_dark' : 'bg-primary hover:bg-primary_dark'
+                                filter === category ? 'bg-secondary' : 'bg-secondary_light hover:bg-secondary'
                             }`}
                             onClick={(e) => {
                                 e.preventDefault();
@@ -61,7 +59,7 @@ const FilterMenu: React.FC = () => {
                         >
                             <Icon
                                 className={`h-[30px] w-[30px] filter-icon-${filter_class} ${
-                                    filter === category ? 'fill-primary' : 'fill-primary_dark group-hover:fill-primary'
+                                    filter === category ? 'fill-stone-300' : 'fill-stone-950 group-hover:fill-stone-300'
                                 }`}
                             />
                         </div>
