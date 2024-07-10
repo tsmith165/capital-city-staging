@@ -1,6 +1,11 @@
 import React from 'react';
 import { Tooltip } from 'react-tooltip';
-import { FaSlidersH, FaCouch, FaTable, FaChair, FaBed, FaBan } from 'react-icons/fa';
+import { FaSlidersH, FaCouch, FaTable, FaChair, FaBed, FaBan, FaToilet, FaPaintBrush } from 'react-icons/fa';
+import { FaRug } from "react-icons/fa6";
+import { LuLamp } from "react-icons/lu";
+import { GiCandles, GiParkBench, GiBarStool } from "react-icons/gi";
+import { TbToolsKitchen3 } from "react-icons/tb";
+
 import useInventoryStore from '@/stores/inventory_store';
 
 const CATEGORY_FILTERS: [string, string, React.ComponentType<{ className?: string }>][] = [
@@ -8,6 +13,14 @@ const CATEGORY_FILTERS: [string, string, React.ComponentType<{ className?: strin
     ['Table', 'table', FaTable],
     ['Chair', 'chair', FaChair],
     ['Bed', 'bed', FaBed],
+    ['Bathroom', 'bathroom', FaToilet],
+    ['Kitchen', 'kitchen', TbToolsKitchen3],
+    ['Lamp', 'lamp', LuLamp],
+    ['Art', 'art', FaPaintBrush],
+    ['Decor', 'decor', GiCandles],
+    ['Bench', 'bench', GiParkBench],
+    ['Barstool', 'barstool', GiBarStool],
+    ['Rug', 'rug', FaRug],
     ['None', 'none', FaBan],
 ];
 
