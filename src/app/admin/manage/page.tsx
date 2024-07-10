@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     metadataBase: new URL('https://www.capitalcitystaging.com'),
 };
 
-import { getInventory } from './actions';
+import { getInventory, getArchivedInventory, getPrioritizedInventory } from './actions';
 
 import PageLayout from '@/components/layout/PageLayout';
 import { Manage } from '@/app/admin/manage/Manage';
@@ -45,10 +45,18 @@ interface PageProps {
 export default async function ManagePage({ searchParams }: PageProps) {
     const tab = searchParams?.tab || 'manage';
     const inventory = await getInventory();
+    const archivedInventory = await getArchivedInventory();
+    const prioritizedInventory = await getPrioritizedInventory();
 
     return (
         <PageLayout page="/manage">
-            <Manage inventory={inventory} activeTab={tab} />
+            <Manage 
+                inventory={inventory} 
+                archivedInventory={archivedInventory} 
+                prioritizedInventory={prioritizedInventory} 
+                activeTab={tab} 
+            />
         </PageLayout>
-    );
+    )
 }
+

@@ -1,11 +1,13 @@
 // File 1: /src/db/schema.ts
 
-import { pgTable, text, integer, date, serial } from 'drizzle-orm/pg-core';
+import { pgTable, text, integer, date, serial, boolean } from 'drizzle-orm/pg-core';
 import { type InferInsertModel, type InferSelectModel } from 'drizzle-orm';
 
 export const inventoryTable = pgTable('inventory', {
     id: serial('id').notNull().primaryKey(),
     o_id: integer('o_id').notNull().unique(),
+    p_id: integer('p_id').notNull().default(0),
+    active: boolean('active').default(true),
     name: text('name').notNull(),
     cost: integer('cost'),
     price: integer('price').notNull(),
