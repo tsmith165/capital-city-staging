@@ -6,6 +6,10 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
 import { menu_list } from '@/lib/menu_list';
 import { useStore } from '@/stores/store';
+import MenuOverlay from './menu/MenuOverlay';
+import { IoIosMenu } from 'react-icons/io';
+import { Protect } from '@clerk/nextjs';
+import AdminProtect from '@/utils/auth/AdminProtect';
 
 export default function Navbar({ page }: { page: string }) {
     const router = useRouter();
@@ -74,34 +78,47 @@ export default function Navbar({ page }: { page: string }) {
     const rightNavbar = navbar.slice(halfLength);
 
     return (
-        <nav className="bg-stone-900 p-0 flex flex-row h-[50px] w-full items-center justify-between">
-            <div className="flex md:hidden mx-4 pb-1" onClick={() => handleClick('home')}>
-                <Image
-                    src="/logo/CCS_logo_text.png"
-                    alt="CCS Logo"
-                    width={247}
-                    height={88}
-                    className="object-contain max-h-[48px] w-fit pt-2 pb-1"
-                />
+        <nav className="bg-stone-900 p-0 h-[50px] w-full ">
+            <div className="flex flex-row items-center justify-between">
+                <div className="flex md:hidden mx-4 pb-1" onClick={() => handleClick('home')}>
+                    <Image
+                        src="/logo/CCS_logo_text.png"
+                        alt="CCS Logo"
+                        width={247}
+                        height={88}
+                        className="object-contain max-h-[48px] w-fit pt-2 pb-1"
+                    />
+                </div>
+                <div className="hidden md:flex flex-row space-x-4 items-center justify-end flex-1">
+                    {leftNavbar}
+                </div>
+                <div className="hidden md:flex mx-4 pb-1 items-center justify-center" onClick={() => handleClick('home')}>
+                    <Image
+                        src="/logo/CCS_logo_text.png"
+                        alt="CCS Logo"
+                        width={247}
+                        height={88}
+                        className="object-contain max-h-[48px] w-fit pt-2 pb-1"
+                    />
+                </div>
+                <div className="hidden md:flex flex-row space-x-4 items-center justify-start flex-1">
+                    {rightNavbar}
+                </div>
+                <div className="md:hidden flex flex-row space-x-4 items-center justify-end w-full pr-4">
+                    {navbar}
+                </div>
             </div>
-            <div className="hidden md:flex flex-row space-x-4 items-center justify-end flex-1">
-                {leftNavbar}
-            </div>
-            <div className="hidden md:flex mx-4 pb-1 items-center justify-center" onClick={() => handleClick('home')}>
-                <Image
-                    src="/logo/CCS_logo_text.png"
-                    alt="CCS Logo"
-                    width={247}
-                    height={88}
-                    className="object-contain max-h-[48px] w-fit pt-2 pb-1"
-                />
-            </div>
-            <div className="hidden md:flex flex-row space-x-4 items-center justify-start flex-1">
-                {rightNavbar}
-            </div>
-            <div className="md:hidden flex flex-row space-x-4 items-center justify-end w-full pr-4">
-                {navbar}
-            </div>
+            <Protect fallback={<></>}>
+                <AdminProtect fallback={<></>}>
+                    <div className="group p-0">
+                        <IoIosMenu className={`h-[50px] w-[50px] absolute top-0 right-0 fill-primary_dark py-[5px] pr-2 group-hover:fill-primary`} />
+                        <div className="absolute right-0 top-[50px] z-50 hidden h-fit w-[160px] rounded-bl-md border-b-2 border-l-2 border-primary_dark bg-secondary_light group-hover:flex">
+                            <MenuOverlay currentPage={page} isAdmin={true} />
+                        </div>
+                    </div>
+                </AdminProtect>
+            </Protect>
+
         </nav>
     );
 }

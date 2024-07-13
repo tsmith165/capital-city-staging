@@ -1,33 +1,18 @@
-import { currentUser } from '@clerk/nextjs/server';
+
 import MenuOverlayButton from './MenuOverlayButton';
 import { menu_list, admin_menu_list } from '@/lib/menu_list';
-import { isClerkUserIdAdmin } from '@/utils/auth/ClerkUtils';
 
 import dynamic from 'next/dynamic';
 const DynamicMenuOverlaySignOutButton = dynamic(() => import('./MenuOverlaySignOutButton'), { ssr: false });
 
 const ADD_SIGN_IN_OUT_BUTTON = false;
-
-async function MenuOverlay({ currentPage }: { currentPage: string }) {
-    const user = await currentUser();
-    const isSignedIn = !!user;
-    let isAdmin = isSignedIn ? await isClerkUserIdAdmin(user.id) : false;
+function MenuOverlay({ currentPage, isAdmin }: { currentPage: string, isAdmin: boolean }) {
 
     console.log('MenuOverlay: Is Admin:', isAdmin);
-    const menuList = selectMenu(isSignedIn, isAdmin);
-    const menuItems = generateMenu(menuList, isSignedIn, currentPage);
+    const menuList = (isAdmin) ? admin_menu_list : menu_list;
+    const menuItems = generateMenu(menuList, isAdmin, currentPage);
 
     return <div className="relative z-50 flex w-full flex-col">{menuItems}</div>;
-}
-
-function selectMenu(isSignedIn: boolean, isAdmin: boolean) {
-    if (!isSignedIn) {
-        return menu_list;
-    }
-    if (isAdmin) {
-        return admin_menu_list;
-    }
-    return menu_list;
 }
 
 function generateMenu(menuList: typeof menu_list, isSignedIn: boolean, currentPage: string) {
