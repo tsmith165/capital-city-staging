@@ -31,6 +31,7 @@ function selectMenu(isSignedIn: boolean, isAdmin: boolean) {
 }
 
 function generateMenu(menuList: typeof menu_list, isSignedIn: boolean, currentPage: string) {
+    console.log("Generating menu items for current page: " + currentPage);
     const menu_items = menuList.map((menuItem) => {
         const [className, menuItemString, urlEndpoint] = menuItem;
         const isActive = urlEndpoint === '/' ? currentPage === '/' : currentPage.includes(urlEndpoint);

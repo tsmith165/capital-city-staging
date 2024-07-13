@@ -55,6 +55,8 @@ export async function onSubmitEditForm(data: SubmitFormData): Promise<{ success:
             return { success: false, error: 'Name is required' };
         }
 
+        console.log('Editing inventory with form data:', data);
+
         if (data.inventory_id) {
             // Update existing inventory
             await db

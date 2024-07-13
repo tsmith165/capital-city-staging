@@ -1,23 +1,17 @@
-// File: /src/components/layout/Navbar.tsx
-
 'use client';
 
 import React, { useEffect, useCallback, useTransition } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { useAuth } from '@clerk/nextjs';
 
-import { navbar_menu_list } from '@/lib/menu_list';
+import { menu_list } from '@/lib/menu_list';
 import { useStore } from '@/stores/store';
-import { isClerkUserIdAdmin } from '@/utils/auth/ClerkUtils';
-import MenuOverlay from './menu/MenuOverlay';
 
 export default function Navbar({ page }: { page: string }) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const [isPending, startTransition] = useTransition();
-    const { userId } = useAuth();
 
     const selectedComponent = useStore((state) => state.selectedComponent);
     const setSelectedComponent = useStore((state) => state.setSelectedComponent);
@@ -63,20 +57,7 @@ export default function Navbar({ page }: { page: string }) {
         }
     }, [page, searchParams, setSelectedComponent]);
 
-    const [isAdmin, setIsAdmin] = React.useState(false);
-
-    useEffect(() => {
-        const checkAdminStatus = async () => {
-            if (userId) {
-                const isUserAdmin = await isClerkUserIdAdmin(userId);
-                setIsAdmin(isUserAdmin);
-            }
-        };
-
-        checkAdminStatus();
-    }, [userId]);
-
-    const navbar = navbar_menu_list.map(([menu_class_name, menu_full_name]) => (
+    const navbar = menu_list.map(([menu_class_name, menu_full_name]) => (
         <div
             key={menu_class_name}
             onClick={() => handleClick(menu_class_name)}
@@ -121,11 +102,6 @@ export default function Navbar({ page }: { page: string }) {
             <div className="md:hidden flex flex-row space-x-4 items-center justify-end w-full pr-4">
                 {navbar}
             </div>
-            {isAdmin && (
-                <div className="absolute right-0">
-                    <MenuOverlay currentPage={page} />
-                </div>
-            )}
         </nav>
     );
 }
