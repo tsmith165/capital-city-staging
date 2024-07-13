@@ -34,7 +34,6 @@ export default function MainView() {
     useLayoutEffect(() => {
         setTimeout(() => {
             setComponentRefs(refs.current);
-            console.log("Selected Component: " + selectedComponent);
             setLayoutLoaded(true);
         }, 500);
     }, [setComponentRefs]);
@@ -44,8 +43,6 @@ export default function MainView() {
 
         // Extract the base component name (remove the timestamp)
         const baseComponent = selectedComponent.split('_')[0];
-
-        console.log("Component refs: ", componentRefs);
         
         // Check if the base component exists and scroll to it
         const index = componentRefs.findIndex((item) => item.current?.id === baseComponent);

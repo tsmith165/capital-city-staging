@@ -8,7 +8,7 @@ export function useIsAdmin() {
   }
 
   for (const role of user.organizationMemberships) {
-    console.log('Checking role:', role);
+    //console.log('Checking role:', role);
     if (role.role === 'org:admin') {
       return true;
     }

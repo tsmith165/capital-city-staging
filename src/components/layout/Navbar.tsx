@@ -1,21 +1,24 @@
 'use client';
 
-import React, { useEffect, useCallback, useTransition } from 'react';
+import React, { useEffect, useCallback, useTransition, useState } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
 import { menu_list } from '@/lib/menu_list';
 import { useStore } from '@/stores/store';
-import MenuOverlay from './menu/MenuOverlay';
 import { IoIosMenu } from 'react-icons/io';
 import { Protect } from '@clerk/nextjs';
 import AdminProtect from '@/utils/auth/AdminProtect';
+
+import dynamic from 'next/dynamic';
+const DynamicMenuOverlay = dynamic(() => import('./menu/MenuOverlay'), { ssr: false });
 
 export default function Navbar({ page }: { page: string }) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const [isPending, startTransition] = useTransition();
+    const [showMenu, setShowMenu] = useState(false);
 
     const selectedComponent = useStore((state) => state.selectedComponent);
     const setSelectedComponent = useStore((state) => state.setSelectedComponent);
@@ -37,7 +40,7 @@ export default function Navbar({ page }: { page: string }) {
         });
     }, [searchParams, pathname]);
 
-    const handleClick = (menu_class_name: string) => {
+    const handleClick = useCallback((menu_class_name: string) => {
         if (menu_class_name === 'contact') {
             router.push('/contact');
         } else {
@@ -52,7 +55,7 @@ export default function Navbar({ page }: { page: string }) {
                 updateUrlWithoutNavigation(menu_class_name);
             }
         }
-    };
+    }, [page, router, setSelectedComponent, updateUrlWithoutNavigation]);
 
     useEffect(() => {
         if (page === 'home') {
@@ -110,15 +113,16 @@ export default function Navbar({ page }: { page: string }) {
             </div>
             <Protect fallback={<></>}>
                 <AdminProtect fallback={<></>}>
-                    <div className="group p-0">
+                    <div className="group p-0" onMouseEnter={() => setShowMenu(true)} onMouseLeave={() => setShowMenu(false)}>
                         <IoIosMenu className={`h-[50px] w-[50px] absolute top-0 right-0 fill-primary_dark py-[5px] pr-2 group-hover:fill-primary`} />
-                        <div className="absolute right-0 top-[50px] z-50 hidden h-fit w-[160px] rounded-bl-md border-b-2 border-l-2 border-primary_dark bg-secondary_light group-hover:flex">
-                            <MenuOverlay currentPage={page} isAdmin={true} />
-                        </div>
+                        {showMenu && (
+                            <div className="absolute right-0 top-[50px] z-50 h-fit w-[160px] rounded-bl-md border-b-2 border-l-2 border-primary_dark bg-secondary_light">
+                                <DynamicMenuOverlay currentPage={page} isAdmin={true} />
+                            </div>
+                        )}
                     </div>
                 </AdminProtect>
             </Protect>
-
         </nav>
     );
 }

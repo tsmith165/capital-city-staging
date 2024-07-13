@@ -60,14 +60,14 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
 
     return (
         <div className="flex h-full w-full flex-col md:flex-row bg-stone-800">
-            <div className="h-1/3 md:h-full md:w-2/5 lg:w-1/2 p-8 rounded-md flex items-center justify-center">
+            <div className="h-1/3 md:h-[calc(100dvh-50px)] md:w-2/5 lg:w-1/2 p-8 rounded-lg flex items-center justify-center">
                 <Image
                     src={inventoryData.image_path}
                     alt={inventoryData.name}
                     width={inventoryData.width}
                     height={inventoryData.height}
                     quality={100}
-                    className="object-contain rounded-md"
+                    className="object-contain rounded-lg max-h-full h-fit w-auto"
                 />
             </div>
             <div className="h-2/3 overflow-y-auto md:h-full md:w-3/5 lg:w-1/2">

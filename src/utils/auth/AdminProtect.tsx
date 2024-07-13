@@ -10,7 +10,7 @@ interface AdminProtectProps {
 
 const AdminProtect: React.FC<AdminProtectProps> = ({ children, fallback }) => {
   const isAdmin = useIsAdmin();
-  console.log('AdminProtect: Is Admin:', isAdmin);
+  //console.log('AdminProtect: Is Admin:', isAdmin);
 
   if (!isAdmin) {
     return fallback || null;
