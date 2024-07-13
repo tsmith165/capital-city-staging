@@ -5,7 +5,7 @@ import { type InferInsertModel, type InferSelectModel } from 'drizzle-orm';
 
 export const inventoryTable = pgTable('inventory', {
     id: serial('id').notNull().primaryKey(),
-    o_id: integer('o_id').notNull().unique(),
+    o_id: integer('o_id').notNull(),
     p_id: integer('p_id').notNull().default(0),
     active: boolean('active').default(true),
     name: text('name').notNull(),
