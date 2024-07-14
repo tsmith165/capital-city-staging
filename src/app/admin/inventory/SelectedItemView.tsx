@@ -102,7 +102,7 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
                 <div className="flex h-7 w-full items-center justify-center space-x-4 pb-1">
                     <div className="flex w-full flex-row">
                         <div className="flex w-full flex-grow justify-end pr-1">
-                            <Link href={`/admin/edit/${selectedItem.id}`} className="ml-2 flex justify-center items-center">
+                            <Link href={`/admin/edit?id=${selectedItem.id}`} className="ml-2 flex justify-center items-center">
                                 <FaEdit className="fill-stone-600 text-xl hover:fill-primary" />
                             </Link>
                             {imageList.length > 1 && (

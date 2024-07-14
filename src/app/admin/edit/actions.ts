@@ -83,7 +83,7 @@ export async function onSubmitEditForm(data: SubmitFormData): Promise<{ success:
             console.log("Skipping inventory creation");
             return { success: false, error: 'Could not find inventory with id ' + data.inventory_id };
         }
-        revalidatePath(`/admin/edit/${data.inventory_id}`);
+        revalidatePath(`/admin/edit`);
         revalidatePath(`/admin/inventory`);
         revalidatePath(`/admin/manage`);
         return { success: true };
@@ -157,7 +157,7 @@ export async function storeUploadedImageDetails(data: UploadFormData): Promise<{
                 });
             }
         }
-        revalidatePath(`/admin/edit/${inventory[0].id}`);
+        revalidatePath(`/admin/edit`);
         revalidatePath(`/admin/inventory`);
         revalidatePath(`/admin/manage`);
         return { success: true, imageUrl: imageUrl };
@@ -190,8 +190,7 @@ export async function handleImageReorder(inventoryId: number, currentInventoryId
         await db.update(extraImagesTable).set({ image_path: currentImage[0].image_path }).where(eq(extraImagesTable.id, targetInventoryId));
 
         // Revalidate the path to refetch the data
-        revalidatePath(`/admin/edit/${currentInventoryId}`);
-        revalidatePath(`/admin/edit/${targetInventoryId}`);
+        revalidatePath(`/admin/edit`);
         revalidatePath(`/admin/inventory`);
         revalidatePath(`/admin/manage`);
         return { success: true };
@@ -210,7 +209,7 @@ export async function handleImageTitleEdit(imageId: number, newTitle: string): P
 
     try {
         await db.update(extraImagesTable).set({ title: newTitle }).where(eq(extraImagesTable.id, imageId));
-        revalidatePath(`/admin/edit/${imageId}`);
+        revalidatePath(`/admin/edit`);
         revalidatePath(`/admin/inventory`);
         revalidatePath(`/admin/manage`);
         return { success: true };
@@ -228,7 +227,7 @@ export async function handleImageDelete(inventoryId: number, imagePath: string):
     }
     try {
         await db.delete(extraImagesTable).where(and(eq(extraImagesTable.inventory_id, inventoryId), eq(extraImagesTable.image_path, imagePath)));
-        revalidatePath(`/admin/edit/${inventoryId}`);
+        revalidatePath(`/admin/edit`);
         revalidatePath(`/admin/inventory`);
         revalidatePath(`/admin/manage`);
         return { success: true };
@@ -255,7 +254,7 @@ export async function handleTitleUpdate(formData: FormData): Promise<{ success: 
         }
 
         await db.update(inventoryTable).set({ name: newTitle }).where(eq(inventoryTable.id, inventoryId));
-        revalidatePath(`/admin/edit/${inventoryId}`);
+        revalidatePath(`/admin/edit`);
         revalidatePath(`/admin/inventory`);
         revalidatePath(`/admin/manage`);
         return { success: true };

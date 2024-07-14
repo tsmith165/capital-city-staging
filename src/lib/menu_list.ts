@@ -16,12 +16,12 @@ export const menu_list: [string, string, string][] = [
 
 export const admin_menu_list: [string, string, string][] = [
     ['portfolio', 'Portfolio', '/?component=portfolio'],
-    ['where', 'Where', '/?component=portfolio'],
-    ['services', 'Services', '/?component=portfolio'],
+    ['where', 'Where', '/?component=where'],
+    ['services', 'Services', '/?component=services'],
     ['contact', 'Contact', '/contact'],
     ['inventory', 'Inventory', '/admin/inventory'],
     ['manage', 'Manage', '/admin/manage'],
-    ['edit', 'Edit', '/admin/edit/images/3'],
+    ['edit', 'Edit', '/admin/edit'],
 ];
 
 export default { navbar_menu_list, menu_list, admin_menu_list };

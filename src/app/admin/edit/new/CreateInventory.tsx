@@ -71,13 +71,13 @@ export default function CreateInventory() {
             if (inventory_data.inventory?.id) {
                 switch(action) {
                     case 'edit':
-                        router.push(`/admin/edit/${inventory_data.inventory.id}`);
+                        router.push(`/admin/edit?id=${inventory_data.inventory.id}`);
                         break;
                     case 'images':
                         router.push(`/admin/edit/images/${inventory_data.inventory.id}`);
                         break;
                     case 'view':
-                        router.push(`/admin/inventory/?item=${inventory_data.inventory.id}`);
+                        router.push(`/admin/inventory?item=${inventory_data.inventory.id}`);
                         break;
                 }
             }

@@ -1,5 +1,3 @@
-// File 1: /src/app/admin/edit/images/[id]/page.tsx
-
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {

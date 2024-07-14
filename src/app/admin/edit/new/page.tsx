@@ -1,5 +1,3 @@
-// File 2: /src/app/admin/edit/new/page.tsx
-
 import { Metadata } from 'next';
 export const metadata: Metadata = {
     title: 'Capital City Staging - Edit Images',

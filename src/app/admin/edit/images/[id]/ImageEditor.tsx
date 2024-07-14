@@ -97,7 +97,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
             });
             setStatusMessage({ type: 'success', message: 'Changes submitted successfully. You can upload another image.' });
             if (shouldNavigate) {
-                router.push(`/admin/edit/${inventoryId}`);
+                router.push(`/admin/edit?id=${inventoryId}`);
             } else {
                 resetInputs();
             }
@@ -126,7 +126,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
                     <ResizeUploader
                         handleUploadComplete={handleUploadComplete}
                         handleResetInputs={resetInputs}
-                        backToEditLink={`/admin/edit/${inventoryId}`}
+                        backToEditLink={`/admin/edit?id=${inventoryId}`}
                     />
                     <InputSelect
                         idName='inventory_type'
