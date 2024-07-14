@@ -20,12 +20,12 @@ export default function Contact() {
                     <h1 className="text-2xl font-bold gradient-gold-main-text">
                         Get in touch with Mia
                     </h1>
-                    <p className="text-md md:text-lg text-stone-100">
+                    <p className="text-md md:text-lg text-stone-300">
                         Reach out to Mia for a personalized home staging consultation. Discuss your needs, budget, and timeline to create a tailored staging plan that showcases your home's best features and attracts potential buyers.
                     </p>
                     <div className="mt-4">
-                        <p className="text-md text-stone-100">mdofflemyer.realestate@gmail.com</p>
-                        <p className="text-md text-stone-100">1 (209) 817-4240</p>
+                        <p className="text-md text-stone-300">mdofflemyer.realestate@gmail.com</p>
+                        <p className="text-md text-stone-300">1 (209) 817-4240</p>
                     </div>
                     <div className="mt-4">
                         <ContactForm />

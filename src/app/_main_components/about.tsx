@@ -15,7 +15,7 @@ export default function About() {
                 />
             </div>
 
-            <div className="flex flex-col h-full w-full md:w-2/3 text-white p-4 space-y-2 rounded-lg shadow-lg justify-center">                    
+            <div className="flex flex-col h-full w-full md:w-2/3 text-stone-300 p-4 space-y-2 rounded-lg shadow-lg justify-center">                    
                 <h1 className="text-2xl font-bold gradient-gold-main-text">
                     Mia Dofflemyer
                 </h1>
@@ -29,8 +29,8 @@ export default function About() {
                     a swift sale at top value!
                 </p>
                 <div className="">
-                    <p className="text-md">mdofflemyer.realestate@gmail.com</p>
-                    <p className="text-md">1 (209) 817-4240</p>
+                    <p className="text-md text-stone-300">mdofflemyer.realestate@gmail.com</p>
+                    <p className="text-md text-stone-300">1 (209) 817-4240</p>
                 </div>
                 <Link href="/contact" className='flex'>
                     <div className={

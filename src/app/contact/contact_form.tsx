@@ -77,7 +77,7 @@ const ContactForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-2 lg:space-y-2">
-      <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
+      <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-2">
         <InputTextbox
           idName="name"
           name="Name"
@@ -93,7 +93,7 @@ const ContactForm = () => {
           placeholder="Enter your email address"
         />
       </div>
-      <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
+      <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-2">
         <InputTextbox
           idName="phone"
           name="Phone"
