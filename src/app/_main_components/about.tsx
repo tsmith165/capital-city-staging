@@ -16,10 +16,10 @@ export default function About() {
             </div>
 
             <div className="flex flex-col h-full w-full md:w-2/3 text-white p-4 space-y-2 rounded-lg shadow-lg justify-center">                    
-                <h1 className="text-2xl font-bold gradient-gold-main">
+                <h1 className="text-2xl font-bold gradient-gold-main-text">
                     Mia Dofflemyer
                 </h1>
-                <p className="text-md md:text-lg">
+                <p className="text-md md:text-lg text-stone-300">
                     Hello! I'm Mia Dofflemyer, the founder of Capital City Staging. Raised in the valley and educated at UC Davis, I
                     later settled in Sacramento to pursue my passion for real estate. Obtaining my license in 2020, I've dedicated
                     myself to assisting individuals in buying and selling homes ever since. My journey into real estate was driven by my
@@ -37,7 +37,7 @@ export default function About() {
                         `flex group items-center justify-center w-fit py-2 font-bold rounded-md px-8 text-md gradient-gold-main ` +
                         + `hover:from-secondary hover:via-secondary_light hover:to-secondary`
                     }>
-                        <div className="group-hover:text-white gradient-secondary-main">
+                        <div className="group-hover:text-white gradient-text gradient-secondary-main-text">
                             {`Send me a message`}
                         </div>
                     </div>

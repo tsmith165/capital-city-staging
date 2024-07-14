@@ -42,7 +42,7 @@ export default function Services() {
         <div className="h-auto md:min-h-[calc(100dvh-50px)] w-full flex flex-col justify-evenly items-center">
             <div className="h-fit w-full flex flex-col items-center justify-center p-4 lg:w-[90%]">
                 <h1 className="text-4xl px-4 font-bold text-white text-center">Focus on your next moves,</h1>
-                <h1 className="text-4xl px-4 font-bold gradient-secondary-main text-center">
+                <h1 className="text-4xl px-4 font-bold gradient-secondary-main-text text-center">
                     we'll handle the rest.
                 </h1>
                 <p className="text-lg text-white pb-4 text-center px-8">
@@ -52,11 +52,11 @@ export default function Services() {
                     {services.map((service, index) => (
                         <div key={index} className="w-full md:w-1/3 flex flex-col ring-stone-500 bg-stone-800 ring-1 rounded-lg p-4">
                             <div className="flex justify-between items-center mb-4">
-                                <div className="gradient-gold-main text-lg font-bold">
+                                <div className="gradient-gold-main-text text-lg font-bold">
                                     {service.title}
                                 </div>
                                 {service.tag && (
-                                    <span className="gradient-secondary-main px-2 py-1 rounded-full text-sm">
+                                    <span className="gradient-secondary-main-text px-2 py-1 rounded-full text-sm">
                                         {service.tag}
                                     </span>
                                 )}
@@ -68,7 +68,7 @@ export default function Services() {
                                     `bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 `
                                     + `hover:from-secondary hover:via-secondary_light hover:to-secondary`
                                 }>
-                                    <div className="group-hover:text-white gradient-secondary-main">
+                                    <div className="group-hover:text-white gradient-secondary-main-text">
                                         {typeof service.price === 'string' ? service.price : `$${service.price.toFixed(2)}`}
                                     </div>
                                 </div>

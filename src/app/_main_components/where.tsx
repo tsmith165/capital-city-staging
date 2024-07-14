@@ -135,7 +135,7 @@ const Where: React.FC = () => {
     return (
         <div ref={containerRef} className="w-full h-[calc(100dvh-50px)] p-4 flex flex-col space-y-2">
             <div className="w-full text-center items-center justify-center flex">
-                <h1 className="w-fit text-4xl font-bold gradient-secondary-main">
+                <h1 className="w-fit text-4xl font-bold gradient-secondary-main-text">
                     Where We Work
                 </h1>
             </div>
@@ -154,7 +154,7 @@ const Where: React.FC = () => {
                             {city.name}
                         </div>
                         {index < cityBoundaries.length - 1 && (
-                            <div className="font-bold gradient-gold-main">
+                            <div className="font-bold gradient-gold-main-text">
                                 -
                             </div>
                         )}

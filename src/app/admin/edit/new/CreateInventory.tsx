@@ -105,7 +105,7 @@ export default function CreateInventory() {
     return (
         <div className="flex h-full w-full flex-col items-center justify-center bg-stone-900">
             <div className="flex w-4/5 flex-col items-center justify-center rounded-lg bg-stone-900">
-                <div id="header" className="w-fit rounded-t-lg text-center text-4xl font-bold gradient-secondary-main">
+                <div id="header" className="w-fit rounded-t-lg text-center text-4xl font-bold gradient-secondary-main-text">
                     Create New Inventory
                 </div>
                 <div className="flex w-full flex-col items-center space-y-2 p-2">

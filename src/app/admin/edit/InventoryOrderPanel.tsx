@@ -113,7 +113,7 @@ const InventoryOrderPanel: React.FC<InventoryOrderPanelProps> = ({ current_inven
             <div className="rounded-lg">
                 {extra_images.length > 0 && (
                     <div>
-                        <h3 className="gradient-primary-main rounded-t-lg px-2 py-2 text-center text-2xl font-semibold">Extra Images</h3>
+                        <h3 className="gradient-primary-main-text rounded-t-lg px-2 py-2 text-center text-2xl font-semibold">Extra Images</h3>
                         <div className="flex h-fit flex-col">{renderImages(extra_images, 'extra')}</div>
                     </div>
                 )}

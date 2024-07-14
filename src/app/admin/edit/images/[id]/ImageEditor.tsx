@@ -118,7 +118,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
             <div className="flex w-4/5 flex-col items-center justify-center rounded-lg bg-stone-900">
                 <div
                     id="header"
-                    className="w-full rounded-t-lg text-center text-4xl font-bold gradient-secondary-main"
+                    className="w-full rounded-t-lg text-center text-4xl font-bold gradient-secondary-main-text"
                 >
                     Edit Images
                 </div>

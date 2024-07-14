@@ -8,8 +8,8 @@ export const navbar_menu_list: [string, string][] = [
 
 export const menu_list: [string, string, string][] = [
     ['portfolio', 'Portfolio', '/?component=portfolio'],
-    ['where', 'Where', '/?component=portfolio'],
-    ['services', 'Services', '/?component=portfolio'],
+    ['where', 'Where', '/?component=where'],
+    ['services', 'Services', '/?component=services'],
     // ['about', 'About', '/?component=portfolio'],
     ['contact', 'Contact', '/contact'],
 ];

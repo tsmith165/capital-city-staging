@@ -17,7 +17,7 @@ export default function Contact() {
                 </div>
 
                 <div className="flex flex-col h-full w-full md:w-2/3 p-4 space-y-2 rounded-lg shadow-lg justify-center">                      
-                    <h1 className="text-2xl font-bold gradient-gold-main">
+                    <h1 className="text-2xl font-bold gradient-gold-main-text">
                         Get in touch with Mia
                     </h1>
                     <p className="text-md md:text-lg text-stone-100">

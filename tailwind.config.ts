@@ -54,14 +54,17 @@ export default withUt({
 
             // Custom gradeint utility classes
             const newUtilities = {
-                '.gradient-primary-main': {
+                '.gradient-primary-main-text': {
                     '@apply text-transparent bg-gradient-to-r bg-clip-text bg-gradient-to-r from-primary from-15% via-primary_dark via-50% to-primary to-85%': {},
                 },
-                '.gradient-secondary-main': {
+                '.gradient-secondary-main-text': {
                     '@apply text-transparent bg-gradient-to-r bg-clip-text bg-gradient-to-r from-secondary from-15% via-secondary_light via-50% to-secondary to-85%': {},
                 },
-                '.gradient-gold-main': {
+                '.gradient-gold-main-text': {
                     '@apply text-transparent bg-gradient-to-r bg-clip-text bg-gradient-to-r from-yellow-500 from-15% via-amber-500 via-50% to-yellow-400 to-85%': {},
+                },
+                '.gradient-gold-main': {
+                    '@apply bg-gradient-to-r from-yellow-500 from-15% via-amber-500 via-50% to-yellow-400 to-85%': {},
                 },
             };
 
