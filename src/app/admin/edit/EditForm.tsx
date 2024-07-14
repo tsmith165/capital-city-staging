@@ -7,7 +7,7 @@ import InputTextbox from '@/components/inputs/InputTextbox';
 import InputSelect from '@/components/inputs/InputSelect';
 import InputTextArea from '@/components/inputs/InputTextArea';
 
-import { onSubmitEditForm } from '../actions';
+import { onSubmitEditForm } from './actions';
 
 const MAX_CHANGE_DISPLAY_LENGTH = 30;
 

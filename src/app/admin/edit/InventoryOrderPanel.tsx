@@ -1,6 +1,6 @@
 import React from 'react';
 import { IoIosArrowUp, IoIosArrowDown, IoIosTrash } from 'react-icons/io';
-import { handleImageReorder, handleImageDelete, handleImageTitleEdit } from '../actions';
+import { handleImageReorder, handleImageDelete, handleImageTitleEdit } from './actions';
 import { InventoryWithImages, ExtraImages } from '@/db/schema';
 import Image from 'next/image';
 

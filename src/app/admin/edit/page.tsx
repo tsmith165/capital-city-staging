@@ -34,11 +34,13 @@ export const metadata: Metadata = {
 
 import React, { Suspense } from 'react';
 
-import { fetchInventoryById, fetchAdjacentInventoryIds } from '@/app/actions';
+import { fetchInventoryById, fetchAdjacentInventoryIds, getMostRecentId } from '@/app/actions';
 
 import PageLayout from '@/components/layout/PageLayout';
-import Edit from '@/app/admin/edit/[id]/Edit';
+import Edit from '@/app/admin/edit/Edit';
 import LoadingSpinner from '@/components/layout/LoadingSpinner';
+import { redirect } from 'next/navigation';
+
 
 async function fetchInventoryData(id: number) {
     const inventory = await fetchInventoryById(id);
@@ -46,15 +48,30 @@ async function fetchInventoryData(id: number) {
     return { ...inventory, next_id, last_id };
 }
 
-export default function Page({ params }: { params: { id: string } }) {
-    const id = parseInt(params.id, 10);
+export default async function Page({ searchParams }: { searchParams: { id?: string } }) {
+    let id = searchParams.id ? parseInt(searchParams.id, 10) : null;
+
+    if (!id) {
+        // Fetch the most recent ID if no ID is provided
+        const mostRecentId = await getMostRecentId();
+        if (mostRecentId) {
+            redirect(`/admin/edit?id=${mostRecentId}`);
+        } else {
+            return (
+                <PageLayout page="/edit">
+                    <div className="text-center text-xl">No inventory items found</div>
+                </PageLayout>
+            );
+        }
+    }
+
     const inventoryDataPromise = fetchInventoryData(id);
 
     return (
-        <PageLayout page={`/edit/${id}`}>
-                <Suspense fallback={<LoadingSpinner page="Edit" />}>
-                    <Edit inventoryDataPromise={inventoryDataPromise} current_id={id} />
-                </Suspense>
+        <PageLayout page={`/edit?id=${id}`}>
+            <Suspense fallback={<LoadingSpinner page="Edit" />}>
+                <Edit inventoryDataPromise={inventoryDataPromise} current_id={id} />
+            </Suspense>
         </PageLayout>
     );
 }

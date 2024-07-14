@@ -14,7 +14,7 @@ async function captureClerkUserOrganizationMemberships(userId: string) {
 
         const memberships = await response.json();
 
-        console.log('User Memberships:', memberships.data);
+        // console.log('User Memberships:', memberships.data);
         return memberships;
     } catch (error) {
         console.error('Error fetching organization memberships:', error);
@@ -32,6 +32,6 @@ export async function isClerkUserIdAdmin(userId: string) {
                 (membership.role === 'org:admin' || membership.permissions.includes('org:sys_domains:manage'))
         );
     }
-    console.log('Is user admin:', isAdmin);
+    // console.log('Is user admin:', isAdmin);
     return isAdmin;
 }

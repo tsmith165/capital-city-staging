@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io';
 import { MdPageview } from 'react-icons/md';
 import EditForm from './EditForm';
 import InventoryOrderPanel from './InventoryOrderPanel';
-import { handleTitleUpdate } from '../actions';
+import { handleTitleUpdate } from './actions';
 import LoadingSpinner from '@/components/layout/LoadingSpinner';
 
 interface EditProps {
@@ -18,30 +18,42 @@ interface EditProps {
 const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
     const [inventoryData, setInventoryData] = useState<any>(null);
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-
-    const fetchData = useCallback(async () => {
-        try {
-            const data = await inventoryDataPromise;
-            setInventoryData(data);
-            console.log(`LOADING EDIT DETAILS PAGE - Inventory ID: ${current_id}`);
-        } catch (error) {
-            console.error("Error fetching inventory data:", error);
-            setSubmitMessage({ type: 'error', text: 'Failed to load inventory data.' });
-        }
-    }, [inventoryDataPromise, current_id]);
+    const [titleInput, setTitleInput] = useState('');
 
     useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+        const fetchData = async () => {
+            try {
+                const data = await inventoryDataPromise;
+                setInventoryData(data);
+                setTitleInput(data.name || '');
+                console.log(`LOADING EDIT DETAILS PAGE - Inventory ID: ${current_id}`);
+            } catch (error) {
+                console.error("Error fetching inventory data:", error);
+                setSubmitMessage({ type: 'error', text: 'Failed to load inventory data.' });
+            }
+        };
 
-    const handleTitleUpdateSubmit = async (formData: FormData) => {
+        fetchData();
+    }, [inventoryDataPromise, current_id]);
+
+    const handleTitleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTitleInput(e.target.value);
+    };
+
+    const handleTitleUpdateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
         setSubmitMessage(null);
         try {
+            const formData = new FormData();
+            formData.append('inventoryId', current_id.toString());
+            formData.append('newTitle', titleInput);
+
             const result = await handleTitleUpdate(formData);
             if (result.success) {
                 setSubmitMessage({ type: 'success', text: 'Title updated successfully!' });
                 // Refresh the inventory data to reflect the new title
-                fetchData();
+                const updatedData = await inventoryDataPromise;
+                setInventoryData(updatedData);
             } else {
                 setSubmitMessage({ type: 'error', text: result.error || 'An error occurred while updating the title.' });
             }
@@ -50,13 +62,12 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
         }
     };
 
-    const next_id = inventoryData?.next_id ?? -1;
-    const last_id = inventoryData?.last_id ?? -1;
-    const inventory_name = inventoryData?.name ?? '';
-
     if (!inventoryData) {
         return <LoadingSpinner page="Edit Details" />;
     }
+
+    const next_id = inventoryData?.next_id ?? -1;
+    const last_id = inventoryData?.last_id ?? -1;
 
     return (
         <div className="flex h-full w-full flex-col md:flex-row bg-stone-800">
@@ -73,22 +84,22 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
             <div className="h-2/3 overflow-y-auto md:h-full md:w-3/5 lg:w-1/2">
                 <div className="flex h-fit flex-row items-center space-x-2 p-2">
                     <div className="flex h-[48px] flex-col space-y-1">
-                        <Link href={`/admin/edit/${next_id}`}>
+                        <Link href={`/admin/edit?id=${next_id}`}>
                             <IoIosArrowUp className="h-[22px] w-8 cursor-pointer rounded-lg bg-secondary fill-stone-400 hover:bg-primary hover:fill-secondary_dark" />
                         </Link>
-                        <Link href={`/admin/edit/${last_id}`}>
+                        <Link href={`/admin/edit?id=${last_id}`}>
                             <IoIosArrowDown className="h-[22px] w-8 cursor-pointer rounded-lg bg-secondary fill-stone-400 hover:bg-primary hover:fill-secondary_dark" />
                         </Link>
                     </div>
                     <Link href={`/admin/inventory/?item=${current_id}`}>
                         <MdPageview className="h-[48px] w-[48px] cursor-pointer rounded-lg bg-secondary fill-stone-400 p-1 hover:bg-primary hover:fill-secondary_dark" />
                     </Link>
-                    <form action={handleTitleUpdateSubmit} className="flex w-full flex-grow flex-row rounded-lg bg-secondary_dark">
-                        <input type="hidden" name="inventoryId" value={current_id} />
+                    <form onSubmit={handleTitleUpdateSubmit} className="flex w-full flex-grow flex-row rounded-lg bg-secondary_dark">
                         <input
                             type="text"
                             name="newTitle"
-                            defaultValue={inventory_name}
+                            value={titleInput}
+                            onChange={handleTitleInputChange}
                             className="m-0 flex w-full flex-grow rounded-lg border-none bg-secondary_dark px-3 py-1 text-2xl font-bold text-stone-400 outline-none"
                         />
                         <button
