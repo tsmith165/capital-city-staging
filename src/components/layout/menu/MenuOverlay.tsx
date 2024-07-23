@@ -27,7 +27,7 @@ function generateMenu(menuList: typeof menu_list, isSignedIn: boolean, currentPa
 
     if (isSignedIn) {
         menu_items.push(
-            <div key="sign_out_button">
+            <div key="sign_out_button" className="z-0">
                 <DynamicMenuOverlaySignOutButton />
             </div>,
         );

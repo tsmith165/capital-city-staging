@@ -12,6 +12,7 @@ export async function fetchInventory(): Promise<InventoryWithImages[]> {
             extraImages: extraImagesTable,
         })
         .from(inventoryTable)
+        .where(eq(inventoryTable.active, true))
         .leftJoin(extraImagesTable, eq(extraImagesTable.inventory_id, inventoryTable.id))
         .orderBy(desc(inventoryTable.o_id));
 

@@ -154,7 +154,7 @@ const Where: React.FC = () => {
                             {city.name}
                         </div>
                         {index < cityBoundaries.length - 1 && (
-                            <div className="font-bold gradient-gold-main-text">
+                            <div className="font-bold gradient-gold-main">
                                 -
                             </div>
                         )}
