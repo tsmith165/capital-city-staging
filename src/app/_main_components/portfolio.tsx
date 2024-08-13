@@ -4,6 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io';
 
 const images = [
+    { src: '/portfolio/job_2/entry.jpg', width: 1500, height: 999 },
+    { src: '/portfolio/job_2/family_room_1.jpg', width: 1500, height: 999 },
+    { src: '/portfolio/job_2/family_room_2.jpg', width: 1500, height: 999 },
+    { src: '/portfolio/job_2/kids_bedroom.jpeg', width: 1500, height: 999 },
+    { src: '/portfolio/job_2/kitchen_1.jpg', width: 1500, height: 999 },
+    { src: '/portfolio/job_2/kitchen_1.jpg', width: 1500, height: 999 },
+    { src: '/portfolio/job_2/master_bedroom.jpeg', width: 1500, height: 1000 },
     { src: '/portfolio/job_1/entry.jpg', width: 1500, height: 1000 },
     { src: '/portfolio/job_1/dining.jpg', width: 1500, height: 1000 },
     { src: '/portfolio/job_1/entry_2.jpg', width: 1500, height: 1000 },

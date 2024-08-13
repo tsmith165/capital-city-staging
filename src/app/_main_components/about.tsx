@@ -32,16 +32,23 @@ export default function About() {
                     <p className="text-md text-stone-300">mdofflemyer.realestate@gmail.com</p>
                     <p className="text-md text-stone-300">1 (209) 817-4240</p>
                 </div>
-                <Link href="/contact" className='flex'>
-                    <div className={
-                        `flex group items-center justify-center w-fit py-2 font-bold rounded-md px-8 text-md gradient-gold-main ` +
-                        + `hover:from-secondary hover:via-secondary_light hover:to-secondary`
-                    }>
-                        <div className="group-hover:text-white gradient-text gradient-secondary-main-text">
-                            {`Send me a message`}
+                <div className="flex flex-row h-[2.5rem]">
+                    <Link href="/contact" className='flex'>
+                        <div className={
+                            `flex group items-center justify-center w-full py-2 font-bold rounded-md px-8 text-base gradient-gold-main ` +
+                            + `hover:from-secondary hover:via-secondary_light hover:to-secondary`
+                        }>
+                            <div className="group-hover:text-white gradient-text gradient-secondary-main-text w-full">
+                                {`Send me a message`}
+                            </div>
                         </div>
-                    </div>
-                </Link>
+                    </Link>
+                </div>
+                <div className="flex flex-row h-[8rem]">
+                    <Link href="https://www.realestatestagingassociation.com/" className='flex'>
+                        <Image src="/logo/RESA_logo.png" alt="RESA Logo" width={1024} height={512} className="max-h-full w-auto bg-stone-300 rounded-3xl p-2 hover:bg-stone-400"/>
+                    </Link>
+                </div>
             </div>
         </div>
     );

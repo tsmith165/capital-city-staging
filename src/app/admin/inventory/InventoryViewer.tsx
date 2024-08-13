@@ -1,5 +1,3 @@
-// File: /src/app/admin/inventory/InventoryViewer.tsx
-
 'use client';
 
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';

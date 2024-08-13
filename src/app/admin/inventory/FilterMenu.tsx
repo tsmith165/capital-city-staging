@@ -1,7 +1,10 @@
 import React from 'react';
 import { Tooltip } from 'react-tooltip';
-import { FaSlidersH, FaCouch, FaTable, FaChair, FaBed, FaBan, FaToilet, FaPaintBrush } from 'react-icons/fa';
+import { FaSlidersH, FaCouch, FaTable, FaChair, FaBed, FaBan, FaToilet, FaPaintBrush, FaBook } from 'react-icons/fa';
+import { IoIosAddCircleOutline } from "react-icons/io";
+import { PiDesk } from "react-icons/pi";
 import { FaRug } from "react-icons/fa6";
+import { RiPlantLine } from "react-icons/ri";
 import { GiCandles, GiParkBench, GiBarStool, GiForkKnifeSpoon, GiBedLamp } from "react-icons/gi";
 
 import useInventoryStore from '@/stores/inventory_store';
@@ -10,15 +13,20 @@ const CATEGORY_FILTERS: [string, string, React.ComponentType<{ className?: strin
     ['Couch', 'couch', FaCouch],
     ['Table', 'table', FaTable],
     ['Chair', 'chair', FaChair],
-    ['Bed', 'bed', FaBed],
+    ['Bedroom', 'bedroom', FaBed],
     ['Bathroom', 'bathroom', FaToilet],
     ['Kitchen', 'kitchen', GiForkKnifeSpoon],
+    ['Bookcase', 'bookcase', FaBook],
     ['Lamp', 'lamp', GiBedLamp],
     ['Art', 'art', FaPaintBrush],
     ['Decor', 'decor', GiCandles],
     ['Bench', 'bench', GiParkBench],
     ['Barstool', 'barstool', GiBarStool],
     ['Rug', 'rug', FaRug],
+    ['Plant', 'plant', RiPlantLine],
+    ['Book', 'book', FaBook],
+    ['Desk', 'desk', PiDesk],
+    ['Other', 'other', IoIosAddCircleOutline],
     ['None', 'none', FaBan],
 ];
 
