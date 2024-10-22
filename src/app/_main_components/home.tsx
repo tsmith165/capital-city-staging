@@ -57,6 +57,8 @@ export default function Home() {
                             height={images[currentImageIndexRef.current].height}
                             className="absolute inset-0 w-full h-full object-cover"
                             alt="One of our recently staged homes"
+                            priority
+                            sizes="100vw"
                         />
                     </motion.div>
                 )}

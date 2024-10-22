@@ -72,9 +72,7 @@ export default function MainView() {
                     rel="preload"
                     as="image"
                     href="/portfolio/stock/staging-stock-3.jpg"
-                    imageSizes="max-width: 768px) 100vw,
-                            (max-width: 1200px) 50vw,
-                            33vw"
+                    imageSizes="100vw"
                 />
             </Head>
             {components.map(({ id, component: Component }, index) => (
