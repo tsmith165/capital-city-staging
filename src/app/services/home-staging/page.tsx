@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 export default function HomeStagingServices() {
   return (
     <PageLayout page="home-staging">
-      <div className="flex flex-col items-center w-full h-full py-16 px-8 space-y-8">
+      <div className="flex flex-col items-center w-full h-fit py-16 px-8 space-y-8 bg-stone-900">
         <h1 className="text-4xl font-bold text-center text-transparent bg-clip-text gradient-gold-main">
           Professional Home Staging Services in Sacramento
         </h1>

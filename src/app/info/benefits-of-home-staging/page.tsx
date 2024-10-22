@@ -30,17 +30,10 @@ export const metadata: Metadata = {
 export default function BenefitsOfHomeStaging() {
   return (
     <PageLayout page="benefits-of-home-staging">
-      <div className="flex flex-col items-center w-full h-full py-16 px-8 space-y-8">
+      <div className="flex flex-col items-center w-full h-fit py-16 px-8 space-y-8 bg-stone-900">
         <h1 className="text-4xl font-bold text-center text-transparent bg-clip-text gradient-gold-main">
           The Benefits of Home Staging
         </h1>
-        <Image
-          src="/images/benefits-of-home-staging.jpg"
-          alt="Beautifully staged living room"
-          width={1200}
-          height={630}
-          className="rounded-lg shadow-lg"
-        />
         <div className="flex flex-col space-y-6 max-w-4xl text-stone-300">
           <p className="text-lg">
             Selling a home is a significant undertaking, and first impressions are crucial.

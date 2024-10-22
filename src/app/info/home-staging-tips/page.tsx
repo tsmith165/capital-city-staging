@@ -30,17 +30,10 @@ export const metadata: Metadata = {
 export default function HomeStagingTips() {
   return (
     <PageLayout page="home-staging-tips">
-      <div className="flex flex-col items-center w-full h-full py-16 px-8 space-y-8">
+      <div className="flex flex-col items-center w-full h-fit py-16 px-8 space-y-8 bg-stone-900">
         <h1 className="text-4xl font-bold text-center text-transparent bg-clip-text gradient-gold-main">
           Home Staging Tips and Tricks
         </h1>
-        <Image
-          src="/images/home-staging-tips.jpg"
-          alt="Expert home staging tips"
-          width={1200}
-          height={630}
-          className="rounded-lg shadow-lg"
-        />
         <div className="flex flex-col space-y-6 max-w-4xl text-stone-300">
           <p className="text-lg">
             Preparing your home for sale can be a daunting task. At Capital City Staging, we've compiled a list of expert tips and tricks to help you stage your home effectively and attract potential buyers.
