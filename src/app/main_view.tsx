@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useRef, useLayoutEffect, useEffect, useState } from 'react';
+import Head from 'next/head';
+import Link from 'next/link';
 import { useStore } from '@/stores/store';
 
 import Home from '@/app/_main_components/home';
@@ -65,6 +67,16 @@ export default function MainView() {
     return (
         <div className="flex flex-col overflow-y-auto h-full">
             <PostHogPageView />
+            <Head>
+                <link
+                    rel="preload"
+                    as="image"
+                    href="/portfolio/stock/staging-stock-3.jpg"
+                    imageSizes="max-width: 768px) 100vw,
+                            (max-width: 1200px) 50vw,
+                            33vw"
+                />
+            </Head>
             {components.map(({ id, component: Component }, index) => (
                 <div
                     key={id}

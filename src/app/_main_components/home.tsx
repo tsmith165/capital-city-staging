@@ -16,7 +16,7 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function Home() {
     const [isLogoVisible, setLogoVisible] = useState(true);
-    const [isStagingImageVisible, setStagingImageVisible] = useState(false);
+    const [isStagingImageVisible, setStagingImageVisible] = useState(true);
     const currentImageIndexRef = useRef(0);
 
     useEffect(() => {
@@ -26,11 +26,6 @@ export default function Home() {
             currentImageIndexRef.current = (currentImageIndexRef.current + 1) % images.length;
             setStagingImageVisible(true);
         }, 5500);
-
-        setTimeout(async () => {
-            await delay(1000);
-            setStagingImageVisible(true);
-        }, 1000);
 
         return () => clearInterval(interval);
     }, []);
