@@ -1,10 +1,16 @@
 import React from 'react';
 import Image from 'next/image';
-import ContactForm from './contact_form';
+import ContactForm from './contact_form'; 
+
+import dynamic from 'next/dynamic'
+const PostHogPageView = dynamic(() => import('@/app/PostHogPageView'), {
+    ssr: false,
+})
 
 export default function Contact() {
     return (
         <div className="h-full w-full overflow-y-auto">
+            <PostHogPageView/>
             <div className="h-fit md:h-full w-full flex p-4 flex-col md:flex-row items-center justify-center ">
                 <div className="flex w-full md:w-fit md:max-w-1/3 h-full md:h-auto items-center justify-center">
                     <Image

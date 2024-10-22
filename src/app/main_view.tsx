@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useRef, useLayoutEffect, useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
 import { useStore } from '@/stores/store';
 
 import Home from '@/app/_main_components/home';
@@ -10,6 +9,10 @@ import Portfolio from '@/app/_main_components/portfolio';
 import Services from '@/app/_main_components/services';
 // import Testimonials from '@/app/_main_components/testimonials';
 
+import dynamic from 'next/dynamic';
+const PostHogPageView = dynamic(() => import('@/app/PostHogPageView'), {
+    ssr: false,
+})
 const Where = dynamic(() => import('@/app/_main_components/where'), {
     ssr: false,
 });
@@ -61,6 +64,7 @@ export default function MainView() {
 
     return (
         <div className="flex flex-col overflow-y-auto h-full">
+            <PostHogPageView />
             {components.map(({ id, component: Component }, index) => (
                 <div
                     key={id}

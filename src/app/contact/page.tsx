@@ -37,7 +37,6 @@ export const metadata: Metadata = {
     metadataBase: new URL('https://www.capitalcitystaging.com'),
 };
 
-
 export default async function ContactPage() {
     const distinctId = await captureDistictId();
     captureEvent('Contact page was loaded', { distinctId });
