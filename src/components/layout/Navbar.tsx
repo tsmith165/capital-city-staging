@@ -107,7 +107,7 @@ export default function Navbar({ page }: { page: string }) {
                 <div className="hidden md:flex flex-row space-x-4 items-center justify-start flex-1">
                     {rightNavbar}
                 </div>
-                <div className="md:hidden flex flex-row space-x-4 items-center justify-end w-full pr-4">
+                <div className="md:hidden flex flex-row space-x-4 items-center justify-end w-full pr-[55px] pt-[10px]">
                     {navbar}
                 </div>
             </div>
