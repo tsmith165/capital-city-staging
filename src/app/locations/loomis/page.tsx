@@ -6,7 +6,7 @@ import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 const locationData = {
   locationName: 'Loomis',
   pageSlug: 'loomis',
-  imageUrl: '/favicon/CCS_og_image.png',
+  imageUrl: '/locations/loomis.jpg',
   imageAlt: 'Home Staging in Loomis, CA',
   description:
     'Capital City Staging provides professional home staging services in Loomis, enhancing your property’s appeal to attract more buyers.',
@@ -26,8 +26,7 @@ export const metadata: Metadata = generateLocationMetadata({
   pageSlug: locationData.pageSlug,
   description:
     'Expert home staging services in Loomis, California. Make your property stand out with Capital City Staging.',
-  imageUrl: locationData.imageUrl,
-  imageAlt: locationData.imageAlt,
+  ogImageUrl: '/favicon/CCS_og_image.png'
 });
 
 export default function LoomisHomeStaging() {

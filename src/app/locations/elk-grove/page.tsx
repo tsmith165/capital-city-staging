@@ -6,7 +6,7 @@ import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 const locationData = {
   locationName: 'Elk Grove',
   pageSlug: 'elk-grove',
-  imageUrl: '/favicon/CCS_og_image.png',
+  imageUrl: '/locations/elk-grove.jpg',
   imageAlt: 'Home Staging in Elk Grove, CA',
   description:
     'Capital City Staging provides expert home staging services in Elk Grove, enhancing your property\'s appeal to attract more buyers and sell faster.',
@@ -26,8 +26,7 @@ export const metadata: Metadata = generateLocationMetadata({
   pageSlug: locationData.pageSlug,
   description:
     'Top-quality home staging services in Elk Grove, California. Make your property irresistible to buyers with Capital City Staging.',
-  imageUrl: locationData.imageUrl,
-  imageAlt: locationData.imageAlt,
+  ogImageUrl: '/favicon/CCS_og_image.png'
 });
 
 export default function ElkGroveHomeStaging() {

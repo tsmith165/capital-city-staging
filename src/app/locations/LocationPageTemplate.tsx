@@ -29,23 +29,31 @@ export default function LocationPageTemplate({
         <h1 className="text-4xl font-bold text-center text-transparent bg-clip-text gradient-gold-main">
           Professional Home Staging in {locationName}, CA
         </h1>
+        <div className="relative w-full max-w-4xl h-64">
+          <Image
+            src={imageUrl}
+            alt={imageAlt}
+            fill
+            className="object-cover rounded-md"
+          />
+        </div>
         <p className="text-lg text-stone-300 max-w-3xl text-center">
           {description}
         </p>
         <div className="flex flex-col space-y-6 max-w-4xl px-8">
-          <h2 className="text-2xl font-semibold text-stone-100">
+          <h2 className="text-2xl font-semibold text-primary">
             Why Home Staging in {locationName}?
           </h2>
           <p className="text-stone-300">{whyStaging}</p>
-          <h2 className="text-2xl font-semibold text-stone-100">
+          <h2 className="text-2xl font-semibold text-primary">
             Our {locationName} Services Include:
           </h2>
           <ul className="list-disc list-inside text-stone-300 space-y-2">
             {services.map((service, index) => (
-              <li key={index}>{service}</li>
+              <li key={index} className='text-stone-300'>{service}</li>
             ))}
           </ul>
-          <h2 className="text-2xl font-semibold text-stone-100">Contact Us</h2>
+          <h2 className="text-2xl font-semibold text-primary">Contact Us</h2>
           <p className="text-stone-300">
             {contactText}{' '}
             <a href="/contact" className="text-secondary hover:underline">

@@ -6,7 +6,7 @@ import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 const locationData = {
   locationName: 'Rancho Cordova',
   pageSlug: 'rancho-cordova',
-  imageUrl: '/favicon/CCS_og_image.png',
+  imageUrl: '/locations/rancho-cordova.jpg',
   imageAlt: 'Home Staging in Rancho Cordova, CA',
   description:
     'Capital City Staging offers professional home staging services in Rancho Cordova, helping you present your property in the best possible light to attract potential buyers.',
@@ -26,8 +26,7 @@ export const metadata: Metadata = generateLocationMetadata({
   pageSlug: locationData.pageSlug,
   description:
     "Expert home staging services in Rancho Cordova, California. Enhance your property's marketability with Capital City Staging.",
-  imageUrl: locationData.imageUrl,
-  imageAlt: locationData.imageAlt,
+  ogImageUrl: '/favicon/CCS_og_image.png'
 });
 
 export default function RanchoCordovaHomeStaging() {

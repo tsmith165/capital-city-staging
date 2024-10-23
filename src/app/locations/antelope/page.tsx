@@ -6,7 +6,7 @@ import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 const locationData = {
   locationName: 'Antelope',
   pageSlug: 'antelope',
-  imageUrl: '/favicon/CCS_og_image.png',
+  imageUrl: '/locations/antelope.jpg',
   imageAlt: 'Home Staging in Antelope, CA',
   description:
     'Capital City Staging provides expert home staging services in Antelope, helping you present your property in the best possible light.',
@@ -26,8 +26,7 @@ export const metadata: Metadata = generateLocationMetadata({
   pageSlug: locationData.pageSlug,
   description:
     'Professional home staging services in Antelope, California. Enhance your property’s marketability with Capital City Staging.',
-  imageUrl: locationData.imageUrl,
-  imageAlt: locationData.imageAlt,
+  ogImageUrl: '/favicon/CCS_og_image.png'
 });
 
 export default function AntelopeHomeStaging() {

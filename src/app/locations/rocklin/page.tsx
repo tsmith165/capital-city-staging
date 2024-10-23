@@ -6,7 +6,7 @@ import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 const locationData = {
   locationName: 'Rocklin',
   pageSlug: 'rocklin',
-  imageUrl: '/favicon/CCS_og_image.png',
+  imageUrl: '/locations/rocklin.jpg',
   imageAlt: 'Home Staging in Rocklin, CA',
   description:
     'Capital City Staging offers expert home staging services in Rocklin, enhancing your property’s appeal to attract potential buyers.',
@@ -26,8 +26,7 @@ export const metadata: Metadata = generateLocationMetadata({
   pageSlug: locationData.pageSlug,
   description:
     'Professional home staging services in Rocklin, California. Enhance your property’s marketability with Capital City Staging.',
-  imageUrl: locationData.imageUrl,
-  imageAlt: locationData.imageAlt,
+  ogImageUrl: '/favicon/CCS_og_image.png'
 });
 
 export default function RocklinHomeStaging() {

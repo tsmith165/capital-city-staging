@@ -6,7 +6,7 @@ import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 const locationData = {
   locationName: 'Fair Oaks',
   pageSlug: 'fair-oaks',
-  imageUrl: '/favicon/CCS_og_image.png',
+  imageUrl: '/locations/fair-oaks.jpg',
   imageAlt: 'Home Staging in Fair Oaks, CA',
   description:
     'Capital City Staging offers professional home staging services in Fair Oaks, helping your property attract more potential buyers.',
@@ -26,8 +26,7 @@ export const metadata: Metadata = generateLocationMetadata({
   pageSlug: locationData.pageSlug,
   description:
     'Expert home staging services in Fair Oaks, California. Enhance your property’s appeal with Capital City Staging.',
-  imageUrl: locationData.imageUrl,
-  imageAlt: locationData.imageAlt,
+  ogImageUrl: '/favicon/CCS_og_image.png'
 });
 
 export default function FairOaksHomeStaging() {

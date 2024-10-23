@@ -6,7 +6,7 @@ import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 const locationData = {
   locationName: 'Roseville',
   pageSlug: 'roseville',
-  imageUrl: '/favicon/CCS_og_image.png',
+  imageUrl: '/locations/roseville.jpg',
   imageAlt: 'Home Staging in Roseville, CA',
   description:
     'Capital City Staging provides professional home staging services in Roseville, helping your property attract more buyers and sell faster.',
@@ -26,8 +26,7 @@ export const metadata: Metadata = generateLocationMetadata({
   pageSlug: locationData.pageSlug,
   description:
     'Professional home staging services in Roseville, California. Elevate your property’s appeal with Capital City Staging.',
-  imageUrl: locationData.imageUrl,
-  imageAlt: locationData.imageAlt,
+  ogImageUrl: '/favicon/CCS_og_image.png'
 });
 
 export default function RosevilleHomeStaging() {

@@ -6,7 +6,7 @@ import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 const locationData = {
   locationName: 'Citrus Heights',
   pageSlug: 'citrus-heights',
-  imageUrl: '/favicon/CCS_og_image.png',
+  imageUrl: '/locations/citrus-heights.jpg',
   imageAlt: 'Home Staging in Citrus Heights, CA',
   description:
     'Capital City Staging offers professional home staging services in Citrus Heights, enhancing your property’s appeal to attract more buyers.',
@@ -26,8 +26,7 @@ export const metadata: Metadata = generateLocationMetadata({
   pageSlug: locationData.pageSlug,
   description:
     'Expert home staging services in Citrus Heights, California. Make your property stand out with Capital City Staging.',
-  imageUrl: locationData.imageUrl,
-  imageAlt: locationData.imageAlt,
+  ogImageUrl: '/favicon/CCS_og_image.png'
 });
 
 export default function CitrusHeightsHomeStaging() {

@@ -6,7 +6,7 @@ import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 const locationData = {
   locationName: 'Folsom',
   pageSlug: 'folsom',
-  imageUrl: '/favicon/CCS_og_image.png',
+  imageUrl: '/locations/folsom.jpg',
   imageAlt: 'Home Staging in Folsom, CA',
   description:
     'Capital City Staging is proud to offer premier home staging services in Folsom, California. We help homeowners and real estate agents showcase properties to attract more buyers and achieve higher sale prices.',
@@ -26,8 +26,7 @@ export const metadata: Metadata = generateLocationMetadata({
   pageSlug: locationData.pageSlug,
   description:
     "Professional home staging services in Folsom, California. Enhance your property's appeal with Capital City Staging.",
-  imageUrl: locationData.imageUrl,
-  imageAlt: locationData.imageAlt,
+  ogImageUrl: '/favicon/CCS_og_image.png'
 });
 
 export default function FolsomHomeStaging() {

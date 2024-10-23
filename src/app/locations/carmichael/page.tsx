@@ -6,7 +6,7 @@ import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 const locationData = {
   locationName: 'Carmichael',
   pageSlug: 'carmichael',
-  imageUrl: '/favicon/CCS_og_image.png',
+  imageUrl: '/locations/carmichael.jpg',
   imageAlt: 'Home Staging in Carmichael, CA',
   description:
     'Capital City Staging offers professional home staging services in Carmichael, enhancing your property’s appeal to attract more buyers.',
@@ -26,8 +26,7 @@ export const metadata: Metadata = generateLocationMetadata({
   pageSlug: locationData.pageSlug,
   description:
     'Professional home staging services in Carmichael, California. Enhance your property’s marketability with Capital City Staging.',
-  imageUrl: locationData.imageUrl,
-  imageAlt: locationData.imageAlt,
+  ogImageUrl: '/favicon/CCS_og_image.png'
 });
 
 export default function CarmichaelHomeStaging() {

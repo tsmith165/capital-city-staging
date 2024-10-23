@@ -6,7 +6,7 @@ import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 const locationData = {
   locationName: 'West Sacramento',
   pageSlug: 'west-sacramento',
-  imageUrl: '/favicon/CCS_og_image.png',
+  imageUrl: '/locations/west-sacramento.jpg',
   imageAlt: 'Home Staging in West Sacramento, CA',
   description:
     'Capital City Staging provides expert home staging services in West Sacramento, helping your property shine in a competitive market.',
@@ -26,8 +26,7 @@ export const metadata: Metadata = generateLocationMetadata({
   pageSlug: locationData.pageSlug,
   description:
     'Expert home staging services in West Sacramento, California. Make your property irresistible with Capital City Staging.',
-  imageUrl: locationData.imageUrl,
-  imageAlt: locationData.imageAlt,
+  ogImageUrl: '/favicon/CCS_og_image.png'
 });
 
 export default function WestSacramentoHomeStaging() {

@@ -6,7 +6,7 @@ import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 const locationData = {
   locationName: 'Gold River',
   pageSlug: 'gold-river',
-  imageUrl: '/favicon/CCS_og_image.png',
+  imageUrl: '/locations/gold-river.jpg',
   imageAlt: 'Home Staging in Gold River, CA',
   description:
     'Capital City Staging provides expert home staging services in Gold River, elevating your property’s appeal to attract discerning buyers.',
@@ -26,8 +26,7 @@ export const metadata: Metadata = generateLocationMetadata({
   pageSlug: locationData.pageSlug,
   description:
     'Professional home staging services in Gold River, California. Showcase your property’s luxury with Capital City Staging.',
-  imageUrl: locationData.imageUrl,
-  imageAlt: locationData.imageAlt,
+  ogImageUrl: '/favicon/CCS_og_image.png'
 });
 
 export default function GoldRiverHomeStaging() {

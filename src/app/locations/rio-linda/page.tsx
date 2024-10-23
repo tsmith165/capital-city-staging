@@ -6,7 +6,7 @@ import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 const locationData = {
   locationName: 'Rio Linda',
   pageSlug: 'rio-linda',
-  imageUrl: '/favicon/CCS_og_image.png',
+  imageUrl: '/locations/rio-linda.jpg',
   imageAlt: 'Home Staging in Rio Linda, CA',
   description:
     'Capital City Staging provides top-notch home staging services in Rio Linda, helping your property appeal to a wide range of buyers.',
@@ -26,8 +26,7 @@ export const metadata: Metadata = generateLocationMetadata({
   pageSlug: locationData.pageSlug,
   description:
     'Expert home staging services in Rio Linda, California. Make your property stand out with Capital City Staging.',
-  imageUrl: locationData.imageUrl,
-  imageAlt: locationData.imageAlt,
+  ogImageUrl: '/favicon/CCS_og_image.png'
 });
 
 export default function RioLindaHomeStaging() {

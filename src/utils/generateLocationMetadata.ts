@@ -3,8 +3,7 @@ import type { Metadata } from 'next';
 interface LocationData {
   locationName: string;
   pageSlug: string;
-  imageUrl: string;
-  imageAlt: string;
+  ogImageUrl: string;
   description: string;
   keywords?: string;
 }
@@ -15,8 +14,7 @@ export function generateLocationMetadata(locationData: LocationData): Metadata {
     pageSlug,
     description,
     keywords = `home staging ${locationName}, ${locationName} home staging, Capital City Staging, home staging sacramento, home staging sacramento ca, staging services ${locationName}, sell home ${locationName}, real estate staging ${locationName}`,
-    imageUrl,
-    imageAlt,
+    ogImageUrl
   } = locationData;
 
   return {
@@ -29,10 +27,10 @@ export function generateLocationMetadata(locationData: LocationData): Metadata {
       url: `https://www.capitalcitystaging.com/locations/${pageSlug}`,
       images: [
         {
-          url: `https://www.capitalcitystaging.com${imageUrl}`,
+          url: `https://www.capitalcitystaging.com${ogImageUrl}`,
           width: 1200,
           height: 630,
-          alt: imageAlt,
+          alt: 'Home Staging in the Sacramento area',
         },
       ],
       type: 'website',

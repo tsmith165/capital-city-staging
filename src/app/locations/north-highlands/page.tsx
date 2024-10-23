@@ -6,7 +6,7 @@ import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 const locationData = {
   locationName: 'North Highlands',
   pageSlug: 'north-highlands',
-  imageUrl: '/favicon/CCS_og_image.png',
+  imageUrl: '/locations/north-highlands.jpg',
   imageAlt: 'Home Staging in North Highlands, CA',
   description:
     'Capital City Staging offers professional home staging services in North Highlands, enhancing your property’s appeal to attract more buyers.',
@@ -26,8 +26,7 @@ export const metadata: Metadata = generateLocationMetadata({
   pageSlug: locationData.pageSlug,
   description:
     'Professional home staging services in North Highlands, California. Enhance your property’s appeal with Capital City Staging.',
-  imageUrl: locationData.imageUrl,
-  imageAlt: locationData.imageAlt,
+  ogImageUrl: '/favicon/CCS_og_image.png'
 });
 
 export default function NorthHighlandsHomeStaging() {

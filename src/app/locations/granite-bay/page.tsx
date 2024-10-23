@@ -6,7 +6,7 @@ import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 const locationData = {
   locationName: 'Granite Bay',
   pageSlug: 'granite-bay',
-  imageUrl: '/favicon/CCS_og_image.png',
+  imageUrl: '/locations/granite-bay.jpg',
   imageAlt: 'Home Staging in Granite Bay, CA',
   description:
     'Capital City Staging offers luxury home staging services in Granite Bay, enhancing your property’s elegance to attract high-end buyers.',
@@ -26,8 +26,7 @@ export const metadata: Metadata = generateLocationMetadata({
   pageSlug: locationData.pageSlug,
   description:
     'Expert home staging services in Granite Bay, California. Showcase your property’s luxury with Capital City Staging.',
-  imageUrl: locationData.imageUrl,
-  imageAlt: locationData.imageAlt,
+  ogImageUrl: '/favicon/CCS_og_image.png'
 });
 
 export default function GraniteBayHomeStaging() {
