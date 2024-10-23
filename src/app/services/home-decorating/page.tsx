@@ -59,8 +59,8 @@ export default function HomeDecorationServices() {
                     <Image
                         src="/services/home-decoration.jpg"
                         alt="Home Decoration in Sacramento"
-                        width={715}
-                        height={464}
+                        width={1280}
+                        height={720}
                         className="w-full h-auto rounded-md"
                     />
                 </div>
