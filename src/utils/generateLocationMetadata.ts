@@ -14,7 +14,7 @@ export function generateLocationMetadata(locationData: LocationData): Metadata {
     locationName,
     pageSlug,
     description,
-    keywords = `home staging ${locationName}, ${locationName} home staging, Capital City Staging, staging services ${locationName}, sell home ${locationName}, real estate staging ${locationName}`,
+    keywords = `home staging ${locationName}, ${locationName} home staging, Capital City Staging, home staging sacramento, home staging sacramento ca, staging services ${locationName}, sell home ${locationName}, real estate staging ${locationName}`,
     imageUrl,
     imageAlt,
   } = locationData;
