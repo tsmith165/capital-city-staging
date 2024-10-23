@@ -1,5 +1,3 @@
-// File: /src/app/info/home-staging-statistics/page.tsx
-
 import React from 'react';
 import type { Metadata } from 'next';
 import PageLayout from '@/components/layout/PageLayout';
@@ -19,7 +17,7 @@ export const metadata: Metadata = {
     url: 'https://www.capitalcitystaging.com/info/home-staging-statistics',
     images: [
       {
-        url: 'https://www.capitalcitystaging.com/images/home-staging-statistics.jpg',
+        url: '/favicon/CCS_og_image.png',
         width: 1200,
         height: 630,
         alt: 'Home Staging Statistics',
@@ -159,7 +157,7 @@ export default function HomeStagingStatistics() {
           <h2 className="text-2xl font-semibold text-stone-100">Ready to Benefit from Staging?</h2>
           <p>
             If you're interested in leveraging the power of home staging statistics for your sale,{' '}
-            <a href="/contact" className="text-secondary hover:underline">
+            <a href="/contact" className="text-secondary_light hover:underline">
               contact us
             </a>{' '}
             today to discuss how we can help.
