@@ -21,6 +21,8 @@ interface SitemapEntry {
         changeFrequency: 'monthly',
         priority: 1,
       },
+
+      // Services pages
       {
         url: 'https://www.capitalcitystaging.com/services/home-staging',
         lastModified: new Date(),
@@ -109,12 +111,6 @@ interface SitemapEntry {
       },
       {
         url: 'https://www.capitalcitystaging.com/locations/fair-oaks',
-        lastModified: new Date(),
-        changeFrequency: 'monthly',
-        priority: 0.8,
-      },
-      {
-        url: 'https://www.capitalcitystaging.com/locations/elk-grove',
         lastModified: new Date(),
         changeFrequency: 'monthly',
         priority: 0.8,
