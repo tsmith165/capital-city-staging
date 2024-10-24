@@ -46,11 +46,9 @@ export default function Portfolio() {
     };
 
     return (
-        <div className="min-h-[calc(100dvh-50px)] flex flex-col items-center justify-center p-4 space-y-4">
-            <h1 className="h-fit text-4xl font-bold gradient-secondary-main-text">
-                Staged by Mia
-            </h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 px-8 lg:px-24 x2l:px-48">
+        <div className="flex min-h-[calc(100dvh-50px)] flex-col items-center justify-center space-y-4 p-4">
+            <h1 className="h-fit text-4xl font-bold gradient-secondary-main-text">Staged by Mia</h1>
+            <div className="x2l:px-48 grid grid-cols-1 gap-4 px-8 sm:grid-cols-2 lg:grid-cols-3 lg:px-24 2xl:grid-cols-4">
                 {images.map((image, index) => (
                     <div key={index} className="relative">
                         <Image
@@ -58,7 +56,7 @@ export default function Portfolio() {
                             alt={`Portfolio image ${index + 1}`}
                             width={image.width}
                             height={image.height}
-                            className="object-cover w-full rounded-lg cursor-pointer"
+                            className="w-full cursor-pointer rounded-lg object-cover"
                             onClick={() => handleImageClick(index)}
                             priority={true}
                         />
@@ -68,13 +66,13 @@ export default function Portfolio() {
             <AnimatePresence>
                 {fullScreenImage && selectedImageIndex !== null && (
                     <motion.div
-                        className="fixed inset-0 z-50 flex bg-black bg-opacity-85 m-0 w-full h-full"
+                        className="fixed inset-0 z-50 m-0 flex h-full w-full bg-black bg-opacity-85"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setFullScreenImage(false)}
                     >
-                        <div className="relative w-full h-full flex items-center justify-center">
+                        <div className="relative flex h-full w-full items-center justify-center">
                             <AnimatePresence mode="wait">
                                 <motion.img
                                     key={selectedImageIndex}
@@ -92,14 +90,14 @@ export default function Portfolio() {
                                     <button
                                         aria-label="Previous"
                                         onClick={handlePrev}
-                                        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 rounded-full p-2"
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 transform rounded-full bg-black bg-opacity-50 p-2"
                                     >
                                         <IoIosArrowBack className="text-4xl text-white" />
                                     </button>
                                     <button
                                         aria-label="Next"
                                         onClick={handleNext}
-                                        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 rounded-full p-2"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 transform rounded-full bg-black bg-opacity-50 p-2"
                                     >
                                         <IoIosArrowForward className="text-4xl text-white" />
                                     </button>

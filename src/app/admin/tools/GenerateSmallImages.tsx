@@ -69,14 +69,14 @@ const GenerateSmallImages: React.FC = () => {
                     <button
                         onClick={handleGenerateSmallImages}
                         disabled={isGenerating}
-                        className="flex w-fit items-center rounded-md border-none bg-secondary_dark px-4 py-2 font-lato uppercase text-white hover:bg-stone-400 hover:font-bold hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+                        className="font-lato flex w-fit items-center rounded-md border-none bg-secondary_dark px-4 py-2 uppercase text-white hover:bg-stone-400 hover:font-bold hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {isGenerating ? 'Generating...' : 'Generate Missing Small Images'}
                     </button>
                     {isGenerating && (
                         <button
                             onClick={handleStopGeneration}
-                            className="flex w-fit items-center rounded-md border-none bg-red-600 px-4 py-2 font-lato uppercase text-white hover:bg-red-700 hover:font-bold"
+                            className="font-lato flex w-fit items-center rounded-md border-none bg-red-600 px-4 py-2 uppercase text-white hover:bg-red-700 hover:font-bold"
                         >
                             Stop
                         </button>

@@ -5,13 +5,13 @@ import { cookies } from 'next/headers';
 const COOKIE_KEY = 'distinct_id';
 
 export async function GET(request: Request) {
-  const cookieStore = cookies();
-  let distinctId = cookieStore.get(COOKIE_KEY)?.value;
+    const cookieStore = cookies();
+    let distinctId = cookieStore.get(COOKIE_KEY)?.value;
 
-  if (!distinctId) {
-    distinctId = uuidv4();
-    cookieStore.set(COOKIE_KEY, distinctId, { maxAge: 60 * 60 * 24 * 365, path: '/' });
-  }
+    if (!distinctId) {
+        distinctId = uuidv4();
+        cookieStore.set(COOKIE_KEY, distinctId, { maxAge: 60 * 60 * 24 * 365, path: '/' });
+    }
 
-  return NextResponse.json({ distinctId });
+    return NextResponse.json({ distinctId });
 }

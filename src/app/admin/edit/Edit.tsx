@@ -28,7 +28,7 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
                 setTitleInput(data.name || '');
                 console.log(`LOADING EDIT DETAILS PAGE - Inventory ID: ${current_id}`);
             } catch (error) {
-                console.error("Error fetching inventory data:", error);
+                console.error('Error fetching inventory data:', error);
                 setSubmitMessage({ type: 'error', text: 'Failed to load inventory data.' });
             }
         };
@@ -70,15 +70,15 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
     const last_id = inventoryData?.last_id ?? -1;
 
     return (
-        <div className="flex h-full w-full flex-col md:flex-row bg-stone-800">
-            <div className="h-1/3 md:h-[calc(100dvh-50px)] md:w-2/5 lg:w-1/2 p-8 rounded-lg flex items-center justify-center">
+        <div className="flex h-full w-full flex-col bg-stone-800 md:flex-row">
+            <div className="flex h-1/3 items-center justify-center rounded-lg p-8 md:h-[calc(100dvh-50px)] md:w-2/5 lg:w-1/2">
                 <Image
                     src={inventoryData.image_path}
                     alt={inventoryData.name}
                     width={inventoryData.width}
                     height={inventoryData.height}
                     quality={100}
-                    className="object-contain rounded-lg max-h-full h-fit w-auto"
+                    className="h-fit max-h-full w-auto rounded-lg object-contain"
                 />
             </div>
             <div className="h-2/3 overflow-y-auto md:h-full md:w-3/5 lg:w-1/2">
@@ -111,7 +111,7 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
                     </form>
                 </div>
                 {submitMessage && (
-                    <div className={`mt-2 p-2 rounded-md ${submitMessage.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`}>
+                    <div className={`mt-2 rounded-md p-2 ${submitMessage.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`}>
                         {submitMessage.text}
                     </div>
                 )}

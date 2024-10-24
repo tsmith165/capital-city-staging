@@ -1,11 +1,11 @@
 import React from 'react';
 import { Tooltip } from 'react-tooltip';
 import { FaSlidersH, FaCouch, FaTable, FaChair, FaBed, FaBan, FaToilet, FaPaintBrush, FaBook } from 'react-icons/fa';
-import { IoIosAddCircleOutline } from "react-icons/io";
-import { PiDesk } from "react-icons/pi";
-import { FaRug } from "react-icons/fa6";
-import { RiPlantLine } from "react-icons/ri";
-import { GiCandles, GiParkBench, GiBarStool, GiForkKnifeSpoon, GiBedLamp } from "react-icons/gi";
+import { IoIosAddCircleOutline } from 'react-icons/io';
+import { PiDesk } from 'react-icons/pi';
+import { FaRug } from 'react-icons/fa6';
+import { RiPlantLine } from 'react-icons/ri';
+import { GiCandles, GiParkBench, GiBarStool, GiForkKnifeSpoon, GiBedLamp } from 'react-icons/gi';
 
 import useInventoryStore from '@/stores/inventory_store';
 
@@ -50,7 +50,7 @@ const FilterMenu: React.FC = () => {
                     setFilterMenuOpen(!filterMenuOpen);
                 }}
             >
-                <FaSlidersH className={`${filterMenuOpen ? 'fill-stone-300' : 'fill-stone-950 '} h-[30px] w-[30px] p-0.5`} />
+                <FaSlidersH className={`${filterMenuOpen ? 'fill-stone-300' : 'fill-stone-950'} h-[30px] w-[30px] p-0.5`} />
             </div>
             {filterMenuOpen === true && (
                 <div className="absolute bottom-0 right-[40px] flex h-[40px] w-fit flex-row rounded-tl-lg md:rounded-bl-none md:rounded-tl-lg">

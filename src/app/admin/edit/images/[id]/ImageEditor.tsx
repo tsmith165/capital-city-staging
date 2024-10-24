@@ -43,39 +43,48 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
         setStatusMessage(null);
     }, []);
 
-    const handleUploadComplete = useCallback((
-        fileName: string,
-        originalImageUrl: string, 
-        smallImageUrl: string, 
-        originalWidth: number, 
-        originalHeight: number, 
-        smallWidth: number, 
-        smallHeight: number
-    ) => {
-        console.log('handleUploadComplete called with:', {
-            fileName, originalImageUrl, smallImageUrl, originalWidth, originalHeight, smallWidth, smallHeight
-        });
+    const handleUploadComplete = useCallback(
+        (
+            fileName: string,
+            originalImageUrl: string,
+            smallImageUrl: string,
+            originalWidth: number,
+            originalHeight: number,
+            smallWidth: number,
+            smallHeight: number,
+        ) => {
+            console.log('handleUploadComplete called with:', {
+                fileName,
+                originalImageUrl,
+                smallImageUrl,
+                originalWidth,
+                originalHeight,
+                smallWidth,
+                smallHeight,
+            });
 
-        setTitle(fileName.split('.')[0] || 'Not yet uploaded');
-        setImageUrl(originalImageUrl);
-        setSmallImageUrl(smallImageUrl);
-        setWidth(originalWidth);
-        setHeight(originalHeight);
-        setSmallWidth(smallWidth);
-        setSmallHeight(smallHeight);
-        setIsSubmitting(false);
-        setStatusMessage(null);
+            setTitle(fileName.split('.')[0] || 'Not yet uploaded');
+            setImageUrl(originalImageUrl);
+            setSmallImageUrl(smallImageUrl);
+            setWidth(originalWidth);
+            setHeight(originalHeight);
+            setSmallWidth(smallWidth);
+            setSmallHeight(smallHeight);
+            setIsSubmitting(false);
+            setStatusMessage(null);
 
-        console.log('State after update:', {
-            title: fileName.split('.')[0] || 'Not yet uploaded',
-            imageUrl: originalImageUrl,
-            smallImageUrl,
-            width: originalWidth,
-            height: originalHeight,
-            smallWidth,
-            smallHeight
-        });
-    }, []);
+            console.log('State after update:', {
+                title: fileName.split('.')[0] || 'Not yet uploaded',
+                imageUrl: originalImageUrl,
+                smallImageUrl,
+                width: originalWidth,
+                height: originalHeight,
+                smallWidth,
+                smallHeight,
+            });
+        },
+        [],
+    );
 
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedOption(e.target.value);
@@ -116,10 +125,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
     return (
         <div className="flex h-full w-full flex-col items-center justify-center bg-stone-900">
             <div className="flex w-4/5 flex-col items-center justify-center rounded-lg bg-stone-900">
-                <div
-                    id="header"
-                    className="w-full rounded-t-lg text-center text-4xl font-bold gradient-secondary-main-text"
-                >
+                <div id="header" className="w-full rounded-t-lg text-center text-4xl font-bold gradient-secondary-main-text">
                     Edit Images
                 </div>
                 <div className="flex w-full flex-col items-center space-y-2 p-2">
@@ -129,7 +135,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
                         backToEditLink={`/admin/edit?id=${inventoryId}`}
                     />
                     <InputSelect
-                        idName='inventory_type'
+                        idName="inventory_type"
                         key="image_type"
                         name="Image Type"
                         defaultValue={{ value: selectedOption, label: selectedOption }}
@@ -139,12 +145,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
                         ]}
                         onChange={handleSelectChange}
                     />
-                    <InputTextbox 
-                        idName="title" 
-                        name="Title" 
-                        value={title} 
-                        onChange={(e) => setTitle(e.target.value)} 
-                    />
+                    <InputTextbox idName="title" name="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
                     <InputTextbox idName="image_path" name="Image Path" value={imageUrl} />
                     <InputTextbox idName="px_width" name="Width (px)" value={width.toString()} />
                     <InputTextbox idName="px_height" name="Height (px)" value={height.toString()} />
@@ -187,7 +188,9 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ inventoryId }) => {
                         </button>
                     </div>
                     {statusMessage && (
-                        <div className={`mt-4 p-2 rounded ${statusMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        <div
+                            className={`mt-4 rounded p-2 ${statusMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
+                        >
                             {statusMessage.message}
                         </div>
                     )}

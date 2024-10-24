@@ -47,14 +47,14 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
 
     return (
         <motion.div
-            className={`flex h-fit w-full md:w-4/5 mx-auto flex-col md:flex-row items-center p-4 pb-0`}
+            className={`mx-auto flex h-fit w-full flex-col items-center p-4 pb-0 md:w-4/5 md:flex-row`}
             ref={selectedImageRef}
             initial={{ y: -300, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.75 }}
         >
-            <div className="relative flex flex-col w-fit cursor-pointer items-center justify-center space-y-2 pb-2">
-                <h1 className="pb-2 text-center font-cinzel text-2xl font-bold text-primary">{selectedItem.name}</h1>
+            <div className="relative flex w-fit cursor-pointer flex-col items-center justify-center space-y-2 pb-2">
+                <h1 className="font-cinzel pb-2 text-center text-2xl font-bold text-primary">{selectedItem.name}</h1>
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={`${selectedItemIndex}-${currentImageIndex}`}
@@ -92,7 +92,7 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
                                     width={image.width}
                                     height={image.height}
                                     hidden
-                                    className="max-h-[40dvh] w-auto rounded-md bg-stone-600 object-contain p-1 hover:cursor-pointer md:max-h-[50dvh] "
+                                    className="max-h-[40dvh] w-auto rounded-md bg-stone-600 object-contain p-1 hover:cursor-pointer md:max-h-[50dvh]"
                                     onLoad={handleImageLoad}
                                 />
                             ),
@@ -102,7 +102,7 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
                 <div className="flex h-7 w-full items-center justify-center space-x-4 pb-1">
                     <div className="flex w-full flex-row">
                         <div className="flex w-full flex-grow justify-end pr-1">
-                            <Link href={`/admin/edit?id=${selectedItem.id}`} className="ml-2 flex justify-center items-center">
+                            <Link href={`/admin/edit?id=${selectedItem.id}`} className="ml-2 flex items-center justify-center">
                                 <FaEdit className="fill-stone-600 text-xl hover:fill-primary" />
                             </Link>
                             {imageList.length > 1 && (
@@ -169,7 +169,6 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
                         </div>
                     </div>
                 </div>
-
             </div>
             <div className="flex h-fit w-full flex-col items-center space-y-2">
                 <p className="text-lg font-bold text-primary">{selectedItem.category}</p>

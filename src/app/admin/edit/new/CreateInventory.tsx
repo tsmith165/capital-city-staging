@@ -29,29 +29,41 @@ export default function CreateInventory() {
 
     const router = useRouter();
 
-    const handleUploadComplete = useCallback((
-        fileName: string,
-        originalImageUrl: string, 
-        smallImageUrl: string, 
-        originalWidth: number, 
-        originalHeight: number, 
-        smallWidth: number, 
-        smallHeight: number
-    ) => {
-        console.log('handleUploadComplete', fileName, originalImageUrl, smallImageUrl, originalWidth, originalHeight, smallWidth, smallHeight);
-        setTitle(fileName.split('.')[0]);
-        setImageUrl(originalImageUrl);
-        setSmallImageUrl(smallImageUrl);
-        setWidth(originalWidth);
-        setHeight(originalHeight);
-        setSmallWidth(smallWidth);
-        setSmallHeight(smallHeight);
-        setStatusMessage(null);
-        
-        if (fileName) {
+    const handleUploadComplete = useCallback(
+        (
+            fileName: string,
+            originalImageUrl: string,
+            smallImageUrl: string,
+            originalWidth: number,
+            originalHeight: number,
+            smallWidth: number,
+            smallHeight: number,
+        ) => {
+            console.log(
+                'handleUploadComplete',
+                fileName,
+                originalImageUrl,
+                smallImageUrl,
+                originalWidth,
+                originalHeight,
+                smallWidth,
+                smallHeight,
+            );
             setTitle(fileName.split('.')[0]);
-        }
-    }, []);
+            setImageUrl(originalImageUrl);
+            setSmallImageUrl(smallImageUrl);
+            setWidth(originalWidth);
+            setHeight(originalHeight);
+            setSmallWidth(smallWidth);
+            setSmallHeight(smallHeight);
+            setStatusMessage(null);
+
+            if (fileName) {
+                setTitle(fileName.split('.')[0]);
+            }
+        },
+        [],
+    );
 
     const handleCreateInventory = async (action: 'edit' | 'images' | 'view') => {
         setIsSubmitting(true);
@@ -69,7 +81,7 @@ export default function CreateInventory() {
             setStatusMessage({ type: 'success', message: 'Inventory created successfully.' });
             handleResetInputs();
             if (inventory_data.inventory?.id) {
-                switch(action) {
+                switch (action) {
                     case 'edit':
                         router.push(`/admin/edit?id=${inventory_data.inventory.id}`);
                         break;
@@ -171,7 +183,9 @@ export default function CreateInventory() {
                         </button>
                     </div>
                     {statusMessage && (
-                        <div className={`mt-4 p-2 rounded ${statusMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        <div
+                            className={`mt-4 rounded p-2 ${statusMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
+                        >
                             {statusMessage.message}
                         </div>
                     )}

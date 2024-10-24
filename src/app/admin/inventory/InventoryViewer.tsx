@@ -58,19 +58,22 @@ const InventoryViewer: React.FC<{ items: InventoryWithImages[] }> = ({ items }) 
         setItemList(items);
     }, [items, setItemList]);
 
-    const handleItemClick = useCallback((id: number, index: number) => {
-        if (selectedItemIndex === index) {
+    const handleItemClick = useCallback(
+        (id: number, index: number) => {
+            if (selectedItemIndex === index) {
+                selectedImageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                return;
+            }
+            setCurrentImageIndex(0);
+            setSelectedItemIndex(index);
+            const newSearchParams = new URLSearchParams(searchParams);
+            newSearchParams.set('item', `${id}`);
+            router.replace(`/admin/inventory?${newSearchParams.toString()}`);
+            setImageLoadStates({});
             selectedImageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            return;
-        }
-        setCurrentImageIndex(0);
-        setSelectedItemIndex(index);
-        const newSearchParams = new URLSearchParams(searchParams);
-        newSearchParams.set('item', `${id}`);
-        router.replace(`/admin/inventory?${newSearchParams.toString()}`);
-        setImageLoadStates({});
-        selectedImageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, [selectedItemIndex, searchParams, router]);
+        },
+        [selectedItemIndex, searchParams, router],
+    );
 
     const filteredItems = useMemo(() => {
         return itemList.filter((item) => {
@@ -116,11 +119,14 @@ const InventoryViewer: React.FC<{ items: InventoryWithImages[] }> = ({ items }) 
         };
     }, [speed, isPlaying, imageList.length, selectedItem]);
 
-    const inventory_clicked = useCallback((e: React.MouseEvent) => {
-        if (filterMenuOpen && window.innerWidth < 768) {
-            setFilterMenuOpen(false);
-        }
-    }, [filterMenuOpen, setFilterMenuOpen]);
+    const inventory_clicked = useCallback(
+        (e: React.MouseEvent) => {
+            if (filterMenuOpen && window.innerWidth < 768) {
+                setFilterMenuOpen(false);
+            }
+        },
+        [filterMenuOpen, setFilterMenuOpen],
+    );
 
     const handleImageLoad = useCallback(() => {
         setImageLoadStates((prevLoadStates) => ({
@@ -144,7 +150,7 @@ const InventoryViewer: React.FC<{ items: InventoryWithImages[] }> = ({ items }) 
     if (!isMasonryLoaded)
         return (
             <div className="inset-0 flex h-full w-full items-center justify-center">
-                <div className="relative flex h-[250px] w-[250px] items-center justify-center rounded-full bg-stone-900 p-6 opacity-70 xxs:h-[300px] xxs:w-[300px] xs:h-[350px] xs:w-[350px]">
+                <div className="xxs:h-[300px] xxs:w-[300px] relative flex h-[250px] w-[250px] items-center justify-center rounded-full bg-stone-900 p-6 opacity-70 xs:h-[350px] xs:w-[350px]">
                     <Image src="/logo/ccs_logo.png" alt="Capital City Staging Logo" width={370} height={150} />
                 </div>
             </div>

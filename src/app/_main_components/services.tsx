@@ -17,65 +17,61 @@ export default function Services() {
             title: 'Occupied Staging',
             description:
                 'Mia will make adjustments to your furniture and decor that will make your home ready to sell with minimal hassle.',
-            price: "Call Mia for a quote",
+            price: 'Call Mia for a quote',
             includedItems: [
-                "Conduct a walkthrough of your home to assess overall space, room count and available furniture and accessories",
-                "Create a proposal with recommended services based on your requirements, budget, and timeline",
-                "Use marketing and design to create an environment that buyers aspire to live in",
-                "Transform each room to enhance appeal for a faster, more profitable sale",
+                'Conduct a walkthrough of your home to assess overall space, room count and available furniture and accessories',
+                'Create a proposal with recommended services based on your requirements, budget, and timeline',
+                'Use marketing and design to create an environment that buyers aspire to live in',
+                'Transform each room to enhance appeal for a faster, more profitable sale',
             ],
         },
         {
             title: 'Vacant Staging',
             description: 'Mia will bring in all the latest furniture and decor to your home to make it pop.',
-            price: "Call Mia for a quote",
+            price: 'Call Mia for a quote',
             includedItems: [
-                "Visit the home for measurements and blueprint development",
+                'Visit the home for measurements and blueprint development',
                 "Select furniture, artwork, and accessories that complement the home and suit the buyer's lifestyle",
                 "Arrange furnishings expertly to enhance each room's appeal and functionality",
-                "Remove staged items promptly and complete inventory retrieval after the property sells",
-            ]
-        }
-    ]
+                'Remove staged items promptly and complete inventory retrieval after the property sells',
+            ],
+        },
+    ];
 
     return (
-        <div className="h-auto md:min-h-[calc(100dvh-50px)] w-full flex flex-col justify-evenly items-center">
-            <div className="h-fit w-full flex flex-col items-center justify-center p-4 lg:w-[90%]">
-                <h1 className="text-4xl px-4 font-bold text-white text-center">Focus on your next moves,</h1>
-                <h1 className="text-4xl px-4 font-bold gradient-secondary-main-text text-center">
-                    we'll handle the rest.
-                </h1>
-                <p className="text-lg text-white pb-4 text-center px-8">
+        <div className="flex h-auto w-full flex-col items-center justify-evenly md:min-h-[calc(100dvh-50px)]">
+            <div className="flex h-fit w-full flex-col items-center justify-center p-4 lg:w-[90%]">
+                <h1 className="px-4 text-center text-4xl font-bold text-white">Focus on your next moves,</h1>
+                <h1 className="px-4 text-center text-4xl font-bold gradient-secondary-main-text">we'll handle the rest.</h1>
+                <p className="px-8 pb-4 text-center text-lg text-white">
                     With a home staged by Mia, you can trust that your home has reached its full potential.
                 </p>
-                <div className="w-full flex md:flex-row md:space-x-4 flex-col space-y-4 md:space-y-0 justify-center">
+                <div className="flex w-full flex-col justify-center space-y-4 md:flex-row md:space-x-4 md:space-y-0">
                     {services.map((service, index) => (
-                        <div key={index} className="w-full md:w-1/3 flex flex-col ring-stone-500 bg-stone-800 ring-1 rounded-lg p-4">
-                            <div className="flex justify-between items-center mb-4">
-                                <div className="gradient-gold-main-text text-lg font-bold">
-                                    {service.title}
-                                </div>
+                        <div key={index} className="flex w-full flex-col rounded-lg bg-stone-800 p-4 ring-1 ring-stone-500 md:w-1/3">
+                            <div className="mb-4 flex items-center justify-between">
+                                <div className="text-lg font-bold gradient-gold-main-text">{service.title}</div>
                                 {service.tag && (
-                                    <span className="gradient-secondary-main-text px-2 py-1 rounded-full text-sm">
-                                        {service.tag}
-                                    </span>
+                                    <span className="rounded-full px-2 py-1 text-sm gradient-secondary-main-text">{service.tag}</span>
                                 )}
                             </div>
-                            <p className="text-md text-white mb-4">{service.description}</p>
+                            <p className="text-md mb-4 text-white">{service.description}</p>
                             <Link href="/contact">
-                                <div className={
-                                    `flex group items-center justify-center w-full py-2 font-bold rounded-md mb-4 px-2 text-md ` +
-                                    `bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 `
-                                    + `hover:from-secondary hover:via-secondary_light hover:to-secondary`
-                                }>
-                                    <div className="group-hover:text-white gradient-secondary-main-text">
+                                <div
+                                    className={
+                                        `text-md group mb-4 flex w-full items-center justify-center rounded-md px-2 py-2 font-bold ` +
+                                        `bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400` +
+                                        `hover:from-secondary hover:via-secondary_light hover:to-secondary`
+                                    }
+                                >
+                                    <div className="gradient-secondary-main-text group-hover:text-white">
                                         {typeof service.price === 'string' ? service.price : `$${service.price.toFixed(2)}`}
                                     </div>
                                 </div>
                             </Link>
-                            <ul className="list-disc list-outside space-y-1 p-3 ml-1">
+                            <ul className="ml-1 list-outside list-disc space-y-1 p-3">
                                 {service.includedItems.map((item, itemIndex) => (
-                                    <li key={itemIndex} className="text-md text-white leading-tight hover:text-secondary_light text-lg">
+                                    <li key={itemIndex} className="text-md text-lg leading-tight text-white hover:text-secondary_light">
                                         {item}
                                     </li>
                                 ))}
@@ -84,9 +80,9 @@ export default function Services() {
                     ))}
                 </div>
             </div>
-            <div className="hidden h-fit w-full md:flex flex-col items-center justify-center space-y-2 py-4 px-4">
-                <Statistics arrows={false}/>
-            </div>  
+            <div className="hidden h-fit w-full flex-col items-center justify-center space-y-2 px-4 py-4 md:flex">
+                <Statistics arrows={false} />
+            </div>
         </div>
     );
 }

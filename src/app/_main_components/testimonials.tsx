@@ -20,20 +20,16 @@ const testimonials = [
 
 export default function Testimonials() {
     return (
-        <div className='flex flex-col w-full space-y-4 h-full justify-center items-center'>
-            <div className="w-full h-auto flex items-center justify-center">
-                <h1 className="text-4xl font-bold text-center gradient-secondary-main-text">
-                    Testimonials
-                </h1>
+        <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
+            <div className="flex h-auto w-full items-center justify-center">
+                <h1 className="text-center text-4xl font-bold gradient-secondary-main-text">Testimonials</h1>
             </div>
 
-            <div className="flex flex-col w-full md:flex-row flex-grow space-y-4 md:space-y-0 md:space-x-4 px-4">
+            <div className="flex w-full flex-grow flex-col space-y-4 px-4 md:flex-row md:space-x-4 md:space-y-0">
                 {testimonials.map((testimonial, index) => (
-                    <div className="h-fit bg-secondary_dark text-white p-4 rounded-lg shadow-lg">
+                    <div className="h-fit rounded-lg bg-secondary_dark p-4 text-white shadow-lg">
                         <p className="text-md md:text-lg">{`"${testimonial.text}"`}</p>
-                        <p className="mt-2 text-md font-bold text-transparent gradient-gold-main-text">
-                            {testimonial.name}
-                        </p>
+                        <p className="text-md mt-2 font-bold text-transparent gradient-gold-main-text">{testimonial.name}</p>
                     </div>
                 ))}
             </div>

@@ -6,8 +6,7 @@ import { Inventory } from '@/db/schema';
 import { eq, and, desc } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
-
-async function checkUserRole(): Promise<{ isAdmin: boolean; error?: string | undefined; }> {
+async function checkUserRole(): Promise<{ isAdmin: boolean; error?: string | undefined }> {
     const { userId } = auth();
     if (!userId) {
         return { isAdmin: false, error: 'User is not authenticated. Cannot edit piece.' };
@@ -80,7 +79,7 @@ export async function onSubmitEditForm(data: SubmitFormData): Promise<{ success:
                 .where(eq(inventoryTable.id, parseInt(data.inventory_id)));
         } else {
             console.log("Couldn't find inventory with id " + data.inventory_id);
-            console.log("Skipping inventory creation");
+            console.log('Skipping inventory creation');
             return { success: false, error: 'Could not find inventory with id ' + data.inventory_id };
         }
         revalidatePath(`/admin/edit`);
@@ -167,7 +166,11 @@ export async function storeUploadedImageDetails(data: UploadFormData): Promise<{
     }
 }
 
-export async function handleImageReorder(inventoryId: number, currentInventoryId: number, targetInventoryId: number): Promise<{ success: boolean; error?: string }> {
+export async function handleImageReorder(
+    inventoryId: number,
+    currentInventoryId: number,
+    targetInventoryId: number,
+): Promise<{ success: boolean; error?: string }> {
     const { isAdmin, error: roleError } = await checkUserRole();
     if (!isAdmin) {
         console.error(roleError);
@@ -226,7 +229,9 @@ export async function handleImageDelete(inventoryId: number, imagePath: string):
         return { success: false, error: roleError };
     }
     try {
-        await db.delete(extraImagesTable).where(and(eq(extraImagesTable.inventory_id, inventoryId), eq(extraImagesTable.image_path, imagePath)));
+        await db
+            .delete(extraImagesTable)
+            .where(and(eq(extraImagesTable.inventory_id, inventoryId), eq(extraImagesTable.image_path, imagePath)));
         revalidatePath(`/admin/edit`);
         revalidatePath(`/admin/inventory`);
         revalidatePath(`/admin/manage`);
@@ -279,7 +284,9 @@ interface NewInventoryData {
     smallHeight: number;
 }
 
-export async function createInventory(newInventoryData: NewInventoryData): Promise<{ success: boolean; inventory?: Inventory; error?: string }> {
+export async function createInventory(
+    newInventoryData: NewInventoryData,
+): Promise<{ success: boolean; inventory?: Inventory; error?: string }> {
     const { isAdmin, error: roleError } = await checkUserRole();
     if (!isAdmin) {
         console.error(roleError);
@@ -347,4 +354,3 @@ export async function createNewInventory(newInventoryData: NewInventoryData) {
     revalidatePath(`/admin/manage`);
     return { success: true, inventory: newInventoryOutput.inventory };
 }
-

@@ -89,7 +89,7 @@ const Where: React.FC = () => {
                     }
                 });
             },
-            { threshold: 0.2 }
+            { threshold: 0.2 },
         );
 
         if (containerRef.current) {
@@ -133,46 +133,44 @@ const Where: React.FC = () => {
     };
 
     return (
-        <div ref={containerRef} className="w-full h-[calc(100dvh-50px)] p-4 flex flex-col space-y-2">
-            <div className="w-full text-center items-center justify-center flex">
-                <h1 className="w-fit text-4xl font-bold gradient-secondary-main-text">
-                    Where We Work
-                </h1>
+        <div ref={containerRef} className="flex h-[calc(100dvh-50px)] w-full flex-col space-y-2 p-4">
+            <div className="flex w-full items-center justify-center text-center">
+                <h1 className="w-fit text-4xl font-bold gradient-secondary-main-text">Where We Work</h1>
             </div>
-            <div className="flex flex-wrap justify-center space-x-2 pb-2 px-2">
+            <div className="flex flex-wrap justify-center space-x-2 px-2 pb-2">
                 {cityBoundaries.map((city, index) => (
                     <React.Fragment key={index}>
                         <div
                             onMouseOver={() => handleMouseOver(city.name)}
                             onMouseOut={handleMouseOut}
                             onClick={() => handleCityClick(city.name)}
-                            className={`cursor-pointer font-bold text-transparent bg-clip-text ${
+                            className={`cursor-pointer bg-clip-text font-bold text-transparent ${
                                 selectedCity === city.name || (!selectedCity && index === currentCityIndex)
                                     ? 'bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400'
-                                    : 'bg-gradient-to-r  from-secondary from-10% via-secondary_light via-70% to-secondary to-90% hover:from-yellow-400 hover:via-amber-500 hover:to-yellow-400'
-                            }`}>
+                                    : 'bg-gradient-to-r from-secondary from-10% via-secondary_light via-70% to-secondary to-90% hover:from-yellow-400 hover:via-amber-500 hover:to-yellow-400'
+                            }`}
+                        >
                             {city.name}
                         </div>
                         {index < cityBoundaries.length - 1 && (
-                            <div className="font-bold gradient-gold-main bg-clip-text text-transparent">
-                                -
-                            </div>
+                            <div className="bg-clip-text font-bold text-transparent gradient-gold-main">-</div>
                         )}
                     </React.Fragment>
                 ))}
             </div>
-            <div className="flex-grow relative w-full">
+            <div className="relative w-full flex-grow">
                 <MapContainer
                     center={MAP_CENTER}
                     zoom={5}
-                    className="w-full h-full rounded-lg"
+                    className="h-full w-full rounded-lg"
                     ref={mapRef}
                     dragging={false}
                     zoomControl={false}
                     scrollWheelZoom={false}
                     doubleClickZoom={false}
                     touchZoom={false}
-                    keyboard={false}>
+                    keyboard={false}
+                >
                     <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" subdomains="abcd" maxZoom={11} />
                     {zoomComplete && (
                         <>

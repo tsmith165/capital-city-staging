@@ -28,26 +28,24 @@ export default function Statistics({ arrows }: { arrows?: boolean }) {
     }, [shuffledStats]);
 
     return (
-        <div className="min-h-full max-h-full w-full flex items-center justify-center relative p-4">
+        <div className="relative flex max-h-full min-h-full w-full items-center justify-center p-4">
             {arrows && (
                 <button
                     onClick={prevStat}
-                    className="absolute left-4 flex justify-center items-center text-secondary hover:text-secondary_light font-bold">
+                    className="absolute left-4 flex items-center justify-center font-bold text-secondary hover:text-secondary_light"
+                >
                     <MdArrowBackIos size={48} />
                 </button>
             )}
-            <div className="text-center flex-grow px-2 md:px-16">
-                <div className="text-3xl md:text-4xl font-bold gradient-gold-main-text">
-                    {`"${shuffledStats[current].text}"`}
-                </div>
-                <div className="text-lg mt-2 gradient-secondary-main-text">
-                    {`- ${shuffledStats[current].attributor}`}
-                </div>
+            <div className="flex-grow px-2 text-center md:px-16">
+                <div className="text-3xl font-bold gradient-gold-main-text md:text-4xl">{`"${shuffledStats[current].text}"`}</div>
+                <div className="mt-2 text-lg gradient-secondary-main-text">{`- ${shuffledStats[current].attributor}`}</div>
             </div>
             {arrows && (
                 <button
                     onClick={nextStat}
-                    className="absolute right-4 flex justify-center items-center text-secondary hover:text-secondary_light font-bold">
+                    className="absolute right-4 flex items-center justify-center font-bold text-secondary hover:text-secondary_light"
+                >
                     <MdArrowForwardIos size={48} />
                 </button>
             )}

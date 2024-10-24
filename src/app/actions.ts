@@ -126,11 +126,7 @@ export async function fetchAdjacentInventoryIds(currentId: number) {
 
 export async function getMostRecentId(): Promise<number | null> {
     console.log('Fetching most recent inventory ID...');
-    const inventory = await db
-        .select()
-        .from(inventoryTable)
-        .orderBy(desc(inventoryTable.o_id))
-        .limit(1);
+    const inventory = await db.select().from(inventoryTable).orderBy(desc(inventoryTable.o_id)).limit(1);
 
     return inventory[0]?.id || null;
 }

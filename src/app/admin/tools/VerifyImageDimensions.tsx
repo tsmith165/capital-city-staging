@@ -75,14 +75,14 @@ const VerifyImageDimensions: React.FC = () => {
                     <button
                         onClick={handleVerifyImageDimensions}
                         disabled={isVerifying}
-                        className="flex w-fit items-center rounded-md border-none bg-secondary_dark px-4 py-2 font-lato uppercase text-white hover:bg-stone-400 hover:font-bold hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+                        className="font-lato flex w-fit items-center rounded-md border-none bg-secondary_dark px-4 py-2 uppercase text-white hover:bg-stone-400 hover:font-bold hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {isVerifying ? 'Verifying...' : 'Verify Image Dimensions'}
                     </button>
                     {isVerifying && (
                         <button
                             onClick={handleStopVerification}
-                            className="flex w-fit items-center rounded-md border-none bg-red-600 px-4 py-2 font-lato uppercase text-white hover:bg-red-700 hover:font-bold"
+                            className="font-lato flex w-fit items-center rounded-md border-none bg-red-600 px-4 py-2 uppercase text-white hover:bg-red-700 hover:font-bold"
                         >
                             Stop
                         </button>

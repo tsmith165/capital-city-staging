@@ -99,7 +99,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                                             <div
                                                 key={`dot-${index}`}
                                                 className={`h-3 w-3 rounded-full text-2xl ${
-                                                    index === currentImageIndex ? ' bg-primary' : 'bg-stone-600'
+                                                    index === currentImageIndex ? 'bg-primary' : 'bg-stone-600'
                                                 }`}
                                             ></div>
                                         ))}
@@ -118,9 +118,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                                             {imageList.length > 1 && (
                                                 <>
                                                     {showSlider ? (
-                                                        <div className="mr-0.5 w-6 text-center leading-6 text-primary">
-                                                            {speed / 1000}s
-                                                        </div>
+                                                        <div className="mr-0.5 w-6 text-center leading-6 text-primary">{speed / 1000}s</div>
                                                     ) : (
                                                         <IoIosSpeedometer
                                                             className={`${

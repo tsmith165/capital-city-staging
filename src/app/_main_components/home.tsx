@@ -50,12 +50,13 @@ export default function Home() {
                         animate={{ opacity: 1, scale: 1.3 }}
                         exit={{ opacity: 0, scale: 1 }}
                         transition={{ duration: 3 }}
-                        className="absolute inset-0 w-full h-full">
+                        className="absolute inset-0 h-full w-full"
+                    >
                         <Image
                             src={images[currentImageIndexRef.current].src}
                             width={images[currentImageIndexRef.current].width}
                             height={images[currentImageIndexRef.current].height}
-                            className="absolute inset-0 w-full h-full object-cover"
+                            className="absolute inset-0 h-full w-full object-cover"
                             alt="One of our recently staged homes"
                             priority
                             sizes="100vw"
@@ -68,14 +69,16 @@ export default function Home() {
                 initial="hidden"
                 animate={isStagingImageVisible ? 'visible' : 'hidden'}
                 transition={{ duration: 2 }}
-                className="absolute inset-0 bg-stone-900"></motion.div>
+                className="absolute inset-0 bg-stone-900"
+            ></motion.div>
             {isLogoVisible && (
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 1 }}
-                    className="absolute inset-0 flex justify-center items-center">
-                    <div className="relative bg-stone-900 rounded-full w-[350px] h-[350px] flex justify-center items-center opacity-70">
+                    className="absolute inset-0 flex items-center justify-center"
+                >
+                    <div className="relative flex h-[350px] w-[350px] items-center justify-center rounded-full bg-stone-900 opacity-70">
                         <Image src={require('/public/logo/CCS_logo.png')} alt="Capital City Staging Logo" width={300} height={300} />
                     </div>
                 </motion.div>

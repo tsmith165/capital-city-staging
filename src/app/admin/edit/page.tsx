@@ -4,7 +4,7 @@ export const metadata: Metadata = {
     description:
         "Capital City Staging allows you to focus on your next moves, we'll handle your history. With a home staged by Mia, you can trust that every room tells your story.",
     keywords:
-    'Capital City Staging, Sacramento Staging, Mia Capital City Staging, Mia Realtor, Mia Staging, Staging, Homestaging, Real Estate, Staging Services, Staging Software, Homestaging, Real Estate, Real Estate Staging, Real Estate Staging Services, Real Estate Staging Software, Mia, Mia Dofflemyer, Home Staging, Sacramento, Sacramento Home Staging, Sacramento Real Estate, Sacramento Real Estate Staging, Sacramento Real Estate Staging Services, Sacramento Staging Services, Capital City, Capital, City, City Stage, City Staging',
+        'Capital City Staging, Sacramento Staging, Mia Capital City Staging, Mia Realtor, Mia Staging, Staging, Homestaging, Real Estate, Staging Services, Staging Software, Homestaging, Real Estate, Real Estate Staging, Real Estate Staging Services, Real Estate Staging Software, Mia, Mia Dofflemyer, Home Staging, Sacramento, Sacramento Home Staging, Sacramento Real Estate, Sacramento Real Estate Staging, Sacramento Real Estate Staging Services, Sacramento Staging Services, Capital City, Capital, City, City Stage, City Staging',
     applicationName: 'Capital City Staging',
     icons: {
         icon: '/logo/CCS_logo_152x152.png',
@@ -31,7 +31,6 @@ export const metadata: Metadata = {
     metadataBase: new URL('https://www.capitalcitystaging.com'),
 };
 
-
 import React, { Suspense } from 'react';
 
 import { fetchInventoryById, fetchAdjacentInventoryIds, getMostRecentId } from '@/app/actions';
@@ -40,7 +39,6 @@ import PageLayout from '@/components/layout/PageLayout';
 import Edit from '@/app/admin/edit/Edit';
 import LoadingSpinner from '@/components/layout/LoadingSpinner';
 import { redirect } from 'next/navigation';
-
 
 async function fetchInventoryData(id: number) {
     const inventory = await fetchInventoryById(id);

@@ -8,12 +8,12 @@ const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 interface ResizeUploaderProps {
     handleUploadComplete: (
         fileName: string,
-        originalImageUrl: string, 
-        smallImageUrl: string, 
-        originalWidth: number, 
-        originalHeight: number, 
-        smallWidth: number, 
-        smallHeight: number
+        originalImageUrl: string,
+        smallImageUrl: string,
+        originalWidth: number,
+        originalHeight: number,
+        smallWidth: number,
+        smallHeight: number,
     ) => void;
     handleResetInputs: () => void;
     backToEditLink: string;
@@ -34,29 +34,29 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ handleUploadComplete, h
         onClientUploadComplete: async (res) => {
             console.log('Upload complete:', res);
             setLoadingState('Loading Data');
-            handleResetInputs()
+            handleResetInputs();
             if (res && res.length === 2) {
                 const fileName = res[0].name;
                 const smallImage = res.find((file: UploadResponse) => file.name.startsWith('small-'));
                 const largeImage = res.find((file: UploadResponse) => !file.name.startsWith('small-'));
-                
+
                 if (smallImage && largeImage) {
                     try {
                         const [imgDimensions, smallImgDimensions] = await Promise.all([
                             getImageDimensions(largeImage.url),
-                            getImageDimensions(smallImage.url)
+                            getImageDimensions(smallImage.url),
                         ]);
 
                         console.log(`Image ${largeImage.url} dimensions:`, imgDimensions);
                         console.log(`Small image ${smallImage.url} dimensions:`, smallImgDimensions);
                         handleUploadComplete(
                             fileName,
-                            largeImage.url, 
-                            smallImage.url, 
-                            imgDimensions.width, 
-                            imgDimensions.height, 
-                            smallImgDimensions.width, 
-                            smallImgDimensions.height
+                            largeImage.url,
+                            smallImage.url,
+                            imgDimensions.width,
+                            imgDimensions.height,
+                            smallImgDimensions.width,
+                            smallImgDimensions.height,
                         );
                     } catch (error) {
                         console.error('Error getting image dimensions:', error);
@@ -82,7 +82,7 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ handleUploadComplete, h
         },
     });
 
-    const getImageDimensions = (url: string): Promise<{width: number, height: number}> => {
+    const getImageDimensions = (url: string): Promise<{ width: number; height: number }> => {
         return new Promise((resolve, reject) => {
             const img = new Image();
             img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
@@ -129,24 +129,27 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ handleUploadComplete, h
         });
     };
 
-    const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const selectedFiles = e.target.files;
-        if (selectedFiles && selectedFiles.length > 0) {
-            const originalFile = selectedFiles[0];
+    const handleFileChange = useCallback(
+        async (e: React.ChangeEvent<HTMLInputElement>) => {
+            const selectedFiles = e.target.files;
+            if (selectedFiles && selectedFiles.length > 0) {
+                const originalFile = selectedFiles[0];
 
-            setIsUploading(true);
-            handleResetInputs();
+                setIsUploading(true);
+                handleResetInputs();
 
-            const originalResizedFile = await resizeImage(originalFile, 1920, 1920);
-            const smallResizedFile = await resizeImage(originalFile, 450, 450);
+                const originalResizedFile = await resizeImage(originalFile, 1920, 1920);
+                const smallResizedFile = await resizeImage(originalFile, 450, 450);
 
-            const smallFileWithPrefix = new File([smallResizedFile], `small-${smallResizedFile.name}`, { type: smallResizedFile.type });
-            console.log('Resize complete...')
+                const smallFileWithPrefix = new File([smallResizedFile], `small-${smallResizedFile.name}`, { type: smallResizedFile.type });
+                console.log('Resize complete...');
 
-            setLoadingState('Uploading Image');
-            await startUpload([smallFileWithPrefix, originalResizedFile]);
-        }
-    }, [handleResetInputs, startUpload]);
+                setLoadingState('Uploading Image');
+                await startUpload([smallFileWithPrefix, originalResizedFile]);
+            }
+        },
+        [handleResetInputs, startUpload],
+    );
 
     const handleSelectFilesClick = () => {
         if (fileInputRef.current) {
@@ -156,13 +159,7 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ handleUploadComplete, h
 
     return (
         <>
-            <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileChange} 
-                className="hidden" 
-                disabled={isUploading}
-            />
+            <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" disabled={isUploading} />
             <div className="flex space-x-2">
                 <button
                     onClick={handleSelectFilesClick}
@@ -172,9 +169,9 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ handleUploadComplete, h
                     } px-4 py-1 text-lg font-bold`}
                 >
                     {isUploading && (
-                        <div 
-                            className="absolute left-0 top-0 z-0 h-full bg-primary" 
-                            style={{ width: `${uploadProgress}%`, transition: 'width 0.3s ease-in-out' }} 
+                        <div
+                            className="absolute left-0 top-0 z-0 h-full bg-primary"
+                            style={{ width: `${uploadProgress}%`, transition: 'width 0.3s ease-in-out' }}
                         />
                     )}
                     <span className={`relative z-10 text-stone-300 ${isUploading ? '' : 'group-hover:text-primary'}`}>
@@ -182,7 +179,7 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ handleUploadComplete, h
                     </span>
                 </button>
                 <Link href={backToEditLink} passHref>
-                    <button className="px-4 py-1 bg-gray-500 text-white rounded-md hover:bg-gray-600 text-lg font-bold">
+                    <button className="rounded-md bg-gray-500 px-4 py-1 text-lg font-bold text-white hover:bg-gray-600">
                         Back To Edit
                     </button>
                 </Link>

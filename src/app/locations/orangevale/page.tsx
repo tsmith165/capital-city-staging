@@ -4,31 +4,25 @@ import LocationPageTemplate from '../LocationPageTemplate';
 import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 
 const locationData = {
-  locationName: 'Orangevale',
-  pageSlug: 'orangevale',
-  imageUrl: '/locations/orangevale.jpg',
-  imageAlt: 'Home Staging in Orangevale, CA',
-  description:
-    'Capital City Staging provides expert home staging services in Orangevale, making your property more attractive to potential buyers.',
-  whyStaging:
-    'In Orangevale’s competitive market, effective staging is key to making your home memorable. We highlight your property’s best features.',
-  services: [
-    'Vacant and Occupied Home Staging',
-    'Interior Design Consultation',
-    'Customized Styling',
-    'Market-Ready Preparation',
-  ],
-  contactText: 'Interested in staging your Orangevale home?',
+    locationName: 'Orangevale',
+    pageSlug: 'orangevale',
+    imageUrl: '/locations/orangevale.jpg',
+    imageAlt: 'Home Staging in Orangevale, CA',
+    description:
+        'Capital City Staging provides expert home staging services in Orangevale, making your property more attractive to potential buyers.',
+    whyStaging:
+        'In Orangevale’s competitive market, effective staging is key to making your home memorable. We highlight your property’s best features.',
+    services: ['Vacant and Occupied Home Staging', 'Interior Design Consultation', 'Customized Styling', 'Market-Ready Preparation'],
+    contactText: 'Interested in staging your Orangevale home?',
 };
 
 export const metadata: Metadata = generateLocationMetadata({
-  locationName: locationData.locationName,
-  pageSlug: locationData.pageSlug,
-  description:
-    'Professional home staging services in Orangevale, California. Make your property stand out with Capital City Staging.',
-  ogImageUrl: '/favicon/CCS_og_image.png'
+    locationName: locationData.locationName,
+    pageSlug: locationData.pageSlug,
+    description: 'Professional home staging services in Orangevale, California. Make your property stand out with Capital City Staging.',
+    ogImageUrl: '/favicon/CCS_og_image.png',
 });
 
 export default function OrangevaleHomeStaging() {
-  return <LocationPageTemplate {...locationData} />;
+    return <LocationPageTemplate {...locationData} />;
 }

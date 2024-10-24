@@ -23,7 +23,7 @@ export const ourFileRouter = {
             console.log('User hasAdminRole: ' + hasAdminRole);
             if (!hasAdminRole) {
                 console.log('User does not have admin role. Redirecting to home page.');
-                return {}
+                return {};
             }
             console.log('User has admin role. Continuing...');
 

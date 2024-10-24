@@ -22,7 +22,7 @@ const ourFileRouter = {
 
 export type OurFileRouter = typeof ourFileRouter;
 
-async function checkUserRole(): Promise<{ isAdmin: boolean; error?: string | undefined; }> {
+async function checkUserRole(): Promise<{ isAdmin: boolean; error?: string | undefined }> {
     const { userId } = auth();
     if (!userId) {
         return { isAdmin: false, error: 'User is not authenticated. Cannot edit piece.' };
@@ -40,7 +40,7 @@ export async function generateMissingSmallImages(
     progressCallback?: (item: any, current: number, total: number) => Promise<boolean>,
 ): Promise<{
     success: boolean;
-    updatedItem?: { updatedItems: number; updatedExtraImages: number; };
+    updatedItem?: { updatedItems: number; updatedExtraImages: number };
     error?: string;
 }> {
     const { isAdmin, error: roleError } = await checkUserRole();
@@ -61,11 +61,7 @@ export async function generateMissingSmallImages(
         let updatedItems = 0;
         let updatedExtraImages = 0;
 
-        const updateImage = async (
-            image: any,
-            table: typeof inventoryTable | typeof extraImagesTable,
-            index: number,
-        ) => {
+        const updateImage = async (image: any, table: typeof inventoryTable | typeof extraImagesTable, index: number) => {
             if (!image.image_path) return;
 
             if (progressCallback) {
@@ -138,7 +134,7 @@ export async function generateMissingSmallImages(
         console.error('Error generating small images:', error);
         return {
             success: false,
-            error: 'An error occurred while processing your request.' ,
+            error: 'An error occurred while processing your request.',
         };
     }
 }
@@ -154,7 +150,7 @@ export async function getInventoryToVerify(): Promise<{ success: boolean; invent
         const extraImages = await db.select().from(extraImagesTable).execute();
         const inventoryWithImages: InventoryWithImages[] = inventory.map((item: Inventory) => ({
             ...item,
-            extraImages: extraImages.filter((extra: ExtraImages) => extra.inventory_id === item.id),        
+            extraImages: extraImages.filter((extra: ExtraImages) => extra.inventory_id === item.id),
         }));
         return { success: true, inventory: inventoryWithImages };
     } catch (error) {
@@ -164,7 +160,7 @@ export async function getInventoryToVerify(): Promise<{ success: boolean; invent
 }
 
 export async function verifyImageDimensions(
-    image: any
+    image: any,
 ): Promise<{ success: boolean; verifyResult?: { id: number; title: string; mainImage?: any; smallImage?: any }; error?: string }> {
     const { isAdmin, error: roleError } = await checkUserRole();
     if (!isAdmin) {
@@ -189,18 +185,18 @@ export async function verifyImageDimensions(
 
                 const updateFields = isSmall
                     ? {
-                        small_width: metadata.width,
-                        small_height: metadata.height,
-                    }
+                          small_width: metadata.width,
+                          small_height: metadata.height,
+                      }
                     : {
-                        width: metadata.width,
-                        height: metadata.height,
-                    };
+                          width: metadata.width,
+                          height: metadata.height,
+                      };
 
                 let table;
                 if ('piece_type' in image) {
                     table = inventoryTable;
-                } else  {
+                } else {
                     table = extraImagesTable;
                 }
 

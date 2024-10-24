@@ -4,31 +4,31 @@ import LocationPageTemplate from '../LocationPageTemplate';
 import { generateLocationMetadata } from '@/utils/generateLocationMetadata';
 
 const locationData = {
-  locationName: 'Rocklin',
-  pageSlug: 'rocklin',
-  imageUrl: '/locations/rocklin.jpg',
-  imageAlt: 'Home Staging in Rocklin, CA',
-  description:
-    'Capital City Staging offers expert home staging services in Rocklin, enhancing your property’s appeal to attract potential buyers.',
-  whyStaging:
-    'Rocklin’s growing community values homes that are move-in ready. Our staging services help your property meet buyer expectations.',
-  services: [
-    'Vacant and Occupied Home Staging',
-    'Interior Design Consultation',
-    'Customized Styling Solutions',
-    'Photography Preparation',
-  ],
-  contactText: 'Interested in staging your Rocklin home?',
+    locationName: 'Rocklin',
+    pageSlug: 'rocklin',
+    imageUrl: '/locations/rocklin.jpg',
+    imageAlt: 'Home Staging in Rocklin, CA',
+    description:
+        'Capital City Staging offers expert home staging services in Rocklin, enhancing your property’s appeal to attract potential buyers.',
+    whyStaging:
+        'Rocklin’s growing community values homes that are move-in ready. Our staging services help your property meet buyer expectations.',
+    services: [
+        'Vacant and Occupied Home Staging',
+        'Interior Design Consultation',
+        'Customized Styling Solutions',
+        'Photography Preparation',
+    ],
+    contactText: 'Interested in staging your Rocklin home?',
 };
 
 export const metadata: Metadata = generateLocationMetadata({
-  locationName: locationData.locationName,
-  pageSlug: locationData.pageSlug,
-  description:
-    'Professional home staging services in Rocklin, California. Enhance your property’s marketability with Capital City Staging.',
-  ogImageUrl: '/favicon/CCS_og_image.png'
+    locationName: locationData.locationName,
+    pageSlug: locationData.pageSlug,
+    description:
+        'Professional home staging services in Rocklin, California. Enhance your property’s marketability with Capital City Staging.',
+    ogImageUrl: '/favicon/CCS_og_image.png',
 });
 
 export default function RocklinHomeStaging() {
-  return <LocationPageTemplate {...locationData} />;
+    return <LocationPageTemplate {...locationData} />;
 }

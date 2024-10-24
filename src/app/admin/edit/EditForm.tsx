@@ -135,7 +135,7 @@ const EditForm: React.FC<EditFormProps> = ({ current_inventory }) => {
                 {/* Row 2.) Category Select */}
                 <div className="flex h-fit w-full">
                     <InputSelect
-                        idName='category'
+                        idName="category"
                         name="Category"
                         value={formData.category}
                         onChange={handleChange}
@@ -171,7 +171,7 @@ const EditForm: React.FC<EditFormProps> = ({ current_inventory }) => {
                         <InputTextbox idName="cost" name="Cost" value={formData.cost} onChange={handleChange} />
                     </div>
                 </div>
-                
+
                 {/* Row 8.) Width / Height Text Box */}
                 <div className="flex h-fit w-full flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
                     <div className="w-full md:w-1/2">
@@ -185,28 +185,13 @@ const EditForm: React.FC<EditFormProps> = ({ current_inventory }) => {
                 {/* Row 5.) Real Width / Height / Depth Text Boxes */}
                 <div className="flex h-fit w-full flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
                     <div className="w-full md:w-1/3">
-                        <InputTextbox
-                            idName="real_width"
-                            name="Width (in)"
-                            value={formData.real_width}
-                            onChange={handleChange}
-                        />
+                        <InputTextbox idName="real_width" name="Width (in)" value={formData.real_width} onChange={handleChange} />
                     </div>
                     <div className="w-full md:w-1/3">
-                        <InputTextbox
-                            idName="real_height"
-                            name="Height (in)"
-                            value={formData.real_height}
-                            onChange={handleChange}
-                        />
+                        <InputTextbox idName="real_height" name="Height (in)" value={formData.real_height} onChange={handleChange} />
                     </div>
                     <div className="w-full md:w-1/3">
-                        <InputTextbox
-                            idName="real_depth"
-                            name="Depth (in)"
-                            value={formData.real_depth}
-                            onChange={handleChange}
-                        />
+                        <InputTextbox idName="real_depth" name="Depth (in)" value={formData.real_depth} onChange={handleChange} />
                     </div>
                 </div>
 
