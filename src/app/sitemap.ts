@@ -136,6 +136,12 @@ export default function sitemap(): SitemapEntry[] {
 
         // Info pages
         {
+            url: 'https://www.capitalcitystaging.com/info',
+            lastModified: new Date(),
+            changeFrequency: 'weekly',
+            priority: 1,
+        },
+        {
             url: 'https://www.capitalcitystaging.com/info/understanding-buyer-psychology',
             lastModified: new Date(),
             changeFrequency: 'monthly',

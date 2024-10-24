@@ -39,8 +39,7 @@
         ".next/types/**/*.ts",
         "tailwind.config.ts",
         "middleware.js",
-        "src/scripts/scripts/border_coord_capture.js",
-
+        "src/scripts/scripts/border_coord_capture.js"
     ],
     "exclude": ["node_modules"]
 }

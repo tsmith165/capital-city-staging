@@ -89,7 +89,7 @@ export default function CostVsValueAnalysis() {
                         The cost of staging varies depending on the size of your home, the amount of work needed, and the duration the home
                         will be on the market. Typical costs include:
                     </p>
-                    <ul className="list-inside list-disc space-y-2">
+                    <ul className="list-inside list-disc space-y-2 pl-2">
                         <li className="text-secondary_light">Initial Consultation Fee</li>
                         <li className="text-secondary_light">Design and Planning</li>
                         <li className="text-secondary_light">Furniture and Decor Rental</li>

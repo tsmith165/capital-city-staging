@@ -60,8 +60,8 @@ export default function Services() {
                                 <div
                                     className={
                                         `text-md group mb-4 flex w-full items-center justify-center rounded-md px-2 py-2 font-bold ` +
-                                        `bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400` +
-                                        `hover:from-secondary hover:via-secondary_light hover:to-secondary`
+                                        ` bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400` +
+                                        ` hover:from-secondary hover:via-secondary_light hover:to-secondary`
                                     }
                                 >
                                     <div className="gradient-secondary-main-text group-hover:text-white">

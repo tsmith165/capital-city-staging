@@ -4,6 +4,7 @@ export const navbar_menu_list: [string, string][] = [
     ['services', 'Services'],
     // ['about', 'About'],
     ['contact', 'Contact'],
+    ['articles', 'Articles'],
 ];
 
 export const menu_list: [string, string, string][] = [
@@ -12,6 +13,7 @@ export const menu_list: [string, string, string][] = [
     ['services', 'Services', '/?component=services'],
     // ['about', 'About', '/?component=portfolio'],
     ['contact', 'Contact', '/contact'],
+    ['articles', 'Articles', '/info'],
 ];
 
 export const admin_menu_list: [string, string, string][] = [
@@ -19,6 +21,7 @@ export const admin_menu_list: [string, string, string][] = [
     ['where', 'Where', '/?component=where'],
     ['services', 'Services', '/?component=services'],
     ['contact', 'Contact', '/contact'],
+    ['articles', 'Articles', '/info'],
     ['inventory', 'Inventory', '/admin/inventory'],
     ['manage', 'Manage', '/admin/manage'],
     ['edit', 'Edit', '/admin/edit'],

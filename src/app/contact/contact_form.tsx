@@ -130,8 +130,8 @@ const ContactForm = () => {
                     type="submit"
                     className={
                         'rounded-md px-4 py-2 font-bold ' +
-                        `bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 text-stone-950` +
-                        `hover:bg-gradient-to-r hover:from-secondary hover:via-secondary_light hover:to-secondary hover:text-white`
+                        ` bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 text-stone-950` +
+                        ` hover:bg-gradient-to-r hover:from-secondary hover:via-secondary_light hover:to-secondary hover:text-white`
                     }
                 >
                     Send details to Mia!

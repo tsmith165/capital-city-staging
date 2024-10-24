@@ -86,34 +86,34 @@ export default function UnderstandingBuyerPsychology() {
 
                     <h2 className="text-2xl font-semibold text-primary">Key Psychological Principles in Home Staging</h2>
 
-                    <h3 className="text-xl font-semibold text-primary">1. First Impressions Matter</h3>
+                    <h3 className="text-xl font-semibold text-secondary_light">1. First Impressions Matter</h3>
                     <p className="text-stone-300">
                         The first few seconds upon entering a home are critical. A welcoming entryway sets the tone for the entire viewing
                         experience. Ensure that the entrance is clean, well-lit, and inviting to make a positive initial impact.
                     </p>
 
-                    <h3 className="text-xl font-semibold text-primary">2. Creating a Sense of Space</h3>
+                    <h3 className="text-xl font-semibold text-secondary_light">2. Creating a Sense of Space</h3>
                     <p className="text-stone-300">
                         Cluttered or over-furnished rooms can make spaces feel smaller and overwhelming. By arranging furniture
                         strategically and decluttering, you can create an open and spacious environment that allows buyers to imagine their
                         own belongings in the space.
                     </p>
 
-                    <h3 className="text-xl font-semibold text-primary">3. Neutralizing Personal Touches</h3>
+                    <h3 className="text-xl font-semibold text-secondary_light">3. Neutralizing Personal Touches</h3>
                     <p className="text-stone-300">
                         While family photos and personalized decor make a house feel like home to you, they can hinder a buyer's ability to
                         envision themselves living there. Neutralizing these elements helps create a blank canvas for buyers to project
                         their own lives onto.
                     </p>
 
-                    <h3 className="text-xl font-semibold text-primary">4. Appealing to the Senses</h3>
+                    <h3 className="text-xl font-semibold text-secondary_light">4. Appealing to the Senses</h3>
                     <p className="text-stone-300">
                         Engaging multiple senses can enhance the emotional connection. Soft background music, pleasant scents, and
                         comfortable temperatures contribute to a positive atmosphere. Be cautious to keep these elements subtle to avoid
                         overwhelming buyers.
                     </p>
 
-                    <h3 className="text-xl font-semibold text-primary">5. Highlighting Lifestyle Aspirations</h3>
+                    <h3 className="text-xl font-semibold text-secondary_light">5. Highlighting Lifestyle Aspirations</h3>
                     <p className="text-stone-300">
                         Staging should reflect the lifestyle that buyers aspire to. Whether it's a cozy family home, a modern urban condo,
                         or a luxurious retreat, aligning the staging with the target market's desires can make your property more

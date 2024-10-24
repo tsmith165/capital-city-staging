@@ -108,7 +108,7 @@ export default function HomeStagingStatistics() {
 
                     <h2 className="text-2xl font-semibold text-primary">Room Importance Rankings</h2>
                     <p className="text-stone-300">Buyers consider the following rooms most important when viewing a home:</p>
-                    <ol className="list-inside list-decimal space-y-2">
+                    <ol className="list-inside list-decimal space-y-2 pl-2">
                         <li className="text-secondary_light">Living Room</li>
                         <li className="text-secondary_light">Master Bedroom</li>
                         <li className="text-secondary_light">Kitchen</li>
