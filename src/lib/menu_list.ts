@@ -4,7 +4,6 @@ export const navbar_menu_list: [string, string][] = [
     ['services', 'Services'],
     // ['about', 'About'],
     ['contact', 'Contact'],
-    ['articles', 'Articles'],
 ];
 
 export const menu_list: [string, string, string][] = [
