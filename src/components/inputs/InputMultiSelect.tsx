@@ -30,12 +30,12 @@ const InputMultiSelect: React.FC<InputMultiSelectProps> = ({ defaultValue, idNam
 
     return (
         <div className="m-0 flex w-full p-0">
-            <div 
+            <div
                 className="flex min-w-28 max-w-28 items-center justify-center rounded-l-md bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 px-2.5 py-1.5"
                 data-tooltip-id={`tooltip-${idName}`}
                 data-tooltip-content={formatted_name}
             >
-                <div className="text-stone-950 font-bold">{formatted_name}</div>
+                <div className="font-bold text-stone-950">{formatted_name}</div>
             </div>
             <Tooltip id={`tooltip-${idName}`} place="top" />
             <Select
@@ -49,22 +49,22 @@ const InputMultiSelect: React.FC<InputMultiSelectProps> = ({ defaultValue, idNam
                     DropdownIndicator,
                 }}
                 styles={{
-                    control: (baseStyles, state) => ({
+                    control: (baseStyles: any, state: any) => ({
                         ...baseStyles,
                         borderColor: '',
                         backgroundColor: 'var(--color-secondary)',
                     }),
-                    multiValue: (styles) => ({
+                    multiValue: (styles: any) => ({
                         ...styles,
                         backgroundColor: 'var(--color-secondary-light)',
                     }),
-                    option: (provided, state) => ({
+                    option: (provided: any, state: any) => ({
                         ...provided,
                         color: 'var(--color-secondary)',
                     }),
                 }}
                 options={react_select_options}
-                onChange={(selectedOptions) => {
+                onChange={(selectedOptions: { value: string; label: string }[]) => {
                     if (onChange) {
                         onChange(selectedOptions as { value: string; label: string }[]);
                     }
