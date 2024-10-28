@@ -5,10 +5,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io';
 import { MdPageview } from 'react-icons/md';
+import { useQueryState } from 'nuqs';
 import EditForm from './EditForm';
 import InventoryOrderPanel from './InventoryOrderPanel';
 import { handleTitleUpdate } from './actions';
 import LoadingSpinner from '@/components/layout/LoadingSpinner';
+import { idParser } from './parsers';
 
 interface EditProps {
     inventoryDataPromise: Promise<any>;
@@ -16,6 +18,7 @@ interface EditProps {
 }
 
 const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
+    const [id, setId] = useQueryState('id', idParser);
     const [inventoryData, setInventoryData] = useState<any>(null);
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
     const [titleInput, setTitleInput] = useState('');
@@ -60,6 +63,10 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
         } catch (error) {
             setSubmitMessage({ type: 'error', text: 'An unexpected error occurred.' });
         }
+    };
+
+    const handleNavigate = async (newId: number) => {
+        await setId(newId.toString());
     };
 
     if (!inventoryData) {

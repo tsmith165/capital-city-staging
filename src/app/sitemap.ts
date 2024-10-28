@@ -1,5 +1,3 @@
-// File: /src/app/sitemap.ts
-
 interface SitemapEntry {
     url: string;
     lastModified: Date;

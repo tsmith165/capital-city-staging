@@ -3,9 +3,9 @@ import { RefObject } from 'react';
 
 type Store = {
     selectedComponent: string;
-    componentRefs: RefObject<HTMLDivElement>[];
+    componentRefs: RefObject<HTMLDivElement | null>[];
     setSelectedComponent: (component: string) => void;
-    setComponentRefs: (refs: RefObject<HTMLDivElement>[]) => void;
+    setComponentRefs: (refs: RefObject<HTMLDivElement | null>[]) => void;
 };
 
 export const useStore = create<Store>((set) => ({

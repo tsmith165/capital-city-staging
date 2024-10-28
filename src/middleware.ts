@@ -3,23 +3,23 @@ import { NextResponse } from 'next/server';
 import { isClerkUserIdAdmin } from '@/utils/auth/ClerkUtils';
 
 export default clerkMiddleware(async (auth, req) => {
-    const userId = auth().userId;
+    const { userId } = await auth();
 
-  // Apply admin checks only on protected routes
-  if (req.nextUrl.pathname.startsWith('/admin')) {
-    if (!userId) {
-      return NextResponse.redirect(new URL('/', req.url));
+    // Apply admin checks only on protected routes
+    if (req.nextUrl.pathname.startsWith('/admin')) {
+        if (!userId) {
+            return NextResponse.redirect(new URL('/', req.url));
+        }
+
+        const hasAdminRole = await isClerkUserIdAdmin(userId);
+        if (!hasAdminRole) {
+            return NextResponse.redirect(new URL('/', req.url));
+        }
     }
 
-    const hasAdminRole = await isClerkUserIdAdmin(userId);
-    if (!hasAdminRole) {
-      return NextResponse.redirect(new URL('/', req.url));
-    }
-  }
-
-  return NextResponse.next();
+    return NextResponse.next();
 });
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/uploadthing'],
+    matcher: ['/admin/:path*', '/api/uploadthing'],
 };
