@@ -21,9 +21,10 @@ const useInventoryStore = create<InventoryState>((set) => ({
     setCategory: (category) => set({ category }),
     setFilterMenuOpen: (isOpen) => set({ filterMenuOpen: isOpen }),
     setItemList: (items) => set({ itemList: items }),
-    setInventoryItems: (items) => set((state) => ({ 
-        inventoryItems: typeof items === 'function' ? items(state.inventoryItems) : items 
-    })),
+    setInventoryItems: (items) =>
+        set((state) => ({
+            inventoryItems: typeof items === 'function' ? items(state.inventoryItems) : items,
+        })),
 }));
 
 export default useInventoryStore;

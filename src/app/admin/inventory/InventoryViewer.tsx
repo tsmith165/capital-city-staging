@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useQueryStates } from 'nuqs';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import Masonry from 'react-masonry-css';
@@ -14,29 +14,53 @@ import InventoryItem from './InventoryItem';
 import FullScreenView from './FullScreenView';
 import SelectedItemView from './SelectedItemView';
 import FilterMenu from './FilterMenu';
+import { categoryParser, itemIdParser, ParsedParams } from './parsers';
 
-const InventoryViewer: React.FC<{ items: InventoryWithImages[] }> = ({ items }) => {
-    const router = useRouter();
-    const searchParams = useSearchParams();
+interface InventoryViewerProps {
+    items: InventoryWithImages[];
+    initialParams: ParsedParams;
+}
 
-    const { category, filterMenuOpen, setFilterMenuOpen, itemList, setItemList } = useInventoryStore((state) => ({
+const InventoryViewer: React.FC<InventoryViewerProps> = ({ items, initialParams }) => {
+    const [params, setParams] = useQueryStates(
+        {
+            category: categoryParser,
+            item: itemIdParser,
+        },
+        {
+            shallow: true,
+            history: 'push',
+        },
+    );
+
+    const { category, filterMenuOpen, setFilterMenuOpen, setItemList, setCategory } = useInventoryStore((state) => ({
         category: state.category,
         filterMenuOpen: state.filterMenuOpen,
         setFilterMenuOpen: state.setFilterMenuOpen,
-        itemList: state.itemList,
         setItemList: state.setItemList,
+        setCategory: state.setCategory,
     }));
 
-    const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
-    const [isMasonryLoaded, setIsMasonryLoaded] = useState(false);
+    // Initialize loading state based on items
+    const [isMasonryLoaded, setIsMasonryLoaded] = useState(items.length > 0);
+
+    // Find initial selected item index
+    const initialIndex = useMemo(() => {
+        if (!initialParams.item) return null;
+        return items.findIndex((item) => item.id.toString() === initialParams.item);
+    }, [items, initialParams.item]);
+
+    const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(initialIndex);
     const [isFullScreenImage, setIsFullScreenImage] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [imageLoadStates, setImageLoadStates] = useState<{ [key: number]: boolean }>({});
     const [isPlaying, setIsPlaying] = useState(true);
     const [speed, setSpeed] = useState(3000);
+    const [mounted, setMounted] = useState(false);
+
+    const selectedImageRef = useRef<HTMLDivElement>(null);
 
     const selectedItem = useMemo(() => (selectedItemIndex !== null ? items[selectedItemIndex] : null), [items, selectedItemIndex]);
-    const selectedImageRef = useRef<HTMLDivElement>(null);
 
     const imageList = useMemo(() => {
         if (!selectedItem) return [];
@@ -54,9 +78,15 @@ const InventoryViewer: React.FC<{ items: InventoryWithImages[] }> = ({ items }) 
         ];
     }, [selectedItem]);
 
-    useEffect(() => {
-        setItemList(items);
-    }, [items, setItemList]);
+    const filteredItems = useMemo(() => {
+        return items.filter((item) => {
+            const item_category = item.category || 'None';
+            if (category !== 'None' && category) {
+                return item_category.includes(category);
+            }
+            return true;
+        });
+    }, [items, category]);
 
     const handleItemClick = useCallback(
         (id: number, index: number) => {
@@ -66,67 +96,18 @@ const InventoryViewer: React.FC<{ items: InventoryWithImages[] }> = ({ items }) 
             }
             setCurrentImageIndex(0);
             setSelectedItemIndex(index);
-            const newSearchParams = new URLSearchParams(searchParams);
-            newSearchParams.set('item', `${id}`);
-            router.replace(`/admin/inventory?${newSearchParams.toString()}`);
+            setParams({ item: id.toString() });
             setImageLoadStates({});
             selectedImageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         },
-        [selectedItemIndex, searchParams, router],
+        [selectedItemIndex, setParams],
     );
 
-    const filteredItems = useMemo(() => {
-        return itemList.filter((item) => {
-            const item_category = item.category || 'None';
-            if (category !== 'None' && category) {
-                return item_category.includes(category);
-            }
-            return true;
-        });
-    }, [itemList, category]);
-
-    const inventoryItems = useMemo(() => {
+    const renderedItems = useMemo(() => {
         return filteredItems.map((item, index) => (
             <InventoryItem key={`item-${item.id}`} item={{ ...item, index }} handleItemClick={handleItemClick} />
         ));
     }, [filteredItems, handleItemClick]);
-
-    useEffect(() => {
-        if (itemList.length > 0) {
-            setIsMasonryLoaded(true);
-        }
-    }, [itemList]);
-
-    useEffect(() => {
-        const selectedItemId = searchParams.get('item');
-        const initialSelectedIndex = items.findIndex((item) => item.id.toString() === selectedItemId);
-        setSelectedItemIndex(initialSelectedIndex !== -1 ? initialSelectedIndex : null);
-    }, [searchParams, items]);
-
-    useEffect(() => {
-        let interval: NodeJS.Timeout;
-
-        if (isPlaying && selectedItem && imageList.length > 1) {
-            interval = setInterval(() => {
-                setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imageList.length);
-            }, speed);
-        }
-
-        return () => {
-            if (interval) {
-                clearInterval(interval);
-            }
-        };
-    }, [speed, isPlaying, imageList.length, selectedItem]);
-
-    const inventory_clicked = useCallback(
-        (e: React.MouseEvent) => {
-            if (filterMenuOpen && window.innerWidth < 768) {
-                setFilterMenuOpen(false);
-            }
-        },
-        [filterMenuOpen, setFilterMenuOpen],
-    );
 
     const handleImageLoad = useCallback(() => {
         setImageLoadStates((prevLoadStates) => ({
@@ -146,6 +127,66 @@ const InventoryViewer: React.FC<{ items: InventoryWithImages[] }> = ({ items }) 
     const togglePlayPause = useCallback(() => {
         setIsPlaying((prevState) => !prevState);
     }, []);
+
+    const inventory_clicked = useCallback(
+        (e: React.MouseEvent) => {
+            if (filterMenuOpen && window.innerWidth < 768) {
+                setFilterMenuOpen(false);
+            }
+        },
+        [filterMenuOpen, setFilterMenuOpen],
+    );
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // Initial data setup
+    useEffect(() => {
+        // Initialize store with server-side state
+        setItemList(items);
+        if (initialParams.category) {
+            setCategory(initialParams.category);
+        }
+    }, [items, initialParams.category, setItemList, setCategory]);
+
+    // Sync URL category to store only when different
+    useEffect(() => {
+        const urlCategory = params.category;
+        if (urlCategory && urlCategory !== category) {
+            setCategory(urlCategory);
+        }
+    }, [params.category, category, setCategory]);
+
+    // Handle selected item from URL
+    useEffect(() => {
+        const selectedItemId = params.item;
+        if (selectedItemId) {
+            const initialSelectedIndex = items.findIndex((item) => item.id.toString() === selectedItemId);
+            setSelectedItemIndex(initialSelectedIndex !== -1 ? initialSelectedIndex : null);
+        }
+    }, [params.item, items]);
+
+    // Handle image slideshow
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+
+        if (isPlaying && selectedItem && imageList.length > 1) {
+            interval = setInterval(() => {
+                setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imageList.length);
+            }, speed);
+        }
+
+        return () => {
+            if (interval) {
+                clearInterval(interval);
+            }
+        };
+    }, [speed, isPlaying, imageList.length, selectedItem]);
+
+    if (!mounted) {
+        return null; // Return null on server-side and first render
+    }
 
     if (!isMasonryLoaded)
         return (
@@ -200,7 +241,7 @@ const InventoryViewer: React.FC<{ items: InventoryWithImages[] }> = ({ items }) 
                         className="my-masonry-grid w-full"
                         columnClassName="my-masonry-grid_column"
                     >
-                        {inventoryItems}
+                        {renderedItems}
                     </Masonry>
                 </motion.div>
             </motion.div>
