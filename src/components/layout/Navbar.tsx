@@ -7,9 +7,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { navbar_menu_list } from '@/lib/menu_list';
 import { useStore } from '@/stores/store';
 import { IoIosMenu } from 'react-icons/io';
-import { Protect } from '@clerk/nextjs';
 import { useIsAdmin } from '@/utils/auth/useIsAdmin';
-import AdminProtect from '@/utils/auth/AdminProtect';
 
 import dynamic from 'next/dynamic';
 const DynamicMenuOverlay = dynamic(() => import('./menu/MenuOverlay'), { ssr: false });
@@ -20,6 +18,7 @@ export default function Navbar({ page }: { page: string }) {
     const pathname = usePathname();
     const [isPending, startTransition] = useTransition();
     const [showMenu, setShowMenu] = useState(false);
+    const isAdmin = useIsAdmin();
 
     const selectedComponent = useStore((state) => state.selectedComponent);
     const setSelectedComponent = useStore((state) => state.setSelectedComponent);
@@ -33,11 +32,7 @@ export default function Navbar({ page }: { page: string }) {
                 } else {
                     params.delete('component');
                 }
-
-                // Create new URL
                 const newUrl = `${pathname}${params.toString() ? `?${params.toString()}` : ''}`;
-
-                // Update the URL without navigation
                 window.history.pushState(null, '', newUrl);
             });
         },
@@ -49,14 +44,11 @@ export default function Navbar({ page }: { page: string }) {
             if (menu_class_name === 'contact') {
                 router.push('/contact');
             } else {
-                // Force update by appending a timestamp
                 const updatedComponent = `${menu_class_name}_${Date.now()}`;
                 setSelectedComponent(updatedComponent);
                 if (page !== 'home') {
-                    console.log('Navigating to homepage with component: ' + menu_class_name);
                     router.push('/?component=' + menu_class_name);
                 } else {
-                    console.log('Updating URL without navigation: ' + menu_class_name);
                     updateUrlWithoutNavigation(menu_class_name);
                 }
             }
@@ -66,7 +58,6 @@ export default function Navbar({ page }: { page: string }) {
 
     useEffect(() => {
         if (page === 'home') {
-            console.log('Current homepage component: ' + searchParams.get('component'));
             setSelectedComponent(searchParams.get('component') || '');
         }
     }, [page, searchParams, setSelectedComponent]);
@@ -118,7 +109,7 @@ export default function Navbar({ page }: { page: string }) {
                 />
                 {showMenu && (
                     <div className="absolute right-0 top-[50px] z-50 h-fit w-[160px] rounded-bl-md border-b-2 border-l-2 border-primary_dark bg-secondary_light">
-                        <DynamicMenuOverlay currentPage={page} isAdmin={useIsAdmin()} />
+                        <DynamicMenuOverlay currentPage={page} isAdmin={isAdmin} />
                     </div>
                 )}
             </div>

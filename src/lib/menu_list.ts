@@ -19,13 +19,14 @@ export const menu_list: MenuItem[] = [
     { id: 'contact', label: 'Contact', url: '/contact' },
     {
         id: 'info',
-        label: 'Resources',
+        label: 'Articles',
         url: '/info',
         subMenu: [
             { id: 'staging-tips', label: 'Staging Tips', url: '/info/home-staging-tips' },
             { id: 'statistics', label: 'Statistics', url: '/info/home-staging-statistics' },
             { id: 'buyer-psychology', label: 'Buyer Psychology', url: '/info/understanding-buyer-psychology' },
             { id: 'cost-analysis', label: 'Cost Analysis', url: '/info/cost-vs-value-analysis' },
+            { id: 'staging-benefits', label: 'Staging Benefits', url: '/info/benefits-of-home-staging' },
         ],
     },
 ];
