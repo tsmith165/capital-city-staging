@@ -7,7 +7,7 @@ import { eq, and, desc } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
 async function checkUserRole(): Promise<{ isAdmin: boolean; error?: string | undefined }> {
-    const { userId } = auth();
+    const { userId } = await auth();
     if (!userId) {
         return { isAdmin: false, error: 'User is not authenticated. Cannot edit piece.' };
     }

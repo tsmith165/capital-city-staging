@@ -37,12 +37,13 @@ import PageLayout from '@/components/layout/PageLayout';
 import { Manage } from '@/app/admin/manage/Manage';
 
 interface PageProps {
-    searchParams?: {
+    searchParams?: Promise<{
         tab?: string;
-    };
+    }>;
 }
 
-export default async function ManagePage({ searchParams }: PageProps) {
+export default async function ManagePage(props: PageProps) {
+    const searchParams = await props.searchParams;
     const tab = searchParams?.tab || 'manage';
     const inventory = await getInventory();
     const archivedInventory = await getArchivedInventory();

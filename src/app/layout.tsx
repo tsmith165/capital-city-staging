@@ -1,25 +1,36 @@
-import '../styles/globals.scss';
-
-import React, { ReactNode } from 'react';
+import React from 'react';
 
 import { ClerkProvider } from '@clerk/nextjs';
-
 import { PHProvider } from '@/app/providers';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
-type LayoutProps = {
-    children: ReactNode;
+import { dark } from '@clerk/themes';
+
+import 'tailwindcss/tailwind.css';
+import '@/styles/globals.css';
+
+interface RootLayoutProps {
+    children: React.ReactNode;
+}
+
+const RootProvider = ({ children }: RootLayoutProps) => {
+    return (
+        <ClerkProvider appearance={{ baseTheme: dark }}>
+            <PHProvider>
+                <NuqsAdapter>{children}</NuqsAdapter>
+            </PHProvider>
+        </ClerkProvider>
+    );
 };
 
-export default function RootLayout({ children }: LayoutProps) {
+export default function RootLayout({ children }: RootLayoutProps) {
     return (
-        <ClerkProvider>
+        <RootProvider>
             <html lang="en">
-                <PHProvider>
-                    <body className="h-full w-full">
-                        <main>{children}</main>
-                    </body>
-                </PHProvider>
+                <body className="h-full w-full">
+                    <main>{children}</main>
+                </body>
             </html>
-        </ClerkProvider>
+        </RootProvider>
     );
 }

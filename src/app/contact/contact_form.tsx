@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { sendContactFormEmail } from './actions';
 import InputTextbox from '@/components/inputs/InputTextbox';
@@ -23,6 +23,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const ContactForm = () => {
+    const [mounted, setMounted] = useState(false);
     const [formData, setFormData] = useState<FormData>({
         name: '',
         email: '',
@@ -33,6 +34,10 @@ const ContactForm = () => {
     });
     const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -79,6 +84,10 @@ const ContactForm = () => {
         }
     };
 
+    if (!mounted) {
+        return null; // Return null on server-side and first render
+    }
+
     return (
         <form onSubmit={handleSubmit} className="space-y-2 lg:space-y-2">
             <div className="flex flex-col space-y-2 lg:flex-row lg:space-x-2 lg:space-y-0">
@@ -102,7 +111,7 @@ const ContactForm = () => {
                 <InputTextbox
                     idName="square_ft"
                     name="Sq Footage"
-                    value={formData.square_ft === null ? '' : `${formData.square_ft.toString()}`}
+                    value={formData.square_ft === null ? '' : formData.square_ft.toString()}
                     onChange={handleChange}
                     placeholder="Enter your home's square footage"
                 />
@@ -113,6 +122,7 @@ const ContactForm = () => {
                     name="Type"
                     value={formData.type}
                     onChange={handleChange}
+                    defaultValue={{ value: 'vacant', label: 'Vacant' }}
                     select_options={[
                         ['vacant', 'Vacant'],
                         ['occupied', 'Occupied'],
@@ -128,11 +138,7 @@ const ContactForm = () => {
             <div className="flex items-center space-x-4">
                 <button
                     type="submit"
-                    className={
-                        'rounded-md px-4 py-2 font-bold ' +
-                        ` bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 text-stone-950` +
-                        ` hover:bg-gradient-to-r hover:from-secondary hover:via-secondary_light hover:to-secondary hover:text-white`
-                    }
+                    className="rounded-md bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 px-4 py-2 font-bold text-stone-950 hover:bg-gradient-to-r hover:from-secondary hover:via-secondary_light hover:to-secondary hover:text-white"
                 >
                     Send details to Mia!
                 </button>

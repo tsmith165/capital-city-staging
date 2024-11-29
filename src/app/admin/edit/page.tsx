@@ -1,4 +1,13 @@
 import { Metadata } from 'next';
+import React, { Suspense } from 'react';
+import { redirect } from 'next/navigation';
+
+import { fetchInventoryById, fetchAdjacentInventoryIds, getMostRecentId } from '@/app/actions';
+import PageLayout from '@/components/layout/PageLayout';
+import Edit from '@/app/admin/edit/Edit';
+import LoadingSpinner from '@/components/layout/LoadingSpinner';
+import { idParser, ParsedParams } from './parsers';
+
 export const metadata: Metadata = {
     title: 'Capital City Staging - Edit Images',
     description:
@@ -31,23 +40,26 @@ export const metadata: Metadata = {
     metadataBase: new URL('https://www.capitalcitystaging.com'),
 };
 
-import React, { Suspense } from 'react';
-
-import { fetchInventoryById, fetchAdjacentInventoryIds, getMostRecentId } from '@/app/actions';
-
-import PageLayout from '@/components/layout/PageLayout';
-import Edit from '@/app/admin/edit/Edit';
-import LoadingSpinner from '@/components/layout/LoadingSpinner';
-import { redirect } from 'next/navigation';
-
 async function fetchInventoryData(id: number) {
     const inventory = await fetchInventoryById(id);
     const { next_id, last_id } = await fetchAdjacentInventoryIds(id);
     return { ...inventory, next_id, last_id };
 }
 
-export default async function Page({ searchParams }: { searchParams: { id?: string } }) {
-    let id = searchParams.id ? parseInt(searchParams.id, 10) : null;
+interface PageProps {
+    searchParams: Promise<{
+        [key: string]: string | string[] | undefined;
+    }>;
+}
+
+export default async function Page({ searchParams }: PageProps) {
+    // Parse search params server-side using nuqs parser
+    const resolvedSearchParams = await searchParams;
+    const parsedParams = {
+        id: idParser.parseServerSide(resolvedSearchParams.id),
+    };
+
+    let id = parsedParams.id ? parseInt(parsedParams.id, 10) : null;
 
     if (!id) {
         // Fetch the most recent ID if no ID is provided

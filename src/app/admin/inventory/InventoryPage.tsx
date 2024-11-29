@@ -1,11 +1,13 @@
-import { fetchInventory } from '@/app/actions';
 import React from 'react';
 import InventoryViewer from './InventoryViewer';
+import { InventoryWithImages } from '@/db/schema';
+import { ParsedParams } from './parsers';
 
-export default async function InventoryPage() {
-    const inventoryData = await fetchInventory();
-
-    return <InventoryViewer items={inventoryData} />;
+interface InventoryPageProps {
+    initialData: InventoryWithImages[];
+    initialParams: ParsedParams;
 }
 
-export const revalidate = 60; // Revalidate this page every 60 seconds
+export default function InventoryPage({ initialData, initialParams }: InventoryPageProps) {
+    return <InventoryViewer items={initialData} initialParams={initialParams} />;
+}

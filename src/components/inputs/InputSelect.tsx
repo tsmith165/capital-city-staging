@@ -31,12 +31,12 @@ const InputSelect: React.FC<InputSelectProps> = ({ defaultValue, idName, name, s
 
     return (
         <div className="m-0 flex w-full p-0">
-            <div 
+            <div
                 className="flex min-w-28 max-w-28 items-center justify-center rounded-l-md bg-secondary_dark px-2.5 py-1.5"
                 data-tooltip-id={`tooltip-${idName}`}
                 data-tooltip-content={formatted_name}
             >
-                <div className="text-stone-400 font-bold">{formatted_name}</div>
+                <div className="font-bold text-stone-400">{formatted_name}</div>
             </div>
             <Tooltip id={`tooltip-${idName}`} place="top" />
             {onChange === undefined ? (
@@ -52,7 +52,7 @@ const InputSelect: React.FC<InputSelectProps> = ({ defaultValue, idName, name, s
                         DropdownIndicator,
                     }}
                     styles={{
-                        control: (baseStyles, state) => ({
+                        control: (baseStyles: any, state: any) => ({
                             ...baseStyles,
                             borderColor: '',
                             backgroundColor: 'var(--tw-bg-stone-400)',
@@ -73,14 +73,14 @@ const InputSelect: React.FC<InputSelectProps> = ({ defaultValue, idName, name, s
                         DropdownIndicator,
                     }}
                     styles={{
-                        control: (baseStyles, state) => ({
+                        control: (baseStyles: any, state: any) => ({
                             ...baseStyles,
                             borderColor: '',
                             backgroundColor: 'var(--tw-bg-stone-400)',
                         }),
                     }}
                     options={react_select_options}
-                    onChange={(selectedOption) =>
+                    onChange={(selectedOption: { value: any }) =>
                         onChange?.({ target: { value: selectedOption?.value, name: idName } } as React.ChangeEvent<HTMLSelectElement>)
                     }
                 />

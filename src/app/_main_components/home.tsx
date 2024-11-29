@@ -79,7 +79,7 @@ export default function Home() {
                     className="absolute inset-0 flex items-center justify-center"
                 >
                     <div className="relative flex h-[350px] w-[350px] items-center justify-center rounded-full bg-stone-900 opacity-70">
-                        <Image src={require('/public/logo/CCS_logo.png')} alt="Capital City Staging Logo" width={300} height={300} />
+                        <Image src={'/logo/CCS_logo.png'} alt="Capital City Staging Logo" width={300} height={300} />
                     </div>
                 </motion.div>
             )}

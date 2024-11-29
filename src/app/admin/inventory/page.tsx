@@ -3,6 +3,8 @@ import React, { Suspense } from 'react';
 import PageLayout from '@/components/layout/PageLayout';
 import InventoryPage from './InventoryPage';
 import Image from 'next/image';
+import { categoryParser, itemIdParser } from './parsers';
+import { fetchInventory } from '@/app/actions';
 
 export const metadata: Metadata = {
     title: 'Capital City Staging - Inventory Management',
@@ -36,22 +38,32 @@ export const metadata: Metadata = {
     metadataBase: new URL('https://www.capitalcitystaging.com'),
 };
 
-export default async function Page() {
+interface PageProps {
+    searchParams: Promise<{
+        [key: string]: string | string[] | undefined;
+    }>;
+}
+
+export default async function Page({ searchParams }: PageProps) {
+    // Await searchParams first
+    const resolvedSearchParams = await searchParams;
+
+    // Parse all search parameters server-side using nuqs parsers
+    const parsedParams = {
+        category: categoryParser.parseServerSide(resolvedSearchParams.category),
+        item: itemIdParser.parseServerSide(resolvedSearchParams.item),
+    };
+
+    // Pre-fetch initial data
+    const inventoryData = await fetchInventory();
+
     return (
         <PageLayout page="/admin/inventory">
-            <Suspense
-                fallback={
-                    <div className="inset-0 flex h-full w-full items-center justify-center">
-                        <div className="xxs:h-[300px] xxs:w-[300px] relative flex h-[250px] w-[250px] items-center justify-center rounded-full bg-stone-900 p-6 opacity-70 xs:h-[350px] xs:w-[350px]">
-                            <Image src="/logo/admin_logo.png" alt="Admin Logo" width={370} height={150} />
-                        </div>
-                    </div>
-                }
-            >
-                <InventoryPage />
+            <Suspense>
+                <InventoryPage initialData={inventoryData} initialParams={parsedParams} />
             </Suspense>
         </PageLayout>
     );
 }
 
-export const revalidate = 60; // Revalidate this page every 60 seconds
+export const revalidate = 60;
