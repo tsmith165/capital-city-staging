@@ -21,5 +21,10 @@ export default clerkMiddleware(async (auth, req) => {
 });
 
 export const config = {
-    matcher: ['/admin/:path*', '/api/uploadthing'],
+    matcher: [
+        // Match all routes starting with /admin/
+        '/admin/:path*',
+        // Match the uploadthing API route
+        '/api/uploadthing',
+    ],
 };

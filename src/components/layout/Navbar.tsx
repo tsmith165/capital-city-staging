@@ -8,6 +8,7 @@ import { navbar_menu_list } from '@/lib/menu_list';
 import { useStore } from '@/stores/store';
 import { IoIosMenu } from 'react-icons/io';
 import { Protect } from '@clerk/nextjs';
+import { useIsAdmin } from '@/utils/auth/useIsAdmin';
 import AdminProtect from '@/utils/auth/AdminProtect';
 
 import dynamic from 'next/dynamic';
@@ -111,20 +112,16 @@ export default function Navbar({ page }: { page: string }) {
                 <div className="hidden flex-1 flex-row items-center justify-start space-x-4 md:flex">{rightNavbar}</div>
                 <div className="flex w-full flex-row items-center justify-end space-x-4 pr-[55px] pt-[10px] md:hidden">{navbar}</div>
             </div>
-            <Protect fallback={<></>}>
-                <AdminProtect fallback={<></>}>
-                    <div className="group p-0" onMouseEnter={() => setShowMenu(true)} onMouseLeave={() => setShowMenu(false)}>
-                        <IoIosMenu
-                            className={`absolute right-0 top-0 h-[50px] w-[50px] fill-primary_dark py-[5px] pr-2 group-hover:fill-primary`}
-                        />
-                        {showMenu && (
-                            <div className="absolute right-0 top-[50px] z-50 h-fit w-[160px] rounded-bl-md border-b-2 border-l-2 border-primary_dark bg-secondary_light">
-                                <DynamicMenuOverlay currentPage={page} isAdmin={true} />
-                            </div>
-                        )}
+            <div className="group p-0" onMouseEnter={() => setShowMenu(true)} onMouseLeave={() => setShowMenu(false)}>
+                <IoIosMenu
+                    className={`absolute right-0 top-0 h-[50px] w-[50px] fill-primary_dark py-[5px] pr-2 group-hover:fill-primary`}
+                />
+                {showMenu && (
+                    <div className="absolute right-0 top-[50px] z-50 h-fit w-[160px] rounded-bl-md border-b-2 border-l-2 border-primary_dark bg-secondary_light">
+                        <DynamicMenuOverlay currentPage={page} isAdmin={useIsAdmin()} />
                     </div>
-                </AdminProtect>
-            </Protect>
+                )}
+            </div>
         </nav>
     );
 }
