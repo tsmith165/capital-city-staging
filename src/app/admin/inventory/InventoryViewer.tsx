@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef, useCallback, useMemo, MutableRefObject } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useQueryStates, useQueryState } from 'nuqs';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -66,7 +66,7 @@ const InventoryViewer: React.FC<InventoryViewerProps> = ({ items, initialParams 
     const [speed, setSpeed] = useState(3000);
     const [mounted, setMounted] = useState(false);
 
-    const selectedImageRef = useRef<HTMLDivElement>(null) as MutableRefObject<HTMLDivElement>;
+    const selectedImageRef = useRef<HTMLDivElement>(null);
 
     const selectedItem = useMemo(() => (selectedItemIndex !== null ? items[selectedItemIndex] : null), [items, selectedItemIndex]);
 

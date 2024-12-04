@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tooltip } from 'react-tooltip';
 import { FaSlidersH, FaCouch, FaTable, FaChair, FaBed, FaBan, FaToilet, FaPaintBrush, FaBook } from 'react-icons/fa';
-import { GiPillow } from 'react-icons/gi';
+import { GiPillow, GiBookshelf } from 'react-icons/gi';
 import { IoIosAddCircleOutline } from 'react-icons/io';
 import { PiDesk } from 'react-icons/pi';
 import { FaRug } from 'react-icons/fa6';
@@ -15,6 +15,7 @@ const CATEGORY_FILTERS: [string, string, React.ComponentType<{ className?: strin
     ['Chair', 'chair', FaChair],
     ['Bedroom', 'bedroom', FaBed],
     ['Pillow', 'pillow', GiPillow],
+    ['Bookcase', 'bookcase', GiBookshelf],
     ['Bathroom', 'bathroom', FaToilet],
     ['Kitchen', 'kitchen', GiForkKnifeSpoon],
     ['Bookcase', 'bookcase', FaBook],

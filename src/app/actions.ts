@@ -19,7 +19,11 @@ export async function fetchInventory(): Promise<InventoryWithImages[]> {
     console.log(`Captured inventory successfully`);
 
     const formattedInventory = inventoryWithImages.reduce<InventoryWithImages[]>((acc, curr) => {
-        const inventory = curr.inventory;
+        const inventory = {
+            ...curr.inventory,
+            extraImages: [],
+        } as unknown as InventoryWithImages;
+
         const extraImage = curr.extraImages;
 
         const existingInventory = acc.find((p) => p.id === inventory.id);
@@ -29,10 +33,11 @@ export async function fetchInventory(): Promise<InventoryWithImages[]> {
                 existingInventory.extraImages.push(extraImage);
             }
         } else {
-            acc.push({
+            const newInventoryItem: InventoryWithImages = {
                 ...inventory,
                 extraImages: extraImage ? [extraImage] : [],
-            });
+            };
+            acc.push(newInventoryItem);
         }
 
         return acc;
