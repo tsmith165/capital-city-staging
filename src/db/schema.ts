@@ -56,6 +56,27 @@ export const resendCoreTable = pgTable('resendCoreTable', {
 export type ResendCore = InferSelectModel<typeof resendCoreTable>;
 export type InsertResendCore = InferInsertModel<typeof resendCoreTable>;
 
-export type InventoryWithImages = Inventory & {
+export interface InventoryWithImages {
+    id: number;
+    name: string;
+    category: string | null;
+    description: string | null;
+    location: string | null;
+    status: string | null;
+    quantity: number | null;
+    notes: string | null;
+    image_path: string;
+    width: number | null;
+    height: number | null;
+    depth: number | null;
+    created_at: string | null;
+    updated_at: string | null;
+    small_image_path: string | null;
+    small_width: number | null;
+    small_height: number | null;
     extraImages: ExtraImages[];
-};
+    vendor: string | null;
+    cost: number | null;
+    list_price: number | null;
+    count: number | null;
+}

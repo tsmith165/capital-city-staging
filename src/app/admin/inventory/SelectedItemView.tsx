@@ -170,16 +170,32 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
                     </div>
                 </div>
             </div>
-            <div className="flex h-fit w-full flex-col items-center space-y-2">
-                <p className="text-lg font-bold text-primary">{selectedItem.category}</p>
-                <p className="text-lg font-bold text-primary">
-                    {`${selectedItem.real_width}" x ${selectedItem.real_height}" x ${selectedItem.real_depth}"`}
-                </p>
-                <p className="text-lg font-bold text-primary">${selectedItem.price}</p>
-                <p className="text-lg font-bold text-primary">Vendor: {selectedItem.vendor}</p>
-                <p className="text-lg text-primary">Location: {selectedItem.location}</p>
-                <p className="text-lg text-primary">In Stock: {selectedItem.count}</p>
-                <p className="text-center text-primary">{selectedItem.description}</p>
+            <div className="flex h-fit w-full flex-col space-y-2">
+                <div className="grid w-full grid-cols-2 gap-2 px-4">
+                    <p className="text-lg font-bold text-primary">Category:</p>
+                    <p className="text-lg text-primary">{selectedItem.category}</p>
+
+                    <p className="text-lg font-bold text-primary">Dimensions:</p>
+                    <p className="text-lg text-primary">
+                        {`${selectedItem.width}in. x ${selectedItem.height}in.` + (selectedItem.depth ? ` x ${selectedItem.depth}in.` : '')}
+                    </p>
+
+                    <p className="text-lg font-bold text-primary">Price:</p>
+                    <p className="text-lg text-primary">${selectedItem.cost}</p>
+
+                    <p className="text-lg font-bold text-primary">List Price:</p>
+                    <p className="text-lg text-primary">${selectedItem.list_price}</p>
+
+                    <p className="text-lg font-bold text-primary">Vendor:</p>
+                    <p className="text-lg text-primary">{selectedItem.vendor}</p>
+
+                    <p className="text-lg font-bold text-primary">Location:</p>
+                    <p className="text-lg text-primary">{selectedItem.location}</p>
+
+                    <p className="text-lg font-bold text-primary">In Stock:</p>
+                    <p className="text-lg text-primary">{selectedItem.count}</p>
+                </div>
+                <p className="mt-4 max-w-md px-4 text-center text-lg text-primary">{selectedItem.description}</p>
             </div>
         </motion.div>
     );

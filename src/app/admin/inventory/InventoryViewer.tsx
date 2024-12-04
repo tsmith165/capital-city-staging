@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
-import { useQueryStates } from 'nuqs';
+import React, { useEffect, useState, useRef, useCallback, useMemo, MutableRefObject } from 'react';
+import { useQueryStates, useQueryState } from 'nuqs';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import Masonry from 'react-masonry-css';
@@ -33,7 +33,15 @@ const InventoryViewer: React.FC<InventoryViewerProps> = ({ items, initialParams 
         },
     );
 
-    const { category, filterMenuOpen, setFilterMenuOpen, setItemList, setCategory } = useInventoryStore((state) => ({
+    const [category] = useQueryState('category');
+
+    const {
+        category: storeCategory,
+        filterMenuOpen,
+        setFilterMenuOpen,
+        setItemList,
+        setCategory,
+    } = useInventoryStore((state) => ({
         category: state.category,
         filterMenuOpen: state.filterMenuOpen,
         setFilterMenuOpen: state.setFilterMenuOpen,
@@ -58,7 +66,7 @@ const InventoryViewer: React.FC<InventoryViewerProps> = ({ items, initialParams 
     const [speed, setSpeed] = useState(3000);
     const [mounted, setMounted] = useState(false);
 
-    const selectedImageRef = useRef<HTMLDivElement>(null);
+    const selectedImageRef = useRef<HTMLDivElement>(null) as MutableRefObject<HTMLDivElement>;
 
     const selectedItem = useMemo(() => (selectedItemIndex !== null ? items[selectedItemIndex] : null), [items, selectedItemIndex]);
 
@@ -81,7 +89,7 @@ const InventoryViewer: React.FC<InventoryViewerProps> = ({ items, initialParams 
     const filteredItems = useMemo(() => {
         return items.filter((item) => {
             const item_category = item.category || 'None';
-            if (category !== 'None' && category) {
+            if (category && category !== 'None') {
                 return item_category.includes(category);
             }
             return true;
@@ -210,7 +218,11 @@ const InventoryViewer: React.FC<InventoryViewerProps> = ({ items, initialParams 
                     <SelectedItemView
                         selectedItem={selectedItem}
                         currentImageIndex={currentImageIndex}
-                        imageList={imageList}
+                        imageList={imageList.map((img) => ({
+                            ...img,
+                            width: img.width ?? 0,
+                            height: img.height ?? 0,
+                        }))}
                         imageLoadStates={imageLoadStates}
                         handleImageLoad={handleImageLoad}
                         setIsFullScreenImage={setIsFullScreenImage}
@@ -251,7 +263,11 @@ const InventoryViewer: React.FC<InventoryViewerProps> = ({ items, initialParams 
                     selectedItem={selectedItem}
                     currentImageIndex={currentImageIndex}
                     setCurrentImageIndex={setCurrentImageIndex}
-                    imageList={imageList}
+                    imageList={imageList.map((img) => ({
+                        ...img,
+                        width: img.width ?? 0,
+                        height: img.height ?? 0,
+                    }))}
                     isPlaying={isPlaying}
                     setIsPlaying={setIsPlaying}
                     setIsFullScreenImage={setIsFullScreenImage}
