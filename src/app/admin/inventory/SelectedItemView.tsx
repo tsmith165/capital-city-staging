@@ -126,7 +126,7 @@ const InventoryDetailItem: React.FC<InventoryDetailItemProps> = ({
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
                         disabled={isPending}
-                        className="flex-grow rounded-md border border-stone-400 bg-stone-400 px-2 py-1.5 text-sm font-bold text-stone-950 focus:border-primary focus:outline-none md:text-base"
+                        className="flex-grow rounded-md border border-stone-400 bg-stone-400 px-2 text-sm font-bold text-stone-950 focus:border-primary focus:outline-none md:text-base"
                     >
                         {CATEGORY_OPTIONS.map(([value, label]) => (
                             <option key={value} value={value}>
@@ -148,38 +148,38 @@ const InventoryDetailItem: React.FC<InventoryDetailItemProps> = ({
             return (
                 <div className="flex flex-grow items-center space-x-2">
                     <div className="flex flex-grow space-x-2">
-                        <span className="w-fit text-nowrap text-base leading-[48px] text-secondary_light">W:</span>
+                        <span className="w-fit text-nowrap text-base leading-6 text-secondary_light">W:</span>
                         <input
                             type="text"
                             value={dimensionValues.width}
                             onChange={(e) => setDimensionValues((prev) => ({ ...prev, width: e.target.value }))}
                             placeholder="Width"
-                            className="w-12 rounded-md border border-stone-400 bg-white px-2 py-1 text-base text-secondary_light focus:border-primary focus:outline-none md:text-lg"
+                            className="h-6 w-8 rounded-md border border-stone-400 bg-white px-1 text-sm text-secondary_light focus:border-primary focus:outline-none md:w-12 md:text-base"
                             disabled={isPending}
                         />
-                        <span className="w-fit text-nowrap text-base leading-[48px] text-secondary_light">H:</span>
+                        <span className="w-fit text-nowrap text-base leading-6 text-secondary_light">H:</span>
                         <input
                             type="text"
                             value={dimensionValues.height}
                             onChange={(e) => setDimensionValues((prev) => ({ ...prev, height: e.target.value }))}
                             placeholder="Height"
-                            className="w-12 rounded-md border border-stone-400 bg-white px-2 py-1 text-base text-secondary_light focus:border-primary focus:outline-none md:text-lg"
+                            className="h-6 w-8 rounded-md border border-stone-400 bg-white px-1 text-sm text-secondary_light focus:border-primary focus:outline-none md:w-12 md:text-base"
                             disabled={isPending}
                         />
-                        <span className="w-fit text-nowrap text-base leading-[48px] text-secondary_light">D:</span>
+                        <span className="w-fit text-nowrap text-base leading-6 text-secondary_light">D:</span>
                         <input
                             type="text"
                             value={dimensionValues.depth}
                             onChange={(e) => setDimensionValues((prev) => ({ ...prev, depth: e.target.value }))}
                             placeholder="Depth"
-                            className="w-12 rounded-md border border-stone-400 bg-white px-2 py-1 text-base text-secondary_light focus:border-primary focus:outline-none md:text-lg"
+                            className="h-6 w-8 rounded-md border border-stone-400 bg-white px-1 text-sm text-secondary_light focus:border-primary focus:outline-none md:w-12 md:text-base"
                             disabled={isPending}
                         />
                     </div>
-                    <button onClick={handleSubmit} disabled={isPending} className="rounded-md p-1 text-green-600 hover:bg-green-100">
+                    <button onClick={handleSubmit} disabled={isPending} className="rounded-md text-green-600 hover:bg-green-100">
                         <FaCheck />
                     </button>
-                    <button onClick={handleCancel} disabled={isPending} className="rounded-md p-1 text-red-600 hover:bg-red-100">
+                    <button onClick={handleCancel} disabled={isPending} className="rounded-md text-red-600 hover:bg-red-100">
                         <FaTimes />
                     </button>
                 </div>
@@ -207,12 +207,14 @@ const InventoryDetailItem: React.FC<InventoryDetailItemProps> = ({
 
     return (
         <div className="group mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-300">
-            <p className="w-[100px] text-base font-bold text-primary_dark group-hover:text-secondary_dark md:text-lg">{label}:</p>
+            <p className="w-[80px] text-sm font-bold text-primary_dark group-hover:text-secondary_dark md:w-[100px] md:text-base">
+                {label}:
+            </p>
             {isEditing ? (
                 renderEditContent()
             ) : (
                 <div className="flex flex-grow items-center justify-between">
-                    <p className="text-base text-secondary_light md:text-lg">
+                    <p className="text-sm text-secondary_light md:text-base">
                         {fieldName === 'cost' || fieldName === 'price' ? `$${value}` : value}
                     </p>
                     {isAdmin && (
