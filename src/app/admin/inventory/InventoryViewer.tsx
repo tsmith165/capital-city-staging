@@ -99,16 +99,19 @@ const InventoryViewer: React.FC<InventoryViewerProps> = ({ items, initialParams 
     const handleItemClick = useCallback(
         (id: number, index: number) => {
             if (selectedItemIndex === index) {
+                console.log('Selected item equals current index.  Scrolling to item.');
                 selectedImageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 return;
             }
+            console.log('Selected item does not equal current index.  Setting new index.');
+            console.log('Setting item to ID: ', id, 'Index: ', index);
             setCurrentImageIndex(0);
             setSelectedItemIndex(index);
             setParams({ item: id.toString() });
             setImageLoadStates({});
             selectedImageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         },
-        [selectedItemIndex, setParams],
+        [selectedItemIndex, setParams, filteredItems],
     );
 
     const renderedItems = useMemo(() => {
@@ -194,17 +197,37 @@ const InventoryViewer: React.FC<InventoryViewerProps> = ({ items, initialParams 
 
     const handleNextItem = useCallback(() => {
         if (selectedItemIndex === null) return;
-        const nextIndex = (selectedItemIndex + 1) % filteredItems.length;
-        const nextItem = filteredItems[nextIndex];
-        handleItemClick(nextItem.id, nextIndex);
-    }, [selectedItemIndex, filteredItems, handleItemClick]);
+
+        // Find current item in filtered list
+        const currentItem = items[selectedItemIndex];
+        const currentFilteredIndex = filteredItems.findIndex((item) => item.id === currentItem.id);
+
+        // Get next item from filtered list
+        const nextFilteredIndex = (currentFilteredIndex + 1) % filteredItems.length;
+        const nextItem = filteredItems[nextFilteredIndex];
+
+        // Find that item's index in full list
+        const nextFullIndex = items.findIndex((item) => item.id === nextItem.id);
+
+        handleItemClick(nextItem.id, nextFullIndex);
+    }, [selectedItemIndex, filteredItems, items, handleItemClick]);
 
     const handlePrevItem = useCallback(() => {
         if (selectedItemIndex === null) return;
-        const prevIndex = (selectedItemIndex - 1 + filteredItems.length) % filteredItems.length;
-        const prevItem = filteredItems[prevIndex];
-        handleItemClick(prevItem.id, prevIndex);
-    }, [selectedItemIndex, filteredItems, handleItemClick]);
+
+        // Find current item in filtered list
+        const currentItem = items[selectedItemIndex];
+        const currentFilteredIndex = filteredItems.findIndex((item) => item.id === currentItem.id);
+
+        // Get prev item from filtered list
+        const prevFilteredIndex = (currentFilteredIndex - 1 + filteredItems.length) % filteredItems.length;
+        const prevItem = filteredItems[prevFilteredIndex];
+
+        // Find that item's index in full list
+        const prevFullIndex = items.findIndex((item) => item.id === prevItem.id);
+
+        handleItemClick(prevItem.id, prevFullIndex);
+    }, [selectedItemIndex, filteredItems, items, handleItemClick]);
 
     if (!mounted) {
         return null; // Return null on server-side and first render
