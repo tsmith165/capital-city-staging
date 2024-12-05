@@ -148,10 +148,15 @@ export async function getInventoryToVerify(): Promise<{ success: boolean; invent
     try {
         const inventory = await db.select().from(inventoryTable).execute();
         const extraImages = await db.select().from(extraImagesTable).execute();
-        const inventoryWithImages: InventoryWithImages[] = inventory.map((item: Inventory) => ({
-            ...item,
-            extraImages: extraImages.filter((extra: ExtraImages) => extra.inventory_id === item.id),
-        }));
+
+        const inventoryWithImages = inventory.map((item: Inventory) => {
+            const inventoryItem = {
+                ...item,
+                extraImages: extraImages.filter((extra: ExtraImages) => extra.inventory_id === item.id),
+            } as unknown as InventoryWithImages;
+            return inventoryItem;
+        });
+
         return { success: true, inventory: inventoryWithImages };
     } catch (error) {
         console.error('Error fetching pieces:', error);
