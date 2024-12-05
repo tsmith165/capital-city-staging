@@ -54,7 +54,6 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
             transition={{ duration: 0.75 }}
         >
             <div className="relative flex w-fit cursor-pointer flex-col items-center justify-center space-y-2 pb-2">
-                <h1 className="font-cinzel pb-2 text-center text-2xl font-bold text-primary">{selectedItem.name}</h1>
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={`${selectedItemIndex}-${currentImageIndex}`}
@@ -170,16 +169,38 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
                     </div>
                 </div>
             </div>
-            <div className="flex h-fit w-full flex-col items-center space-y-2">
-                <p className="text-lg font-bold text-primary">{selectedItem.category}</p>
-                <p className="text-lg font-bold text-primary">
-                    {`${selectedItem.real_width}" x ${selectedItem.real_height}" x ${selectedItem.real_depth}"`}
-                </p>
-                <p className="text-lg font-bold text-primary">${selectedItem.price}</p>
-                <p className="text-lg font-bold text-primary">Vendor: {selectedItem.vendor}</p>
-                <p className="text-lg text-primary">Location: {selectedItem.location}</p>
-                <p className="text-lg text-primary">In Stock: {selectedItem.count}</p>
-                <p className="text-center text-primary">{selectedItem.description}</p>
+            <div className="flex h-fit w-full flex-col space-y-2">
+                <h1 className="font-cinzel pb-2 text-center text-2xl font-bold text-primary">{selectedItem.name}</h1>
+                <div className="mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-200">
+                    <p className="w-[100px] text-lg font-bold text-primary_dark">Category:</p>
+                    <p className="text-lg text-secondary_light">{selectedItem.category}</p>
+                </div>
+                <div className="mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-200">
+                    <p className="w-[100px] text-lg font-bold text-primary_dark">Dimensions:</p>
+                    <p className="text-lg text-secondary_light">
+                        {`${selectedItem.width}in. x ${selectedItem.height}in.` + (selectedItem.depth ? ` x ${selectedItem.depth}in.` : '')}
+                    </p>
+                </div>
+                <div className="mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-200">
+                    <p className="w-[100px] text-lg font-bold text-primary_dark">Price:</p>
+                    <p className="text-lg text-secondary_light">${selectedItem.cost}</p>
+                </div>
+                <div className="mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-200">
+                    <p className="w-[100px] text-lg font-bold text-primary_dark">Vendor:</p>
+                    <p className="text-lg text-secondary_light">{selectedItem.vendor}</p>
+                </div>
+                <div className="mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-200">
+                    <p className="w-[100px] text-lg font-bold text-primary_dark">Location:</p>
+                    <p className="text-lg text-secondary_light">{selectedItem.location}</p>
+                </div>
+                <div className="mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-200">
+                    <p className="w-[100px] text-lg font-bold text-primary_dark">In Stock:</p>
+                    <p className="text-lg text-secondary_light">{selectedItem.count}</p>
+                </div>
+                <div className="mx-4 flex flex-col justify-center space-x-4 px-2">
+                    <p className="w-[100px] text-lg font-bold text-primary_dark">Description:</p>
+                    <p className="text-lg text-secondary_light">{selectedItem.description}</p>
+                </div>
             </div>
         </motion.div>
     );

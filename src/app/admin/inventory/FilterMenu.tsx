@@ -1,22 +1,24 @@
 import React from 'react';
 import { Tooltip } from 'react-tooltip';
 import { FaSlidersH, FaCouch, FaTable, FaChair, FaBed, FaBan, FaToilet, FaPaintBrush, FaBook } from 'react-icons/fa';
+import { GiPillow, GiBookshelf } from 'react-icons/gi';
 import { IoIosAddCircleOutline } from 'react-icons/io';
 import { PiDesk } from 'react-icons/pi';
 import { FaRug } from 'react-icons/fa6';
 import { RiPlantLine } from 'react-icons/ri';
 import { GiCandles, GiParkBench, GiBarStool, GiForkKnifeSpoon, GiBedLamp } from 'react-icons/gi';
-
-import useInventoryStore from '@/stores/inventory_store';
+import { useQueryState } from 'nuqs';
 
 const CATEGORY_FILTERS: [string, string, React.ComponentType<{ className?: string }>][] = [
     ['Couch', 'couch', FaCouch],
     ['Table', 'table', FaTable],
     ['Chair', 'chair', FaChair],
     ['Bedroom', 'bedroom', FaBed],
+    ['Pillow', 'pillow', GiPillow],
+    ['Bookcase', 'bookcase', GiBookshelf],
+    ['Book', 'book', FaBook],
     ['Bathroom', 'bathroom', FaToilet],
     ['Kitchen', 'kitchen', GiForkKnifeSpoon],
-    ['Bookcase', 'bookcase', FaBook],
     ['Lamp', 'lamp', GiBedLamp],
     ['Art', 'art', FaPaintBrush],
     ['Decor', 'decor', GiCandles],
@@ -24,19 +26,14 @@ const CATEGORY_FILTERS: [string, string, React.ComponentType<{ className?: strin
     ['Barstool', 'barstool', GiBarStool],
     ['Rug', 'rug', FaRug],
     ['Plant', 'plant', RiPlantLine],
-    ['Book', 'book', FaBook],
     ['Desk', 'desk', PiDesk],
     ['Other', 'other', IoIosAddCircleOutline],
     ['None', 'none', FaBan],
 ];
 
 const FilterMenu: React.FC = () => {
-    const { category, filterMenuOpen, setCategory, setFilterMenuOpen } = useInventoryStore((state) => ({
-        category: state.category,
-        filterMenuOpen: state.filterMenuOpen,
-        setCategory: state.setCategory,
-        setFilterMenuOpen: state.setFilterMenuOpen,
-    }));
+    const [category, setCategory] = useQueryState('category');
+    const [filterMenuOpen, setFilterMenuOpen] = React.useState(false);
 
     return (
         <div onMouseEnter={() => setFilterMenuOpen(true)} onMouseLeave={() => setFilterMenuOpen(false)}>
@@ -62,7 +59,7 @@ const FilterMenu: React.FC = () => {
                             }`}
                             onClick={(e) => {
                                 e.preventDefault();
-                                setCategory(filter);
+                                setCategory(filter === 'None' ? null : filter);
                             }}
                         >
                             <Icon
