@@ -43,18 +43,7 @@ export const metadata: Metadata = {
 async function fetchInventoryData(id: number) {
     const inventory = await fetchInventoryById(id);
     const { next_id, last_id } = await fetchAdjacentInventoryIds(id);
-
-    // Fetch next and previous inventory data in parallel
-    const [nextInventory, lastInventory] = await Promise.all([
-        next_id ? fetchInventoryById(next_id) : null,
-        last_id ? fetchInventoryById(last_id) : null,
-    ]);
-
-    return {
-        current: { ...inventory, next_id, last_id },
-        next: nextInventory,
-        last: lastInventory,
-    };
+    return { ...inventory, next_id, last_id };
 }
 
 interface PageProps {
@@ -86,19 +75,12 @@ export default async function Page({ searchParams }: PageProps) {
         }
     }
 
-    const inventoryDataPromise = fetchInventoryData(id).then((data) => data.current);
-    const nextInventoryPromise = fetchInventoryData(id).then((data) => data.next);
-    const lastInventoryPromise = fetchInventoryData(id).then((data) => data.last);
+    const inventoryDataPromise = fetchInventoryData(id);
 
     return (
         <PageLayout page={`/edit?id=${id}`}>
             <Suspense fallback={<LoadingSpinner page="Edit" />}>
-                <Edit
-                    inventoryDataPromise={inventoryDataPromise}
-                    nextInventoryPromise={nextInventoryPromise}
-                    lastInventoryPromise={lastInventoryPromise}
-                    current_id={id}
-                />
+                <Edit inventoryDataPromise={inventoryDataPromise} current_id={id} />
             </Suspense>
         </PageLayout>
     );

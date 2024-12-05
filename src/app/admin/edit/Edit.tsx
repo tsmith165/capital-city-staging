@@ -11,46 +11,24 @@ import InventoryOrderPanel from './InventoryOrderPanel';
 import { handleTitleUpdate } from './actions';
 import LoadingSpinner from '@/components/layout/LoadingSpinner';
 import { idParser } from './parsers';
-import { useRouter } from 'next/navigation';
-import { preloadImage } from '@/utils/imageUtils';
 
 interface EditProps {
     inventoryDataPromise: Promise<any>;
     current_id: number;
-    nextInventoryPromise: Promise<any>;
-    lastInventoryPromise: Promise<any>;
 }
 
-const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id, nextInventoryPromise, lastInventoryPromise }) => {
-    const router = useRouter();
+const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
     const [id, setId] = useQueryState('id', idParser);
     const [inventoryData, setInventoryData] = useState<any>(null);
-    const [nextInventory, setNextInventory] = useState<any>(null);
-    const [lastInventory, setLastInventory] = useState<any>(null);
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
     const [titleInput, setTitleInput] = useState('');
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [currentData, nextData, lastData] = await Promise.all([
-                    inventoryDataPromise,
-                    nextInventoryPromise,
-                    lastInventoryPromise,
-                ]);
-
-                setInventoryData(currentData);
-                setNextInventory(nextData);
-                setLastInventory(lastData);
-                setTitleInput(currentData.name || '');
-
-                if (nextData?.image_path) {
-                    preloadImage(nextData.image_path);
-                }
-                if (lastData?.image_path) {
-                    preloadImage(lastData.image_path);
-                }
-
+                const data = await inventoryDataPromise;
+                setInventoryData(data);
+                setTitleInput(data.name || '');
                 console.log(`LOADING EDIT DETAILS PAGE - Inventory ID: ${current_id}`);
             } catch (error) {
                 console.error('Error fetching inventory data:', error);
@@ -59,7 +37,7 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id, nextInven
         };
 
         fetchData();
-    }, [inventoryDataPromise, nextInventoryPromise, lastInventoryPromise, current_id]);
+    }, [inventoryDataPromise, current_id]);
 
     const handleTitleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTitleInput(e.target.value);
@@ -76,6 +54,7 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id, nextInven
             const result = await handleTitleUpdate(formData);
             if (result.success) {
                 setSubmitMessage({ type: 'success', text: 'Title updated successfully!' });
+                // Refresh the inventory data to reflect the new title
                 const updatedData = await inventoryDataPromise;
                 setInventoryData(updatedData);
             } else {
@@ -86,16 +65,8 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id, nextInven
         }
     };
 
-    const handleNavigate = async (direction: 'next' | 'last') => {
-        const newData = direction === 'next' ? nextInventory : lastInventory;
-        if (!newData) return;
-
-        setInventoryData(newData);
-        setTitleInput(newData.name || '');
-
-        await setId(newData.id.toString());
-
-        router.push(`/admin/edit?id=${newData.id}`, { scroll: false });
+    const handleNavigate = async (newId: number) => {
+        await setId(newId.toString());
     };
 
     if (!inventoryData) {
@@ -120,20 +91,12 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id, nextInven
             <div className="h-2/3 overflow-y-auto md:h-full md:w-3/5 lg:w-1/2">
                 <div className="flex h-fit flex-row items-center space-x-2 p-2">
                     <div className="flex h-[48px] flex-col space-y-1">
-                        <button
-                            onClick={() => handleNavigate('next')}
-                            disabled={!nextInventory}
-                            className="h-[22px] w-8 cursor-pointer rounded-lg bg-secondary hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            <IoIosArrowUp className="h-full w-full fill-stone-400 hover:fill-secondary_dark" />
-                        </button>
-                        <button
-                            onClick={() => handleNavigate('last')}
-                            disabled={!lastInventory}
-                            className="h-[22px] w-8 cursor-pointer rounded-lg bg-secondary hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            <IoIosArrowDown className="h-full w-full fill-stone-400 hover:fill-secondary_dark" />
-                        </button>
+                        <Link href={`/admin/edit?id=${next_id}`}>
+                            <IoIosArrowUp className="h-[22px] w-8 cursor-pointer rounded-lg bg-secondary fill-stone-400 hover:bg-primary hover:fill-secondary_dark" />
+                        </Link>
+                        <Link href={`/admin/edit?id=${last_id}`}>
+                            <IoIosArrowDown className="h-[22px] w-8 cursor-pointer rounded-lg bg-secondary fill-stone-400 hover:bg-primary hover:fill-secondary_dark" />
+                        </Link>
                     </div>
                     <Link href={`/admin/inventory/?item=${current_id}`}>
                         <MdPageview className="h-[48px] w-[48px] cursor-pointer rounded-lg bg-secondary fill-stone-400 p-1 hover:bg-primary hover:fill-secondary_dark" />
