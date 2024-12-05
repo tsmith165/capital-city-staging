@@ -49,7 +49,7 @@ const FilterMenu: React.FC = () => {
     }, []);
 
     return (
-        <div onMouseEnter={() => setFilterMenuOpen(true)} onMouseLeave={() => setFilterMenuOpen(false)}>
+        <div onMouseEnter={() => setFilterMenuOpen(true)}>
             <div
                 className={
                     `group absolute bottom-0 right-0 z-10 flex flex-row p-[5px] ` +
