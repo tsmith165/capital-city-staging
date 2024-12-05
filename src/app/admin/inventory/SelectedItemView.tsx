@@ -380,22 +380,22 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
                     </div>
                 </div>
             </div>
-            <div className="flex h-fit w-full flex-col space-y-0.5 md:w-3/5">
+            <div className="flex h-full w-full flex-col space-y-0.5 md:w-3/5">
                 <div className="flex items-center justify-start space-x-2">
                     <div className="flex flex-col items-center justify-center space-y-0.5">
                         <button
                             onClick={handlePrevItem}
-                            className="group rounded-md bg-secondary_dark p-0.5 hover:bg-secondary_light"
+                            className="group rounded-md bg-secondary_dark p-0.5 hover:bg-primary_dark"
                             aria-label="Previous item"
                         >
-                            <IoIosArrowBack className="rotate-90 fill-stone-300 text-2xl group-hover:fill-secondary_dark" />
+                            <IoIosArrowBack className="rotate-90 fill-primary text-2xl group-hover:fill-secondary_dark" />
                         </button>
                         <button
                             onClick={handleNextItem}
-                            className="group rounded-md bg-secondary_dark p-0.5 hover:bg-secondary_light"
+                            className="group rounded-md bg-secondary_dark p-0.5 hover:bg-primary_dark"
                             aria-label="Next item"
                         >
-                            <IoIosArrowBack className="-rotate-90 fill-stone-300 text-2xl group-hover:fill-secondary_dark" />
+                            <IoIosArrowBack className="-rotate-90 fill-primary text-2xl group-hover:fill-secondary_dark" />
                         </button>
                     </div>
                     <h1 className="font-cinzel text-start text-lg font-bold text-secondary_light md:text-xl">{selectedItem.name}</h1>
