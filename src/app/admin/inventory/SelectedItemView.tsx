@@ -1,9 +1,14 @@
+'use client';
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IoIosArrowForward, IoIosArrowBack, IoIosSpeedometer } from 'react-icons/io';
-import { FaPlay, FaPause, FaEdit } from 'react-icons/fa';
+import { FaPlay, FaPause, FaEdit, FaCheck, FaTimes } from 'react-icons/fa';
 import { InventoryWithImages } from '@/db/schema';
 import Link from 'next/link';
+import { useUser } from '@clerk/nextjs';
+import { updateInventoryField } from '@/app/actions';
+import InputSelect from '@/components/inputs/InputSelect';
 
 interface SelectedItemViewProps {
     selectedItem: InventoryWithImages;
@@ -22,6 +27,208 @@ interface SelectedItemViewProps {
     setSpeed: (speed: number) => void;
 }
 
+interface InventoryDetailItemProps {
+    label: string;
+    value: string | number;
+    itemId: number;
+    fieldName: string;
+    isAdmin: boolean;
+    realWidth?: number | null;
+    realHeight?: number | null;
+    realDepth?: number | null;
+}
+
+const CATEGORY_OPTIONS: [string, string][] = [
+    ['Couch', 'Couch'],
+    ['Table', 'Table'],
+    ['Chair', 'Chair'],
+    ['Bedroom', 'Bedroom'],
+    ['Bathroom', 'Bathroom'],
+    ['Kitchen', 'Kitchen'],
+    ['Pillow', 'Pillow'],
+    ['Bookcase', 'Bookcase'],
+    ['Book', 'Book'],
+    ['Lamp', 'Lamp'],
+    ['Art', 'Art'],
+    ['Decor', 'Decor'],
+    ['Bench', 'Bench'],
+    ['Barstool', 'Barstool'],
+    ['Rug', 'Rug'],
+    ['Plant', 'Plant'],
+    ['Desk', 'Desk'],
+    ['Other', 'Other'],
+];
+
+const InventoryDetailItem: React.FC<InventoryDetailItemProps> = ({
+    label,
+    value,
+    itemId,
+    fieldName,
+    isAdmin,
+    realWidth,
+    realHeight,
+    realDepth,
+}) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editValue, setEditValue] = useState(value.toString());
+    const [dimensionValues, setDimensionValues] = useState({
+        width: realWidth?.toString() ?? '',
+        height: realHeight?.toString() ?? '',
+        depth: realDepth?.toString() ?? '',
+    });
+    const [isPending, setIsPending] = useState(false);
+
+    const handleSubmit = async () => {
+        setIsPending(true);
+        let result;
+
+        if (fieldName === 'dimensions') {
+            // Handle dimensions update
+            const updates = [
+                updateInventoryField(itemId, 'real_width', parseFloat(dimensionValues.width) || 0),
+                updateInventoryField(itemId, 'real_height', parseFloat(dimensionValues.height) || 0),
+            ];
+
+            if (dimensionValues.depth) {
+                updates.push(updateInventoryField(itemId, 'real_depth', parseFloat(dimensionValues.depth)));
+            }
+
+            const results = await Promise.all(updates);
+            result = results.every((r) => r.success) ? { success: true } : { success: false, error: 'Failed to update dimensions' };
+        } else {
+            // Handle regular field update
+            const parsedValue = fieldName === 'cost' || fieldName === 'price' || fieldName === 'count' ? parseFloat(editValue) : editValue;
+
+            result = await updateInventoryField(itemId, fieldName, parsedValue);
+        }
+
+        if (result.success) {
+            setIsEditing(false);
+        }
+        setIsPending(false);
+    };
+
+    const handleCancel = () => {
+        setEditValue(value.toString());
+        setDimensionValues({
+            width: realWidth?.toString() ?? '',
+            height: realHeight?.toString() ?? '',
+            depth: realDepth?.toString() ?? '',
+        });
+        setIsEditing(false);
+    };
+
+    const renderEditContent = () => {
+        if (fieldName === 'category') {
+            return (
+                <div className="flex flex-grow items-center space-x-2">
+                    <select
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        disabled={isPending}
+                        className="flex-grow rounded-md border border-stone-400 bg-stone-400 px-2 py-1.5 text-sm font-bold text-stone-950 focus:border-primary focus:outline-none md:text-base"
+                    >
+                        {CATEGORY_OPTIONS.map(([value, label]) => (
+                            <option key={value} value={value}>
+                                {label}
+                            </option>
+                        ))}
+                    </select>
+                    <button onClick={handleSubmit} disabled={isPending} className="rounded-md p-1 text-green-600 hover:bg-green-100">
+                        <FaCheck />
+                    </button>
+                    <button onClick={handleCancel} disabled={isPending} className="rounded-md p-1 text-red-600 hover:bg-red-100">
+                        <FaTimes />
+                    </button>
+                </div>
+            );
+        }
+
+        if (fieldName === 'dimensions') {
+            return (
+                <div className="flex flex-grow items-center space-x-2">
+                    <div className="flex flex-grow space-x-2">
+                        <span className="w-fit text-nowrap text-base leading-[48px] text-secondary_light">W:</span>
+                        <input
+                            type="text"
+                            value={dimensionValues.width}
+                            onChange={(e) => setDimensionValues((prev) => ({ ...prev, width: e.target.value }))}
+                            placeholder="Width"
+                            className="w-12 rounded-md border border-stone-400 bg-white px-2 py-1 text-base text-secondary_light focus:border-primary focus:outline-none md:text-lg"
+                            disabled={isPending}
+                        />
+                        <span className="w-fit text-nowrap text-base leading-[48px] text-secondary_light">H:</span>
+                        <input
+                            type="text"
+                            value={dimensionValues.height}
+                            onChange={(e) => setDimensionValues((prev) => ({ ...prev, height: e.target.value }))}
+                            placeholder="Height"
+                            className="w-12 rounded-md border border-stone-400 bg-white px-2 py-1 text-base text-secondary_light focus:border-primary focus:outline-none md:text-lg"
+                            disabled={isPending}
+                        />
+                        <span className="w-fit text-nowrap text-base leading-[48px] text-secondary_light">D:</span>
+                        <input
+                            type="text"
+                            value={dimensionValues.depth}
+                            onChange={(e) => setDimensionValues((prev) => ({ ...prev, depth: e.target.value }))}
+                            placeholder="Depth"
+                            className="w-12 rounded-md border border-stone-400 bg-white px-2 py-1 text-base text-secondary_light focus:border-primary focus:outline-none md:text-lg"
+                            disabled={isPending}
+                        />
+                    </div>
+                    <button onClick={handleSubmit} disabled={isPending} className="rounded-md p-1 text-green-600 hover:bg-green-100">
+                        <FaCheck />
+                    </button>
+                    <button onClick={handleCancel} disabled={isPending} className="rounded-md p-1 text-red-600 hover:bg-red-100">
+                        <FaTimes />
+                    </button>
+                </div>
+            );
+        }
+
+        return (
+            <div className="flex flex-grow items-center space-x-2">
+                <input
+                    type="text"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    className="flex-grow rounded-md border border-stone-400 bg-white px-2 py-1 text-base text-secondary_light focus:border-primary focus:outline-none md:text-lg"
+                    disabled={isPending}
+                />
+                <button onClick={handleSubmit} disabled={isPending} className="rounded-md p-1 text-green-600 hover:bg-green-100">
+                    <FaCheck />
+                </button>
+                <button onClick={handleCancel} disabled={isPending} className="rounded-md p-1 text-red-600 hover:bg-red-100">
+                    <FaTimes />
+                </button>
+            </div>
+        );
+    };
+
+    return (
+        <div className="group mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-300">
+            <p className="w-[100px] text-base font-bold text-primary_dark group-hover:text-secondary_dark md:text-lg">{label}:</p>
+            {isEditing ? (
+                renderEditContent()
+            ) : (
+                <div className="flex flex-grow items-center justify-between">
+                    <p className="text-base text-secondary_light md:text-lg">
+                        {fieldName === 'cost' || fieldName === 'price' ? `$${value}` : value}
+                    </p>
+                    {isAdmin && (
+                        <button
+                            onClick={() => setIsEditing(true)}
+                            className="invisible rounded-md p-1 text-stone-600 hover:bg-stone-200 group-hover:visible"
+                        >
+                            <FaEdit />
+                        </button>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};
+
 const SelectedItemView: React.FC<SelectedItemViewProps> = ({
     selectedItem,
     currentImageIndex,
@@ -38,6 +245,8 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
     speed,
     setSpeed,
 }) => {
+    const { user } = useUser();
+    const isAdmin = !!user;
     const [showSlider, setShowSlider] = useState(false);
 
     const handleSpeedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -171,40 +380,67 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
             </div>
             <div className="flex h-fit w-full flex-col space-y-2 md:w-3/5">
                 <h1 className="font-cinzel text-center text-lg font-bold text-primary md:text-2xl">{selectedItem.name}</h1>
-                <div className="group mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-300">
-                    <p className="w-[100px] text-base font-bold text-primary_dark group-hover:text-secondary_dark md:text-lg">Category:</p>
-                    <p className="text-base text-secondary_light md:text-lg">{selectedItem.category}</p>
-                </div>
-                <div className="group mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-300">
-                    <p className="w-[100px] text-base font-bold text-primary_dark group-hover:text-secondary_dark md:text-lg">
-                        Dimensions:
-                    </p>
-                    <p className="text-base text-secondary_light md:text-lg">
-                        {`${selectedItem.width}in. x ${selectedItem.height}in.` + (selectedItem.depth ? ` x ${selectedItem.depth}in.` : '')}
-                    </p>
-                </div>
-                <div className="group mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-300">
-                    <p className="w-[100px] text-base font-bold text-primary_dark group-hover:text-secondary_dark md:text-lg">Price:</p>
-                    <p className="text-base text-secondary_light md:text-lg">${selectedItem.cost}</p>
-                </div>
-                <div className="group mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-300">
-                    <p className="w-[100px] text-base font-bold text-primary_dark group-hover:text-secondary_dark md:text-lg">Vendor:</p>
-                    <p className="text-base text-secondary_light md:text-lg">{selectedItem.vendor}</p>
-                </div>
-                <div className="group mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-300">
-                    <p className="w-[100px] text-base font-bold text-primary_dark group-hover:text-secondary_dark md:text-lg">Location:</p>
-                    <p className="text-base text-secondary_light md:text-lg">{selectedItem.location}</p>
-                </div>
-                <div className="group mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-300">
-                    <p className="w-[100px] text-base font-bold text-primary_dark group-hover:text-secondary_dark md:text-lg">In Stock:</p>
-                    <p className="text-base text-secondary_light md:text-lg">{selectedItem.count}</p>
-                </div>
-                <div className="group mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-300">
-                    <p className="w-[100px] text-base font-bold text-primary_dark group-hover:text-secondary_dark md:text-lg">
-                        Description:
-                    </p>
-                    <p className="text-base text-secondary_light md:text-lg">{selectedItem.description}</p>
-                </div>
+                <InventoryDetailItem
+                    label="Category"
+                    value={selectedItem.category ?? ''}
+                    itemId={selectedItem.id}
+                    fieldName="category"
+                    isAdmin={isAdmin}
+                />
+                <InventoryDetailItem
+                    label="Dimensions"
+                    value={`${selectedItem.real_width ?? 0}in. x ${selectedItem.real_height ?? 0}in.${
+                        selectedItem.real_depth ? ` x ${selectedItem.real_depth}in.` : ''
+                    }`}
+                    itemId={selectedItem.id}
+                    fieldName="dimensions"
+                    isAdmin={isAdmin}
+                    realWidth={selectedItem.real_width}
+                    realHeight={selectedItem.real_height}
+                    realDepth={selectedItem.real_depth}
+                />
+                <InventoryDetailItem
+                    label="Cost"
+                    value={selectedItem.cost ?? 0}
+                    itemId={selectedItem.id}
+                    fieldName="cost"
+                    isAdmin={isAdmin}
+                />
+                <InventoryDetailItem
+                    label="Price"
+                    value={selectedItem.price ?? 0}
+                    itemId={selectedItem.id}
+                    fieldName="price"
+                    isAdmin={isAdmin}
+                />
+                <InventoryDetailItem
+                    label="Vendor"
+                    value={selectedItem.vendor ?? ''}
+                    itemId={selectedItem.id}
+                    fieldName="vendor"
+                    isAdmin={isAdmin}
+                />
+                <InventoryDetailItem
+                    label="Location"
+                    value={selectedItem.location ?? ''}
+                    itemId={selectedItem.id}
+                    fieldName="location"
+                    isAdmin={isAdmin}
+                />
+                <InventoryDetailItem
+                    label="In Stock"
+                    value={selectedItem.count ?? 0}
+                    itemId={selectedItem.id}
+                    fieldName="count"
+                    isAdmin={isAdmin}
+                />
+                <InventoryDetailItem
+                    label="Description"
+                    value={selectedItem.description ?? ''}
+                    itemId={selectedItem.id}
+                    fieldName="description"
+                    isAdmin={isAdmin}
+                />
             </div>
         </motion.div>
     );

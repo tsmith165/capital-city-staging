@@ -68,7 +68,9 @@ export interface InventoryWithImages {
     image_path: string;
     width: number | null;
     height: number | null;
-    depth: number | null;
+    real_width: number | null;
+    real_height: number | null;
+    real_depth: number | null;
     created_at: string | null;
     updated_at: string | null;
     small_image_path: string | null;
@@ -77,6 +79,6 @@ export interface InventoryWithImages {
     extraImages: ExtraImages[];
     vendor: string | null;
     cost: number | null;
-    list_price: number | null;
+    price: number | null;
     count: number | null;
 }

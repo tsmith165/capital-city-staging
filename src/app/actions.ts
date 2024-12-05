@@ -3,6 +3,7 @@
 import { eq, desc, asc, gt, lt, and, inArray } from 'drizzle-orm';
 import { db, inventoryTable, extraImagesTable } from '@/db/db';
 import { InventoryWithImages, ExtraImages } from '@/db/schema';
+import { revalidatePath } from 'next/cache';
 
 export async function fetchInventory(): Promise<InventoryWithImages[]> {
     console.log(`Fetching inventory with Drizzle`);
@@ -148,4 +149,22 @@ export async function fetchInventoryImageById(id: number) {
         .execute();
 
     return inventory[0] || null;
+}
+
+export async function updateInventoryField(id: number, field: string, value: string | number) {
+    'use server';
+
+    try {
+        await db
+            .update(inventoryTable)
+            .set({ [field]: value })
+            .where(eq(inventoryTable.id, id))
+            .execute();
+
+        revalidatePath('/admin/inventory');
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating inventory field:', error);
+        return { success: false, error: 'Failed to update field' };
+    }
 }
