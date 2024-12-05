@@ -264,7 +264,7 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.75 }}
         >
-            <div className="relative flex w-2/5 cursor-pointer flex-col items-center justify-center space-y-2 pb-2 md:w-fit">
+            <div className="relative flex w-full cursor-pointer flex-col items-center justify-center space-y-2 pb-2 md:w-2/5 md:w-fit">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={`${selectedItemIndex}-${currentImageIndex}`}
@@ -380,8 +380,8 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
                     </div>
                 </div>
             </div>
-            <div className="flex h-fit w-full flex-col space-y-2 md:w-3/5">
-                <h1 className="font-cinzel text-center text-lg font-bold text-primary md:text-2xl">{selectedItem.name}</h1>
+            <div className="flex h-fit w-full flex-col space-y-0.5 md:w-3/5">
+                <h1 className="font-cinzel text-center text-base font-bold text-secondary_light md:text-lg">{selectedItem.name}</h1>
                 <InventoryDetailItem
                     label="Category"
                     value={selectedItem.category ?? ''}
