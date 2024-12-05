@@ -53,7 +53,7 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.75 }}
         >
-            <div className="relative flex w-fit cursor-pointer flex-col items-center justify-center space-y-2 pb-2">
+            <div className="relative flex w-2/5 cursor-pointer flex-col items-center justify-center space-y-2 pb-2 md:w-fit">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={`${selectedItemIndex}-${currentImageIndex}`}
@@ -62,7 +62,7 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
                         onClick={() => setIsFullScreenImage(true)}
-                        className="flex max-h-[40dvh] min-h-[40dvh] w-auto items-center justify-center rounded-md md:max-h-[50dvh]"
+                        className="flex w-auto items-center justify-center rounded-md md:max-h-[50dvh]"
                     >
                         {imageList.map((image, index) =>
                             index === currentImageIndex ? (
@@ -169,37 +169,41 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
                     </div>
                 </div>
             </div>
-            <div className="flex h-fit w-full flex-col space-y-2">
-                <h1 className="font-cinzel pb-2 text-center text-2xl font-bold text-primary">{selectedItem.name}</h1>
-                <div className="mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-200">
-                    <p className="w-[100px] text-lg font-bold text-primary_dark">Category:</p>
-                    <p className="text-lg text-secondary_light">{selectedItem.category}</p>
+            <div className="flex h-fit w-full flex-col space-y-2 md:w-3/5">
+                <h1 className="font-cinzel text-center text-lg font-bold text-primary md:text-2xl">{selectedItem.name}</h1>
+                <div className="group mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-300">
+                    <p className="w-[100px] text-base font-bold text-primary_dark group-hover:text-secondary_dark md:text-lg">Category:</p>
+                    <p className="text-base text-secondary_light md:text-lg">{selectedItem.category}</p>
                 </div>
-                <div className="mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-200">
-                    <p className="w-[100px] text-lg font-bold text-primary_dark">Dimensions:</p>
-                    <p className="text-lg text-secondary_light">
+                <div className="group mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-300">
+                    <p className="w-[100px] text-base font-bold text-primary_dark group-hover:text-secondary_dark md:text-lg">
+                        Dimensions:
+                    </p>
+                    <p className="text-base text-secondary_light md:text-lg">
                         {`${selectedItem.width}in. x ${selectedItem.height}in.` + (selectedItem.depth ? ` x ${selectedItem.depth}in.` : '')}
                     </p>
                 </div>
-                <div className="mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-200">
-                    <p className="w-[100px] text-lg font-bold text-primary_dark">Price:</p>
-                    <p className="text-lg text-secondary_light">${selectedItem.cost}</p>
+                <div className="group mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-300">
+                    <p className="w-[100px] text-base font-bold text-primary_dark group-hover:text-secondary_dark md:text-lg">Price:</p>
+                    <p className="text-base text-secondary_light md:text-lg">${selectedItem.cost}</p>
                 </div>
-                <div className="mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-200">
-                    <p className="w-[100px] text-lg font-bold text-primary_dark">Vendor:</p>
-                    <p className="text-lg text-secondary_light">{selectedItem.vendor}</p>
+                <div className="group mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-300">
+                    <p className="w-[100px] text-base font-bold text-primary_dark group-hover:text-secondary_dark md:text-lg">Vendor:</p>
+                    <p className="text-base text-secondary_light md:text-lg">{selectedItem.vendor}</p>
                 </div>
-                <div className="mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-200">
-                    <p className="w-[100px] text-lg font-bold text-primary_dark">Location:</p>
-                    <p className="text-lg text-secondary_light">{selectedItem.location}</p>
+                <div className="group mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-300">
+                    <p className="w-[100px] text-base font-bold text-primary_dark group-hover:text-secondary_dark md:text-lg">Location:</p>
+                    <p className="text-base text-secondary_light md:text-lg">{selectedItem.location}</p>
                 </div>
-                <div className="mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-200">
-                    <p className="w-[100px] text-lg font-bold text-primary_dark">In Stock:</p>
-                    <p className="text-lg text-secondary_light">{selectedItem.count}</p>
+                <div className="group mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-300">
+                    <p className="w-[100px] text-base font-bold text-primary_dark group-hover:text-secondary_dark md:text-lg">In Stock:</p>
+                    <p className="text-base text-secondary_light md:text-lg">{selectedItem.count}</p>
                 </div>
-                <div className="mx-4 flex flex-col justify-center space-x-4 px-2">
-                    <p className="w-[100px] text-lg font-bold text-primary_dark">Description:</p>
-                    <p className="text-lg text-secondary_light">{selectedItem.description}</p>
+                <div className="group mx-4 flex flex-row justify-start space-x-4 rounded-md px-2 hover:bg-stone-300">
+                    <p className="w-[100px] text-base font-bold text-primary_dark group-hover:text-secondary_dark md:text-lg">
+                        Description:
+                    </p>
+                    <p className="text-base text-secondary_light md:text-lg">{selectedItem.description}</p>
                 </div>
             </div>
         </motion.div>

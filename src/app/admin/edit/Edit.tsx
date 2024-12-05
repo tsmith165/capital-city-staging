@@ -11,6 +11,7 @@ import InventoryOrderPanel from './InventoryOrderPanel';
 import { handleTitleUpdate } from './actions';
 import LoadingSpinner from '@/components/layout/LoadingSpinner';
 import { idParser } from './parsers';
+import FullScreenView from '../inventory/FullScreenView';
 
 interface EditProps {
     inventoryDataPromise: Promise<any>;
@@ -22,6 +23,28 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
     const [inventoryData, setInventoryData] = useState<any>(null);
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
     const [titleInput, setTitleInput] = useState('');
+    const [isFullScreenImage, setIsFullScreenImage] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isPlaying, setIsPlaying] = useState(true);
+    const [speed, setSpeed] = useState(3000);
+
+    const getImageList = () => {
+        if (!inventoryData) return [];
+        return [
+            {
+                src: inventoryData.image_path,
+                width: inventoryData.width,
+                height: inventoryData.height,
+            },
+            ...(inventoryData.extraImages || []).map((image: any) => ({
+                src: image.image_path,
+                width: image.width,
+                height: image.height,
+            })),
+        ];
+    };
+
+    const imageList = getImageList();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -38,6 +61,22 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
 
         fetchData();
     }, [inventoryDataPromise, current_id]);
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+
+        if (isPlaying && isFullScreenImage && imageList.length > 1) {
+            interval = setInterval(() => {
+                setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imageList.length);
+            }, speed);
+        }
+
+        return () => {
+            if (interval) {
+                clearInterval(interval);
+            }
+        };
+    }, [speed, isPlaying, isFullScreenImage, imageList.length]);
 
     const handleTitleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTitleInput(e.target.value);
@@ -69,6 +108,11 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
         await setId(newId.toString());
     };
 
+    const handleImageClick = (index: number = 0) => {
+        setCurrentImageIndex(index);
+        setIsFullScreenImage(true);
+    };
+
     if (!inventoryData) {
         return <LoadingSpinner page="Edit Details" />;
     }
@@ -85,7 +129,8 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
                     width={inventoryData.width}
                     height={inventoryData.height}
                     quality={100}
-                    className="h-fit max-h-full w-auto rounded-lg object-contain"
+                    className="h-fit max-h-full w-auto cursor-pointer rounded-lg object-contain"
+                    onClick={() => handleImageClick(0)}
                 />
             </div>
             <div className="h-2/3 overflow-y-auto md:h-full md:w-3/5 lg:w-1/2">
@@ -123,8 +168,22 @@ const Edit: React.FC<EditProps> = ({ inventoryDataPromise, current_id }) => {
                     </div>
                 )}
                 <EditForm current_inventory={inventoryData} />
-                <InventoryOrderPanel current_inventory={inventoryData} />
+                <InventoryOrderPanel current_inventory={inventoryData} onImageClick={handleImageClick} />
             </div>
+            {isFullScreenImage && (
+                <FullScreenView
+                    selectedItem={inventoryData}
+                    currentImageIndex={currentImageIndex}
+                    setCurrentImageIndex={setCurrentImageIndex}
+                    imageList={imageList}
+                    isPlaying={isPlaying}
+                    setIsPlaying={setIsPlaying}
+                    setIsFullScreenImage={setIsFullScreenImage}
+                    selectedItemIndex={0}
+                    setSpeed={setSpeed}
+                    speed={speed}
+                />
+            )}
         </div>
     );
 };

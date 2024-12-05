@@ -6,9 +6,10 @@ import Image from 'next/image';
 
 interface InventoryOrderPanelProps {
     current_inventory: InventoryWithImages;
+    onImageClick: (index: number) => void;
 }
 
-const InventoryOrderPanel: React.FC<InventoryOrderPanelProps> = ({ current_inventory }) => {
+const InventoryOrderPanel: React.FC<InventoryOrderPanelProps> = ({ current_inventory, onImageClick }) => {
     const extra_images: ExtraImages[] = current_inventory.extraImages || [];
 
     async function handleImageReorderAction(formData: FormData) {
@@ -66,7 +67,8 @@ const InventoryOrderPanel: React.FC<InventoryOrderPanelProps> = ({ current_inven
                         alt={image.image_path}
                         width={image.width}
                         height={image.height}
-                        className="h-[40x] w-[40px] object-contain"
+                        className="h-[40x] w-[40px] cursor-pointer object-contain"
+                        onClick={() => onImageClick(index + 1)}
                     />
                     <div className="flex h-[40px] flex-col space-y-0.5">
                         <form action={handleImageReorderAction} className="flex h-full w-fit">
