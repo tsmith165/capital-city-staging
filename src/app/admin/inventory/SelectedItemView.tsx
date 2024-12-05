@@ -25,6 +25,8 @@ interface SelectedItemViewProps {
     isPlaying: boolean;
     speed: number;
     setSpeed: (speed: number) => void;
+    handleNextItem: () => void;
+    handlePrevItem: () => void;
 }
 
 interface InventoryDetailItemProps {
@@ -246,6 +248,8 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
     isPlaying,
     speed,
     setSpeed,
+    handleNextItem,
+    handlePrevItem,
 }) => {
     const { user } = useUser();
     const isAdmin = !!user;
@@ -264,7 +268,7 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.75 }}
         >
-            <div className="relative flex w-full cursor-pointer flex-col items-center justify-center space-y-2 pb-2 md:w-2/5 md:w-fit">
+            <div className="relative flex h-[352px] w-full flex-col items-center justify-center space-y-2 pb-2 md:w-2/5">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={`${selectedItemIndex}-${currentImageIndex}`}
@@ -273,7 +277,7 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
                         onClick={() => setIsFullScreenImage(true)}
-                        className="flex w-auto items-center justify-center rounded-md md:max-h-[50dvh]"
+                        className="flex h-[300px] w-4/5 cursor-pointer items-center justify-center rounded-md bg-stone-600 p-1"
                     >
                         {imageList.map((image, index) =>
                             index === currentImageIndex ? (
@@ -285,9 +289,7 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
                                     key={`selected-${index}`}
                                     src={image.src}
                                     alt={selectedItem.name}
-                                    width={image.width}
-                                    height={image.height}
-                                    className="max-h-[40dvh] w-auto rounded-md bg-stone-600 object-contain p-1 hover:cursor-pointer md:max-h-[50dvh]"
+                                    className="h-fit max-h-[300px] w-full object-contain p-1"
                                     onLoad={handleImageLoad}
                                 />
                             ) : (
@@ -299,10 +301,8 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
                                     key={`selected-${index}`}
                                     src={image.src}
                                     alt={selectedItem.name}
-                                    width={image.width}
-                                    height={image.height}
                                     hidden
-                                    className="max-h-[40dvh] w-auto rounded-md bg-stone-600 object-contain p-1 hover:cursor-pointer md:max-h-[50dvh]"
+                                    className="h-fit max-h-[300px] w-full object-contain p-1"
                                     onLoad={handleImageLoad}
                                 />
                             ),
@@ -381,7 +381,25 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
                 </div>
             </div>
             <div className="flex h-fit w-full flex-col space-y-0.5 md:w-3/5">
-                <h1 className="font-cinzel text-center text-base font-bold text-secondary_light md:text-lg">{selectedItem.name}</h1>
+                <div className="flex items-center justify-start space-x-2">
+                    <div className="flex flex-col items-center justify-center space-y-0.5">
+                        <button
+                            onClick={handlePrevItem}
+                            className="group rounded-md bg-secondary_dark p-0.5 hover:bg-secondary_light"
+                            aria-label="Previous item"
+                        >
+                            <IoIosArrowBack className="rotate-90 fill-stone-300 text-2xl group-hover:fill-secondary_dark" />
+                        </button>
+                        <button
+                            onClick={handleNextItem}
+                            className="group rounded-md bg-secondary_dark p-0.5 hover:bg-secondary_light"
+                            aria-label="Next item"
+                        >
+                            <IoIosArrowBack className="-rotate-90 fill-stone-300 text-2xl group-hover:fill-secondary_dark" />
+                        </button>
+                    </div>
+                    <h1 className="font-cinzel text-start text-lg font-bold text-secondary_light md:text-xl">{selectedItem.name}</h1>
+                </div>
                 <InventoryDetailItem
                     label="Category"
                     value={selectedItem.category ?? ''}

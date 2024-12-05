@@ -192,6 +192,20 @@ const InventoryViewer: React.FC<InventoryViewerProps> = ({ items, initialParams 
         };
     }, [speed, isPlaying, imageList.length, selectedItem]);
 
+    const handleNextItem = useCallback(() => {
+        if (selectedItemIndex === null) return;
+        const nextIndex = (selectedItemIndex + 1) % filteredItems.length;
+        const nextItem = filteredItems[nextIndex];
+        handleItemClick(nextItem.id, nextIndex);
+    }, [selectedItemIndex, filteredItems, handleItemClick]);
+
+    const handlePrevItem = useCallback(() => {
+        if (selectedItemIndex === null) return;
+        const prevIndex = (selectedItemIndex - 1 + filteredItems.length) % filteredItems.length;
+        const prevItem = filteredItems[prevIndex];
+        handleItemClick(prevItem.id, prevIndex);
+    }, [selectedItemIndex, filteredItems, handleItemClick]);
+
     if (!mounted) {
         return null; // Return null on server-side and first render
     }
@@ -230,6 +244,8 @@ const InventoryViewer: React.FC<InventoryViewerProps> = ({ items, initialParams 
                         selectedImageRef={selectedImageRef}
                         handleNext={handleNext}
                         handlePrev={handlePrev}
+                        handleNextItem={handleNextItem}
+                        handlePrevItem={handlePrevItem}
                         togglePlayPause={togglePlayPause}
                         isPlaying={isPlaying}
                         speed={speed}
