@@ -18,7 +18,7 @@
         "@tailwindcss/typography": "^0.5.15",
         "@types/react": "npm:types-react@19.0.0-rc.1",
         "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1",
-        "@uploadthing/react": "^6.8.0",
+        "@uploadthing/react": "^7.1.2",
         "autoprefixer": "^10.4.20",
         "axios": "^1.7.7",
         "dotenv": "^16.4.5",
