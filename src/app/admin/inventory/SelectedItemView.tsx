@@ -40,6 +40,12 @@ interface InventoryDetailItemProps {
     realDepth?: number | null;
 }
 
+interface EditableNameProps {
+    name: string;
+    itemId: number;
+    isAdmin: boolean;
+}
+
 const CATEGORY_OPTIONS: [string, string][] = [
     ['Couch', 'Couch'],
     ['Table', 'Table'],
@@ -60,6 +66,60 @@ const CATEGORY_OPTIONS: [string, string][] = [
     ['Desk', 'Desk'],
     ['Other', 'Other'],
 ];
+
+const EditableName: React.FC<EditableNameProps> = ({ name, itemId, isAdmin }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editValue, setEditValue] = useState(name);
+    const [isPending, setIsPending] = useState(false);
+
+    const handleSubmit = async () => {
+        setIsPending(true);
+        const result = await updateInventoryField(itemId, 'name', editValue);
+        if (result.success) {
+            setIsEditing(false);
+        }
+        setIsPending(false);
+    };
+
+    const handleCancel = () => {
+        setEditValue(name);
+        setIsEditing(false);
+    };
+
+    if (isEditing) {
+        return (
+            <div className="flex flex-grow items-center space-x-2">
+                <input
+                    type="text"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    className="font-cinzel flex-grow rounded-md border border-stone-400 bg-white px-2 py-1 text-lg font-bold text-secondary_light focus:border-primary focus:outline-none md:text-xl"
+                    disabled={isPending}
+                />
+                <button onClick={handleSubmit} disabled={isPending} className="rounded-md p-1 text-green-600 hover:bg-green-100">
+                    <FaCheck />
+                </button>
+                <button onClick={handleCancel} disabled={isPending} className="rounded-md p-1 text-red-600 hover:bg-red-100">
+                    <FaTimes />
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="group flex flex-grow items-center justify-between">
+            <h1 className="font-cinzel text-start text-lg font-bold text-secondary_light md:text-xl">{name}</h1>
+            {isAdmin && (
+                <button
+                    onClick={() => setIsEditing(true)}
+                    className="invisible rounded-md p-1 text-stone-600 hover:bg-stone-200 group-hover:visible"
+                >
+                    <FaEdit />
+                </button>
+            )}
+        </div>
+    );
+};
 
 const InventoryDetailItem: React.FC<InventoryDetailItemProps> = ({
     label,
@@ -398,7 +458,7 @@ const SelectedItemView: React.FC<SelectedItemViewProps> = ({
                             <IoIosArrowBack className="-rotate-90 fill-primary text-2xl group-hover:fill-secondary_dark" />
                         </button>
                     </div>
-                    <h1 className="font-cinzel text-start text-lg font-bold text-secondary_light md:text-xl">{selectedItem.name}</h1>
+                    <EditableName name={selectedItem.name} itemId={selectedItem.id} isAdmin={isAdmin} />
                 </div>
                 <InventoryDetailItem
                     label="Category"
