@@ -237,7 +237,7 @@ const ContactFormEmail: React.FC<ContactFormEmailProps> = ({
                   {quote.distanceAdjustment > 0 && (
                     <Row>
                       <Column width="70%">
-                        <Text className="text-sm text-gray-600 m-0">Distance Fee (>20 miles):</Text>
+                        <Text className="text-sm text-gray-600 m-0">Distance Fee ({'>'}20 miles):</Text>
                       </Column>
                       <Column width="30%" align="right">
                         <Text className="text-sm font-semibold text-gray-800 m-0">+{formatPrice(quote.distanceAdjustment)}</Text>
@@ -259,7 +259,7 @@ const ContactFormEmail: React.FC<ContactFormEmailProps> = ({
                   {quote.largeSquareFootageAdjustment > 0 && (
                     <Row>
                       <Column width="70%">
-                        <Text className="text-sm text-gray-600 m-0">Very Large Home Fee (3500+ sq ft):</Text>
+                        <Text className="text-sm text-gray-600 m-0">Very Large Home Fee (3500{'+'}  sq ft):</Text>
                       </Column>
                       <Column width="30%" align="right">
                         <Text className="text-sm font-semibold text-gray-800 m-0">+{formatPrice(quote.largeSquareFootageAdjustment)}</Text>
