@@ -20,6 +20,18 @@ interface QuoteBreakdown {
   bedroomCount: number;
   bedroomRate: number;
   bedroomTotal: number;
+  bathroomCount: number;
+  bathroomRate: number;
+  bathroomTotal: number;
+  livingAreaCount: number;
+  livingAreaRate: number;
+  livingAreaTotal: number;
+  officeCount: number;
+  officeRate: number;
+  officeTotal: number;
+  diningSpaceCount: number;
+  diningSpaceRate: number;
+  diningSpaceTotal: number;
   distanceAdjustment: number;
   multiFloorAdjustment: number;
   largeSquareFootageAdjustment: number;
@@ -37,6 +49,10 @@ interface ContactFormEmailProps {
   phone: string;
   squareFootage: number;
   bedrooms: number;
+  bathrooms: number;
+  livingAreas: number;
+  offices: number;
+  diningSpaces: number;
   distanceFromDowntown: number;
   outdoorStaging: boolean;
   multiFloor: boolean;
@@ -60,6 +76,10 @@ const ContactFormEmail: React.FC<ContactFormEmailProps> = ({
   phone,
   squareFootage,
   bedrooms,
+  bathrooms,
+  livingAreas,
+  offices,
+  diningSpaces,
   distanceFromDowntown,
   outdoorStaging,
   multiFloor,
@@ -156,19 +176,21 @@ const ContactFormEmail: React.FC<ContactFormEmailProps> = ({
                   <Text className="text-base font-semibold text-gray-800 m-0">{squareFootage.toLocaleString()} sq ft</Text>
                 </Column>
                 <Column width="50%">
-                  <Text className="text-sm text-gray-600 m-0 mb-1">Bedrooms</Text>
-                  <Text className="text-base font-semibold text-gray-800 m-0">{bedrooms}</Text>
+                  <Text className="text-sm text-gray-600 m-0 mb-1">Distance from Downtown</Text>
+                  <Text className="text-base font-semibold text-gray-800 m-0">{distanceFromDowntown} miles</Text>
                 </Column>
               </Row>
 
               <Row className="mb-3">
                 <Column width="50%">
-                  <Text className="text-sm text-gray-600 m-0 mb-1">Distance from Downtown</Text>
-                  <Text className="text-base font-semibold text-gray-800 m-0">{distanceFromDowntown} miles</Text>
-                </Column>
-                <Column width="50%">
                   <Text className="text-sm text-gray-600 m-0 mb-1">Staging Type</Text>
                   <Text className="text-base font-semibold text-gray-800 m-0 capitalize">{stagingType} Home</Text>
+                </Column>
+                <Column width="50%">
+                  <Text className="text-sm text-gray-600 m-0 mb-1">Room Counts</Text>
+                  <Text className="text-base font-semibold text-gray-800 m-0">
+                    {bedrooms} BR • {bathrooms} BA • {livingAreas} Living • {offices} Office • {diningSpaces} Dining
+                  </Text>
                 </Column>
               </Row>
 
@@ -205,7 +227,7 @@ const ContactFormEmail: React.FC<ContactFormEmailProps> = ({
                   <Row>
                     <Column width="70%">
                       <Text className="text-sm text-gray-600 m-0">Base Package ({stagingType}):</Text>
-                      <Text className="text-xs text-gray-500 m-0">Kitchen, living room, entryway</Text>
+                      <Text className="text-xs text-gray-500 m-0">Kitchen + entryway</Text>
                     </Column>
                     <Column width="30%" align="right">
                       <Text className="text-sm font-semibold text-gray-800 m-0">{formatPrice(quote.basePrice)}</Text>
@@ -219,6 +241,50 @@ const ContactFormEmail: React.FC<ContactFormEmailProps> = ({
                       </Column>
                       <Column width="30%" align="right">
                         <Text className="text-sm font-semibold text-gray-800 m-0">{formatPrice(quote.bedroomTotal)}</Text>
+                      </Column>
+                    </Row>
+                  )}
+
+                  {quote.bathroomTotal > 0 && (
+                    <Row>
+                      <Column width="70%">
+                        <Text className="text-sm text-gray-600 m-0">Bathrooms ({quote.bathroomCount} × {formatPrice(quote.bathroomRate)}):</Text>
+                      </Column>
+                      <Column width="30%" align="right">
+                        <Text className="text-sm font-semibold text-gray-800 m-0">{formatPrice(quote.bathroomTotal)}</Text>
+                      </Column>
+                    </Row>
+                  )}
+
+                  {quote.livingAreaTotal > 0 && (
+                    <Row>
+                      <Column width="70%">
+                        <Text className="text-sm text-gray-600 m-0">Living Areas ({quote.livingAreaCount} × {formatPrice(quote.livingAreaRate)}):</Text>
+                      </Column>
+                      <Column width="30%" align="right">
+                        <Text className="text-sm font-semibold text-gray-800 m-0">{formatPrice(quote.livingAreaTotal)}</Text>
+                      </Column>
+                    </Row>
+                  )}
+
+                  {quote.officeTotal > 0 && (
+                    <Row>
+                      <Column width="70%">
+                        <Text className="text-sm text-gray-600 m-0">Home Offices ({quote.officeCount} × {formatPrice(quote.officeRate)}):</Text>
+                      </Column>
+                      <Column width="30%" align="right">
+                        <Text className="text-sm font-semibold text-gray-800 m-0">{formatPrice(quote.officeTotal)}</Text>
+                      </Column>
+                    </Row>
+                  )}
+
+                  {quote.diningSpaceTotal > 0 && (
+                    <Row>
+                      <Column width="70%">
+                        <Text className="text-sm text-gray-600 m-0">Dining Spaces ({quote.diningSpaceCount} × {formatPrice(quote.diningSpaceRate)}):</Text>
+                      </Column>
+                      <Column width="30%" align="right">
+                        <Text className="text-sm font-semibold text-gray-800 m-0">{formatPrice(quote.diningSpaceTotal)}</Text>
                       </Column>
                     </Row>
                   )}

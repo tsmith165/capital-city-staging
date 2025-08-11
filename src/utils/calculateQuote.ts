@@ -1,9 +1,14 @@
 /**
  * Calculate staging quote based on property details
  * 
- * Base Pricing Structure:
- * - Base price: $1000 occupied / $1500 vacant (includes kitchen, living room, entryway)
- * - Per bedroom: $500 occupied / $750 vacant
+ * Room-Based Pricing Structure:
+ * - Base package always includes: Kitchen + Entryway
+ * - Per room pricing:
+ *   - Bedrooms: $250 occupied / $500 vacant
+ *   - Bathrooms: $100 (same for both)
+ *   - Living Areas: $250 occupied / $500 vacant
+ *   - Offices: $100 occupied / $250 vacant
+ *   - Dining Spaces: $100 occupied / $250 vacant
  * 
  * Adjustments:
  * - Distance >20 miles from downtown Sacramento: +$500
@@ -15,6 +20,10 @@
 export interface QuoteDetails {
     squareFootage: number;
     bedrooms: number;
+    bathrooms: number;
+    livingAreas: number;
+    offices: number;
+    diningSpaces: number;
     distanceFromDowntown: number;
     outdoorStaging: boolean;
     multiFloor: boolean;
@@ -26,6 +35,18 @@ export interface QuoteBreakdown {
     bedroomCount: number;
     bedroomRate: number;
     bedroomTotal: number;
+    bathroomCount: number;
+    bathroomRate: number;
+    bathroomTotal: number;
+    livingAreaCount: number;
+    livingAreaRate: number;
+    livingAreaTotal: number;
+    officeCount: number;
+    officeRate: number;
+    officeTotal: number;
+    diningSpaceCount: number;
+    diningSpaceRate: number;
+    diningSpaceTotal: number;
     distanceAdjustment: number;
     multiFloorAdjustment: number;
     largeSquareFootageAdjustment: number;
@@ -40,13 +61,31 @@ export interface QuoteBreakdown {
 export function calculateStagingQuote(details: QuoteDetails): QuoteBreakdown {
     const isOccupied = details.stagingType === 'occupied';
     
-    // Base price (includes kitchen, living room, entryway)
-    const basePrice = isOccupied ? 1000 : 1500;
+    // Base price always includes kitchen + entryway
+    const basePrice = isOccupied ? 500 : 800;
     
-    // Per bedroom pricing
-    const bedroomRate = isOccupied ? 500 : 750;
+    // Room pricing rates
+    const bedroomRate = isOccupied ? 250 : 500;
+    const bathroomRate = 100; // Same for both occupied and vacant
+    const livingAreaRate = isOccupied ? 250 : 500;
+    const officeRate = isOccupied ? 100 : 250;
+    const diningSpaceRate = isOccupied ? 100 : 250;
+    
+    // Calculate room totals
     const bedroomCount = details.bedrooms;
     const bedroomTotal = bedroomCount * bedroomRate;
+    
+    const bathroomCount = details.bathrooms;
+    const bathroomTotal = bathroomCount * bathroomRate;
+    
+    const livingAreaCount = details.livingAreas;
+    const livingAreaTotal = livingAreaCount * livingAreaRate;
+    
+    const officeCount = details.offices;
+    const officeTotal = officeCount * officeRate;
+    
+    const diningSpaceCount = details.diningSpaces;
+    const diningSpaceTotal = diningSpaceCount * diningSpaceRate;
     
     // Additional fees
     let distanceAdjustment = 0;
@@ -70,7 +109,7 @@ export function calculateStagingQuote(details: QuoteDetails): QuoteBreakdown {
     }
 
     // Calculate total
-    const totalEstimate = basePrice + bedroomTotal + distanceAdjustment + multiFloorAdjustment + largeSquareFootageAdjustment + outdoorAdjustment;
+    const totalEstimate = basePrice + bedroomTotal + bathroomTotal + livingAreaTotal + officeTotal + diningSpaceTotal + distanceAdjustment + multiFloorAdjustment + largeSquareFootageAdjustment + outdoorAdjustment;
 
     // Calculate price range (±15% for estimate variance) with rounded values
     const variance = 0.15;
@@ -88,6 +127,18 @@ export function calculateStagingQuote(details: QuoteDetails): QuoteBreakdown {
         bedroomCount,
         bedroomRate,
         bedroomTotal,
+        bathroomCount,
+        bathroomRate,
+        bathroomTotal,
+        livingAreaCount,
+        livingAreaRate,
+        livingAreaTotal,
+        officeCount,
+        officeRate,
+        officeTotal,
+        diningSpaceCount,
+        diningSpaceRate,
+        diningSpaceTotal,
         distanceAdjustment,
         multiFloorAdjustment,
         largeSquareFootageAdjustment,

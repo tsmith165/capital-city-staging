@@ -35,7 +35,7 @@ import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { sendContactFormEmail } from './actions';
 import { calculateStagingQuote, formatPrice, type QuoteDetails } from '@/utils/calculateQuote';
-import { Calculator, Send, CheckCircle, AlertCircle, Info, Ruler, Bed, MapPin, Trees, Building, Home, Users } from 'lucide-react';
+import { Calculator, Send, CheckCircle, AlertCircle, Info, Ruler, Bed, MapPin, Trees, Building, Home, Users, Bath, Sofa, Briefcase, UtensilsCrossed } from 'lucide-react';
 
 const schema = z.object({
     name: z.string().nonempty('Name is required'),
@@ -46,7 +46,11 @@ const schema = z.object({
         .positive('Square footage must be positive')
         .min(500, 'Square footage seems too small')
         .max(10000, 'Square footage seems too large'),
-    bedrooms: z.number().positive('Number of bedrooms required').min(1, 'At least 1 bedroom required').max(10, 'Maximum 10 bedrooms'),
+    bedrooms: z.number().min(0, 'Number of bedrooms must be 0 or more').max(10, 'Maximum 10 bedrooms'),
+    bathrooms: z.number().min(0, 'Number of bathrooms must be 0 or more').max(10, 'Maximum 10 bathrooms'),
+    livingAreas: z.number().min(0, 'Number of living areas must be 0 or more').max(10, 'Maximum 10 living areas'),
+    offices: z.number().min(0, 'Number of offices must be 0 or more').max(5, 'Maximum 5 offices'),
+    diningSpaces: z.number().min(0, 'Number of dining spaces must be 0 or more').max(5, 'Maximum 5 dining spaces'),
     distanceFromDowntown: z.number().min(0, 'Distance must be positive').max(100, 'Distance seems too far'),
     outdoorStaging: z.boolean(),
     multiFloor: z.boolean(),
@@ -146,6 +150,10 @@ const ContactForm = () => {
         phone: '',
         squareFootage: 2000,
         bedrooms: 3,
+        bathrooms: 2,
+        livingAreas: 1,
+        offices: 0,
+        diningSpaces: 1,
         distanceFromDowntown: 10,
         outdoorStaging: false,
         multiFloor: false,
@@ -171,13 +179,17 @@ const ContactForm = () => {
     const quote = calculateStagingQuote({
         squareFootage: formData.squareFootage,
         bedrooms: formData.bedrooms,
+        bathrooms: formData.bathrooms,
+        livingAreas: formData.livingAreas,
+        offices: formData.offices,
+        diningSpaces: formData.diningSpaces,
         distanceFromDowntown: formData.distanceFromDowntown,
         outdoorStaging: formData.outdoorStaging,
         multiFloor: formData.multiFloor,
         stagingType: formData.stagingType,
     });
 
-    // Check if there are any additional items to show separator
+    // Check if there are any additional items to show separator after room counts
     const hasAdditionalItems = quote.outdoorAdjustment > 0 || 
                               quote.multiFloorAdjustment > 0 || 
                               quote.largeSquareFootageAdjustment > 0 || 
@@ -213,6 +225,10 @@ const ContactForm = () => {
                     phone: '',
                     squareFootage: 2000,
                     bedrooms: 3,
+                    bathrooms: 2,
+                    livingAreas: 1,
+                    offices: 0,
+                    diningSpaces: 1,
                     distanceFromDowntown: 10,
                     outdoorStaging: false,
                     multiFloor: false,
@@ -329,7 +345,7 @@ const ContactForm = () => {
                         </h3>
 
                         <div className="space-y-6">
-                            {/* First Row: Square Footage and Bedrooms */}
+                            {/* First Row: Square Footage and Distance */}
                             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                                 <Slider
                                     value={formData.squareFootage}
@@ -343,20 +359,6 @@ const ContactForm = () => {
                                 />
 
                                 <Slider
-                                    value={formData.bedrooms}
-                                    onChange={(value) => handleChange('bedrooms', value)}
-                                    min={1}
-                                    max={6}
-                                    step={1}
-                                    label="Number of Bedrooms"
-                                    icon={<Bed size={20} />}
-                                    formatValue={(value) => `${value} ${value === 1 ? 'Bedroom' : 'Bedrooms'}`}
-                                />
-                            </div>
-
-                            {/* Second Row: Distance and Staging Type */}
-                            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                                <Slider
                                     value={formData.distanceFromDowntown}
                                     onChange={(value) => handleChange('distanceFromDowntown', value)}
                                     min={0}
@@ -366,7 +368,71 @@ const ContactForm = () => {
                                     icon={<MapPin size={20} />}
                                     formatValue={(value) => `${value} miles`}
                                 />
+                            </div>
 
+                            {/* Second Row: Bedrooms and Bathrooms */}
+                            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                                <Slider
+                                    value={formData.bedrooms}
+                                    onChange={(value) => handleChange('bedrooms', value)}
+                                    min={0}
+                                    max={6}
+                                    step={1}
+                                    label="Number of Bedrooms"
+                                    icon={<Bed size={20} />}
+                                    formatValue={(value) => `${value} ${value === 1 ? 'Bedroom' : 'Bedrooms'}`}
+                                />
+
+                                <Slider
+                                    value={formData.bathrooms}
+                                    onChange={(value) => handleChange('bathrooms', value)}
+                                    min={0}
+                                    max={5}
+                                    step={1}
+                                    label="Number of Bathrooms"
+                                    icon={<Bath size={20} />}
+                                    formatValue={(value) => `${value} ${value === 1 ? 'Bathroom' : 'Bathrooms'}`}
+                                />
+                            </div>
+
+                            {/* Third Row: Living Areas and Offices */}
+                            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                                <Slider
+                                    value={formData.livingAreas}
+                                    onChange={(value) => handleChange('livingAreas', value)}
+                                    min={0}
+                                    max={4}
+                                    step={1}
+                                    label="Living Areas"
+                                    icon={<Sofa size={20} />}
+                                    formatValue={(value) => `${value} ${value === 1 ? 'Area' : 'Areas'}`}
+                                />
+
+                                <Slider
+                                    value={formData.offices}
+                                    onChange={(value) => handleChange('offices', value)}
+                                    min={0}
+                                    max={3}
+                                    step={1}
+                                    label="Home Offices"
+                                    icon={<Briefcase size={20} />}
+                                    formatValue={(value) => `${value} ${value === 1 ? 'Office' : 'Offices'}`}
+                                />
+                            </div>
+
+                            {/* Fourth Row: Dining Spaces and Staging Type */}
+                            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                                <Slider
+                                    value={formData.diningSpaces}
+                                    onChange={(value) => handleChange('diningSpaces', value)}
+                                    min={0}
+                                    max={3}
+                                    step={1}
+                                    label="Dining Spaces"
+                                    icon={<UtensilsCrossed size={20} />}
+                                    formatValue={(value) => `${value} ${value === 1 ? 'Space' : 'Spaces'}`}
+                                />
+                                
                                 {/* Staging Type Toggle Buttons */}
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2">
@@ -463,21 +529,75 @@ const ContactForm = () => {
                                             <div className="flex justify-between items-center">
                                                 <div>
                                                     <span className="text-stone-300 font-medium">Base {formData.stagingType} staging package</span>
-                                                    <div className="text-sm text-stone-400">Kitchen, living room, entryway</div>
+                                                    <div className="text-sm text-stone-400">Kitchen + entryway</div>
                                                 </div>
                                                 <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.basePrice)}</span>
                                             </div>
 
                                             {/* Bedrooms */}
-                                            <div className={`flex justify-between items-center ${hasAdditionalItems ? 'border-b border-stone-600/50 pb-3' : ''}`}>
-                                                <div>
-                                                    <span className="text-stone-300 font-medium">Bedrooms</span>
-                                                    <div className="text-sm text-stone-400">
-                                                        {quote.bedroomCount} × {formatPrice(quote.bedroomRate)} each
+                                            {quote.bedroomCount > 0 && (
+                                                <div className="flex justify-between items-center">
+                                                    <div>
+                                                        <span className="text-stone-300 font-medium">Bedrooms</span>
+                                                        <div className="text-sm text-stone-400">
+                                                            {quote.bedroomCount} × {formatPrice(quote.bedroomRate)} each
+                                                        </div>
                                                     </div>
+                                                    <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.bedroomTotal)}</span>
                                                 </div>
-                                                <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.bedroomTotal)}</span>
-                                            </div>
+                                            )}
+
+                                            {/* Bathrooms */}
+                                            {quote.bathroomCount > 0 && (
+                                                <div className="flex justify-between items-center">
+                                                    <div>
+                                                        <span className="text-stone-300 font-medium">Bathrooms</span>
+                                                        <div className="text-sm text-stone-400">
+                                                            {quote.bathroomCount} × {formatPrice(quote.bathroomRate)} each
+                                                        </div>
+                                                    </div>
+                                                    <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.bathroomTotal)}</span>
+                                                </div>
+                                            )}
+
+                                            {/* Living Areas */}
+                                            {quote.livingAreaCount > 0 && (
+                                                <div className="flex justify-between items-center">
+                                                    <div>
+                                                        <span className="text-stone-300 font-medium">Living Areas</span>
+                                                        <div className="text-sm text-stone-400">
+                                                            {quote.livingAreaCount} × {formatPrice(quote.livingAreaRate)} each
+                                                        </div>
+                                                    </div>
+                                                    <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.livingAreaTotal)}</span>
+                                                </div>
+                                            )}
+
+                                            {/* Home Offices */}
+                                            {quote.officeCount > 0 && (
+                                                <div className="flex justify-between items-center">
+                                                    <div>
+                                                        <span className="text-stone-300 font-medium">Home Offices</span>
+                                                        <div className="text-sm text-stone-400">
+                                                            {quote.officeCount} × {formatPrice(quote.officeRate)} each
+                                                        </div>
+                                                    </div>
+                                                    <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.officeTotal)}</span>
+                                                </div>
+                                            )}
+
+                                            {/* Dining Spaces */}
+                                            {quote.diningSpaceCount > 0 && (
+                                                <div className={`flex justify-between items-center ${hasAdditionalItems ? 'border-b border-stone-600/50 pb-3' : ''}`}>
+                                                    <div>
+                                                        <span className="text-stone-300 font-medium">Dining Spaces</span>
+                                                        <div className="text-sm text-stone-400">
+                                                            {quote.diningSpaceCount} × {formatPrice(quote.diningSpaceRate)} each
+                                                        </div>
+                                                    </div>
+                                                    <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.diningSpaceTotal)}</span>
+                                                </div>
+                                            )}
 
                                             {/* Additional Services */}
                                             {quote.outdoorAdjustment > 0 && (
