@@ -222,7 +222,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                     </button>
 
                     {detailsExpanded && (
-                        <div className="px-6 pb-6">
+                        <div className="px-6 pb-6 pt-2">
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
                                     <label className="mb-1 block text-sm font-medium text-stone-200">Project Name *</label>
