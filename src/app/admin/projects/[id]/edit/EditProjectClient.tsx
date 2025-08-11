@@ -8,6 +8,7 @@ import ProjectResizeUploader from '@/components/ProjectResizeUploader';
 import { Id } from '@/convex/_generated/dataModel';
 import { ChevronDown, ChevronRight, Plus, Bell } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
+import Image from 'next/image';
 
 interface UploadedImage {
     fileName: string;
@@ -57,6 +58,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
     const [detailsExpanded, setDetailsExpanded] = useState(false);
     const [imagesExpanded, setImagesExpanded] = useState(false);
     const [inventoryExpanded, setInventoryExpanded] = useState(false);
+    const [inventoryFilter, setInventoryFilter] = useState('');
 
     useEffect(() => {
         if (project) {
@@ -351,7 +353,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                     </div>
 
                     {imagesExpanded && (
-                        <div className="px-6">
+                        <div className="px-6 pb-6">
                             <div className="space-y-4">
                                 {/* Hidden ProjectResizeUploader */}
                                 <div id="project-uploader" className="hidden">
@@ -369,33 +371,35 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                             <Bell size={16} />
                                             <span className="text-sm">Drag and drop to reorder</span>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                                            {project.images.map((image, index) => (
-                                                <div
-                                                    key={image._id}
-                                                    className="group relative cursor-move"
-                                                    draggable
-                                                    onDragStart={() => handleDragStart(index)}
-                                                    onDragOver={handleDragOver}
-                                                    onDrop={(e) => handleDrop(e, index)}
-                                                >
-                                                    <img
-                                                        src={image.thumbnailPath || image.imagePath}
-                                                        alt={`Project image ${index + 1}`}
-                                                        className="h-32 w-full rounded-lg object-cover"
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleRemoveImage(image._id)}
-                                                        className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                                        <div className="scrollbar-thin scrollbar-thumb-stone-600 scrollbar-track-stone-800 max-h-120 overflow-y-auto">
+                                            <div className="grid grid-cols-2 gap-4 pr-2 md:grid-cols-3 lg:grid-cols-4">
+                                                {project.images.map((image, index) => (
+                                                    <div
+                                                        key={image._id}
+                                                        className="group relative cursor-move"
+                                                        draggable
+                                                        onDragStart={() => handleDragStart(index)}
+                                                        onDragOver={handleDragOver}
+                                                        onDrop={(e) => handleDrop(e, index)}
                                                     >
-                                                        ×
-                                                    </button>
-                                                    <div className="absolute bottom-2 left-2 rounded bg-black bg-opacity-60 px-2 py-1 text-xs text-white">
-                                                        {index + 1}
+                                                        <img
+                                                            src={image.thumbnailPath || image.imagePath}
+                                                            alt={`Project image ${index + 1}`}
+                                                            className="aspect-square w-full rounded-lg object-cover"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveImage(image._id)}
+                                                            className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                                                        >
+                                                            ×
+                                                        </button>
+                                                        <div className="absolute bottom-2 left-2 rounded bg-black bg-opacity-60 px-2 py-1 text-xs text-white">
+                                                            {index + 1}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 )}
@@ -415,49 +419,100 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                 <h2 className="text-2xl font-bold text-stone-100">Project Inventory</h2>
                                 {projectInventory && projectInventory.length > 0 && (
                                     <span className="text-sm text-stone-400">
-                                        ({projectInventory.filter((item) => !item.returnedAt).length} assigned)
+                                        ({projectInventory.filter((item) => !item.returnedAt).length})
                                     </span>
                                 )}
                             </div>
                         </button>
-                        <button
-                            type="button"
-                            onClick={() => router.push(`/admin/projects/${projectId}/inventory`)}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary bg-transparent text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-stone-300"
-                            title="Assign inventory"
-                        >
-                            <Plus size={16} />
-                        </button>
+                        <div className="flex items-center gap-2">
+                            {/* Category Filter */}
+                            {projectInventory && projectInventory.filter((item) => !item.returnedAt).length > 0 && (
+                                <select
+                                    value={inventoryFilter}
+                                    onChange={(e) => setInventoryFilter(e.target.value)}
+                                    className="rounded border border-stone-600 bg-stone-700 px-2 py-1 text-xs text-stone-100 focus:border-primary focus:outline-none"
+                                >
+                                    <option value="">All Categories</option>
+                                    {[
+                                        ...new Set(
+                                            projectInventory
+                                                .filter((item) => !item.returnedAt)
+                                                .map((item) => item.inventory?.category)
+                                                .filter(Boolean),
+                                        ),
+                                    ]
+                                        .sort()
+                                        .map((category) => (
+                                            <option key={category} value={category}>
+                                                {category}
+                                            </option>
+                                        ))}
+                                </select>
+                            )}
+                            <button
+                                type="button"
+                                onClick={() => router.push(`/admin/projects/${projectId}/inventory`)}
+                                className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary bg-transparent text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-stone-300"
+                                title="Assign inventory"
+                            >
+                                <Plus size={16} />
+                            </button>
+                        </div>
                     </div>
 
                     {inventoryExpanded && (
-                        <div className="px-6 pb-6">
+                        <div className="px-6 pb-6 pt-4">
                             <div className="space-y-4">
                                 {/* Assigned Inventory */}
                                 {projectInventory && projectInventory.filter((item) => !item.returnedAt).length > 0 ? (
-                                    <div className="space-y-2">
-                                        {projectInventory
-                                            .filter((item) => !item.returnedAt)
-                                            .map((assignment) => (
-                                                <div
-                                                    key={assignment._id}
-                                                    className="flex items-center justify-between rounded-lg bg-stone-700 p-3"
-                                                >
-                                                    <div className="flex-1">
-                                                        <p className="font-medium text-stone-100">{assignment.inventory?.name}</p>
-                                                        <p className="text-sm text-stone-400">
-                                                            Quantity: {assignment.quantity} • ${assignment.pricePerItem} each
-                                                        </p>
-                                                    </div>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleReturnInventory(assignment._id)}
-                                                        className="rounded bg-red-600 px-3 py-1 text-sm text-white transition-colors hover:bg-red-700"
+                                    <div className="scrollbar-thin scrollbar-thumb-stone-600 scrollbar-track-stone-800 max-h-120 overflow-y-auto">
+                                        <div className="grid grid-cols-1 gap-4 pr-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                                            {projectInventory
+                                                .filter((item) => !item.returnedAt)
+                                                .filter((item) => !inventoryFilter || item.inventory?.category === inventoryFilter)
+                                                .map((assignment) => (
+                                                    <div
+                                                        key={assignment._id}
+                                                        className="group relative overflow-hidden rounded-lg bg-stone-700 transition-all hover:bg-stone-600"
                                                     >
-                                                        Return
-                                                    </button>
-                                                </div>
-                                            ))}
+                                                        {/* Image */}
+                                                        <div className="relative aspect-square overflow-hidden">
+                                                            <Image
+                                                                src={assignment.inventory?.imagePath || '/placeholder-image.jpg'}
+                                                                alt={assignment.inventory?.name || 'Inventory item'}
+                                                                width={200}
+                                                                height={200}
+                                                                className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                                                            />
+                                                            {/* Category tag */}
+                                                            {assignment.inventory?.category && (
+                                                                <div className="absolute right-2 top-2 rounded bg-secondary px-2 py-1 text-xs font-medium text-white">
+                                                                    {assignment.inventory.category}
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Info overlay */}
+                                                        <div className="p-3">
+                                                            <h3 className="truncate font-medium text-stone-100">
+                                                                {assignment.inventory?.name}
+                                                            </h3>
+                                                            <p className="text-sm text-stone-400">
+                                                                Qty: {assignment.quantity} • ${assignment.pricePerItem} each
+                                                            </p>
+                                                        </div>
+
+                                                        {/* Return button */}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleReturnInventory(assignment._id)}
+                                                            className="absolute bottom-2 right-2 rounded bg-red-600 px-2 py-1 text-xs text-white opacity-0 transition-all hover:bg-red-700 group-hover:opacity-100"
+                                                        >
+                                                            Return
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                        </div>
                                     </div>
                                 ) : (
                                     <div className="py-8 text-center text-stone-400">

@@ -274,28 +274,17 @@ export const assignInventoryToProject = mutation({
       throw new Error("Not authorized");
     }
 
-    // Check inventory availability
+    // Get inventory for price
     const inventory = await ctx.db.get(args.inventoryId);
     if (!inventory) throw new Error("Inventory not found");
 
-    const available = inventory.count - inventory.inUse;
-    if (available < args.quantity) {
-      throw new Error(`Only ${available} items available`);
-    }
-
-    // Create assignment
+    // Create assignment (no inventory blocking)
     await ctx.db.insert("projectInventory", {
       projectId: args.projectId,
       inventoryId: args.inventoryId,
       quantity: args.quantity,
       pricePerItem: inventory.price,
       assignedAt: Date.now(),
-    });
-
-    // Update inventory inUse count
-    await ctx.db.patch(args.inventoryId, {
-      inUse: inventory.inUse + args.quantity,
-      updatedAt: Date.now(),
     });
 
     // Update project
@@ -332,15 +321,6 @@ export const returnInventoryFromProject = mutation({
     if (project.ownerId !== identity.subject && user.role !== "admin") {
       throw new Error("Not authorized");
     }
-
-    // Update inventory inUse count
-    const inventory = await ctx.db.get(assignment.inventoryId);
-    if (!inventory) throw new Error("Inventory not found");
-
-    await ctx.db.patch(assignment.inventoryId, {
-      inUse: Math.max(0, inventory.inUse - assignment.quantity),
-      updatedAt: Date.now(),
-    });
 
     // Mark assignment as returned
     await ctx.db.patch(args.projectInventoryId, {
@@ -559,22 +539,13 @@ export const deleteProject = mutation({
       throw new Error("Not authorized");
     }
 
-    // Return all assigned inventory
+    // Delete all project inventory assignments
     const assignments = await ctx.db
       .query("projectInventory")
       .withIndex("by_project", (q) => q.eq("projectId", args.id))
       .collect();
 
     for (const assignment of assignments) {
-      if (!assignment.returnedAt) {
-        const inventory = await ctx.db.get(assignment.inventoryId);
-        if (inventory) {
-          await ctx.db.patch(assignment.inventoryId, {
-            inUse: Math.max(0, inventory.inUse - assignment.quantity),
-            updatedAt: Date.now(),
-          });
-        }
-      }
       await ctx.db.delete(assignment._id);
     }
 

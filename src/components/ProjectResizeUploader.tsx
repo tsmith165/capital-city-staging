@@ -31,6 +31,7 @@ const ProjectResizeUploader: React.FC<ProjectResizeUploaderProps> = ({
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [loadingState, setLoadingState] = useState<string>('Resizing Images');
+    const [selectedFileCount, setSelectedFileCount] = useState<number>(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const { startUpload } = useUploadThing('imageUploader', {
@@ -79,12 +80,14 @@ const ProjectResizeUploader: React.FC<ProjectResizeUploaderProps> = ({
             setIsUploading(false);
             setUploadProgress(0);
             setLoadingState('Resizing Images');
+            setSelectedFileCount(0);
         },
         onUploadError: (error: Error) => {
             alert(`ERROR! ${error.message}`);
             setIsUploading(false);
             setUploadProgress(0);
-            setLoadingState('');
+            setLoadingState('Resizing Images');
+            setSelectedFileCount(0);
         },
         onUploadProgress: (progress: number) => {
             setUploadProgress(progress);
@@ -142,8 +145,10 @@ const ProjectResizeUploader: React.FC<ProjectResizeUploaderProps> = ({
         async (e: React.ChangeEvent<HTMLInputElement>) => {
             const selectedFiles = e.target.files;
             if (selectedFiles && selectedFiles.length > 0) {
+                setSelectedFileCount(selectedFiles.length);
                 setIsUploading(true);
                 onResetInputs();
+                setLoadingState(`Resizing ${selectedFiles.length} Images`);
 
                 const filesToUpload = [];
 
@@ -163,20 +168,11 @@ const ProjectResizeUploader: React.FC<ProjectResizeUploaderProps> = ({
                 }
 
                 console.log('Resize complete...');
-                setLoadingState('Uploading Images');
+                setLoadingState(`Uploading ${selectedFiles.length} Images`);
                 
-                // UploadThing has a limit, so we need to batch if too many files
-                const maxFilesPerBatch = 2; // Since we have small + large for each image
-                const batches = [];
-                
-                for (let i = 0; i < filesToUpload.length; i += maxFilesPerBatch) {
-                    batches.push(filesToUpload.slice(i, i + maxFilesPerBatch));
-                }
-                
-                // For now, just upload the first batch (1 image = 2 files)
-                if (batches.length > 0) {
-                    await startUpload(batches[0]);
-                }
+                // Upload all files at once - UploadThing handles the batching internally
+                console.log(`Uploading ${filesToUpload.length} files (${selectedFiles.length} images)`);
+                await startUpload(filesToUpload);
             }
         },
         [onResetInputs, startUpload],
@@ -216,7 +212,7 @@ const ProjectResizeUploader: React.FC<ProjectResizeUploaderProps> = ({
                         />
                     )}
                     <span className="relative z-10">
-                        {isUploading ? loadingState : 'Select Project Images'}
+                        {isUploading ? loadingState : 'Select Project Images (Multiple)'}
                     </span>
                 </button>
                 
