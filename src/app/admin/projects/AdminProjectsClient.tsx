@@ -3,7 +3,7 @@
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import Link from 'next/link';
-import { Edit3, Plus, Trash2 } from 'lucide-react';
+import { Edit3, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { Tooltip } from 'react-tooltip';
 
@@ -11,6 +11,10 @@ export default function AdminProjectsClient() {
     const projects = useQuery(api.projects.getAllProjects);
     const toggleHighlight = useMutation(api.projects.toggleProjectHighlight);
     const deleteProject = useMutation(api.projects.deleteProject);
+    const moveProjectUp = useMutation(api.projects.moveProjectUp);
+    const moveProjectDown = useMutation(api.projects.moveProjectDown);
+    const moveProjectToFirst = useMutation(api.projects.moveProjectToFirst);
+    const moveProjectToLast = useMutation(api.projects.moveProjectToLast);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
 
     const handleToggleHighlight = async (projectId: string) => {
@@ -27,6 +31,32 @@ export default function AdminProjectsClient() {
             setShowDeleteConfirm(null);
         } catch (error) {
             console.error('Error deleting project:', error);
+        }
+    };
+
+    const handleMoveUp = async (projectId: string, isFirst: boolean) => {
+        try {
+            if (isFirst) {
+                // Move to last position
+                await moveProjectToLast({ projectId: projectId as any });
+            } else {
+                await moveProjectUp({ projectId: projectId as any });
+            }
+        } catch (error) {
+            console.error('Error moving project up:', error);
+        }
+    };
+
+    const handleMoveDown = async (projectId: string, isLast: boolean) => {
+        try {
+            if (isLast) {
+                // Move to first position
+                await moveProjectToFirst({ projectId: projectId as any });
+            } else {
+                await moveProjectDown({ projectId: projectId as any });
+            }
+        } catch (error) {
+            console.error('Error moving project down:', error);
         }
     };
 
@@ -65,17 +95,39 @@ export default function AdminProjectsClient() {
                     <table className="min-w-full rounded-lg bg-stone-800">
                         <thead>
                             <tr className="">
+                                <th className="px-4 py-3 text-center text-stone-200">Order</th>
                                 <th className="px-4 py-3 text-left text-stone-200">Name</th>
                                 <th className="px-4 py-3 text-left text-stone-200">Status</th>
                                 <th className="px-4 py-3 text-left text-stone-200">Address</th>
-                                <th className="px-4 py-3 text-left text-stone-200">Created</th>
+                                <th className="px-4 py-3 text-left text-stone-200">Started</th>
                                 <th className="px-4 py-3 text-center text-stone-200">Highlighted</th>
                                 <th className="px-4 py-3 text-center text-stone-200">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="">
-                            {projects.map((project) => (
+                            {projects.map((project, index) => (
                                 <tr key={project._id} className="border-t border-stone-700 text-stone-300">
+                                    <td className="px-4 py-3 text-center">
+                                        <div className="flex items-center justify-center">
+                                            <button
+                                                onClick={() => handleMoveUp(project._id, index === 0)}
+                                                className="rounded p-1 text-stone-400 hover:text-stone-200 hover:bg-stone-700 transition-colors"
+                                                data-tooltip-id="move-up-tooltip"
+                                                data-tooltip-content={index === 0 ? "Move to Last" : "Move Up"}
+                                            >
+                                                <ChevronUp size={16} />
+                                            </button>
+                                            <span className="text-sm font-medium w-8 text-center">{project.displayOrder || (index + 1)}</span>
+                                            <button
+                                                onClick={() => handleMoveDown(project._id, index === projects.length - 1)}
+                                                className="rounded p-1 text-stone-400 hover:text-stone-200 hover:bg-stone-700 transition-colors"
+                                                data-tooltip-id="move-down-tooltip"
+                                                data-tooltip-content={index === projects.length - 1 ? "Move to First" : "Move Down"}
+                                            >
+                                                <ChevronDown size={16} />
+                                            </button>
+                                        </div>
+                                    </td>
                                     <td className="px-4 py-3 font-medium">{project.name}</td>
                                     <td className="px-4 py-3">
                                         <span
@@ -93,7 +145,7 @@ export default function AdminProjectsClient() {
                                         </span>
                                     </td>
                                     <td className="px-4 py-3">{project.address || '-'}</td>
-                                    <td className="px-4 py-3">{new Date(project.createdAt).toLocaleDateString()}</td>
+                                    <td className="px-4 py-3">{project.startDate ? new Date(project.startDate).toLocaleDateString() : '-'}</td>
                                     <td className="px-4 py-3 text-center">
                                         <button
                                             onClick={() => handleToggleHighlight(project._id)}
@@ -163,6 +215,8 @@ export default function AdminProjectsClient() {
             <Tooltip id="edit-tooltip" place="top" />
             <Tooltip id="inventory-tooltip" place="top" />
             <Tooltip id="delete-tooltip" place="top" />
+            <Tooltip id="move-up-tooltip" place="top" />
+            <Tooltip id="move-down-tooltip" place="top" />
         </div>
     );
 }

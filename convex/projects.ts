@@ -8,12 +8,13 @@ export const getHighlightedProjects = query({
     const projects = await ctx.db
       .query("projects")
       .withIndex("by_highlighted", (q) => q.eq("highlighted", true))
-      .order("desc")
-      .take(10);
+      .collect();
 
-    // Get images for each project
+    // Sort by display order and get images for each project
+    const sortedProjects = projects.sort((a, b) => (a.displayOrder || 999) - (b.displayOrder || 999));
+    
     const projectsWithImages = await Promise.all(
-      projects.map(async (project) => {
+      sortedProjects.map(async (project) => {
         const images = await ctx.db
           .query("projectImages")
           .withIndex("by_project", (q) => q.eq("projectId", project._id))
@@ -45,7 +46,7 @@ export const getAllProjects = query({
       throw new Error("Not authorized");
     }
 
-    return await ctx.db.query("projects").order("desc").collect();
+    return await ctx.db.query("projects").withIndex("by_order").collect();
   },
 });
 
@@ -155,6 +156,10 @@ export const createProject = mutation({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
+    // Get the highest display order to append new project to end
+    const projects = await ctx.db.query("projects").collect();
+    const maxOrder = Math.max(...projects.map(p => p.displayOrder || 0), 0);
+
     const projectId = await ctx.db.insert("projects", {
       ownerId: identity.subject,
       name: args.name,
@@ -166,6 +171,7 @@ export const createProject = mutation({
       notes: args.notes,
       highlighted: false,
       inventoryAssigned: false,
+      displayOrder: maxOrder + 1,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
@@ -561,5 +567,160 @@ export const deleteProject = mutation({
 
     // Delete project
     await ctx.db.delete(args.id);
+  },
+});
+
+// Move project up in order (admin only)
+export const moveProjectUp = mutation({
+  args: { projectId: v.id("projects") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .first();
+
+    if (!user || user.role !== "admin") {
+      throw new Error("Not authorized");
+    }
+
+    const project = await ctx.db.get(args.projectId);
+    if (!project) throw new Error("Project not found");
+
+    // Find the project with the next lower order
+    const projects = await ctx.db.query("projects").collect();
+    const sortedProjects = projects.sort((a, b) => (a.displayOrder || 999) - (b.displayOrder || 999));
+    const currentIndex = sortedProjects.findIndex(p => p._id === args.projectId);
+    
+    if (currentIndex > 0) {
+      const prevProject = sortedProjects[currentIndex - 1];
+      
+      // Swap display orders
+      await ctx.db.patch(args.projectId, { displayOrder: prevProject.displayOrder || 0 });
+      await ctx.db.patch(prevProject._id, { displayOrder: project.displayOrder || 0 });
+    }
+  },
+});
+
+// Move project down in order (admin only)
+export const moveProjectDown = mutation({
+  args: { projectId: v.id("projects") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .first();
+
+    if (!user || user.role !== "admin") {
+      throw new Error("Not authorized");
+    }
+
+    const project = await ctx.db.get(args.projectId);
+    if (!project) throw new Error("Project not found");
+
+    // Find the project with the next higher order
+    const projects = await ctx.db.query("projects").collect();
+    const sortedProjects = projects.sort((a, b) => (a.displayOrder || 999) - (b.displayOrder || 999));
+    const currentIndex = sortedProjects.findIndex(p => p._id === args.projectId);
+    
+    if (currentIndex < sortedProjects.length - 1) {
+      const nextProject = sortedProjects[currentIndex + 1];
+      
+      // Swap display orders
+      await ctx.db.patch(args.projectId, { displayOrder: nextProject.displayOrder || 0 });
+      await ctx.db.patch(nextProject._id, { displayOrder: project.displayOrder || 0 });
+    }
+  },
+});
+
+// Initialize display order for existing projects (admin only - run once)
+export const initializeProjectOrder = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .first();
+
+    if (!user || user.role !== "admin") {
+      throw new Error("Not authorized");
+    }
+
+    const projects = await ctx.db.query("projects").order("desc").collect();
+    
+    for (let i = 0; i < projects.length; i++) {
+      const project = projects[i];
+      if (project.displayOrder === undefined || project.displayOrder === null) {
+        await ctx.db.patch(project._id, { displayOrder: i + 1 });
+      }
+    }
+    
+    return { success: true, updated: projects.length };
+  },
+});
+
+// Move project to first position (admin only)
+export const moveProjectToFirst = mutation({
+  args: { projectId: v.id("projects") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .first();
+
+    if (!user || user.role !== "admin") {
+      throw new Error("Not authorized");
+    }
+
+    const projects = await ctx.db.query("projects").collect();
+    const sortedProjects = projects.sort((a, b) => (a.displayOrder || 999) - (b.displayOrder || 999));
+    
+    if (sortedProjects.length > 0) {
+      const firstProject = sortedProjects[0];
+      const minOrder = firstProject.displayOrder || 1;
+      
+      // Set this project's order to be before the current first
+      await ctx.db.patch(args.projectId, { displayOrder: minOrder - 1 });
+    }
+  },
+});
+
+// Move project to last position (admin only)
+export const moveProjectToLast = mutation({
+  args: { projectId: v.id("projects") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .first();
+
+    if (!user || user.role !== "admin") {
+      throw new Error("Not authorized");
+    }
+
+    const projects = await ctx.db.query("projects").collect();
+    const sortedProjects = projects.sort((a, b) => (a.displayOrder || 999) - (b.displayOrder || 999));
+    
+    if (sortedProjects.length > 0) {
+      const lastProject = sortedProjects[sortedProjects.length - 1];
+      const maxOrder = lastProject.displayOrder || sortedProjects.length;
+      
+      // Set this project's order to be after the current last
+      await ctx.db.patch(args.projectId, { displayOrder: maxOrder + 1 });
+    }
   },
 });

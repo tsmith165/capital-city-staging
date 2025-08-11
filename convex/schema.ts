@@ -76,13 +76,15 @@ export default defineSchema({
     inventoryAssigned: v.boolean(),
     inventoryRentalCost: v.optional(v.number()),
     notes: v.optional(v.string()),
+    displayOrder: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_owner", ["ownerId"])
     .index("by_status", ["status"])
     .index("by_highlighted", ["highlighted"])
-    .index("by_created", ["createdAt"]),
+    .index("by_created", ["createdAt"])
+    .index("by_order", ["displayOrder"]),
 
   projectImages: defineTable({
     projectId: v.id("projects"),
