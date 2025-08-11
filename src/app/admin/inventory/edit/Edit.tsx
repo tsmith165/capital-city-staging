@@ -11,7 +11,7 @@ import InventoryOrderPanel from './InventoryOrderPanel';
 import { handleTitleUpdate } from './actions';
 import LoadingSpinner from '@/components/layout/LoadingSpinner';
 import { idParser } from './parsers';
-import FullScreenView from '../inventory/FullScreenView';
+import FullScreenView from '../FullScreenView';
 
 interface EditProps {
     inventoryDataPromise: Promise<any>;
