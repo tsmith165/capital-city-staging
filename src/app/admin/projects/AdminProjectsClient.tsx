@@ -3,16 +3,30 @@
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import Link from 'next/link';
+import { Edit3, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { Tooltip } from 'react-tooltip';
 
 export default function AdminProjectsClient() {
   const projects = useQuery(api.projects.getAllProjects);
   const toggleHighlight = useMutation(api.projects.toggleProjectHighlight);
+  const deleteProject = useMutation(api.projects.deleteProject);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
 
   const handleToggleHighlight = async (projectId: string) => {
     try {
       await toggleHighlight({ projectId: projectId as any });
     } catch (error) {
       console.error('Error toggling highlight:', error);
+    }
+  };
+
+  const handleDeleteProject = async (projectId: string) => {
+    try {
+      await deleteProject({ id: projectId as any });
+      setShowDeleteConfirm(null);
+    } catch (error) {
+      console.error('Error deleting project:', error);
     }
   };
 
@@ -50,7 +64,7 @@ export default function AdminProjectsClient() {
         <div className="overflow-x-auto">
           <table className="min-w-full bg-stone-800 rounded-lg">
             <thead>
-              <tr className="border-b border-stone-700">
+              <tr className="">
                 <th className="px-4 py-3 text-left text-stone-200">Name</th>
                 <th className="px-4 py-3 text-left text-stone-200">Status</th>
                 <th className="px-4 py-3 text-left text-stone-200">Address</th>
@@ -61,7 +75,7 @@ export default function AdminProjectsClient() {
             </thead>
             <tbody>
               {projects.map((project) => (
-                <tr key={project._id} className="border-b border-stone-700 text-stone-300">
+                <tr key={project._id} className="text-stone-300">
                   <td className="px-4 py-3 font-medium">{project.name}</td>
                   <td className="px-4 py-3">
                     <span
@@ -94,21 +108,52 @@ export default function AdminProjectsClient() {
                       {project.highlighted ? 'Yes' : 'No'}
                     </button>
                   </td>
-                  <td className="px-4 py-3 text-center">
-                    <div className="flex justify-center gap-3">
+                  <td className="px-4 py-3 text-center relative">
+                    <div className="flex justify-center gap-2">
                       <Link
                         href={`/admin/projects/${project._id}/edit`}
-                        className="text-blue-400 hover:text-blue-300 transition-colors"
+                        className="p-2 text-blue-400 hover:text-blue-300 hover:bg-stone-700 rounded transition-colors"
+                        data-tooltip-id="edit-tooltip"
+                        data-tooltip-content="Edit Project"
                       >
-                        Edit
+                        <Edit3 size={18} />
                       </Link>
                       <Link
                         href={`/admin/projects/${project._id}/inventory`}
-                        className="text-secondary_light hover:text-secondary transition-colors"
+                        className="p-2 text-secondary_light hover:text-secondary hover:bg-stone-700 rounded transition-colors"
+                        data-tooltip-id="inventory-tooltip"
+                        data-tooltip-content="Manage Inventory"
                       >
-                        Inventory
+                        <Plus size={18} />
                       </Link>
+                      <button
+                        onClick={() => setShowDeleteConfirm(project._id)}
+                        className="p-2 text-red-400 hover:text-red-300 hover:bg-stone-700 rounded transition-colors"
+                        data-tooltip-id="delete-tooltip"
+                        data-tooltip-content="Delete Project"
+                      >
+                        <Trash2 size={18} />
+                      </button>
                     </div>
+                    {showDeleteConfirm === project._id && (
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-stone-700 border border-stone-600 rounded-lg p-4 shadow-lg z-10 min-w-64">
+                        <p className="text-stone-200 text-sm mb-3">Are you sure you want to delete this project?</p>
+                        <div className="flex justify-center gap-2">
+                          <button
+                            onClick={() => setShowDeleteConfirm(null)}
+                            className="px-3 py-1 bg-stone-600 text-stone-300 rounded hover:bg-stone-500 transition-colors text-sm"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProject(project._id)}
+                            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm"
+                          >
+                            Confirm
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -116,6 +161,10 @@ export default function AdminProjectsClient() {
           </table>
         </div>
       )}
+      
+      <Tooltip id="edit-tooltip" place="top" />
+      <Tooltip id="inventory-tooltip" place="top" />
+      <Tooltip id="delete-tooltip" place="top" />
     </div>
   );
 }

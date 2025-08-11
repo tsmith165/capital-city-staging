@@ -54,7 +54,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
     const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null);
 
     // Collapsible sections state
-    const [detailsExpanded, setDetailsExpanded] = useState(true);
+    const [detailsExpanded, setDetailsExpanded] = useState(false);
     const [imagesExpanded, setImagesExpanded] = useState(false);
     const [inventoryExpanded, setInventoryExpanded] = useState(false);
 
