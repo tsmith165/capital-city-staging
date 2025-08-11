@@ -307,17 +307,30 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                 </div>
 
                                 <div className="md:col-span-2">
-                                    <div className="flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            id="highlighted"
-                                            checked={formData.highlighted}
-                                            onChange={(e) => setFormData({ ...formData, highlighted: e.target.checked })}
-                                            className="mr-2 h-4 w-4 rounded border-stone-600 bg-stone-700 text-primary focus:ring-2 focus:ring-primary"
-                                        />
-                                        <label htmlFor="highlighted" className="text-sm font-medium text-stone-200">
-                                            Show in portfolio (highlighted)
-                                        </label>
+                                    <div className="flex items-center justify-between">
+                                        <button
+                                            type="submit"
+                                            disabled={isSubmitting}
+                                            className={`rounded px-4 py-2 font-medium transition-colors ${
+                                                isSubmitting
+                                                    ? 'bg-stone-600 text-stone-400 cursor-not-allowed'
+                                                    : 'bg-primary text-white hover:bg-primary_dark'
+                                            }`}
+                                        >
+                                            {isSubmitting ? 'Saving...' : 'Save Project'}
+                                        </button>
+                                        <div className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                id="highlighted"
+                                                checked={formData.highlighted}
+                                                onChange={(e) => setFormData({ ...formData, highlighted: e.target.checked })}
+                                                className="mr-2 h-4 w-4 rounded border-stone-600 bg-stone-700 text-primary focus:ring-2 focus:ring-primary"
+                                            />
+                                            <label htmlFor="highlighted" className="text-sm font-medium text-stone-200">
+                                                Show in portfolio (highlighted)
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
