@@ -336,23 +336,19 @@ const ContactFormEmail: React.FC<ContactFormEmailProps> = ({
 
                 <Hr className="border-primary/30 my-4" />
                 
-                <Row className="mb-2">
-                  <Column width="70%">
-                    <Text className="text-base font-bold text-gray-800 m-0">Estimated Total:</Text>
-                  </Column>
-                  <Column width="30%" align="right">
-                    <Text className="text-xl font-bold text-primary m-0">{formatPrice(quote.totalEstimate)}</Text>
-                  </Column>
-                </Row>
-
                 <Row>
-                  <Column width="70%">
-                    <Text className="text-sm text-gray-600 m-0">Expected Range:</Text>
-                  </Column>
-                  <Column width="30%" align="right">
-                    <Text className="text-sm text-gray-600 m-0">
-                      {formatPrice(quote.priceRange.min)} - {formatPrice(quote.priceRange.max)}
-                    </Text>
+                  <Column>
+                    <div style={{ textAlign: 'center' }}>
+                      <Text className="text-sm uppercase text-gray-500 m-0 mb-2" style={{ letterSpacing: '0.05em' }}>
+                        Estimated Price Range
+                      </Text>
+                      <Text className="text-2xl font-bold text-primary m-0">
+                        {formatPrice(quote.priceRange.min)} - {formatPrice(quote.priceRange.max)}
+                      </Text>
+                      <Text className="text-xs text-gray-500 m-0 mt-2">
+                        Final pricing determined after consultation
+                      </Text>
+                    </div>
                   </Column>
                 </Row>
 

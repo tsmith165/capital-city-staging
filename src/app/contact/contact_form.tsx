@@ -507,16 +507,14 @@ const ContactForm = () => {
 
                                     {/* Main Quote Display */}
                                     <div className="mb-6 rounded-xl bg-gradient-to-br from-primary/10 via-primary_dark/15 to-primary/10 border border-primary/30 p-6 text-center">
-                                        <div className="mb-3">
-                                            <div className="text-4xl font-bold gradient-gold-main-text mb-1">
-                                                {formatPrice(quote.totalEstimate)}
+                                        <div className="mb-2">
+                                            <div className="text-sm uppercase tracking-wider text-stone-400 mb-2">Estimated Price Range</div>
+                                            <div className="text-3xl font-bold gradient-gold-main-text">
+                                                {formatPrice(quote.priceRange.min)} - {formatPrice(quote.priceRange.max)}
                                             </div>
                                         </div>
-                                        <div className="text-stone-300">
-                                            <span className="text-sm font-medium">Expected Range: </span>
-                                            <span className="font-bold text-stone-200">
-                                                {formatPrice(quote.priceRange.min)} - {formatPrice(quote.priceRange.max)}
-                                            </span>
+                                        <div className="text-xs text-stone-400 mt-3">
+                                            Final pricing determined after consultation
                                         </div>
                                     </div>
 
