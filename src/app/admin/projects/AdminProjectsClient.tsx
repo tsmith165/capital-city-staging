@@ -35,26 +35,32 @@ export default function AdminProjectsClient() {
     };
 
     const handleMoveUp = async (projectId: string, isFirst: boolean) => {
+        console.log('Moving up:', { projectId, isFirst });
         try {
             if (isFirst) {
-                // Move to last position
+                console.log('Moving to last position');
                 await moveProjectToLast({ projectId: projectId as any });
             } else {
+                console.log('Moving up normally');
                 await moveProjectUp({ projectId: projectId as any });
             }
+            console.log('Move up completed');
         } catch (error) {
             console.error('Error moving project up:', error);
         }
     };
 
     const handleMoveDown = async (projectId: string, isLast: boolean) => {
+        console.log('Moving down:', { projectId, isLast });
         try {
             if (isLast) {
-                // Move to first position
+                console.log('Moving to first position');
                 await moveProjectToFirst({ projectId: projectId as any });
             } else {
+                console.log('Moving down normally');
                 await moveProjectDown({ projectId: projectId as any });
             }
+            console.log('Move down completed');
         } catch (error) {
             console.error('Error moving project down:', error);
         }
@@ -117,7 +123,7 @@ export default function AdminProjectsClient() {
                                             >
                                                 <ChevronUp size={16} />
                                             </button>
-                                            <span className="text-sm font-medium w-8 text-center">{project.displayOrder || (index + 1)}</span>
+                                            <span className="text-sm font-medium w-8 text-center">{index + 1}</span>
                                             <button
                                                 onClick={() => handleMoveDown(project._id, index === projects.length - 1)}
                                                 className="rounded p-1 text-stone-400 hover:text-stone-200 hover:bg-stone-700 transition-colors"

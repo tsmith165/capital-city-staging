@@ -596,10 +596,12 @@ export const moveProjectUp = mutation({
     
     if (currentIndex > 0) {
       const prevProject = sortedProjects[currentIndex - 1];
+      const currentOrder = project.displayOrder || (currentIndex + 1);
+      const prevOrder = prevProject.displayOrder || currentIndex;
       
       // Swap display orders
-      await ctx.db.patch(args.projectId, { displayOrder: prevProject.displayOrder || 0 });
-      await ctx.db.patch(prevProject._id, { displayOrder: project.displayOrder || 0 });
+      await ctx.db.patch(args.projectId, { displayOrder: prevOrder });
+      await ctx.db.patch(prevProject._id, { displayOrder: currentOrder });
     }
   },
 });
@@ -630,10 +632,12 @@ export const moveProjectDown = mutation({
     
     if (currentIndex < sortedProjects.length - 1) {
       const nextProject = sortedProjects[currentIndex + 1];
+      const currentOrder = project.displayOrder || (currentIndex + 1);
+      const nextOrder = nextProject.displayOrder || (currentIndex + 2);
       
       // Swap display orders
-      await ctx.db.patch(args.projectId, { displayOrder: nextProject.displayOrder || 0 });
-      await ctx.db.patch(nextProject._id, { displayOrder: project.displayOrder || 0 });
+      await ctx.db.patch(args.projectId, { displayOrder: nextOrder });
+      await ctx.db.patch(nextProject._id, { displayOrder: currentOrder });
     }
   },
 });
@@ -683,15 +687,21 @@ export const moveProjectToFirst = mutation({
       throw new Error("Not authorized");
     }
 
+    // Reorder all projects to maintain sequential order
     const projects = await ctx.db.query("projects").collect();
     const sortedProjects = projects.sort((a, b) => (a.displayOrder || 999) - (b.displayOrder || 999));
     
-    if (sortedProjects.length > 0) {
-      const firstProject = sortedProjects[0];
-      const minOrder = firstProject.displayOrder || 1;
-      
-      // Set this project's order to be before the current first
-      await ctx.db.patch(args.projectId, { displayOrder: minOrder - 1 });
+    // Find the project being moved
+    const movingProject = projects.find(p => p._id === args.projectId);
+    if (!movingProject) throw new Error("Project not found");
+    
+    // Remove from current position and add to beginning
+    const otherProjects = sortedProjects.filter(p => p._id !== args.projectId);
+    const reorderedProjects = [movingProject, ...otherProjects];
+    
+    // Update display orders to be sequential
+    for (let i = 0; i < reorderedProjects.length; i++) {
+      await ctx.db.patch(reorderedProjects[i]._id, { displayOrder: i + 1 });
     }
   },
 });
@@ -712,15 +722,21 @@ export const moveProjectToLast = mutation({
       throw new Error("Not authorized");
     }
 
+    // Reorder all projects to maintain sequential order
     const projects = await ctx.db.query("projects").collect();
     const sortedProjects = projects.sort((a, b) => (a.displayOrder || 999) - (b.displayOrder || 999));
     
-    if (sortedProjects.length > 0) {
-      const lastProject = sortedProjects[sortedProjects.length - 1];
-      const maxOrder = lastProject.displayOrder || sortedProjects.length;
-      
-      // Set this project's order to be after the current last
-      await ctx.db.patch(args.projectId, { displayOrder: maxOrder + 1 });
+    // Find the project being moved
+    const movingProject = projects.find(p => p._id === args.projectId);
+    if (!movingProject) throw new Error("Project not found");
+    
+    // Remove from current position and add to end
+    const otherProjects = sortedProjects.filter(p => p._id !== args.projectId);
+    const reorderedProjects = [...otherProjects, movingProject];
+    
+    // Update display orders to be sequential
+    for (let i = 0; i < reorderedProjects.length; i++) {
+      await ctx.db.patch(reorderedProjects[i]._id, { displayOrder: i + 1 });
     }
   },
 });
