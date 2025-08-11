@@ -6,7 +6,7 @@ import { api } from '@/convex/_generated/api';
 import { useRouter } from 'next/navigation';
 import ProjectResizeUploader from '@/components/ProjectResizeUploader';
 import { Id } from '@/convex/_generated/dataModel';
-import { ChevronDown, ChevronRight, Plus, Bell } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Bell, Loader2 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import Image from 'next/image';
 
@@ -53,6 +53,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
     const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null);
+    const [isUploadingImages, setIsUploadingImages] = useState(false);
 
     // Collapsible sections state
     const [detailsExpanded, setDetailsExpanded] = useState(false);
@@ -79,22 +80,27 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
     }, [project]);
 
     const handleUploadComplete = async (images: UploadedImage[]) => {
+        setIsUploadingImages(true);
         setUploadedImages((prev) => [...prev, ...images]);
 
-        // Add images to project
-        for (let i = 0; i < images.length; i++) {
-            const image = images[i];
-            const currentImageCount = (project?.images?.length || 0) + i;
-            await addProjectImage({
-                projectId: projectId as Id<'projects'>,
-                imagePath: image.originalImageUrl,
-                width: image.originalWidth,
-                height: image.originalHeight,
-                thumbnailPath: image.smallImageUrl,
-                thumbnailWidth: image.smallWidth,
-                thumbnailHeight: image.smallHeight,
-                displayOrder: currentImageCount,
-            });
+        try {
+            // Add images to project
+            for (let i = 0; i < images.length; i++) {
+                const image = images[i];
+                const currentImageCount = (project?.images?.length || 0) + i;
+                await addProjectImage({
+                    projectId: projectId as Id<'projects'>,
+                    imagePath: image.originalImageUrl,
+                    width: image.originalWidth,
+                    height: image.originalHeight,
+                    thumbnailPath: image.smallImageUrl,
+                    thumbnailWidth: image.smallWidth,
+                    thumbnailHeight: image.smallHeight,
+                    displayOrder: currentImageCount,
+                });
+            }
+        } finally {
+            setIsUploadingImages(false);
         }
     };
 
@@ -358,10 +364,15 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                 const uploadInput = document.querySelector('#project-uploader input') as HTMLInputElement;
                                 if (uploadInput) uploadInput.click();
                             }}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary bg-transparent text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-stone-300"
-                            title="Add images"
+                            disabled={isUploadingImages}
+                            className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-colors ${
+                                isUploadingImages
+                                    ? 'border-stone-600 bg-stone-600 text-stone-400 cursor-not-allowed'
+                                    : 'border-primary bg-transparent text-primary hover:border-secondary hover:bg-secondary hover:text-stone-300'
+                            }`}
+                            title={isUploadingImages ? "Processing images..." : "Add images"}
                         >
-                            <Plus size={16} />
+                            {isUploadingImages ? <Loader2 className="animate-spin" size={16} /> : <Plus size={16} />}
                         </button>
                     </div>
 
@@ -376,6 +387,16 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                         disabled={isSubmitting}
                                     />
                                 </div>
+
+                                {/* Upload Loading Spinner */}
+                                {isUploadingImages && (
+                                    <div className="flex items-center justify-center py-8">
+                                        <div className="flex items-center gap-3 rounded-lg bg-stone-700 px-4 py-3">
+                                            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                                            <span className="text-sm text-stone-200">Processing uploaded images...</span>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Existing Images */}
                                 {project.images && project.images.length > 0 && (
