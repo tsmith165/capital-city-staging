@@ -177,6 +177,12 @@ const ContactForm = () => {
         stagingType: formData.stagingType,
     });
 
+    // Check if there are any additional items to show separator
+    const hasAdditionalItems = quote.outdoorAdjustment > 0 || 
+                              quote.multiFloorAdjustment > 0 || 
+                              quote.largeSquareFootageAdjustment > 0 || 
+                              quote.distanceAdjustment > 0;
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -463,7 +469,7 @@ const ContactForm = () => {
                                             </div>
 
                                             {/* Bedrooms */}
-                                            <div className="flex justify-between items-center border-b border-stone-600/50 pb-3">
+                                            <div className={`flex justify-between items-center ${hasAdditionalItems ? 'border-b border-stone-600/50 pb-3' : ''}`}>
                                                 <div>
                                                     <span className="text-stone-300 font-medium">Bedrooms</span>
                                                     <div className="text-sm text-stone-400">
