@@ -1,39 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Home, Sofa, CheckCircle, ArrowRight, Sparkles, Users } from 'lucide-react';
 
 import Statistics from '@/app/_main_components/statistics';
 
 interface Service {
     title: string;
+    icon: React.ReactNode;
     description: string;
     price: number | string;
     includedItems: string[];
     tag?: string;
+    color: 'primary' | 'secondary';
 }
 
 export default function Services() {
+    const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+    
     const services: Service[] = [
         {
             title: 'Occupied Staging',
-            description:
-                'Mia will make adjustments to your furniture and decor that will make your home ready to sell with minimal hassle.',
-            price: 'Call Mia for a quote',
+            icon: <Users size={24} />,
+            description: 'Transform your lived-in home into a buyer\'s dream with strategic adjustments to your existing furniture and decor.',
+            price: 'Get a Custom Quote',
+            color: 'primary',
             includedItems: [
-                'Conduct a walkthrough of your home to assess overall space, room count and available furniture and accessories',
-                'Create a proposal with recommended services based on your requirements, budget, and timeline',
-                'Use marketing and design to create an environment that buyers aspire to live in',
-                'Transform each room to enhance appeal for a faster, more profitable sale',
+                'Complete walkthrough & space assessment',
+                'Custom proposal tailored to your budget',
+                'Strategic design for maximum appeal',
+                'Room-by-room transformation',
             ],
         },
         {
             title: 'Vacant Staging',
-            description: 'Mia will assess your current decor to determine what furniture and decor will make your home pop.',
-            price: 'Call Mia for a quote',
+            icon: <Sofa size={24} />,
+            description: 'Bring empty spaces to life with carefully curated furniture and accessories that showcase your home\'s full potential.',
+            price: 'Get a Custom Quote',
+            color: 'secondary',
             includedItems: [
-                'Visit the home for measurements and blueprint development',
-                "Select furniture, artwork, and accessories that complement the home and suit the buyer's lifestyle",
-                "Arrange furnishings expertly to enhance each room's appeal and functionality",
-                'Remove staged items promptly and complete inventory retrieval after the property sells',
+                'Professional measurements & planning',
+                'Curated furniture & artwork selection',
+                'Expert room arrangement & styling',
+                'Seamless removal after sale',
             ],
         },
     ];
@@ -41,46 +50,155 @@ export default function Services() {
     return (
         <div className="flex h-auto w-full flex-col items-center justify-evenly md:min-h-[calc(100dvh-50px)]">
             <div className="flex h-fit w-full flex-col items-center justify-center p-4 lg:w-[90%]">
-                <h1 className="px-4 text-center text-4xl font-bold text-white">Focus on your next moves,</h1>
-                <h1 className="px-4 text-center text-4xl font-bold gradient-secondary-main-text">we'll handle the rest.</h1>
-                <p className="px-8 pb-4 text-center text-lg text-white">
-                    With a home staged by Mia, you can trust that your home has reached its full potential.
-                </p>
-                <div className="flex w-full flex-col justify-center space-y-4 md:flex-row md:space-x-4 md:space-y-0">
+                {/* Animated Header */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                    className="mb-12 text-center"
+                >
+                    <div className="mb-2 flex items-center justify-center gap-2">
+                        <Sparkles className="text-primary" size={28} />
+                        <h1 className="text-4xl font-bold lg:text-5xl">
+                            <span className="text-white">Focus on your </span>
+                            <span className="gradient-primary-main-text">next moves</span>
+                        </h1>
+                    </div>
+                    <h2 className="text-3xl font-bold gradient-secondary-main-text lg:text-4xl">
+                        We'll handle the rest.
+                    </h2>
+                    <p className="mt-4 text-lg text-stone-300 max-w-2xl mx-auto">
+                        With professional staging expertise, we transform spaces into buyer-ready homes that sell faster and for top dollar.
+                    </p>
+                </motion.div>
+
+                {/* Service Cards */}
+                <div className="grid w-full gap-8 md:grid-cols-2 max-w-5xl mx-auto">
                     {services.map((service, index) => (
-                        <div key={index} className="flex w-full flex-col rounded-lg bg-stone-800 p-4 ring-1 ring-stone-500 md:w-1/3">
-                            <div className="mb-4 flex items-center justify-between">
-                                <div className="text-lg font-bold gradient-gold-main-text">{service.title}</div>
-                                {service.tag && (
-                                    <span className="rounded-full px-2 py-1 text-sm gradient-secondary-main-text">{service.tag}</span>
+                        <motion.div 
+                            key={index}
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: index * 0.2 }}
+                            onMouseEnter={() => setHoveredCard(index)}
+                            onMouseLeave={() => setHoveredCard(null)}
+                            className="relative"
+                        >
+                            <div className={`
+                                h-full rounded-2xl border-2 bg-stone-900/50 backdrop-blur-sm p-8
+                                transition-all duration-300 transform
+                                ${hoveredCard === index ? 'scale-105 shadow-2xl' : 'shadow-lg'}
+                                ${service.color === 'primary' 
+                                    ? 'border-primary hover:border-primary_dark' 
+                                    : 'border-secondary hover:border-secondary_light'
+                                }
+                            `}>
+                                {/* Icon and Title */}
+                                <div className="mb-4 flex items-center gap-3">
+                                    <div className={`
+                                        rounded-lg p-2
+                                        ${service.color === 'primary' 
+                                            ? 'bg-gradient-to-br from-primary/20 to-primary_dark/20 text-primary_dark' 
+                                            : 'bg-gradient-to-br from-secondary/20 to-secondary_light/20 text-secondary_light'
+                                        }
+                                    `}>
+                                        {service.icon}
+                                    </div>
+                                    <h3 className={`text-3xl font-bold ${
+                                        service.color === 'primary' 
+                                            ? 'gradient-gold-main-text' 
+                                            : 'gradient-secondary-main-text'
+                                    }`}>
+                                        {service.title}
+                                    </h3>
+                                </div>
+                                
+                                {/* Description */}
+                                <p className="text-stone-300 leading-relaxed mb-6 min-h-[4.5rem]">
+                                    {service.description}
+                                </p>
+
+                                {/* Features List */}
+                                <div className="space-y-3 mb-8">
+                                    {service.includedItems.map((item, itemIndex) => (
+                                        <motion.div 
+                                            key={itemIndex}
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.4, delay: 0.1 * itemIndex }}
+                                            className="flex items-start gap-3 group"
+                                        >
+                                            <CheckCircle 
+                                                size={20} 
+                                                className={`
+                                                    mt-0.5 flex-shrink-0 transition-colors
+                                                    ${service.color === 'primary' 
+                                                        ? 'text-primary group-hover:text-primary_dark' 
+                                                        : 'text-secondary group-hover:text-secondary_light'
+                                                    }
+                                                `} 
+                                            />
+                                            <span className="text-stone-300 group-hover:text-white transition-colors">
+                                                {item}
+                                            </span>
+                                        </motion.div>
+                                    ))}
+                                </div>
+
+                                {/* CTA Button */}
+                                <Link href="/contact">
+                                    <button className={`
+                                        w-full rounded-lg px-6 py-4 font-semibold text-white
+                                        flex items-center justify-center gap-2 group
+                                        transition-all duration-300 transform hover:scale-105
+                                        ${service.color === 'primary' 
+                                            ? 'bg-gradient-to-r from-primary to-primary_dark hover:shadow-lg hover:shadow-primary/30' 
+                                            : 'bg-gradient-to-r from-secondary to-secondary_light hover:shadow-lg hover:shadow-secondary/30'
+                                        }
+                                    `}>
+                                        <span>{service.price}</span>
+                                        <ArrowRight 
+                                            size={20} 
+                                            className="transition-transform group-hover:translate-x-1" 
+                                        />
+                                    </button>
+                                </Link>
+
+                                {/* Hover Glow Effect */}
+                                {hoveredCard === index && (
+                                    <div className={`
+                                        absolute inset-0 -z-10 rounded-2xl blur-xl opacity-20
+                                        ${service.color === 'primary' 
+                                            ? 'bg-gradient-to-r from-primary to-primary_dark' 
+                                            : 'bg-gradient-to-r from-secondary to-secondary_light'
+                                        }
+                                    `} />
                                 )}
                             </div>
-                            <p className="text-md mb-4 text-white">{service.description}</p>
-                            <Link href="/contact">
-                                <div
-                                    className={
-                                        `text-md group mb-4 flex w-full items-center justify-center rounded-md px-2 py-2 font-bold ` +
-                                        ` bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400` +
-                                        ` hover:from-secondary hover:via-secondary_light hover:to-secondary`
-                                    }
-                                >
-                                    <div className="gradient-secondary-main-text group-hover:text-white">
-                                        {typeof service.price === 'string' ? service.price : `$${service.price.toFixed(2)}`}
-                                    </div>
-                                </div>
-                            </Link>
-                            <ul className="ml-1 list-outside list-disc space-y-1 p-3">
-                                {service.includedItems.map((item, itemIndex) => (
-                                    <li key={itemIndex} className="text-md text-lg leading-tight text-white hover:text-secondary_light">
-                                        {item}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
+
+                {/* Bottom CTA */}
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.6, delay: 0.6 }}
+                    className="mt-12 text-center"
+                >
+                    <p className="text-stone-400 mb-4">Ready to transform your home?</p>
+                    <Link href="/contact">
+                        <button className="group inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary to-primary_dark px-8 py-3 font-semibold text-white shadow-lg transition-all hover:shadow-xl hover:scale-105">
+                            <Home size={20} />
+                            <span>Schedule a Consultation</span>
+                            <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
+                        </button>
+                    </Link>
+                </motion.div>
             </div>
-            <div className="hidden h-fit w-full flex-col items-center justify-center space-y-2 px-4 py-4 md:flex">
+            
+            {/* Statistics Section */}
+            <div className="hidden h-fit w-full flex-col items-center justify-center space-y-2 px-4 py-8 md:flex">
                 <Statistics arrows={false} />
             </div>
         </div>
