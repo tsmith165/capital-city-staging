@@ -26,7 +26,6 @@ a {
 * {
     scrollbar-width: thin;
     scrollbar-color: var(--bg-primary) transparent;
-    color: #54786d;
 }
 
 /* Date Picker Styles */

@@ -19,16 +19,17 @@
                 "name": "next"
             }
         ],
-        "baseUrl": "./src",
+        "baseUrl": "./",
         "paths": {
-            "@/components/*": ["components/*"],
-            "@/styles/*": ["styles/*"],
-            "@/lib/*": ["lib/*"],
-            "@/app/*": ["app/*"],
-            "@/stores/*": ["stores/*"],
-            "@/utils/*": ["utils/*"],
-            "@/db/*": ["db/*"],
-            "@/server/*": ["server/*"]
+            "@/components/*": ["src/components/*"],
+            "@/styles/*": ["src/styles/*"],
+            "@/lib/*": ["src/lib/*"],
+            "@/app/*": ["src/app/*"],
+            "@/stores/*": ["src/stores/*"],
+            "@/utils/*": ["src/utils/*"],
+            "@/db/*": ["src/db/*"],
+            "@/server/*": ["src/server/*"],
+            "@/convex/*": ["convex/*"]
         }
     },
     "include": [

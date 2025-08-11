@@ -1,10 +1,8 @@
 import React from 'react';
 
-import { ClerkProvider } from '@clerk/nextjs';
+import { ConvexClientProvider } from '@/components/ConvexClientProvider';
 import { PHProvider } from '@/app/providers';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
-
-import { dark } from '@clerk/themes';
 
 import 'tailwindcss/tailwind.css';
 import '@/styles/globals.css';
@@ -15,11 +13,11 @@ interface RootLayoutProps {
 
 const RootProvider = ({ children }: RootLayoutProps) => {
     return (
-        <ClerkProvider appearance={{ baseTheme: dark }}>
+        <ConvexClientProvider>
             <PHProvider>
                 <NuqsAdapter>{children}</NuqsAdapter>
             </PHProvider>
-        </ClerkProvider>
+        </ConvexClientProvider>
     );
 };
 

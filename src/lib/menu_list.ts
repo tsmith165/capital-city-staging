@@ -33,9 +33,29 @@ export const menu_list: MenuItem[] = [
 
 export const admin_menu_list: MenuItem[] = [
     ...menu_list,
-    { id: 'inventory', label: 'Inventory', url: '/admin/inventory' },
+    {
+        id: 'projects',
+        label: 'Projects',
+        url: '/admin/projects',
+        subMenu: [
+            { id: 'all-projects', label: 'All Projects', url: '/admin/projects' },
+            { id: 'new-project', label: 'New Project', url: '/admin/projects/new' },
+            { id: 'edit-project', label: 'Edit Project', url: '/admin/projects/edit' },
+        ],
+    },
+    {
+        id: 'inventory',
+        label: 'Inventory',
+        url: '/admin/inventory',
+        subMenu: [
+            { id: 'all-inventory', label: 'All Inventory', url: '/admin/inventory' },
+            { id: 'add-inventory', label: 'Add Inventory', url: '/admin/inventory/new' },
+            { id: 'edit-details', label: 'Edit Details', url: '/admin/inventory/edit' },
+            { id: 'edit-images', label: 'Edit Images', url: '/admin/inventory/edit/images' },
+        ],
+    },
+    { id: 'users', label: 'Users', url: '/admin/users' },
     { id: 'manage', label: 'Manage', url: '/admin/manage' },
-    { id: 'edit', label: 'Edit', url: '/admin/edit' },
 ];
 
 export default { navbar_menu_list, menu_list, admin_menu_list };

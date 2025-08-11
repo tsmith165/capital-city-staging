@@ -14,7 +14,7 @@ export default function PageLayout({ children, page }: PageLayoutProps) {
                 <PostHogPageView />
                 <Navbar page={page} />
             </Suspense>
-            <main className="h-[calc(100dvh-50px)]">{children}</main>
+            <main className="h-[calc(100dvh-50px)] overflow-y-auto">{children}</main>
         </div>
     );
 }

@@ -1,12 +1,12 @@
 import { Metadata } from 'next';
 import React from 'react';
 import PageLayout from '@/components/layout/PageLayout';
-import InventoryConvexClient from './InventoryConvexClient';
+import EditProjectClient from './EditProjectClient';
 
 export const metadata: Metadata = {
-    title: 'Capital City Staging - Inventory Management',
-    description: 'Manage inventory for Capital City Staging.',
-    keywords: 'Capital City Staging, Sacramento Staging, Inventory Management, Home Staging',
+    title: 'Capital City Staging - Edit Project',
+    description: 'Edit staging project details for Capital City Staging.',
+    keywords: 'Capital City Staging, Sacramento Staging, Edit Project, Home Staging',
     applicationName: 'Capital City Staging',
     icons: {
         icon: '/logo/CCS_logo_152x152.png',
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
         apple: '/logo/apple-touch-icon-152x152.png',
     },
     openGraph: {
-        title: 'Capital City Staging - Inventory Management',
-        description: 'Manage inventory for Capital City Staging.',
+        title: 'Capital City Staging - Edit Project',
+        description: 'Edit staging project details for Capital City Staging.',
         siteName: 'Capital City Staging',
         url: 'https://www.capitalcitystaging.com',
         images: [
@@ -32,10 +32,11 @@ export const metadata: Metadata = {
     metadataBase: new URL('https://www.capitalcitystaging.com'),
 };
 
-export default function InventoryPage() {
+export default async function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     return (
-        <PageLayout page="/admin/inventory">
-            <InventoryConvexClient />
+        <PageLayout page={`/admin/projects/${id}/edit`}>
+            <EditProjectClient projectId={id} />
         </PageLayout>
     );
 }
