@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Tooltip } from 'react-tooltip';
 
 export default function About() {
     return (
@@ -16,7 +17,23 @@ export default function About() {
             </div>
 
             <div className="flex h-full w-full flex-col justify-center space-y-2 rounded-lg p-4 text-stone-300 shadow-lg md:w-2/3">
-                <h1 className="text-2xl font-bold gradient-gold-main-text">Mia Dofflemyer</h1>
+                <div className="flex items-center gap-3">
+                    <h1 className="text-4xl font-bold gradient-gold-main-text">Mia Dofflemyer</h1>
+                    <Link 
+                        href="https://www.realestatestagingassociation.com/" 
+                        className="flex"
+                        data-tooltip-id="resa-tooltip"
+                        data-tooltip-content="RESA Certified Professional Home Stager"
+                    >
+                        <Image
+                            src="/logo/RESA_logo.png"
+                            alt="RESA Logo"
+                            width={1024}
+                            height={512}
+                            className="h-10 w-auto rounded bg-stone-300 p-1 hover:bg-stone-400 transition-colors"
+                        />
+                    </Link>
+                </div>
                 <p className="text-md text-stone-300 md:text-lg">
                     Hello! I'm Mia Dofflemyer, the founder of Capital City Staging. Raised in the valley and educated at UC Davis, I later
                     settled in Sacramento to pursue my passion for real estate. Obtaining my license in 2020, I've dedicated myself to
@@ -44,18 +61,8 @@ export default function About() {
                         </div>
                     </Link>
                 </div>
-                <div className="flex h-[8rem] flex-row">
-                    <Link href="https://www.realestatestagingassociation.com/" className="flex">
-                        <Image
-                            src="/logo/RESA_logo.png"
-                            alt="RESA Logo"
-                            width={1024}
-                            height={512}
-                            className="max-h-full w-auto rounded-3xl bg-stone-300 p-2 hover:bg-stone-400"
-                        />
-                    </Link>
-                </div>
             </div>
+            <Tooltip id="resa-tooltip" place="top" />
         </div>
     );
 }

@@ -27,7 +27,7 @@ export default function Services() {
         },
         {
             title: 'Vacant Staging',
-            description: 'Mia will bring in all the latest furniture and decor to your home to make it pop.',
+            description: 'Mia will assess your current decor to determine what furniture and decor will make your home pop.',
             price: 'Call Mia for a quote',
             includedItems: [
                 'Visit the home for measurements and blueprint development',

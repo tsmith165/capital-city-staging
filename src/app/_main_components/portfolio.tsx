@@ -69,15 +69,6 @@ export default function Portfolio() {
                     </div>
                 )}
 
-                {/* Project Info */}
-                {currentProject && (
-                    <div className="mb-8">
-                        {currentProject.address && <p className="text-stone-400 text-lg mb-1">{currentProject.address}</p>}
-                        {currentProject.startDate && (
-                            <p className="text-stone-500">{new Date(currentProject.startDate).toLocaleDateString()}</p>
-                        )}
-                    </div>
-                )}
             </div>
 
             {/* Images Grid */}
