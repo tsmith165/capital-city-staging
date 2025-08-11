@@ -21,15 +21,15 @@ export async function sendContactFormEmail(formData: any) {
             throw new Error('Daily email limit reached. Please try again tomorrow.');
         }
 
-        for (const admin_email of admin_emails) {
-            console.log(`Sending email to ${admin_email}`);
-            await sendEmail({
-                from: 'contact@capitalcitystaging.com',
-                to: [admin_email, formData.email],
-                subject: 'New Contact Form Submission',
-                html: email_html,
-            });
-        }
+        // Send single email to all recipients (admin + user)
+        const allRecipients = [...admin_emails, formData.email];
+        console.log(`Sending email to: ${allRecipients.join(', ')}`);
+        await sendEmail({
+            from: 'contact@capitalcitystaging.com',
+            to: allRecipients,
+            subject: `Estimate for ${formData.name}'s property`,
+            html: email_html,
+        });
         return { success: true };
     } catch (error) {
         console.error('Error sending emails:', error);
