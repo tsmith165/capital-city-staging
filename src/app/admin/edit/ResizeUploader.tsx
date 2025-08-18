@@ -16,7 +16,7 @@ interface ResizeUploaderProps {
         smallHeight: number,
     ) => void;
     handleResetInputs: () => void;
-    backToEditLink: string;
+    backToEditLink?: string;
 }
 
 interface UploadResponse {
@@ -178,11 +178,13 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ handleUploadComplete, h
                         {isUploading ? loadingState : 'Select and Upload File'}
                     </span>
                 </button>
-                <Link href={backToEditLink} passHref>
-                    <button className="rounded-md bg-gray-500 px-4 py-1 text-lg font-bold text-white hover:bg-gray-600">
-                        Back To Edit
-                    </button>
-                </Link>
+                {backToEditLink && (
+                    <Link href={backToEditLink} passHref>
+                        <button className="rounded-md bg-gray-500 px-4 py-1 text-lg font-bold text-white hover:bg-gray-600">
+                            Back To Edit
+                        </button>
+                    </Link>
+                )}
             </div>
         </>
     );

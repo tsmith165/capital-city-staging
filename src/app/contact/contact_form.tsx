@@ -378,7 +378,7 @@ const ContactForm = () => {
                                     min={0}
                                     max={6}
                                     step={1}
-                                    label="Number of Bedrooms"
+                                    label="Bedrooms to be staged"
                                     icon={<Bed size={20} />}
                                     formatValue={(value) => `${value} ${value === 1 ? 'Bedroom' : 'Bedrooms'}`}
                                 />
@@ -389,7 +389,7 @@ const ContactForm = () => {
                                     min={0}
                                     max={5}
                                     step={1}
-                                    label="Number of Bathrooms"
+                                    label="Bathrooms to be staged"
                                     icon={<Bath size={20} />}
                                     formatValue={(value) => `${value} ${value === 1 ? 'Bathroom' : 'Bathrooms'}`}
                                 />

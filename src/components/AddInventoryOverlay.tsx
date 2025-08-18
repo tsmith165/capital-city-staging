@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { X, Package, Edit, Eye, Loader2, Upload } from 'lucide-react';
+import { X, Package, Edit, Eye, Loader2, Upload, File, RotateCcw } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
 import ResizeUploader from '@/app/admin/edit/ResizeUploader';
 import InputTextbox from '@/components/inputs/InputTextbox';
@@ -30,6 +30,17 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
     const [smallHeight, setSmallHeight] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+    
+    // Additional form fields
+    const [category, setCategory] = useState('');
+    const [vendor, setVendor] = useState('');
+    const [price, setPrice] = useState(0);
+    const [cost, setCost] = useState(0);
+    const [location, setLocation] = useState('');
+    const [count, setCount] = useState(1);
+    const [realWidth, setRealWidth] = useState(0);
+    const [realHeight, setRealHeight] = useState(0);
+    const [realDepth, setRealDepth] = useState(0);
 
     const router = useRouter();
     const createInventory = useMutation(api.inventory.createInventory);
@@ -66,6 +77,15 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
         setSmallWidth(0);
         setSmallHeight(0);
         setStatusMessage(null);
+        setCategory('');
+        setVendor('');
+        setPrice(0);
+        setCost(0);
+        setLocation('');
+        setCount(1);
+        setRealWidth(0);
+        setRealHeight(0);
+        setRealDepth(0);
     }, []);
 
     const handleCreateInventory = async (action: 'edit' | 'view' | 'stay') => {
@@ -85,16 +105,16 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                 pId: nextOId,
                 active: true,
                 name: title,
-                cost: 0,
-                price: 0,
-                vendor: '',
-                category: '',
+                cost: cost,
+                price: price,
+                vendor: vendor,
+                category: category,
                 description: '',
-                count: 0,
-                location: '',
-                realWidth: 0,
-                realHeight: 0,
-                realDepth: 0,
+                count: count,
+                location: location,
+                realWidth: realWidth,
+                realHeight: realHeight,
+                realDepth: realDepth,
                 imagePath: imageUrl,
                 width: width,
                 height: height,
@@ -162,32 +182,99 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
 
                     {/* Content */}
                     <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {/* Upload Section */}
-                            <div className="space-y-6">
-                                <div>
-                                    <h3 className="text-lg font-semibold text-stone-200 mb-3">Upload Image</h3>
-                                    <ResizeUploader
-                                        handleUploadComplete={handleUploadComplete}
-                                        handleResetInputs={handleResetInputs}
-                                        backToEditLink="/admin/inventory"
-                                    />
+                        {imageUrl === 'Not yet uploaded' ? (
+                            /* Initial Upload State */
+                            <div className="flex flex-col items-center justify-center min-h-[300px] space-y-6">
+                                <div className="text-center text-stone-400 mb-6">
+                                    <Upload size={64} className="mx-auto mb-4 opacity-50" />
+                                    <p className="text-lg">Select an image to get started</p>
                                 </div>
-
-                                <InputTextbox 
-                                    idName="title" 
-                                    name="Item Title" 
-                                    value={title} 
-                                    onChange={(e) => setTitle(e.target.value)} 
+                                
+                                <ResizeUploader
+                                    handleUploadComplete={handleUploadComplete}
+                                    handleResetInputs={handleResetInputs}
                                 />
                             </div>
+                        ) : (
+                            /* Post-Upload Form State */
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                {/* Form Section */}
+                                <div className="space-y-4">
+                                    <InputTextbox 
+                                        idName="title" 
+                                        name="Item Title" 
+                                        value={title} 
+                                        onChange={(e) => setTitle(e.target.value)} 
+                                    />
+                                    
+                                    <InputTextbox 
+                                        idName="category" 
+                                        name="Category" 
+                                        value={category} 
+                                        onChange={(e) => setCategory(e.target.value)} 
+                                    />
+                                    
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <InputTextbox 
+                                            idName="vendor" 
+                                            name="Vendor" 
+                                            value={vendor} 
+                                            onChange={(e) => setVendor(e.target.value)} 
+                                        />
+                                        <InputTextbox 
+                                            idName="location" 
+                                            name="Location" 
+                                            value={location} 
+                                            onChange={(e) => setLocation(e.target.value)} 
+                                        />
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-3 gap-4">
+                                        <InputTextbox 
+                                            idName="price" 
+                                            name="Price ($)" 
+                                            value={price.toString()} 
+                                            onChange={(e) => setPrice(Number(e.target.value) || 0)} 
+                                        />
+                                        <InputTextbox 
+                                            idName="cost" 
+                                            name="Cost ($)" 
+                                            value={cost.toString()} 
+                                            onChange={(e) => setCost(Number(e.target.value) || 0)} 
+                                        />
+                                        <InputTextbox 
+                                            idName="count" 
+                                            name="Count" 
+                                            value={count.toString()} 
+                                            onChange={(e) => setCount(Number(e.target.value) || 1)} 
+                                        />
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-3 gap-4">
+                                        <InputTextbox 
+                                            idName="realWidth" 
+                                            name="Width (in)" 
+                                            value={realWidth.toString()} 
+                                            onChange={(e) => setRealWidth(Number(e.target.value) || 0)} 
+                                        />
+                                        <InputTextbox 
+                                            idName="realHeight" 
+                                            name="Height (in)" 
+                                            value={realHeight.toString()} 
+                                            onChange={(e) => setRealHeight(Number(e.target.value) || 0)} 
+                                        />
+                                        <InputTextbox 
+                                            idName="realDepth" 
+                                            name="Depth (in)" 
+                                            value={realDepth.toString()} 
+                                            onChange={(e) => setRealDepth(Number(e.target.value) || 0)} 
+                                        />
+                                    </div>
+                                </div>
 
-                            {/* Preview Section */}
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-semibold text-stone-200">Preview</h3>
-                                
-                                <div className="aspect-square bg-stone-800 rounded-lg overflow-hidden flex items-center justify-center">
-                                    {imageUrl && imageUrl !== 'Not yet uploaded' ? (
+                                {/* Preview Section */}
+                                <div className="space-y-4">
+                                    <div className="aspect-square bg-stone-800 rounded-lg overflow-hidden">
                                         <Image
                                             src={imageUrl}
                                             alt="Preview"
@@ -195,35 +282,25 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                                             height={height}
                                             className="w-full h-full object-cover"
                                         />
-                                    ) : (
-                                        <div className="text-center text-stone-400">
-                                            <Upload size={48} className="mx-auto mb-2 opacity-50" />
-                                            <p>Upload an image to see preview</p>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-2 gap-4 text-sm text-stone-400 bg-stone-800 p-4 rounded-lg">
+                                        <div>
+                                            <span className="block font-medium text-stone-300">Dimensions:</span>
+                                            <span>{width} × {height}px</span>
                                         </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                                        <div>
+                                            <span className="block font-medium text-stone-300">Small:</span>
+                                            <span>{smallWidth} × {smallHeight}px</span>
+                                        </div>
+                                    </div>
 
-                        {/* Image Dimensions and Warnings */}
-                        {imageUrl && imageUrl !== 'Not yet uploaded' && (
-                            <div className="mt-6 space-y-4">
-                                <div className="grid grid-cols-2 gap-4 text-sm text-stone-400 bg-stone-800 p-4 rounded-lg">
-                                    <div>
-                                        <span className="block font-medium text-stone-300">Dimensions:</span>
-                                        <span>{width} × {height}px</span>
-                                    </div>
-                                    <div>
-                                        <span className="block font-medium text-stone-300">Small:</span>
-                                        <span>{smallWidth} × {smallHeight}px</span>
-                                    </div>
+                                    {width < 800 || height < 800 ? (
+                                        <div className="text-red-400 text-sm bg-red-900/20 p-3 rounded">
+                                            ⚠️ Warning: Image dimensions are less than 800px. Consider uploading a larger image for better quality.
+                                        </div>
+                                    ) : null}
                                 </div>
-
-                                {width < 800 || height < 800 ? (
-                                    <div className="text-red-400 text-sm bg-red-900/20 p-3 rounded">
-                                        ⚠️ Warning: Image dimensions are less than 800px. Consider uploading a larger image for better quality.
-                                    </div>
-                                ) : null}
                             </div>
                         )}
 
@@ -240,76 +317,97 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                     </div>
 
                     {/* Footer */}
-                    <div className="flex justify-end space-x-3 p-6 bg-stone-800 border-t border-stone-700">
-                        <button
-                            onClick={onClose}
-                            disabled={isSubmitting}
-                            className="px-4 py-2 bg-stone-600 hover:bg-stone-500 text-stone-300 hover:text-stone-100 rounded-lg transition-colors disabled:opacity-50"
-                            data-tooltip-id="cancel-btn"
-                            data-tooltip-content="Cancel creation"
-                        >
-                            Cancel
-                        </button>
+                    <div className="flex justify-between items-center p-6 bg-stone-800 border-t border-stone-700">
+                        <div>
+                            {imageUrl !== 'Not yet uploaded' && (
+                                <button
+                                    onClick={handleResetInputs}
+                                    disabled={isSubmitting}
+                                    className="flex items-center space-x-2 px-4 py-2 bg-stone-700 hover:bg-stone-600 text-stone-300 hover:text-stone-100 rounded-lg transition-colors disabled:opacity-50"
+                                    data-tooltip-id="change-image-btn"
+                                    data-tooltip-content="Change the selected image"
+                                >
+                                    <RotateCcw size={16} />
+                                    <span>Change Image</span>
+                                </button>
+                            )}
+                        </div>
+                        
+                        <div className="flex space-x-3">
+                            <button
+                                onClick={onClose}
+                                disabled={isSubmitting}
+                                className="px-4 py-2 bg-stone-600 hover:bg-stone-500 text-stone-300 hover:text-stone-100 rounded-lg transition-colors disabled:opacity-50"
+                                data-tooltip-id="cancel-btn"
+                                data-tooltip-content="Cancel creation"
+                            >
+                                Cancel
+                            </button>
 
-                        <button
-                            onClick={() => handleCreateInventory('stay')}
-                            disabled={!isFormValid}
-                            className="flex items-center space-x-2 px-4 py-2 bg-stone-700 hover:bg-stone-600 text-stone-300 hover:text-stone-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            data-tooltip-id="create-stay-btn"
-                            data-tooltip-content="Create and stay on current page"
-                        >
-                            {isSubmitting ? (
+                            {imageUrl !== 'Not yet uploaded' && (
                                 <>
-                                    <Loader2 size={16} className="animate-spin" />
-                                    <span>Creating...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <Package size={16} />
-                                    <span>Create</span>
+                                    <button
+                                        onClick={() => handleCreateInventory('stay')}
+                                        disabled={!isFormValid}
+                                        className="flex items-center space-x-2 px-4 py-2 bg-stone-700 hover:bg-stone-600 text-stone-300 hover:text-stone-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        data-tooltip-id="create-stay-btn"
+                                        data-tooltip-content="Create and stay on current page"
+                                    >
+                                        {isSubmitting ? (
+                                            <>
+                                                <Loader2 size={16} className="animate-spin" />
+                                                <span>Creating...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Package size={16} />
+                                                <span>Create</span>
+                                            </>
+                                        )}
+                                    </button>
+
+                                    <button
+                                        onClick={() => handleCreateInventory('edit')}
+                                        disabled={!isFormValid}
+                                        className="flex items-center space-x-2 px-4 py-2 bg-secondary hover:bg-secondary_light text-stone-200 hover:text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        data-tooltip-id="create-edit-btn"
+                                        data-tooltip-content="Create and go to edit page"
+                                    >
+                                        {isSubmitting ? (
+                                            <>
+                                                <Loader2 size={16} className="animate-spin" />
+                                                <span>Creating...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Edit size={16} />
+                                                <span>Create & Edit</span>
+                                            </>
+                                        )}
+                                    </button>
+
+                                    <button
+                                        onClick={() => handleCreateInventory('view')}
+                                        disabled={!isFormValid}
+                                        className="flex items-center space-x-2 px-4 py-2 bg-primary hover:bg-primary_dark text-stone-900 hover:text-stone-800 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        data-tooltip-id="create-view-btn"
+                                        data-tooltip-content="Create and view in inventory"
+                                    >
+                                        {isSubmitting ? (
+                                            <>
+                                                <Loader2 size={16} className="animate-spin" />
+                                                <span>Creating...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Eye size={16} />
+                                                <span>Create & View</span>
+                                            </>
+                                        )}
+                                    </button>
                                 </>
                             )}
-                        </button>
-
-                        <button
-                            onClick={() => handleCreateInventory('edit')}
-                            disabled={!isFormValid}
-                            className="flex items-center space-x-2 px-4 py-2 bg-secondary hover:bg-secondary_light text-stone-200 hover:text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            data-tooltip-id="create-edit-btn"
-                            data-tooltip-content="Create and go to edit page"
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <Loader2 size={16} className="animate-spin" />
-                                    <span>Creating...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <Edit size={16} />
-                                    <span>Create & Edit</span>
-                                </>
-                            )}
-                        </button>
-
-                        <button
-                            onClick={() => handleCreateInventory('view')}
-                            disabled={!isFormValid}
-                            className="flex items-center space-x-2 px-4 py-2 bg-primary hover:bg-primary_dark text-stone-900 hover:text-stone-800 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            data-tooltip-id="create-view-btn"
-                            data-tooltip-content="Create and view in inventory"
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <Loader2 size={16} className="animate-spin" />
-                                    <span>Creating...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <Eye size={16} />
-                                    <span>Create & View</span>
-                                </>
-                            )}
-                        </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -317,6 +415,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
             {/* Tooltips */}
             <Tooltip id="close-btn" />
             <Tooltip id="cancel-btn" />
+            <Tooltip id="change-image-btn" />
             <Tooltip id="create-stay-btn" />
             <Tooltip id="create-edit-btn" />
             <Tooltip id="create-view-btn" />
