@@ -172,9 +172,6 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                     <span className="text-lg font-medium text-stone-200">
                                         {currentImage?.label}
                                     </span>
-                                    {currentImage?.isMain && (
-                                        <span className="ml-2 text-xs text-secondary">(Main)</span>
-                                    )}
                                 </div>
 
                                 {/* Pagination Controls */}

@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { X, Package, Edit, Eye, Loader2 } from 'lucide-react';
+import { X, Package, Edit, Eye, Loader2, Upload } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
 import ResizeUploader from '@/app/admin/edit/ResizeUploader';
 import InputTextbox from '@/components/inputs/InputTextbox';
@@ -161,90 +162,81 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
 
                     {/* Content */}
                     <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-                        <div className="space-y-4">
-                            <ResizeUploader
-                                handleUploadComplete={handleUploadComplete}
-                                handleResetInputs={handleResetInputs}
-                                backToEditLink="/admin/inventory"
-                            />
-                            
-                            <InputTextbox 
-                                idName="title" 
-                                name="Title" 
-                                value={title} 
-                                onChange={(e) => setTitle(e.target.value)} 
-                            />
-                            
-                            <InputTextbox 
-                                idName="image_path" 
-                                name="Image Path" 
-                                value={imageUrl}
-                            />
-                            
-                            <div className="grid grid-cols-2 gap-4">
-                                <InputTextbox 
-                                    idName="px_width" 
-                                    name="Width (px)" 
-                                    value={width.toString()}
-                                />
-                                <InputTextbox 
-                                    idName="px_height" 
-                                    name="Height (px)" 
-                                    value={height.toString()}
-                                />
-                            </div>
-                            
-                            <InputTextbox 
-                                idName="small_image_path" 
-                                name="Small Path" 
-                                value={smallImageUrl}
-                            />
-                            
-                            <div className="grid grid-cols-2 gap-4">
-                                <InputTextbox 
-                                    idName="small_px_width" 
-                                    name="Small Width" 
-                                    value={smallWidth.toString()}
-                                />
-                                <InputTextbox 
-                                    idName="small_px_height" 
-                                    name="Small Height" 
-                                    value={smallHeight.toString()}
-                                />
-                            </div>
-
-                            {/* Warning messages */}
-                            {imageUrl !== 'Not yet uploaded' && (
-                                <>
-                                    {width < 800 && height < 800 && (
-                                        <div className="text-red-400 text-sm bg-red-900/20 p-3 rounded">
-                                            ⚠️ Warning: Image width and height are less than 800px.
-                                        </div>
-                                    )}
-                                    {width < 800 && height >= 800 && (
-                                        <div className="text-red-400 text-sm bg-red-900/20 p-3 rounded">
-                                            ⚠️ Warning: Image width is less than 800px.
-                                        </div>
-                                    )}
-                                    {height < 800 && width >= 800 && (
-                                        <div className="text-red-400 text-sm bg-red-900/20 p-3 rounded">
-                                            ⚠️ Warning: Image height is less than 800px.
-                                        </div>
-                                    )}
-                                </>
-                            )}
-
-                            {/* Status Message */}
-                            {statusMessage && (
-                                <div className={`rounded-lg p-3 ${
-                                    statusMessage.type === 'success' 
-                                        ? 'bg-green-900 text-green-300' 
-                                        : 'bg-red-900 text-red-300'
-                                }`}>
-                                    {statusMessage.message}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {/* Upload Section */}
+                            <div className="space-y-6">
+                                <div>
+                                    <h3 className="text-lg font-semibold text-stone-200 mb-3">Upload Image</h3>
+                                    <ResizeUploader
+                                        handleUploadComplete={handleUploadComplete}
+                                        handleResetInputs={handleResetInputs}
+                                        backToEditLink="/admin/inventory"
+                                    />
                                 </div>
-                            )}
+
+                                <InputTextbox 
+                                    idName="title" 
+                                    name="Item Title" 
+                                    value={title} 
+                                    onChange={(e) => setTitle(e.target.value)} 
+                                />
+                            </div>
+
+                            {/* Preview Section */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-semibold text-stone-200">Preview</h3>
+                                
+                                <div className="aspect-square bg-stone-800 rounded-lg overflow-hidden flex items-center justify-center">
+                                    {imageUrl && imageUrl !== 'Not yet uploaded' ? (
+                                        <Image
+                                            src={imageUrl}
+                                            alt="Preview"
+                                            width={width}
+                                            height={height}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="text-center text-stone-400">
+                                            <Upload size={48} className="mx-auto mb-2 opacity-50" />
+                                            <p>Upload an image to see preview</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
+
+                        {/* Image Dimensions and Warnings */}
+                        {imageUrl && imageUrl !== 'Not yet uploaded' && (
+                            <div className="mt-6 space-y-4">
+                                <div className="grid grid-cols-2 gap-4 text-sm text-stone-400 bg-stone-800 p-4 rounded-lg">
+                                    <div>
+                                        <span className="block font-medium text-stone-300">Dimensions:</span>
+                                        <span>{width} × {height}px</span>
+                                    </div>
+                                    <div>
+                                        <span className="block font-medium text-stone-300">Small:</span>
+                                        <span>{smallWidth} × {smallHeight}px</span>
+                                    </div>
+                                </div>
+
+                                {width < 800 || height < 800 ? (
+                                    <div className="text-red-400 text-sm bg-red-900/20 p-3 rounded">
+                                        ⚠️ Warning: Image dimensions are less than 800px. Consider uploading a larger image for better quality.
+                                    </div>
+                                ) : null}
+                            </div>
+                        )}
+
+                        {/* Status Message */}
+                        {statusMessage && (
+                            <div className={`mt-6 rounded-lg p-3 ${
+                                statusMessage.type === 'success' 
+                                    ? 'bg-green-900 text-green-300' 
+                                    : 'bg-red-900 text-red-300'
+                            }`}>
+                                {statusMessage.message}
+                            </div>
+                        )}
                     </div>
 
                     {/* Footer */}
