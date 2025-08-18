@@ -83,9 +83,7 @@ const ImageEditorConvex: React.FC<ImageEditorConvexProps> = ({ inventoryId }) =>
         [],
     );
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        
+    const handleSubmit = async () => {
         if (imageUrl === 'Not yet uploaded') {
             setStatusMessage({ type: 'error', message: 'Please upload an image first' });
             return;
@@ -151,180 +149,157 @@ const ImageEditorConvex: React.FC<ImageEditorConvexProps> = ({ inventoryId }) =>
     };
 
     return (
-        <div className="container mx-auto max-w-4xl p-6">
-            <div className="mb-6 flex items-center justify-between">
-                <h1 className="text-3xl font-bold">
-                    Manage Images for: {inventoryItem?.name || 'Loading...'}
-                </h1>
-                <button
-                    onClick={() => router.back()}
-                    className="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-600"
-                >
-                    Back
-                </button>
-            </div>
-
-            {/* Current Images Display */}
-            {inventoryItem && (
-                <div className="mb-8 rounded-lg bg-gray-100 p-4">
-                    <h2 className="mb-4 text-xl font-semibold">Current Images</h2>
-                    <div className="grid grid-cols-4 gap-4">
-                        <div className="text-center">
-                            <img 
-                                src={inventoryItem.imagePath} 
-                                alt="Main" 
-                                className="w-full rounded border-2 border-primary"
-                            />
-                            <span className="text-sm font-medium">Main Image</span>
-                        </div>
-                        {inventoryItem.extraImages?.map((img: any, idx: number) => (
-                            <div key={img._id} className="relative text-center group">
-                                <img 
-                                    src={img.imagePath} 
-                                    alt={`Extra ${idx + 1}`}
-                                    className="w-full rounded border"
-                                />
-                                <span className="text-sm">Extra {idx + 1}</span>
-                                <button
-                                    onClick={async () => {
-                                        if (confirm('Delete this extra image?')) {
-                                            try {
-                                                await deleteExtraImage({ id: img._id });
-                                                router.refresh();
-                                            } catch (error) {
-                                                console.error('Failed to delete image:', error);
-                                            }
-                                        }
-                                    }}
-                                    className="absolute top-1 right-1 hidden group-hover:block bg-red-500 text-white p-1 rounded hover:bg-red-600"
-                                    title="Delete Image"
-                                >
-                                    ✕
-                                </button>
-                            </div>
-                        ))}
-                    </div>
+        <div className="flex h-full w-full flex-col items-center justify-center bg-stone-900">
+            <div className="flex w-4/5 flex-col items-center justify-center rounded-lg bg-stone-900">
+                <div id="header" className="w-full rounded-t-lg text-center text-4xl font-bold gradient-secondary-main-text">
+                    Edit Images
                 </div>
-            )}
 
-            <form onSubmit={handleSubmit} className="space-y-6 rounded-lg bg-white p-6 shadow-lg">
-                <h2 className="text-2xl font-bold">Upload New Image</h2>
-
-                {statusMessage && (
-                    <div className={`rounded p-3 ${
-                        statusMessage.type === 'success' 
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-red-100 text-red-700'
-                    }`}>
-                        {statusMessage.message}
+                {/* Compact Current Images Display */}
+                {inventoryItem && (
+                    <div className="w-full mb-4 p-3 bg-stone-800 rounded-lg">
+                        <h3 className="mb-2 text-lg font-semibold text-stone-200">Current Images</h3>
+                        <div className="flex gap-3 overflow-x-auto">
+                            <div className="flex-shrink-0 text-center">
+                                <img 
+                                    src={inventoryItem.imagePath} 
+                                    alt="Main" 
+                                    className="w-16 h-16 object-cover rounded border-2 border-secondary"
+                                />
+                                <span className="text-xs text-stone-400 block mt-1">Main</span>
+                            </div>
+                            {inventoryItem.extraImages?.map((img: any, idx: number) => (
+                                <div key={img._id} className="flex-shrink-0 relative text-center group">
+                                    <img 
+                                        src={img.imagePath} 
+                                        alt={`Extra ${idx + 1}`}
+                                        className="w-16 h-16 object-cover rounded border border-stone-600"
+                                    />
+                                    <span className="text-xs text-stone-400 block mt-1">Extra {idx + 1}</span>
+                                    <button
+                                        onClick={async () => {
+                                            if (confirm('Delete this extra image?')) {
+                                                try {
+                                                    await deleteExtraImage({ id: img._id });
+                                                    router.refresh();
+                                                } catch (error) {
+                                                    console.error('Failed to delete image:', error);
+                                                }
+                                            }
+                                        }}
+                                        className="absolute -top-1 -right-1 hidden group-hover:block bg-red-600 text-white w-4 h-4 text-xs rounded-full hover:bg-red-700 flex items-center justify-center"
+                                        title="Delete Image"
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
 
-                <InputSelect
-                    idName="image_type"
-                    name="Image Type"
-                    select_options={[
-                        ['extra', 'Extra Image'],
-                        ['main', 'Main Image']
-                    ]}
-                    value={selectedOption}
-                    onChange={(e) => setSelectedOption(e.target.value)}
-                />
-
-                <ResizeUploader
-                    handleUploadComplete={handleUploadComplete}
-                    handleResetInputs={resetInputs}
-                    backToEditLink={`/admin/edit?id=${inventoryItem?.oId || ''}`}
-                />
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Title</label>
-                    <input
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        disabled={true}
-                        className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
+                <div className="flex w-full flex-col items-center space-y-2 p-2">
+                    <ResizeUploader
+                        handleUploadComplete={handleUploadComplete}
+                        handleResetInputs={resetInputs}
+                        backToEditLink={`/admin/edit?id=${inventoryItem?.oId || ''}`}
                     />
+                    
+                    <InputSelect
+                        idName="inventory_type"
+                        key="image_type"
+                        name="Image Type"
+                        defaultValue={{ value: selectedOption, label: selectedOption === 'extra' ? 'Add Extra Image' : 'Modify Main Image' }}
+                        select_options={[
+                            ['main', 'Modify Main Image'],
+                            ['extra', 'Add Extra Image'],
+                        ]}
+                        onChange={(e) => setSelectedOption(e.target.value)}
+                    />
+                    
+                    <InputTextbox 
+                        idName="title" 
+                        name="Title" 
+                        value={title} 
+                        onChange={(e) => setTitle(e.target.value)} 
+                    />
+                    <InputTextbox 
+                        idName="image_path" 
+                        name="Image Path" 
+                        value={imageUrl}
+                    />
+                    <InputTextbox 
+                        idName="px_width" 
+                        name="Width (px)" 
+                        value={width.toString()}
+                    />
+                    <InputTextbox 
+                        idName="px_height" 
+                        name="Height (px)" 
+                        value={height.toString()}
+                    />
+                    <InputTextbox 
+                        idName="small_image_path" 
+                        name="Small Path" 
+                        value={smallImageUrl}
+                    />
+                    <InputTextbox 
+                        idName="small_px_width" 
+                        name="Sm Width" 
+                        value={smallWidth.toString()}
+                    />
+                    <InputTextbox 
+                        idName="small_px_height" 
+                        name="Sm Height" 
+                        value={smallHeight.toString()}
+                    />
+                    
+                    {imageUrl !== '' && imageUrl !== null ? null : width < 800 && height < 800 ? (
+                        <div className="text-red-500">Warning: Image width and height are less than 800px.</div>
+                    ) : width < 800 ? (
+                        <div className="text-red-500">Warning: Image width is less than 800px.</div>
+                    ) : height < 800 ? (
+                        <div className="text-red-500">Warning: Image height is less than 800px.</div>
+                    ) : null}
+                    
+                    <div className="flex space-x-4">
+                        <button
+                            type="button"
+                            onClick={handleReset}
+                            disabled={isSubmitting}
+                            className={
+                                'relative rounded-md px-4 py-1 text-lg font-bold ' +
+                                (!isSubmitting
+                                    ? 'bg-stone-600 text-stone-300 hover:bg-stone-500 hover:text-stone-100'
+                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark')
+                            }
+                        >
+                            Reset
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleSubmit}
+                            disabled={isSubmitting || imageUrl === 'Not yet uploaded'}
+                            className={
+                                'relative rounded-md px-4 py-1 text-lg font-bold ' +
+                                (!isSubmitting && imageUrl !== 'Not yet uploaded'
+                                    ? 'bg-secondary text-stone-300 hover:bg-secondary_light hover:text-stone-100'
+                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark hover:bg-stone-300 hover:text-red-600')
+                            }
+                        >
+                            {isSubmitting ? 'Saving...' : 'Save Image'}
+                        </button>
+                    </div>
+                    
+                    {statusMessage && (
+                        <div
+                            className={`mt-4 rounded p-2 ${statusMessage.type === 'success' ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}
+                        >
+                            {statusMessage.message}
+                        </div>
+                    )}
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Full Size Image URL</label>
-                        <input
-                            type="text"
-                            value={imageUrl}
-                            disabled={true}
-                            className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Small Image URL</label>
-                        <input
-                            type="text"
-                            value={smallImageUrl}
-                            disabled={true}
-                            className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
-                        />
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-4 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Width</label>
-                        <input
-                            type="text"
-                            value={width.toString()}
-                            disabled={true}
-                            className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Height</label>
-                        <input
-                            type="text"
-                            value={height.toString()}
-                            disabled={true}
-                            className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Small Width</label>
-                        <input
-                            type="text"
-                            value={smallWidth.toString()}
-                            disabled={true}
-                            className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Small Height</label>
-                        <input
-                            type="text"
-                            value={smallHeight.toString()}
-                            disabled={true}
-                            className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
-                        />
-                    </div>
-                </div>
-
-                <div className="flex justify-between">
-                    <button
-                        type="button"
-                        onClick={handleReset}
-                        className="rounded bg-gray-500 px-6 py-2 text-white hover:bg-gray-600"
-                    >
-                        Reset
-                    </button>
-                    <button
-                        type="submit"
-                        disabled={isSubmitting || imageUrl === 'Not yet uploaded'}
-                        className="rounded bg-primary px-6 py-2 text-white hover:bg-primary_dark disabled:bg-gray-400"
-                    >
-                        {isSubmitting ? 'Saving...' : 'Save Image'}
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
     );
 };
