@@ -79,6 +79,29 @@ export const getInventoryItem = query({
   },
 });
 
+// Get single inventory item by original ID (oId)
+export const getInventoryItemByOId = query({
+  args: { oId: v.number() },
+  handler: async (ctx, args) => {
+    const item = await ctx.db
+      .query("inventory")
+      .filter((q) => q.eq(q.field("oId"), args.oId))
+      .first();
+    
+    if (!item) return null;
+
+    const extraImages = await ctx.db
+      .query("extraImages")
+      .withIndex("by_inventory", (q) => q.eq("inventoryId", item._id))
+      .collect();
+
+    return {
+      ...item,
+      extraImages,
+    };
+  },
+});
+
 // Create inventory item (admin only)
 export const createInventory = mutation({
   args: {
@@ -238,6 +261,50 @@ export const getInventoryCategories = query({
     const inventory = await ctx.db.query("inventory").collect();
     const categories = [...new Set(inventory.map(item => item.category))];
     return categories.sort();
+  },
+});
+
+// Get adjacent inventory oIds for navigation
+export const getAdjacentInventoryOIds = query({
+  args: { oId: v.number() },
+  handler: async (ctx, args) => {
+    const inventory = await ctx.db
+      .query("inventory")
+      .collect();
+    
+    // Sort by oId descending (most recent first)
+    const sorted = inventory.sort((a, b) => b.oId - a.oId);
+    
+    // Find current index
+    const currentIndex = sorted.findIndex(item => item.oId === args.oId);
+    
+    if (currentIndex === -1) {
+      return { nextOId: null, prevOId: null };
+    }
+    
+    // Get adjacent oIds
+    const nextOId = currentIndex > 0 ? sorted[currentIndex - 1].oId : null;
+    const prevOId = currentIndex < sorted.length - 1 ? sorted[currentIndex + 1].oId : null;
+    
+    return { nextOId, prevOId };
+  },
+});
+
+// Get most recent inventory oId
+export const getMostRecentOId = query({
+  handler: async (ctx) => {
+    const inventory = await ctx.db
+      .query("inventory")
+      .collect();
+    
+    if (inventory.length === 0) return null;
+    
+    // Find the item with the highest oId
+    const mostRecent = inventory.reduce((max, item) => 
+      item.oId > max.oId ? item : max
+    );
+    
+    return mostRecent.oId;
   },
 });
 
