@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { File } from 'lucide-react';
+import { File as FileIcon } from 'lucide-react';
 import { generateReactHelpers } from '@uploadthing/react';
 import type { OurFileRouter } from '@/app/api/uploadthing/core';
 
@@ -176,7 +176,7 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ handleUploadComplete, h
                         />
                     )}
                     <span className={`relative z-10 flex items-center space-x-2 text-stone-300 ${isUploading ? '' : 'group-hover:text-primary'}`}>
-                        <File size={16} />
+                        <FileIcon size={16} />
                         <span>{isUploading ? loadingState : 'Select Image'}</span>
                     </span>
                 </button>
