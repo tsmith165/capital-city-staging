@@ -315,17 +315,16 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                         </div>
                     </div>
 
-                        {/* Status Message */}
-                        {statusMessage && (
-                            <div className={`mt-6 rounded-lg p-3 ${
-                                statusMessage.type === 'success' 
-                                    ? 'bg-green-900 text-green-300' 
-                                    : 'bg-red-900 text-red-300'
-                            }`}>
-                                {statusMessage.message}
-                            </div>
-                        )}
-                    </div>
+                    {/* Status Message */}
+                    {statusMessage && (
+                        <div className={`mx-6 mb-4 rounded-lg p-3 ${
+                            statusMessage.type === 'success' 
+                                ? 'bg-green-900 text-green-300' 
+                                : 'bg-red-900 text-red-300'
+                        }`}>
+                            {statusMessage.message}
+                        </div>
+                    )}
 
                     {/* Footer */}
                     <div className="flex justify-between items-center p-6 bg-stone-800 border-t border-stone-700">
