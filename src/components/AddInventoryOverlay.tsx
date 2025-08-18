@@ -9,6 +9,7 @@ import { X, Package, Edit, Eye, Loader2, Upload, RotateCcw } from 'lucide-react'
 import { Tooltip } from 'react-tooltip';
 import ResizeUploader from '@/app/admin/edit/ResizeUploader';
 import InputTextbox from '@/components/inputs/InputTextbox';
+import InputSelect from '@/components/inputs/InputSelect';
 
 interface AddInventoryOverlayProps {
     onClose: () => void;
@@ -31,6 +32,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
     
     // Additional form fields
     const [category, setCategory] = useState('');
@@ -65,6 +67,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
             setSmallWidth(smallWidth);
             setSmallHeight(smallHeight);
             setStatusMessage(null);
+            setIsUploading(false);
         },
         [],
     );
@@ -75,6 +78,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
         setPreviewUrl(localUrl);
         setTitle(file.name.split('.')[0] || 'New Item');
         setStatusMessage(null);
+        setIsUploading(true);
     }, []);
 
     const handleResetInputs = useCallback(() => {
@@ -92,6 +96,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
         setSmallHeight(0);
         setStatusMessage(null);
         setPreviewUrl(null);
+        setIsUploading(false);
         setCategory('');
         setVendor('');
         setPrice(0);
@@ -260,6 +265,14 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                                     ) : (
                                         /* Form Fields State */
                                         <>
+                                            {/* Upload Status */}
+                                            {isUploading && (
+                                                <div className="flex items-center space-x-2 p-3 bg-stone-800 rounded-lg border border-stone-600">
+                                                    <Loader2 size={20} className="animate-spin text-secondary" />
+                                                    <span className="text-stone-300">Processing image...</span>
+                                                </div>
+                                            )}
+                                            
                                             <InputTextbox 
                                                 idName="title" 
                                                 name="Item Title" 
@@ -267,11 +280,32 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                                                 onChange={(e) => setTitle(e.target.value)} 
                                             />
                                             
-                                            <InputTextbox 
-                                                idName="category" 
-                                                name="Category" 
-                                                value={category} 
-                                                onChange={(e) => setCategory(e.target.value)} 
+                                            <InputSelect
+                                                idName="category"
+                                                name="Category"
+                                                value={category}
+                                                onChange={(e) => setCategory(e.target.value)}
+                                                select_options={[
+                                                    ['', 'Select Category...'],
+                                                    ['Couch', 'Couch'],
+                                                    ['Table', 'Table'],
+                                                    ['Chair', 'Chair'],
+                                                    ['Bedroom', 'Bedroom'],
+                                                    ['Bathroom', 'Bathroom'],
+                                                    ['Kitchen', 'Kitchen'],
+                                                    ['Pillow', 'Pillow'],
+                                                    ['Bookcase', 'Bookcase'],
+                                                    ['Book', 'Book'],
+                                                    ['Lamp', 'Lamp'],
+                                                    ['Art', 'Art'],
+                                                    ['Decor', 'Decor'],
+                                                    ['Bench', 'Bench'],
+                                                    ['Barstool', 'Barstool'],
+                                                    ['Rug', 'Rug'],
+                                                    ['Plant', 'Plant'],
+                                                    ['Desk', 'Desk'],
+                                                    ['Other', 'Other'],
+                                                ]}
                                             />
                                             
                                             <InputTextbox 
