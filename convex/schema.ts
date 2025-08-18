@@ -51,9 +51,11 @@ export default defineSchema({
     smallImagePath: v.optional(v.string()),
     smallWidth: v.optional(v.number()),
     smallHeight: v.optional(v.number()),
+    displayOrder: v.number(),
     createdAt: v.number(),
   })
-    .index("by_inventory", ["inventoryId"]),
+    .index("by_inventory", ["inventoryId"])
+    .index("by_inventory_order", ["inventoryId", "displayOrder"]),
 
   projects: defineTable({
     ownerId: v.string(),

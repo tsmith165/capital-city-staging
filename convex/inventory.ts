@@ -72,6 +72,9 @@ export const getInventoryItem = query({
       .withIndex("by_inventory", (q) => q.eq("inventoryId", args.id))
       .collect();
 
+    // Sort extra images by display order
+    extraImages.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+
     return {
       ...item,
       extraImages,
@@ -94,6 +97,9 @@ export const getInventoryItemByOId = query({
       .query("extraImages")
       .withIndex("by_inventory", (q) => q.eq("inventoryId", item._id))
       .collect();
+
+    // Sort extra images by display order
+    extraImages.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
 
     return {
       ...item,
@@ -334,9 +340,18 @@ export const addExtraImage = mutation({
       throw new Error("Not authorized");
     }
 
+    // Get the highest display order for this inventory item's extra images
+    const extraImages = await ctx.db
+      .query("extraImages")
+      .withIndex("by_inventory", (q) => q.eq("inventoryId", args.inventoryId))
+      .collect();
+    
+    const maxOrder = Math.max(...extraImages.map(img => img.displayOrder || 0), 0);
+
     // Create extra image
     const imageId = await ctx.db.insert("extraImages", {
       ...args,
+      displayOrder: maxOrder + 1,
       createdAt: Date.now(),
     });
 
@@ -363,6 +378,178 @@ export const deleteExtraImage = mutation({
 
     // Delete the extra image
     await ctx.db.delete(args.id);
+  },
+});
+
+// Reorder images by swapping two positions (admin only)
+export const reorderImagesBySwapping = mutation({
+  args: { 
+    inventoryId: v.id("inventory"),
+    position1: v.number(), // 1-based position (1 = main image, 2+ = extra images)
+    position2: v.number(), // 1-based position
+  },
+  handler: async (ctx, args) => {
+    // Check admin permission
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .first();
+
+    if (!user || user.role !== "admin") {
+      throw new Error("Not authorized");
+    }
+
+    const { inventoryId, position1, position2 } = args;
+    
+    if (position1 === position2) {
+      return; // No swap needed
+    }
+
+    // Get inventory item and extra images
+    const inventoryItem = await ctx.db.get(inventoryId);
+    if (!inventoryItem) throw new Error("Inventory item not found");
+
+    const extraImages = await ctx.db
+      .query("extraImages")
+      .withIndex("by_inventory", (q) => q.eq("inventoryId", inventoryId))
+      .collect();
+
+    // Sort extra images by display order
+    extraImages.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+
+    // Helper function to extract filename from path
+    const getFilename = (path: string) => {
+      return path.split('/').pop() || path;
+    };
+
+    // Create image array: [mainImage, ...extraImages]
+    const allImages = [
+      {
+        isMain: true,
+        title: getFilename(inventoryItem.imagePath),
+        imagePath: inventoryItem.imagePath,
+        width: inventoryItem.width,
+        height: inventoryItem.height,
+        smallImagePath: inventoryItem.smallImagePath,
+        smallWidth: inventoryItem.smallWidth,
+        smallHeight: inventoryItem.smallHeight,
+        _id: null, // Main image doesn't have an _id in extraImages
+        displayOrder: 0,
+      },
+      ...extraImages.map(img => ({
+        isMain: false,
+        title: img.title || getFilename(img.imagePath),
+        imagePath: img.imagePath,
+        width: img.width,
+        height: img.height,
+        smallImagePath: img.smallImagePath,
+        smallWidth: img.smallWidth,
+        smallHeight: img.smallHeight,
+        _id: img._id,
+        displayOrder: img.displayOrder,
+      }))
+    ];
+
+    // Validate positions
+    const maxPosition = allImages.length;
+    if (position1 < 1 || position1 > maxPosition || position2 < 1 || position2 > maxPosition) {
+      throw new Error(`Invalid positions. Must be between 1 and ${maxPosition}`);
+    }
+
+    // Get the images at the specified positions (convert to 0-based)
+    const img1 = allImages[position1 - 1];
+    const img2 = allImages[position2 - 1];
+
+    // Swap the images
+    [allImages[position1 - 1], allImages[position2 - 1]] = [img2, img1];
+
+    // Update the database
+    const newMainImage = allImages[0];
+    
+    // Update main image in inventory table
+    await ctx.db.patch(inventoryId, {
+      imagePath: newMainImage.imagePath,
+      width: newMainImage.width,
+      height: newMainImage.height,
+      smallImagePath: newMainImage.smallImagePath,
+      smallWidth: newMainImage.smallWidth,
+      smallHeight: newMainImage.smallHeight,
+      updatedAt: Date.now(),
+    });
+
+    // Update or create extra images
+    const newExtraImages = allImages.slice(1); // All except the first (main) image
+
+    // Delete all existing extra images for this inventory
+    for (const img of extraImages) {
+      await ctx.db.delete(img._id);
+    }
+
+    // Create new extra images with correct display order
+    for (let i = 0; i < newExtraImages.length; i++) {
+      const img = newExtraImages[i];
+      await ctx.db.insert("extraImages", {
+        inventoryId,
+        title: img.title,
+        imagePath: img.imagePath,
+        width: img.width,
+        height: img.height,
+        smallImagePath: img.smallImagePath,
+        smallWidth: img.smallWidth,
+        smallHeight: img.smallHeight,
+        displayOrder: i + 1,
+        createdAt: Date.now(),
+      });
+    }
+  },
+});
+
+// Initialize display order for existing extra images (run once for migration)
+export const initializeImageOrder = mutation({
+  args: {},
+  handler: async (ctx) => {
+    // Check admin permission
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .first();
+
+    if (!user || user.role !== "admin") {
+      throw new Error("Not authorized");
+    }
+
+    // Get all extra images that don't have displayOrder set
+    const extraImages = await ctx.db.query("extraImages").collect();
+    
+    // Group by inventory ID
+    const imagesByInventory = extraImages.reduce((acc, img) => {
+      if (!acc[img.inventoryId]) {
+        acc[img.inventoryId] = [];
+      }
+      acc[img.inventoryId].push(img);
+      return acc;
+    }, {} as Record<string, typeof extraImages>);
+
+    // Update display order for each inventory's images
+    for (const [inventoryId, images] of Object.entries(imagesByInventory)) {
+      // Sort by creation time to maintain original order
+      const sortedImages = images.sort((a, b) => a.createdAt - b.createdAt);
+      
+      for (let i = 0; i < sortedImages.length; i++) {
+        const img = sortedImages[i];
+        if (!img.displayOrder) {
+          await ctx.db.patch(img._id, {
+            displayOrder: i + 1,
+          });
+        }
+      }
+    }
   },
 });
 
