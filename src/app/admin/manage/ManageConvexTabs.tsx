@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io';
 import { FaEdit } from 'react-icons/fa';
 import { MdRestore, MdArchive, MdStar, MdStarBorder } from 'react-icons/md';
@@ -35,7 +36,7 @@ export default function ManageConvexTabs() {
         .sort((a, b) => b.pId - a.pId)
         .slice(0, 10); // Top 10 items by pId
     
-    const handleSetInactive = async (id: string) => {
+    const handleSetInactive = async (id: Id<"inventory">) => {
         try {
             await updateInventory({
                 id,
@@ -46,7 +47,7 @@ export default function ManageConvexTabs() {
         }
     };
     
-    const handleSetActive = async (id: string) => {
+    const handleSetActive = async (id: Id<"inventory">) => {
         try {
             await updateInventory({
                 id,
