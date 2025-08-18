@@ -1,287 +1,308 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
+
+import InputTextbox from '@/components/inputs/InputTextbox';
+import InputSelect from '@/components/inputs/InputSelect';
+import InputTextArea from '@/components/inputs/InputTextArea';
+
+const MAX_CHANGE_DISPLAY_LENGTH = 30;
 
 interface EditFormConvexProps {
     inventoryData: any;
     onUpdate?: () => void;
 }
 
+interface SubmitFormData {
+    inventory_id: string;
+    inventory_name: string;
+    description: string;
+    category: string;
+    vendor: string;
+    price: string;
+    cost: string;
+    real_width: string;
+    real_height: string;
+    real_depth: string;
+    location: string;
+    count: string;
+    image_path: string;
+    width: string;
+    height: string;
+}
+
 const EditFormConvex: React.FC<EditFormConvexProps> = ({ inventoryData, onUpdate }) => {
     const updateInventory = useMutation(api.inventory.updateInventory);
-    const deleteInventory = useMutation(api.inventory.deleteInventory);
     
-    const [formData, setFormData] = useState({
-        name: inventoryData.name,
-        price: inventoryData.price,
-        cost: inventoryData.cost || 0,
-        vendor: inventoryData.vendor,
-        category: inventoryData.category,
-        description: inventoryData.description,
-        count: inventoryData.count,
-        location: inventoryData.location,
-        realWidth: inventoryData.realWidth,
-        realHeight: inventoryData.realHeight,
-        realDepth: inventoryData.realDepth,
-        active: inventoryData.active,
+    const [initialFormData, setInitialFormData] = useState<SubmitFormData>({
+        inventory_id: inventoryData._id,
+        inventory_name: inventoryData.name,
+        description: inventoryData.description || '',
+        category: inventoryData.category || '',
+        vendor: inventoryData.vendor || '',
+        price: inventoryData.price?.toString() || '',
+        cost: inventoryData.cost?.toString() || '',
+        real_width: inventoryData.realWidth?.toString() || '',
+        real_height: inventoryData.realHeight?.toString() || '',
+        real_depth: inventoryData.realDepth?.toString() || '',
+        location: inventoryData.location || '',
+        count: inventoryData.count?.toString() || '',
+        image_path: inventoryData.imagePath || '',
+        width: inventoryData.width?.toString() || '',
+        height: inventoryData.height?.toString() || '',
     });
-    
-    const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value, type } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' 
-                ? (e.target as HTMLInputElement).checked 
-                : type === 'number' 
-                    ? Number(value) 
-                    : value
-        }));
+    const [formData, setFormData] = useState<SubmitFormData>(initialFormData);
+    const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+    const [changes, setChanges] = useState<{ field: string; oldValue: string; newValue: string }[]>([]);
+    const [submittedChanges, setSubmittedChanges] = useState<{ field: string; oldValue: string; newValue: string }[]>([]);
+
+    useEffect(() => {
+        const newInitialFormData = {
+            inventory_id: inventoryData._id,
+            inventory_name: inventoryData.name,
+            description: inventoryData.description || '',
+            category: inventoryData.category || '',
+            vendor: inventoryData.vendor || '',
+            price: inventoryData.price?.toString() || '',
+            cost: inventoryData.cost?.toString() || '',
+            real_width: inventoryData.realWidth?.toString() || '',
+            real_height: inventoryData.realHeight?.toString() || '',
+            real_depth: inventoryData.realDepth?.toString() || '',
+            location: inventoryData.location || '',
+            count: inventoryData.count?.toString() || '',
+            image_path: inventoryData.imagePath || '',
+            width: inventoryData.width?.toString() || '',
+            height: inventoryData.height?.toString() || '',
+        };
+        setInitialFormData(newInitialFormData);
+        setFormData(newInitialFormData);
+        setChanges([]);
+    }, [inventoryData]);
+
+    const getChanges = (newData: SubmitFormData) => {
+        const changesArray: { field: string; oldValue: string; newValue: string }[] = [];
+        Object.keys(newData).forEach((key) => {
+            const typedKey = key as keyof SubmitFormData;
+            if (newData[typedKey] !== initialFormData[typedKey]) {
+                changesArray.push({
+                    field: key,
+                    oldValue: String(initialFormData[typedKey]),
+                    newValue: String(newData[typedKey]),
+                });
+            }
+        });
+        return changesArray;
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => {
+            const newData = { ...prevData, [name]: value };
+            setChanges(getChanges(newData));
+            return newData;
+        });
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setIsSubmitting(true);
+        setSubmittedChanges([]);
+        setSubmitMessage(null);
+        console.log('Form Data (Next Line):');
+        console.log(formData);
         
         try {
             await updateInventory({
                 id: inventoryData._id,
-                updates: formData
+                updates: {
+                    name: formData.inventory_name,
+                    price: parseInt(formData.price) || 0,
+                    cost: parseInt(formData.cost) || 0,
+                    vendor: formData.vendor,
+                    category: formData.category,
+                    description: formData.description,
+                    count: parseInt(formData.count) || 0,
+                    location: formData.location,
+                    realWidth: parseInt(formData.real_width) || 0,
+                    realHeight: parseInt(formData.real_height) || 0,
+                    realDepth: parseInt(formData.real_depth) || 0,
+                    width: parseInt(formData.width) || 0,
+                    height: parseInt(formData.height) || 0,
+                    imagePath: formData.image_path,
+                }
             });
             
-            setSubmitMessage({ type: 'success', text: 'Inventory updated successfully!' });
+            setSubmitMessage({ type: 'success', text: 'Changes submitted successfully!' });
+            setSubmittedChanges(changes);
+            setInitialFormData(formData); // Update initial data after successful submission
+            setChanges([]); // Clear pending changes
             if (onUpdate) onUpdate();
         } catch (error) {
             console.error('Error updating inventory:', error);
-            setSubmitMessage({ type: 'error', text: 'Failed to update inventory' });
-        } finally {
-            setIsSubmitting(false);
-            setTimeout(() => setSubmitMessage(null), 3000);
+            setSubmitMessage({ type: 'error', text: 'An unexpected error occurred.' });
         }
     };
 
-    const handleDelete = async () => {
-        if (!confirm('Are you sure you want to delete this item?')) return;
-        
-        try {
-            await deleteInventory({ id: inventoryData._id });
-            // Redirect to inventory page after deletion
-            window.location.href = '/admin/inventory';
-        } catch (error: any) {
-            alert(error.message || 'Failed to delete item');
-        }
+    const truncateChange = (value: string) => {
+        return value.length > MAX_CHANGE_DISPLAY_LENGTH ? value.substring(0, MAX_CHANGE_DISPLAY_LENGTH) + '...' : value;
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-lg bg-white p-6 shadow-lg">
-            <h2 className="text-2xl font-bold">Edit Inventory Item</h2>
-            
-            {submitMessage && (
-                <div className={`rounded p-3 ${
-                    submitMessage.type === 'success' 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-red-100 text-red-700'
-                }`}>
-                    {submitMessage.text}
-                </div>
-            )}
-
-            {/* Name */}
-            <div>
-                <label className="block text-sm font-medium text-gray-700">Name</label>
-                <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-                    required
-                />
-            </div>
-
-            {/* Price and Cost */}
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Price ($)</label>
-                    <input
-                        type="number"
-                        name="price"
-                        value={formData.price}
-                        onChange={handleChange}
-                        step="0.01"
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-                        required
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Cost ($)</label>
-                    <input
-                        type="number"
-                        name="cost"
-                        value={formData.cost}
-                        onChange={handleChange}
-                        step="0.01"
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-                    />
-                </div>
-            </div>
-
-            {/* Vendor and Category */}
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Vendor</label>
-                    <input
-                        type="text"
-                        name="vendor"
-                        value={formData.vendor}
-                        onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-                        required
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Category</label>
-                    <input
-                        type="text"
-                        name="category"
+        <div className="flex h-fit w-full p-2">
+            <form onSubmit={handleSubmit} className="flex w-full flex-col space-y-2">
+                {/* Row 2.) Category Select */}
+                <div className="flex h-fit w-full">
+                    <InputSelect
+                        idName="category"
+                        name="Category"
                         value={formData.category}
                         onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-                        required
+                        select_options={[
+                            ['Couch', 'Couch'],
+                            ['Table', 'Table'],
+                            ['Chair', 'Chair'],
+                            ['Bedroom', 'Bedroom'],
+                            ['Bathroom', 'Bathroom'],
+                            ['Kitchen', 'Kitchen'],
+                            ['Pillow', 'Pillow'],
+                            ['Bookcase', 'Bookcase'],
+                            ['Book', 'Book'],
+                            ['Lamp', 'Lamp'],
+                            ['Art', 'Art'],
+                            ['Decor', 'Decor'],
+                            ['Bench', 'Bench'],
+                            ['Barstool', 'Barstool'],
+                            ['Rug', 'Rug'],
+                            ['Plant', 'Plant'],
+                            ['Desk', 'Desk'],
+                            ['Other', 'Other'],
+                        ]}
                     />
                 </div>
-            </div>
 
-            {/* Description */}
-            <div>
-                <label className="block text-sm font-medium text-gray-700">Description</label>
-                <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    rows={3}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-                />
-            </div>
-
-            {/* Count and Location */}
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Count</label>
-                    <input
-                        type="number"
-                        name="count"
-                        value={formData.count}
-                        onChange={handleChange}
-                        min="0"
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-                        required
-                    />
+                {/* Row 3.) Vendor Textbox */}
+                <div className="flex h-fit w-full">
+                    <InputTextbox idName="vendor" name="Vendor" value={formData.vendor} onChange={handleChange} />
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Location</label>
-                    <input
-                        type="text"
-                        name="location"
-                        value={formData.location}
-                        onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-                        required
-                    />
-                </div>
-            </div>
 
-            {/* Dimensions */}
-            <div className="grid grid-cols-3 gap-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Width (inches)</label>
-                    <input
-                        type="number"
-                        name="realWidth"
-                        value={formData.realWidth}
-                        onChange={handleChange}
-                        min="0"
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-                        required
-                    />
+                {/* Row 4.) Price / Cost Text Box */}
+                <div className="flex h-fit w-full flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+                    <div className="w-full md:w-1/2">
+                        <InputTextbox idName="price" name="Price" value={formData.price} onChange={handleChange} />
+                    </div>
+                    <div className="w-full md:w-1/2">
+                        <InputTextbox idName="cost" name="Cost" value={formData.cost} onChange={handleChange} />
+                    </div>
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Height (inches)</label>
-                    <input
-                        type="number"
-                        name="realHeight"
-                        value={formData.realHeight}
-                        onChange={handleChange}
-                        min="0"
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-                        required
-                    />
+
+                {/* Row 8.) Width / Height Text Box */}
+                <div className="flex h-fit w-full flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+                    <div className="w-full md:w-1/2">
+                        <InputTextbox idName="width" name="Width (px)" value={formData.width} onChange={handleChange} />
+                    </div>
+                    <div className="w-full md:w-1/2">
+                        <InputTextbox idName="height" name="Height (PX)" value={formData.height} onChange={handleChange} />
+                    </div>
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Depth (inches)</label>
-                    <input
-                        type="number"
-                        name="realDepth"
-                        value={formData.realDepth}
-                        onChange={handleChange}
-                        min="0"
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-                        required
-                    />
+
+                {/* Row 5.) Real Width / Height / Depth Text Boxes */}
+                <div className="flex h-fit w-full flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+                    <div className="w-full md:w-1/3">
+                        <InputTextbox idName="real_width" name="Width (in)" value={formData.real_width} onChange={handleChange} />
+                    </div>
+                    <div className="w-full md:w-1/3">
+                        <InputTextbox idName="real_height" name="Height (in)" value={formData.real_height} onChange={handleChange} />
+                    </div>
+                    <div className="w-full md:w-1/3">
+                        <InputTextbox idName="real_depth" name="Depth (in)" value={formData.real_depth} onChange={handleChange} />
+                    </div>
                 </div>
-            </div>
 
-            {/* Active Status */}
-            <div className="flex items-center">
-                <input
-                    type="checkbox"
-                    name="active"
-                    id="active"
-                    checked={formData.active}
-                    onChange={handleChange}
-                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                />
-                <label htmlFor="active" className="ml-2 block text-sm text-gray-700">
-                    Active
-                </label>
-            </div>
+                {/* Row 6.) Location Textbox */}
+                <div className="flex h-fit w-full">
+                    <InputTextbox idName="location" name="Location" value={formData.location} onChange={handleChange} />
+                </div>
 
-            {/* Metadata */}
-            <div className="rounded bg-gray-50 p-3 text-sm text-gray-600">
-                <p>Original ID: {inventoryData.oId}</p>
-                <p>In Use: {inventoryData.inUse} of {formData.count}</p>
-                <p>Created: {new Date(inventoryData.createdAt).toLocaleDateString()}</p>
-                <p>Updated: {new Date(inventoryData.updatedAt).toLocaleDateString()}</p>
-            </div>
+                {/* Row 7.) Count Textbox */}
+                <div className="flex h-fit w-full">
+                    <InputTextbox idName="count" name="Count" value={formData.count} onChange={handleChange} />
+                </div>
 
-            {/* Buttons */}
-            <div className="flex justify-between">
-                <button
-                    type="button"
-                    onClick={handleDelete}
-                    disabled={inventoryData.inUse > 0}
-                    className={`rounded px-4 py-2 text-white ${
-                        inventoryData.inUse > 0
-                            ? 'bg-gray-400 cursor-not-allowed'
-                            : 'bg-red-600 hover:bg-red-700'
-                    }`}
-                >
-                    {inventoryData.inUse > 0 ? 'Cannot Delete (In Use)' : 'Delete'}
-                </button>
-                
-                <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="rounded bg-primary px-6 py-2 text-white transition-colors hover:bg-primary_dark disabled:bg-gray-400"
-                >
-                    {isSubmitting ? 'Saving...' : 'Save Changes'}
-                </button>
-            </div>
-        </form>
+                {/* Row 9.) Description Text Area */}
+                <div className="flex h-fit w-full">
+                    <InputTextArea idName="description" name="Description" value={formData.description} rows={5} onChange={handleChange} />
+                </div>
+
+                <div className="flex flex-row items-center space-x-2">
+                    <button
+                        type="submit"
+                        className={
+                            'rounded-md bg-secondary px-3 py-1 text-center font-bold text-stone-400 ' +
+                            'hover:bg-primary hover:text-secondary_dark'
+                        }
+                    >
+                        Submit Changes
+                    </button>
+                    <Link
+                        href="/admin/edit/new"
+                        className={
+                            'rounded-md bg-secondary px-3 py-1 text-center font-bold text-stone-400 ' +
+                            ' hover:bg-primary hover:text-secondary_dark'
+                        }
+                    >
+                        Create New Inventory
+                    </Link>
+                    <Link
+                        href={`/admin/edit/images/${inventoryData._id}`}
+                        className={
+                            'rounded-md bg-secondary px-3 py-1 text-center font-bold text-stone-400 ' +
+                            'hover:bg-primary hover:text-secondary_dark'
+                        }
+                    >
+                        Edit Images
+                    </Link>
+                </div>
+
+                {changes.length > 0 && (
+                    <div className="mt-2 rounded-md bg-yellow-100 p-2 text-yellow-800">
+                        <p className="font-semibold">Pending Changes:</p>
+                        <ul>
+                            {changes.map((change, index) => (
+                                <li key={index} className="text-sm">
+                                    <span className="font-semibold">{change.field}:</span>{' '}
+                                    <span className="line-through">{truncateChange(change.oldValue)}</span> →{' '}
+                                    <span>{truncateChange(change.newValue)}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
+                {submittedChanges.length > 0 && (
+                    <div className="mt-2 rounded-md bg-green-100 p-2 text-green-800">
+                        <p className="font-semibold">Last Submitted Changes:</p>
+                        <ul>
+                            {submittedChanges.map((change, index) => (
+                                <li key={index} className="text-sm">
+                                    <span className="font-semibold">{change.field}:</span>{' '}
+                                    <span className="line-through">{truncateChange(change.oldValue)}</span> →{' '}
+                                    <span>{truncateChange(change.newValue)}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
+                {submitMessage && (
+                    <div className={`mt-2 rounded-md p-2 ${submitMessage.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`}>
+                        {submitMessage.text}
+                    </div>
+                )}
+            </form>
+        </div>
     );
 };
 

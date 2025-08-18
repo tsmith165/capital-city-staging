@@ -81,129 +81,101 @@ const EditConvex: React.FC<EditConvexProps> = ({
     }
 
     return (
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            {/* Navigation and Title */}
-            <div className="mb-6 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <Link
-                        href="/admin/inventory"
-                        className="rounded bg-primary px-4 py-2 text-white transition-colors hover:bg-primary_dark"
-                    >
-                        Back to Inventory
-                    </Link>
-                    
-                    {/* Navigation Arrows */}
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => handleNavigation(prevOId)}
-                            disabled={!prevOId}
-                            className={`rounded p-2 ${
-                                prevOId 
-                                    ? 'bg-primary text-white hover:bg-primary_dark' 
-                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                            }`}
-                            title="Previous Item"
-                        >
-                            <IoIosArrowUp size={20} />
-                        </button>
+        <div className="flex h-full w-full flex-col bg-stone-800 md:flex-row">
+            <div className="flex h-1/3 items-center justify-center rounded-lg p-8 md:h-[calc(100dvh-50px)] md:w-2/5 lg:w-1/2">
+                <Image
+                    src={inventoryData.imagePath}
+                    alt={inventoryData.name}
+                    width={inventoryData.width}
+                    height={inventoryData.height}
+                    quality={100}
+                    className="h-fit max-h-full w-auto cursor-pointer rounded-lg object-contain"
+                    onClick={() => setIsFullScreenImage(true)}
+                />
+            </div>
+            <div className="h-2/3 overflow-y-auto md:h-full md:w-3/5 lg:w-1/2">
+                <div className="flex h-fit flex-row items-center space-x-2 p-2">
+                    <div className="flex h-[48px] flex-col space-y-1">
                         <button
                             onClick={() => handleNavigation(nextOId)}
                             disabled={!nextOId}
-                            className={`rounded p-2 ${
+                            className={`h-[22px] w-8 cursor-pointer rounded-lg ${
                                 nextOId 
-                                    ? 'bg-primary text-white hover:bg-primary_dark' 
-                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    ? 'bg-secondary fill-stone-400 hover:bg-primary hover:fill-secondary_dark' 
+                                    : 'bg-gray-300 fill-gray-500 cursor-not-allowed'
                             }`}
                             title="Next Item"
                         >
-                            <IoIosArrowDown size={20} />
+                            <IoIosArrowUp className="h-[22px] w-8" />
+                        </button>
+                        <button
+                            onClick={() => handleNavigation(prevOId)}
+                            disabled={!prevOId}
+                            className={`h-[22px] w-8 cursor-pointer rounded-lg ${
+                                prevOId 
+                                    ? 'bg-secondary fill-stone-400 hover:bg-primary hover:fill-secondary_dark' 
+                                    : 'bg-gray-300 fill-gray-500 cursor-not-allowed'
+                            }`}
+                            title="Previous Item"
+                        >
+                            <IoIosArrowDown className="h-[22px] w-8" />
                         </button>
                     </div>
-                </div>
-
-                {/* Title Input */}
-                <div className="flex items-center gap-2">
-                    <input
-                        type="text"
-                        value={titleInput}
-                        onChange={(e) => setTitleInput(e.target.value)}
-                        onBlur={handleTitleUpdate}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                handleTitleUpdate();
-                            }
-                        }}
-                        className="rounded border border-gray-300 px-3 py-1 text-lg font-semibold"
-                    />
-                    {submitMessage && (
-                        <span className={`text-sm ${submitMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
-                            {submitMessage.text}
-                        </span>
-                    )}
-                </div>
-            </div>
-
-            {/* Main Content */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                {/* Image Section */}
-                <div className="space-y-4">
-                    <div className="relative">
-                        <Image
-                            src={inventoryData.imagePath}
-                            alt={inventoryData.name}
-                            width={inventoryData.width}
-                            height={inventoryData.height}
-                            className="w-full rounded-lg shadow-lg cursor-pointer"
-                            onClick={() => setIsFullScreenImage(true)}
+                    <Link href={`/admin/inventory/?item=${currentOId}`}>
+                        <MdPageview className="h-[48px] w-[48px] cursor-pointer rounded-lg bg-secondary fill-stone-400 p-1 hover:bg-primary hover:fill-secondary_dark" />
+                    </Link>
+                    <form onSubmit={(e) => { e.preventDefault(); handleTitleUpdate(); }} className="flex w-full flex-grow flex-row rounded-lg bg-secondary_dark">
+                        <input
+                            type="text"
+                            name="newTitle"
+                            value={titleInput}
+                            onChange={(e) => setTitleInput(e.target.value)}
+                            className="m-0 flex w-full flex-grow rounded-lg border-none bg-secondary_dark px-3 py-1 text-2xl font-bold text-stone-400 outline-none"
                         />
                         <button
-                            onClick={() => setIsFullScreenImage(true)}
-                            className="absolute bottom-2 right-2 rounded bg-black/50 p-2 text-white hover:bg-black/70"
-                            title="View Fullscreen"
+                            type="submit"
+                            className="ml-2 rounded-md bg-secondary px-3 py-1 font-bold text-stone-400 hover:bg-primary_dark hover:text-secondary_dark"
                         >
-                            <MdPageview size={24} />
+                            Save
                         </button>
+                    </form>
+                </div>
+                {submitMessage && (
+                    <div className={`mt-2 rounded-md p-2 ${submitMessage.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`}>
+                        {submitMessage.text}
                     </div>
-
-                    {/* Extra Images */}
-                    {inventoryData.extraImages && inventoryData.extraImages.length > 0 && (
+                )}
+                <EditFormConvex inventoryData={inventoryData} onUpdate={() => router.refresh()} />
+                
+                {/* Extra Images Section - matching original InventoryOrderPanel style */}
+                {inventoryData.extraImages && inventoryData.extraImages.length > 0 && (
+                    <div className="p-2">
+                        <div className="mb-2 text-stone-400 font-bold">Extra Images</div>
                         <div className="grid grid-cols-3 gap-2">
                             {inventoryData.extraImages.map((image: any, index: number) => (
-                                <Image
-                                    key={image._id}
-                                    src={image.imagePath}
-                                    alt={`Extra ${index + 1}`}
-                                    width={image.width}
-                                    height={image.height}
-                                    className="w-full rounded cursor-pointer hover:opacity-80"
-                                    onClick={() => {
-                                        setCurrentImageIndex(index + 1);
-                                        setIsFullScreenImage(true);
-                                    }}
-                                />
+                                <div key={image._id} className="relative">
+                                    <Image
+                                        src={image.imagePath}
+                                        alt={`Extra ${index + 1}`}
+                                        width={image.width}
+                                        height={image.height}
+                                        className="w-full h-24 object-cover rounded cursor-pointer hover:opacity-80 border-2 border-stone-600"
+                                        onClick={() => {
+                                            setCurrentImageIndex(index + 1);
+                                            setIsFullScreenImage(true);
+                                        }}
+                                    />
+                                </div>
                             ))}
                         </div>
-                    )}
-
-                    {/* Add/Edit Images Link */}
-                    <Link
-                        href={`/admin/edit/images/${inventoryData._id}`}
-                        className="block rounded bg-secondary px-4 py-2 text-center text-white transition-colors hover:bg-secondary_dark"
-                    >
-                        Manage Extra Images
-                    </Link>
-                </div>
-
-                {/* Form Section */}
-                <div>
-                    <EditFormConvex 
-                        inventoryData={inventoryData}
-                        onUpdate={() => {
-                            // Refresh the page to show updated data
-                            router.refresh();
-                        }}
-                    />
-                </div>
+                        <Link
+                            href={`/admin/edit/images/${inventoryData._id}`}
+                            className="mt-2 inline-block rounded bg-secondary px-3 py-1 text-sm text-stone-400 hover:bg-primary hover:text-secondary_dark"
+                        >
+                            Manage Images
+                        </Link>
+                    </div>
+                )}
             </div>
 
             {/* Fullscreen View */}
