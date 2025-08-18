@@ -32,18 +32,12 @@ export const metadata: Metadata = {
 };
 
 import PageLayout from '@/components/layout/PageLayout';
-import ManageConvex from '@/app/admin/manage/ManageConvex';
-
-interface PageProps {
-    searchParams?: Promise<{
-        tab?: string;
-    }>;
-}
+import ManageConvexTabs from '@/app/admin/manage/ManageConvexTabs';
 
 export default function ManagePage() {
     return (
         <PageLayout page="/manage">
-            <ManageConvex />
+            <ManageConvexTabs />
         </PageLayout>
     );
 }
