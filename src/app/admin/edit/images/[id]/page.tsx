@@ -33,13 +33,13 @@ export const metadata: Metadata = {
 };
 
 import PageLayout from '@/components/layout/PageLayout';
-import ImageEditor from '@/app/admin/edit/images/[id]/ImageEditor';
+import ImageEditorConvex from '@/app/admin/edit/images/[id]/ImageEditorConvex';
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
     return (
         <PageLayout page={`/edit/${params.id}`}>
-            <ImageEditor inventoryId={params.id} />
+            <ImageEditorConvex inventoryId={params.id} />
         </PageLayout>
     );
 }

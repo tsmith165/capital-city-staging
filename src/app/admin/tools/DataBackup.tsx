@@ -1,15 +1,21 @@
 import { useState } from 'react';
 import { saveAs } from 'file-saver';
 import ExcelJS from 'exceljs';
-import { fetchInventory } from '@/app/actions';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 const DataBackup: React.FC = () => {
     const [isExporting, setIsExporting] = useState(false);
+    const inventory = useQuery(api.inventory.getAllInventory);
 
     const exportPiecesAsXLSX = async () => {
         setIsExporting(true);
         try {
-            const inventory = await fetchInventory();
+            if (!inventory) {
+                console.log('Inventory data not loaded yet');
+                setIsExporting(false);
+                return;
+            }
 
             if (inventory.length > 0) {
                 const workbook = new ExcelJS.Workbook();

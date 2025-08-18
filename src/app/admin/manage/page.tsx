@@ -31,10 +31,8 @@ export const metadata: Metadata = {
     metadataBase: new URL('https://www.capitalcitystaging.com'),
 };
 
-import { getInventory, getArchivedInventory, getPrioritizedInventory } from './actions';
-
 import PageLayout from '@/components/layout/PageLayout';
-import { Manage } from '@/app/admin/manage/Manage';
+import ManageConvex from '@/app/admin/manage/ManageConvex';
 
 interface PageProps {
     searchParams?: Promise<{
@@ -42,21 +40,10 @@ interface PageProps {
     }>;
 }
 
-export default async function ManagePage(props: PageProps) {
-    const searchParams = await props.searchParams;
-    const tab = searchParams?.tab || 'manage';
-    const inventory = await getInventory();
-    const archivedInventory = await getArchivedInventory();
-    const prioritizedInventory = await getPrioritizedInventory();
-
+export default function ManagePage() {
     return (
         <PageLayout page="/manage">
-            <Manage
-                inventory={inventory}
-                archivedInventory={archivedInventory}
-                prioritizedInventory={prioritizedInventory}
-                activeTab={tab}
-            />
+            <ManageConvex />
         </PageLayout>
     );
 }

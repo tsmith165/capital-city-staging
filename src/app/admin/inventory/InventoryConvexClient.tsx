@@ -20,16 +20,16 @@ export default function InventoryConvexClient() {
     
     const categories = useQuery(api.inventory.getInventoryCategories);
 
-    const handleItemClick = (pId: number) => {
-        router.push(`/admin/edit?id=${pId}`);
+    const handleItemClick = (oId: number) => {
+        router.push(`/admin/edit?id=${oId}`);
     };
 
-    const handleEditItem = (pId: number) => {
-        router.push(`/admin/edit?id=${pId}`);
+    const handleEditItem = (oId: number) => {
+        router.push(`/admin/edit?id=${oId}`);
     };
 
-    const handleEditImages = (pId: number) => {
-        router.push(`/admin/edit/images/${pId}`);
+    const handleEditImages = (inventoryId: string) => {
+        router.push(`/admin/edit/images/${inventoryId}`);
     };
 
     if (inventory === undefined || categories === undefined) {
@@ -84,7 +84,7 @@ export default function InventoryConvexClient() {
                         <div
                             key={item._id}
                             className="bg-stone-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
-                            onClick={() => handleItemClick(item.pId)}
+                            onClick={() => handleItemClick(item.oId)}
                         >
                             <div className="relative h-48">
                                 <Image
@@ -118,7 +118,7 @@ export default function InventoryConvexClient() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleEditItem(item.pId);
+                                            handleEditItem(item.oId);
                                         }}
                                         className="flex-1 rounded bg-primary text-secondary_dark px-2 py-1 text-sm font-medium hover:bg-secondary hover:text-primary transition-colors"
                                     >
@@ -127,7 +127,7 @@ export default function InventoryConvexClient() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleEditImages(item.pId);
+                                            handleEditImages(item._id);
                                         }}
                                         className="flex-1 rounded bg-stone-600 text-stone-200 px-2 py-1 text-sm font-medium hover:bg-stone-500 transition-colors"
                                     >

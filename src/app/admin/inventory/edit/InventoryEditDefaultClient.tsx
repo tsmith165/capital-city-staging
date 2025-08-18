@@ -11,14 +11,13 @@ export default function InventoryEditDefaultClient() {
     
     useEffect(() => {
         if (inventory && inventory.length > 0) {
-            // Get the newest inventory item (highest pId)
+            // Get the newest inventory item (highest oId)
             const newestItem = inventory.reduce((latest, current) => 
-                current.pId > latest.pId ? current : latest
+                current.oId > latest.oId ? current : latest
             );
             
-            // Redirect to the old edit page with the newest item ID for now
-            // TODO: Create new Convex-based inventory edit page
-            router.replace(`/admin/edit?id=${newestItem.pId}`);
+            // Redirect to the edit page with the newest item oId
+            router.replace(`/admin/edit?id=${newestItem.oId}`);
         } else if (inventory && inventory.length === 0) {
             // No inventory exists, redirect to create new inventory
             router.replace('/admin/inventory/new');

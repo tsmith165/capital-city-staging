@@ -32,12 +32,12 @@ export const metadata: Metadata = {
 };
 
 import PageLayout from '@/components/layout/PageLayout';
-import CreateInventory from '@/app/admin/edit/new/CreateInventory';
+import CreateInventoryConvex from '@/app/admin/edit/new/CreateInventoryConvex';
 
 export default function NewInventoryPage() {
     return (
         <PageLayout page="/edit/new">
-            <CreateInventory />
+            <CreateInventoryConvex />
         </PageLayout>
     );
 }

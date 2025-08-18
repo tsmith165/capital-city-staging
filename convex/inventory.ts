@@ -344,3 +344,25 @@ export const addExtraImage = mutation({
   },
 });
 
+// Delete extra image (admin only)
+export const deleteExtraImage = mutation({
+  args: { id: v.id("extraImages") },
+  handler: async (ctx, args) => {
+    // Check admin permission
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .first();
+
+    if (!user || user.role !== "admin") {
+      throw new Error("Not authorized");
+    }
+
+    // Delete the extra image
+    await ctx.db.delete(args.id);
+  },
+});
+
