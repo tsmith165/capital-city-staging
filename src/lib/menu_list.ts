@@ -51,7 +51,6 @@ export const admin_menu_list: MenuItem[] = [
             { id: 'all-inventory', label: 'All Inventory', url: '/admin/inventory' },
             { id: 'add-inventory', label: 'Add Inventory', url: '/admin/inventory/new' },
             { id: 'edit-details', label: 'Edit Details', url: '/admin/inventory/edit' },
-            { id: 'edit-images', label: 'Edit Images', url: '/admin/inventory/edit/images' },
         ],
     },
     { id: 'users', label: 'Users', url: '/admin/users' },

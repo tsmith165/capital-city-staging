@@ -255,15 +255,6 @@ const EditFormConvex: React.FC<EditFormConvexProps> = ({ inventoryData, onUpdate
                     >
                         Create New Inventory
                     </Link>
-                    <Link
-                        href={`/admin/edit/images/${inventoryData._id}`}
-                        className={
-                            'rounded-md bg-secondary px-3 py-1 text-center font-bold text-stone-400 ' +
-                            'hover:bg-primary hover:text-secondary_dark'
-                        }
-                    >
-                        Edit Images
-                    </Link>
                 </div>
 
                 {changes.length > 0 && (

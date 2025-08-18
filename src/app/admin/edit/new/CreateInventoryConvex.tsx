@@ -109,7 +109,7 @@ export default function CreateInventoryConvex() {
                     router.push(`/admin/edit?id=${nextOId}`);
                     break;
                 case 'images':
-                    router.push(`/admin/edit/images/${inventoryId}`);
+                    router.push(`/admin/edit?id=${nextOId}`);
                     break;
                 case 'view':
                     router.push(`/admin/inventory?item=${nextOId}`);

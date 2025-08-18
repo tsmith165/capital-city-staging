@@ -28,8 +28,8 @@ export default function InventoryConvexClient() {
         router.push(`/admin/edit?id=${oId}`);
     };
 
-    const handleEditImages = (inventoryId: string) => {
-        router.push(`/admin/edit/images/${inventoryId}`);
+    const handleEditImages = (inventoryOId: number) => {
+        router.push(`/admin/edit?id=${inventoryOId}`);
     };
 
     if (inventory === undefined || categories === undefined) {
@@ -127,7 +127,7 @@ export default function InventoryConvexClient() {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleEditImages(item._id);
+                                            handleEditImages(item.oId);
                                         }}
                                         className="flex-1 rounded bg-stone-600 text-stone-200 px-2 py-1 text-sm font-medium hover:bg-stone-500 transition-colors"
                                     >

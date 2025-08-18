@@ -16,9 +16,8 @@ export default function InventoryImagesDefaultClient() {
                 current.pId > latest.pId ? current : latest
             );
             
-            // Redirect to the old edit images page with the newest item ID for now
-            // TODO: Create new Convex-based inventory images edit page
-            router.replace(`/admin/edit/images/${newestItem.pId}`);
+            // Redirect to the main edit page
+            router.replace(`/admin/edit?id=${newestItem.oId}`);
         } else if (inventory && inventory.length === 0) {
             // No inventory exists, redirect to create new inventory
             router.replace('/admin/inventory/new');
