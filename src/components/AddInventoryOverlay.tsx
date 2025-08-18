@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { X, Package, Edit, Eye, Loader2, Upload, File, RotateCcw } from 'lucide-react';
+import { X, Package, Edit, Eye, Loader2, Upload, RotateCcw } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
 import ResizeUploader from '@/app/admin/edit/ResizeUploader';
 import InputTextbox from '@/components/inputs/InputTextbox';
@@ -187,12 +187,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                             <div className="space-y-4">
                                 {imageUrl === 'Not yet uploaded' ? (
                                     /* Upload Button State */
-                                    <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6">
-                                        <div className="text-center text-stone-400 mb-6">
-                                            <Upload size={64} className="mx-auto mb-4 opacity-50" />
-                                            <p className="text-lg">Select an image to get started</p>
-                                        </div>
-                                        
+                                    <div>
                                         <ResizeUploader
                                             handleUploadComplete={handleUploadComplete}
                                             handleResetInputs={handleResetInputs}
