@@ -181,97 +181,10 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                     </div>
 
                     {/* Content */}
-                    <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {/* Form Section */}
-                            <div className="space-y-4">
-                                {imageUrl === 'Not yet uploaded' ? (
-                                    /* Upload Button State */
-                                    <div>
-                                        <ResizeUploader
-                                            handleUploadComplete={handleUploadComplete}
-                                            handleResetInputs={handleResetInputs}
-                                        />
-                                    </div>
-                                ) : (
-                                    /* Form Fields State */
-                                    <>
-                                        <InputTextbox 
-                                            idName="title" 
-                                            name="Item Title" 
-                                            value={title} 
-                                            onChange={(e) => setTitle(e.target.value)} 
-                                        />
-                                        
-                                        <InputTextbox 
-                                            idName="category" 
-                                            name="Category" 
-                                            value={category} 
-                                            onChange={(e) => setCategory(e.target.value)} 
-                                        />
-                                        
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <InputTextbox 
-                                                idName="vendor" 
-                                                name="Vendor" 
-                                                value={vendor} 
-                                                onChange={(e) => setVendor(e.target.value)} 
-                                            />
-                                            <InputTextbox 
-                                                idName="location" 
-                                                name="Location" 
-                                                value={location} 
-                                                onChange={(e) => setLocation(e.target.value)} 
-                                            />
-                                        </div>
-                                        
-                                        <div className="grid grid-cols-3 gap-4">
-                                            <InputTextbox 
-                                                idName="price" 
-                                                name="Price ($)" 
-                                                value={price.toString()} 
-                                                onChange={(e) => setPrice(Number(e.target.value) || 0)} 
-                                            />
-                                            <InputTextbox 
-                                                idName="cost" 
-                                                name="Cost ($)" 
-                                                value={cost.toString()} 
-                                                onChange={(e) => setCost(Number(e.target.value) || 0)} 
-                                            />
-                                            <InputTextbox 
-                                                idName="count" 
-                                                name="Count" 
-                                                value={count.toString()} 
-                                                onChange={(e) => setCount(Number(e.target.value) || 1)} 
-                                            />
-                                        </div>
-                                        
-                                        <div className="grid grid-cols-3 gap-4">
-                                            <InputTextbox 
-                                                idName="realWidth" 
-                                                name="Width (in)" 
-                                                value={realWidth.toString()} 
-                                                onChange={(e) => setRealWidth(Number(e.target.value) || 0)} 
-                                            />
-                                            <InputTextbox 
-                                                idName="realHeight" 
-                                                name="Height (in)" 
-                                                value={realHeight.toString()} 
-                                                onChange={(e) => setRealHeight(Number(e.target.value) || 0)} 
-                                            />
-                                            <InputTextbox 
-                                                idName="realDepth" 
-                                                name="Depth (in)" 
-                                                value={realDepth.toString()} 
-                                                onChange={(e) => setRealDepth(Number(e.target.value) || 0)} 
-                                            />
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-
-                            {/* Preview Section - Always Visible */}
-                            <div className="space-y-4">
+                    <div className="flex h-[calc(90vh-200px)]">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+                            {/* Preview Section - Left Side */}
+                            <div className="p-6 space-y-4">
                                 <div className="aspect-square bg-stone-800 rounded-lg overflow-hidden flex items-center justify-center">
                                     {imageUrl && imageUrl !== 'Not yet uploaded' ? (
                                         <Image
@@ -310,7 +223,97 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                                     </>
                                 )}
                             </div>
+
+                            {/* Form Section - Right Side */}
+                            <div className="overflow-y-auto p-6">
+                                <div className="space-y-4 pb-6">
+                                    {imageUrl === 'Not yet uploaded' ? (
+                                        /* Upload Button State */
+                                        <div>
+                                            <ResizeUploader
+                                                handleUploadComplete={handleUploadComplete}
+                                                handleResetInputs={handleResetInputs}
+                                            />
+                                        </div>
+                                    ) : (
+                                        /* Form Fields State */
+                                        <>
+                                            <InputTextbox 
+                                                idName="title" 
+                                                name="Item Title" 
+                                                value={title} 
+                                                onChange={(e) => setTitle(e.target.value)} 
+                                            />
+                                            
+                                            <InputTextbox 
+                                                idName="category" 
+                                                name="Category" 
+                                                value={category} 
+                                                onChange={(e) => setCategory(e.target.value)} 
+                                            />
+                                            
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <InputTextbox 
+                                                    idName="vendor" 
+                                                    name="Vendor" 
+                                                    value={vendor} 
+                                                    onChange={(e) => setVendor(e.target.value)} 
+                                                />
+                                                <InputTextbox 
+                                                    idName="location" 
+                                                    name="Location" 
+                                                    value={location} 
+                                                    onChange={(e) => setLocation(e.target.value)} 
+                                                />
+                                            </div>
+                                            
+                                            <div className="grid grid-cols-3 gap-4">
+                                                <InputTextbox 
+                                                    idName="price" 
+                                                    name="Price ($)" 
+                                                    value={price.toString()} 
+                                                    onChange={(e) => setPrice(Number(e.target.value) || 0)} 
+                                                />
+                                                <InputTextbox 
+                                                    idName="cost" 
+                                                    name="Cost ($)" 
+                                                    value={cost.toString()} 
+                                                    onChange={(e) => setCost(Number(e.target.value) || 0)} 
+                                                />
+                                                <InputTextbox 
+                                                    idName="count" 
+                                                    name="Count" 
+                                                    value={count.toString()} 
+                                                    onChange={(e) => setCount(Number(e.target.value) || 1)} 
+                                                />
+                                            </div>
+                                            
+                                            <div className="grid grid-cols-3 gap-4">
+                                                <InputTextbox 
+                                                    idName="realWidth" 
+                                                    name="Width (in)" 
+                                                    value={realWidth.toString()} 
+                                                    onChange={(e) => setRealWidth(Number(e.target.value) || 0)} 
+                                                />
+                                                <InputTextbox 
+                                                    idName="realHeight" 
+                                                    name="Height (in)" 
+                                                    value={realHeight.toString()} 
+                                                    onChange={(e) => setRealHeight(Number(e.target.value) || 0)} 
+                                                />
+                                                <InputTextbox 
+                                                    idName="realDepth" 
+                                                    name="Depth (in)" 
+                                                    value={realDepth.toString()} 
+                                                    onChange={(e) => setRealDepth(Number(e.target.value) || 0)} 
+                                                />
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
                         </div>
+                    </div>
 
                         {/* Status Message */}
                         {statusMessage && (
