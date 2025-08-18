@@ -19,8 +19,8 @@ export default function InventoryEditDefaultClient() {
             // Redirect to the edit page with the newest item oId
             router.replace(`/admin/edit?id=${newestItem.oId}`);
         } else if (inventory && inventory.length === 0) {
-            // No inventory exists, redirect to create new inventory
-            router.replace('/admin/inventory/new');
+            // No inventory exists, redirect to inventory page where they can add via overlay
+            router.replace('/admin/inventory');
         }
     }, [inventory, router]);
 

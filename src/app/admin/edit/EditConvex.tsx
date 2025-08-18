@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io';
 import { MdPageview } from 'react-icons/md';
-import { ChevronLeft, ChevronRight, ImagePlus, RotateCcw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ImagePlus, RotateCcw, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
@@ -13,7 +13,8 @@ import { Tooltip } from 'react-tooltip';
 import EditFormConvex from './EditFormConvex';
 import FullScreenView from '../inventory/FullScreenView';
 import ImageUploadOverlay from './ImageUploadOverlay';
-import ImageOrderingSection from './images/[id]/ImageOrderingSection';
+import ImageOrderingSection from '@/components/ImageOrderingSection';
+import AddInventoryOverlay from '@/components/AddInventoryOverlay';
 
 interface EditConvexProps {
     inventoryData: any;
@@ -39,6 +40,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
     const [speed, setSpeed] = useState(3000);
     const [showUploadOverlay, setShowUploadOverlay] = useState(false);
     const [uploadMode, setUploadMode] = useState<'main' | 'extra'>('extra');
+    const [showAddInventoryOverlay, setShowAddInventoryOverlay] = useState(false);
 
     const getImageList = () => {
         if (!inventoryData) return [];
@@ -218,24 +220,35 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                 )}
 
                                 {/* Image Action Buttons */}
-                                <div className="flex space-x-3">
+                                <div className="flex flex-col space-y-3">
+                                    <div className="flex space-x-3">
+                                        <button
+                                            onClick={handleChangeMainImage}
+                                            className="flex items-center space-x-2 px-4 py-2 bg-stone-700 hover:bg-stone-600 text-stone-300 hover:text-stone-100 rounded-lg transition-colors"
+                                            data-tooltip-id="change-main"
+                                            data-tooltip-content="Change the main image"
+                                        >
+                                            <RotateCcw size={16} />
+                                            <span>Change Main</span>
+                                        </button>
+                                        <button
+                                            onClick={handleAddExtraImage}
+                                            className="flex items-center space-x-2 px-4 py-2 bg-secondary hover:bg-secondary_light text-stone-200 hover:text-white rounded-lg transition-colors"
+                                            data-tooltip-id="add-extra"
+                                            data-tooltip-content="Add an extra image"
+                                        >
+                                            <ImagePlus size={16} />
+                                            <span>Add Extra</span>
+                                        </button>
+                                    </div>
                                     <button
-                                        onClick={handleChangeMainImage}
-                                        className="flex items-center space-x-2 px-4 py-2 bg-stone-700 hover:bg-stone-600 text-stone-300 hover:text-stone-100 rounded-lg transition-colors"
-                                        data-tooltip-id="change-main"
-                                        data-tooltip-content="Change the main image"
+                                        onClick={() => setShowAddInventoryOverlay(true)}
+                                        className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary hover:bg-primary_dark text-stone-900 hover:text-stone-800 rounded-lg transition-colors font-medium"
+                                        data-tooltip-id="add-inventory"
+                                        data-tooltip-content="Create new inventory item"
                                     >
-                                        <RotateCcw size={16} />
-                                        <span>Change Main</span>
-                                    </button>
-                                    <button
-                                        onClick={handleAddExtraImage}
-                                        className="flex items-center space-x-2 px-4 py-2 bg-secondary hover:bg-secondary_light text-stone-200 hover:text-white rounded-lg transition-colors"
-                                        data-tooltip-id="add-extra"
-                                        data-tooltip-content="Add an extra image"
-                                    >
-                                        <ImagePlus size={16} />
-                                        <span>Add Extra</span>
+                                        <Plus size={16} />
+                                        <span>Add New Inventory</span>
                                     </button>
                                 </div>
                             </div>
@@ -327,6 +340,18 @@ const EditConvex: React.FC<EditConvexProps> = ({
                 />
             )}
 
+            {/* Add Inventory Overlay */}
+            {showAddInventoryOverlay && (
+                <AddInventoryOverlay
+                    onClose={() => setShowAddInventoryOverlay(false)}
+                    onSuccess={(oId) => {
+                        // Refresh the current page to see the new inventory
+                        router.refresh();
+                    }}
+                    defaultAction="stay"
+                />
+            )}
+
             {/* Fullscreen View */}
             {isFullScreenImage && (
                 <FullScreenView
@@ -348,6 +373,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
             <Tooltip id="next-image" />
             <Tooltip id="change-main" />
             <Tooltip id="add-extra" />
+            <Tooltip id="add-inventory" />
             <Tooltip id="next-item" />
             <Tooltip id="prev-item" />
             <Tooltip id="view-item" />

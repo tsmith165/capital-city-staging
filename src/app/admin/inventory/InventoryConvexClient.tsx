@@ -5,12 +5,15 @@ import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { Plus } from 'lucide-react';
+import AddInventoryOverlay from '@/components/AddInventoryOverlay';
 
 export default function InventoryConvexClient() {
     const router = useRouter();
     const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [selectedItem, setSelectedItem] = useState<string | null>(null);
+    const [showAddInventoryOverlay, setShowAddInventoryOverlay] = useState(false);
 
     const inventory = useQuery(api.inventory.getInventory, {
         category: selectedCategory || undefined,
@@ -45,7 +48,17 @@ export default function InventoryConvexClient() {
     return (
         <div className="container mx-auto max-w-7xl p-4">
             <div className="mb-6">
-                <h1 className="text-3xl font-bold text-stone-100 mb-4">Inventory Management</h1>
+                <div className="flex items-center justify-between mb-4">
+                    <h1 className="text-3xl font-bold text-stone-100">Inventory Management</h1>
+                    <button
+                        onClick={() => setShowAddInventoryOverlay(true)}
+                        className="flex items-center space-x-2 px-4 py-2 bg-primary hover:bg-primary_dark text-stone-900 hover:text-stone-800 rounded-lg transition-colors font-medium"
+                        title="Create new inventory item"
+                    >
+                        <Plus size={20} />
+                        <span>Add New Inventory</span>
+                    </button>
+                </div>
                 
                 {/* Search and Filter Controls */}
                 <div className="flex flex-wrap gap-4 mb-6">
@@ -71,7 +84,7 @@ export default function InventoryConvexClient() {
                     </select>
                     
                     <button
-                        onClick={() => router.push('/admin/inventory/new')}
+                        onClick={() => setShowAddInventoryOverlay(true)}
                         className="rounded border-2 bg-transparent border-primary text-primary px-4 py-2 font-medium transition-colors hover:bg-secondary hover:border-secondary hover:text-stone-300"
                     >
                         Add New Item
@@ -143,7 +156,7 @@ export default function InventoryConvexClient() {
                     <div className="text-center py-12">
                         <p className="text-stone-400 text-lg">No inventory items found</p>
                         <button
-                            onClick={() => router.push('/admin/inventory/new')}
+                            onClick={() => setShowAddInventoryOverlay(true)}
                             className="mt-4 rounded border-2 bg-transparent border-primary text-primary px-6 py-2 font-medium transition-colors hover:bg-secondary hover:border-secondary hover:text-stone-300"
                         >
                             Add First Item
@@ -151,6 +164,18 @@ export default function InventoryConvexClient() {
                     </div>
                 )}
             </div>
+            
+            {/* Add Inventory Overlay */}
+            {showAddInventoryOverlay && (
+                <AddInventoryOverlay
+                    onClose={() => setShowAddInventoryOverlay(false)}
+                    onSuccess={(oId) => {
+                        // Refresh the inventory list to show the new item
+                        router.refresh();
+                    }}
+                    defaultAction="stay"
+                />
+            )}
         </div>
     );
 }

@@ -182,7 +182,7 @@ const ImageUploadOverlay: React.FC<ImageUploadOverlayProps> = ({
                                         ['main', 'Main Image'],
                                         ['extra', 'Extra Image'],
                                     ]}
-                                    onChange={(e) => setSelectedOption(e.target.value)}
+                                    onChange={(e) => setSelectedOption(e.target.value as 'main' | 'extra')}
                                 />
 
                                 <InputTextbox 
