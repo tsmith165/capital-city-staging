@@ -18,6 +18,7 @@ interface ResizeUploaderProps {
     ) => void;
     handleResetInputs: () => void;
     backToEditLink?: string;
+    onFileSelect?: (file: File) => void;
 }
 
 interface UploadResponse {
@@ -25,7 +26,7 @@ interface UploadResponse {
     url: string;
 }
 
-const ResizeUploader: React.FC<ResizeUploaderProps> = ({ handleUploadComplete, handleResetInputs, backToEditLink }) => {
+const ResizeUploader: React.FC<ResizeUploaderProps> = ({ handleUploadComplete, handleResetInputs, backToEditLink, onFileSelect }) => {
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [loadingState, setLoadingState] = useState<string>('Resizing Image');
@@ -136,6 +137,9 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ handleUploadComplete, h
             if (selectedFiles && selectedFiles.length > 0) {
                 const originalFile = selectedFiles[0];
 
+                // Call onFileSelect to show immediate preview
+                onFileSelect?.(originalFile);
+
                 setIsUploading(true);
                 handleResetInputs();
 
@@ -149,7 +153,7 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ handleUploadComplete, h
                 await startUpload([smallFileWithPrefix, originalResizedFile]);
             }
         },
-        [handleResetInputs, startUpload],
+        [handleResetInputs, startUpload, onFileSelect],
     );
 
     const handleSelectFilesClick = () => {
