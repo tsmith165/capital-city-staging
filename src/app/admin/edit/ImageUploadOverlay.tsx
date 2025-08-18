@@ -197,45 +197,46 @@ const ImageUploadOverlay: React.FC<ImageUploadOverlayProps> = ({
                             <div className="space-y-4">
                                 <h3 className="text-lg font-semibold text-stone-200">Preview</h3>
                                 
-                                {imageUrl ? (
-                                    <div className="space-y-4">
-                                        <div className="aspect-square bg-stone-800 rounded-lg overflow-hidden">
-                                            <Image
-                                                src={imageUrl}
-                                                alt="Preview"
-                                                width={width}
-                                                height={height}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        </div>
-                                        
-                                        <div className="grid grid-cols-2 gap-4 text-sm text-stone-400">
-                                            <div>
-                                                <span className="block font-medium">Dimensions:</span>
-                                                <span>{width} × {height}px</span>
-                                            </div>
-                                            <div>
-                                                <span className="block font-medium">Small:</span>
-                                                <span>{smallWidth} × {smallHeight}px</span>
-                                            </div>
-                                        </div>
-
-                                        {width < 800 || height < 800 ? (
-                                            <div className="text-red-400 text-sm bg-red-900/20 p-3 rounded">
-                                                ⚠️ Warning: Image dimensions are less than 800px. Consider uploading a larger image for better quality.
-                                            </div>
-                                        ) : null}
-                                    </div>
-                                ) : (
-                                    <div className="aspect-square bg-stone-800 rounded-lg flex items-center justify-center">
+                                <div className="aspect-square bg-stone-800 rounded-lg overflow-hidden flex items-center justify-center">
+                                    {imageUrl ? (
+                                        <Image
+                                            src={imageUrl}
+                                            alt="Preview"
+                                            width={width}
+                                            height={height}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
                                         <div className="text-center text-stone-400">
                                             <Upload size={48} className="mx-auto mb-2 opacity-50" />
                                             <p>Upload an image to see preview</p>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
                         </div>
+
+                        {/* Image Dimensions and Warnings */}
+                        {imageUrl && imageUrl !== 'Not yet uploaded' && (
+                            <div className="mt-6 space-y-4">
+                                <div className="grid grid-cols-2 gap-4 text-sm text-stone-400 bg-stone-800 p-4 rounded-lg">
+                                    <div>
+                                        <span className="block font-medium text-stone-300">Dimensions:</span>
+                                        <span>{width} × {height}px</span>
+                                    </div>
+                                    <div>
+                                        <span className="block font-medium text-stone-300">Small:</span>
+                                        <span>{smallWidth} × {smallHeight}px</span>
+                                    </div>
+                                </div>
+
+                                {width < 800 || height < 800 ? (
+                                    <div className="text-red-400 text-sm bg-red-900/20 p-3 rounded">
+                                        ⚠️ Warning: Image dimensions are less than 800px. Consider uploading a larger image for better quality.
+                                    </div>
+                                ) : null}
+                            </div>
+                        )}
 
                         {/* Status Message */}
                         {statusMessage && (

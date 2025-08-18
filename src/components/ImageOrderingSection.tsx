@@ -134,7 +134,7 @@ const ImageOrderingSection: React.FC<ImageOrderingSectionProps> = ({
                                         disabled={isProcessing || isDeletingThis}
                                         className="w-8 h-8 bg-stone-700 hover:bg-stone-600 rounded flex items-center justify-center text-stone-300 hover:text-stone-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         data-tooltip-id={`move-up-${position}`}
-                                        data-tooltip-content={`Move ${position === 1 ? 'to end' : 'up'}`}
+                                        data-tooltip-content={`Move ${position === 1 ? 'main image to end (makes next image main)' : 'up one position'}`}
                                     >
                                         <ChevronUp size={16} />
                                     </button>
@@ -143,7 +143,7 @@ const ImageOrderingSection: React.FC<ImageOrderingSectionProps> = ({
                                         disabled={isProcessing || isDeletingThis}
                                         className="w-8 h-8 bg-stone-700 hover:bg-stone-600 rounded flex items-center justify-center text-stone-300 hover:text-stone-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         data-tooltip-id={`move-down-${position}`}
-                                        data-tooltip-content={`Move ${position === allImages.length ? 'to start' : 'down'}`}
+                                        data-tooltip-content={`Move ${position === allImages.length ? 'to start (may become main image)' : 'down one position'}`}
                                     >
                                         <ChevronDown size={16} />
                                     </button>
@@ -173,7 +173,7 @@ const ImageOrderingSection: React.FC<ImageOrderingSectionProps> = ({
                 </div>
                 
                 <div className="mt-3 text-xs text-stone-400">
-                    Use the arrows to reorder images. Position #1 becomes the main image. Main image cannot be deleted.
+                    Use the arrows to reorder images. Position #1 is the main image. When you move the main image, the image that takes position #1 becomes the new main image.
                 </div>
             </div>
             
