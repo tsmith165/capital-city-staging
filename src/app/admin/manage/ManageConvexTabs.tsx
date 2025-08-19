@@ -7,8 +7,9 @@ import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { IoIosArrowUp, IoIosArrowDown } from 'react-icons/io';
-import { FaEdit } from 'react-icons/fa';
-import { MdRestore, MdArchive, MdStar, MdStarBorder } from 'react-icons/md';
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import { MdRestore } from 'react-icons/md';
+import { Tooltip } from 'react-tooltip';
 
 export default function ManageConvexTabs() {
     const [activeTab, setActiveTab] = useState('order');
@@ -30,11 +31,6 @@ export default function ManageConvexTabs() {
         );
     }
     
-    // Filter prioritized items (assuming priority field or using pId for now)
-    const prioritizedInventory = allInventory
-        .filter(item => item.active)
-        .sort((a, b) => b.pId - a.pId)
-        .slice(0, 10); // Top 10 items by pId
     
     const handleSetInactive = async (id: Id<"inventory">) => {
         try {
@@ -55,6 +51,50 @@ export default function ManageConvexTabs() {
             });
         } catch (error) {
             console.error('Failed to activate item:', error);
+        }
+    };
+
+    const handleMoveUp = async (currentIndex: number) => {
+        if (!inventory) return;
+        
+        const targetIndex = currentIndex === 0 ? inventory.length - 1 : currentIndex - 1;
+        const currentItem = inventory[currentIndex];
+        const targetItem = inventory[targetIndex];
+        
+        try {
+            // Swap pId values
+            await updateInventory({
+                id: currentItem._id,
+                updates: { pId: targetItem.pId }
+            });
+            await updateInventory({
+                id: targetItem._id,
+                updates: { pId: currentItem.pId }
+            });
+        } catch (error) {
+            console.error('Failed to move item up:', error);
+        }
+    };
+
+    const handleMoveDown = async (currentIndex: number) => {
+        if (!inventory) return;
+        
+        const targetIndex = currentIndex === inventory.length - 1 ? 0 : currentIndex + 1;
+        const currentItem = inventory[currentIndex];
+        const targetItem = inventory[targetIndex];
+        
+        try {
+            // Swap pId values
+            await updateInventory({
+                id: currentItem._id,
+                updates: { pId: targetItem.pId }
+            });
+            await updateInventory({
+                id: targetItem._id,
+                updates: { pId: currentItem.pId }
+            });
+        } catch (error) {
+            console.error('Failed to move item down:', error);
         }
     };
     
@@ -90,24 +130,24 @@ export default function ManageConvexTabs() {
                 {activeTab === 'order' && (
                     <>
                         <button
-                            disabled={index === 0}
-                            className={`p-2 rounded ${
-                                index === 0 
-                                    ? 'bg-stone-700 text-stone-500 cursor-not-allowed' 
-                                    : 'bg-stone-600 text-stone-300 hover:bg-secondary hover:text-white'
-                            }`}
-                            title="Move Up"
+                            onClick={() => handleMoveUp(index)}
+                            className="p-2 rounded bg-stone-600 text-stone-300 hover:bg-secondary hover:text-white"
+                            data-tooltip-id={`move-up-${item._id}`}
+                            data-tooltip-content="Move up in order (wraps to end)"
                         >
                             <IoIosArrowUp size={16} />
                         </button>
+                        
+                        {/* Order/Priority ID */}
+                        <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-white font-bold text-sm">
+                            {item.pId}
+                        </div>
+                        
                         <button
-                            disabled={index === inventory.length - 1}
-                            className={`p-2 rounded ${
-                                index === inventory.length - 1
-                                    ? 'bg-stone-700 text-stone-500 cursor-not-allowed' 
-                                    : 'bg-stone-600 text-stone-300 hover:bg-secondary hover:text-white'
-                            }`}
-                            title="Move Down"
+                            onClick={() => handleMoveDown(index)}
+                            className="p-2 rounded bg-stone-600 text-stone-300 hover:bg-secondary hover:text-white"
+                            data-tooltip-id={`move-down-${item._id}`}
+                            data-tooltip-content="Move down in order (wraps to start)"
                         >
                             <IoIosArrowDown size={16} />
                         </button>
@@ -117,7 +157,8 @@ export default function ManageConvexTabs() {
                 <Link
                     href={`/admin/edit?id=${item.oId}`}
                     className="p-2 rounded bg-stone-600 text-stone-300 hover:bg-secondary hover:text-white"
-                    title="Edit"
+                    data-tooltip-id={`edit-${item._id}`}
+                    data-tooltip-content="Edit this item"
                 >
                     <FaEdit size={16} />
                 </Link>
@@ -126,7 +167,8 @@ export default function ManageConvexTabs() {
                     <button
                         onClick={() => handleSetActive(item._id)}
                         className="p-2 rounded bg-stone-600 text-stone-300 hover:bg-green-600 hover:text-white"
-                        title="Restore"
+                        data-tooltip-id={`restore-${item._id}`}
+                        data-tooltip-content="Restore this item"
                     >
                         <MdRestore size={16} />
                     </button>
@@ -134,10 +176,11 @@ export default function ManageConvexTabs() {
                     <button
                         onClick={() => handleSetInactive(item._id)}
                         className="p-2 rounded bg-stone-600 text-stone-300 hover:bg-red-600 hover:text-white"
-                        title="Archive"
+                        data-tooltip-id={`archive-${item._id}`}
+                        data-tooltip-content="Archive Item"
                         disabled={item.inUse > 0}
                     >
-                        <MdArchive size={16} />
+                        <FaTrash size={16} />
                     </button>
                 )}
             </div>
@@ -173,16 +216,6 @@ export default function ManageConvexTabs() {
                 >
                     Archived ({archivedInventory.length})
                 </button>
-                <button
-                    onClick={() => setActiveTab('priority')}
-                    className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${
-                        activeTab === 'priority'
-                            ? 'bg-stone-800 text-stone-100 border-b-2 border-secondary'
-                            : 'bg-stone-800/50 text-stone-400 hover:bg-stone-800 hover:text-stone-200'
-                    }`}
-                >
-                    Priority ({prioritizedInventory.length})
-                </button>
             </div>
             
             {/* Tab Content */}
@@ -206,60 +239,23 @@ export default function ManageConvexTabs() {
                         )}
                     </div>
                 )}
-                
-                {activeTab === 'priority' && (
-                    <div className="space-y-1">
-                        {prioritizedInventory.length === 0 ? (
-                            <p className="text-stone-400 text-center py-8">No priority items set</p>
-                        ) : (
-                            <>
-                                <p className="text-stone-400 text-sm mb-4">
-                                    Top {prioritizedInventory.length} items by priority
-                                </p>
-                                {prioritizedInventory.map((item, index) => (
-                                    <div 
-                                        key={item._id}
-                                        className="flex items-center border-b border-stone-700 py-3 hover:bg-stone-800/50 transition-colors"
-                                    >
-                                        {/* Priority Number */}
-                                        <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-white font-bold mr-4">
-                                            {index + 1}
-                                        </div>
-                                        
-                                        {/* Image */}
-                                        <div className="w-32 h-20 relative mr-4">
-                                            <Image
-                                                src={item.smallImagePath || item.imagePath}
-                                                alt={item.name}
-                                                fill
-                                                className="object-cover rounded"
-                                                sizes="128px"
-                                            />
-                                        </div>
-                                        
-                                        {/* Item Details */}
-                                        <div className="flex-grow">
-                                            <h3 className="text-stone-100 font-medium">{item.name}</h3>
-                                            <p className="text-stone-400 text-sm">
-                                                {item.category} • ${item.price}
-                                            </p>
-                                        </div>
-                                        
-                                        {/* Edit Button */}
-                                        <Link
-                                            href={`/admin/edit?id=${item.oId}`}
-                                            className="p-2 rounded bg-stone-600 text-stone-300 hover:bg-secondary hover:text-white"
-                                            title="Edit"
-                                        >
-                                            <FaEdit size={16} />
-                                        </Link>
-                                    </div>
-                                ))}
-                            </>
-                        )}
-                    </div>
-                )}
             </div>
+            
+            {/* Tooltips */}
+            {inventory && inventory.map((item) => (
+                <div key={`tooltips-${item._id}`}>
+                    <Tooltip id={`move-up-${item._id}`} />
+                    <Tooltip id={`move-down-${item._id}`} />
+                    <Tooltip id={`edit-${item._id}`} />
+                    <Tooltip id={`archive-${item._id}`} />
+                </div>
+            ))}
+            {archivedInventory && archivedInventory.map((item) => (
+                <div key={`archived-tooltips-${item._id}`}>
+                    <Tooltip id={`edit-${item._id}`} />
+                    <Tooltip id={`restore-${item._id}`} />
+                </div>
+            ))}
         </div>
     );
 }
