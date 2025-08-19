@@ -62,14 +62,14 @@ export default function ManageConvexTabs() {
         const targetItem = inventory[targetIndex];
         
         try {
-            // Swap pId values
+            // Swap oId values
             await updateInventory({
                 id: currentItem._id,
-                updates: { pId: targetItem.pId }
+                updates: { oId: targetItem.oId }
             });
             await updateInventory({
                 id: targetItem._id,
-                updates: { pId: currentItem.pId }
+                updates: { oId: currentItem.oId }
             });
         } catch (error) {
             console.error('Failed to move item up:', error);
@@ -84,14 +84,14 @@ export default function ManageConvexTabs() {
         const targetItem = inventory[targetIndex];
         
         try {
-            // Swap pId values
+            // Swap oId values
             await updateInventory({
                 id: currentItem._id,
-                updates: { pId: targetItem.pId }
+                updates: { oId: targetItem.oId }
             });
             await updateInventory({
                 id: targetItem._id,
-                updates: { pId: currentItem.pId }
+                updates: { oId: currentItem.oId }
             });
         } catch (error) {
             console.error('Failed to move item down:', error);
@@ -138,9 +138,9 @@ export default function ManageConvexTabs() {
                             <IoIosArrowUp size={16} />
                         </button>
                         
-                        {/* Order/Priority ID */}
+                        {/* Order Position */}
                         <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-white font-bold text-sm">
-                            {item.pId}
+                            {item.oId}
                         </div>
                         
                         <button
