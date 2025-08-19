@@ -163,6 +163,7 @@ export const updateInventory = mutation({
   args: {
     id: v.id("inventory"),
     updates: v.object({
+      oId: v.optional(v.number()),
       pId: v.optional(v.number()),
       active: v.optional(v.boolean()),
       name: v.optional(v.string()),
