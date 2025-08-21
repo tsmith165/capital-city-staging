@@ -6,11 +6,11 @@ import Contact from './contact';
 import { captureEvent, captureDistictId } from '@/utils/posthog';
 
 export const metadata: Metadata = {
-    title: 'Capital City Staging',
+    title: 'Contact Capital City Staging | Free Home Staging Consultation',
     description:
-        "Capital City Staging allows you to focus on your next moves, we'll handle your history. With a home staged by Mia, you can trust that every room tells your story.",
+        "Get in touch with Capital City Staging for your free consultation. Professional home staging services in Sacramento to help you sell faster and for more money.",
     keywords:
-        'Capital City Staging, Home Staging Sacramento, home staging sacramento ca, Mia Staging, Mia Realtor, Mia Staging, Staging, Homestaging, Real Estate, Staging Services, Staging Software, Homestaging, Real Estate, Real Estate Staging, Sacramento Staging, Real Estate Staging Services, Real Estate Staging Software, Mia, Mia Dofflemyer, Home Staging, Sacramento, Sacramento Home Staging, Sacramento Real Estate, Sacramento Real Estate Staging, Sacramento Real Estate Staging Services, Sacramento Staging Services, Capital City, Capital, Capital Stage, City, City Stage, City Staging',
+        'Contact Capital City Staging, Home Staging Sacramento, home staging consultation, staging quote, Mia Dofflemyer, Sacramento staging services, real estate staging contact',
     applicationName: 'Capital City Staging',
     icons: {
         icon: '/logo/CCS_logo_152x152.png',
@@ -18,17 +18,17 @@ export const metadata: Metadata = {
         apple: '/logo/apple-touch-icon-152x152.png',
     },
     openGraph: {
-        title: 'Capital City Staging',
+        title: 'Contact Capital City Staging | Free Home Staging Consultation',
         description:
-            "Capital City Staging allows you to focus on your next moves, we'll handle your history. With a home staged by Mia, you can trust that every room tells your story.",
+            "Get in touch with Capital City Staging for your free consultation. Professional home staging services in Sacramento to help you sell faster and for more money.",
         siteName: 'Capital City Staging',
-        url: 'https://www.capitalcitystaging.com',
+        url: 'https://www.capitalcitystaging.com/contact',
         images: [
             {
                 url: '/favicon/CCS_og_image.png',
                 width: 1200,
                 height: 630,
-                alt: 'Capital City Staging',
+                alt: 'Capital City Staging Contact',
             },
         ],
         locale: 'en_US',

@@ -26,6 +26,7 @@ export const metadata: Metadata = {
         type: 'website',
         locale: 'en_US',
     },
+    metadataBase: new URL('https://www.capitalcitystaging.com'),
 };
 
 export default function InfoPage() {
