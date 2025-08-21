@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 
 import { ConvexClientProvider } from '@/components/ConvexClientProvider';
 import { PHProvider } from '@/app/providers';
@@ -6,6 +7,10 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 import 'tailwindcss/tailwind.css';
 import '@/styles/globals.css';
+
+export const metadata: Metadata = {
+    metadataBase: new URL('https://www.capitalcitystaging.com'),
+};
 
 interface RootLayoutProps {
     children: React.ReactNode;
