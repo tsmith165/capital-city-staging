@@ -17,7 +17,7 @@ export const getAllInventory = query({
     }
 
     const inventory = await ctx.db.query("inventory").collect();
-    return inventory.sort((a, b) => b.pId - a.pId);
+    return inventory.sort((a, b) => b.oId - a.oId);
   },
 });
 
@@ -55,8 +55,8 @@ export const getInventory = query({
       );
     }
 
-    // Sort by pId descending
-    return filtered.sort((a, b) => b.pId - a.pId);
+    // Sort by oId descending
+    return filtered.sort((a, b) => b.oId - a.oId);
   },
 });
 

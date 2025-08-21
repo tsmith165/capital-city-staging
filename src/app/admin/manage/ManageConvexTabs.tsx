@@ -62,14 +62,18 @@ export default function ManageConvexTabs() {
         const targetItem = inventory[targetIndex];
         
         try {
+            // Store the original oId values
+            const currentOId = currentItem.oId;
+            const targetOId = targetItem.oId;
+            
             // Swap oId values
             await updateInventory({
                 id: currentItem._id,
-                updates: { oId: targetItem.oId }
+                updates: { oId: targetOId }
             });
             await updateInventory({
                 id: targetItem._id,
-                updates: { oId: currentItem.oId }
+                updates: { oId: currentOId }
             });
         } catch (error) {
             console.error('Failed to move item up:', error);
@@ -84,14 +88,18 @@ export default function ManageConvexTabs() {
         const targetItem = inventory[targetIndex];
         
         try {
+            // Store the original oId values
+            const currentOId = currentItem.oId;
+            const targetOId = targetItem.oId;
+            
             // Swap oId values
             await updateInventory({
                 id: currentItem._id,
-                updates: { oId: targetItem.oId }
+                updates: { oId: targetOId }
             });
             await updateInventory({
                 id: targetItem._id,
-                updates: { oId: currentItem.oId }
+                updates: { oId: currentOId }
             });
         } catch (error) {
             console.error('Failed to move item down:', error);
