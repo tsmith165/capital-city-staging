@@ -15,14 +15,6 @@ export const metadata: Metadata = {
         description:
             'Explore our collection of home staging articles, tips, and insights. Learn how to maximize your property value with professional staging advice.',
         url: 'https://www.capitalcitystaging.com/info',
-        images: [
-            {
-                url: '/favicon/CCS_og_image.png',
-                width: 1200,
-                height: 630,
-                alt: 'Capital City Staging Resources',
-            },
-        ],
         type: 'website',
         locale: 'en_US',
     },
