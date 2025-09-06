@@ -28,12 +28,12 @@ const RootProvider = ({ children }: RootLayoutProps) => {
 
 export default function RootLayout({ children }: RootLayoutProps) {
     return (
-        <RootProvider>
-            <html lang="en">
-                <body className="h-full w-full">
+        <html lang="en">
+            <body className="h-full w-full">
+                <RootProvider>
                     <main>{children}</main>
-                </body>
-            </html>
-        </RootProvider>
+                </RootProvider>
+            </body>
+        </html>
     );
 }
