@@ -1,22 +1,22 @@
 'use client';
 
-import { ClerkProvider, useAuth } from '@clerk/nextjs';
-import { ConvexProviderWithClerk } from 'convex/react-clerk';
+import { ReactNode } from 'react';
 import { ConvexReactClient } from 'convex/react';
-import { dark } from '@clerk/themes';
+import dynamic from 'next/dynamic';
+import { useAuth } from '@clerk/nextjs';
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-export function ConvexClientProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+// Dynamic import to prevent SSR issues
+const ConvexProviderWithClerk = dynamic(
+  () => import('convex/react-clerk').then((mod) => mod.ConvexProviderWithClerk),
+  { ssr: false }
+);
+
+export function ConvexClientProvider({ children }: { children: ReactNode }) {
   return (
-    <ClerkProvider appearance={{ baseTheme: dark }} dynamic>
-      <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-        {children}
-      </ConvexProviderWithClerk>
-    </ClerkProvider>
+    <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+      {children}
+    </ConvexProviderWithClerk>
   );
 }

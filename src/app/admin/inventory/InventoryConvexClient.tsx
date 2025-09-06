@@ -1,19 +1,52 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { Plus } from 'lucide-react';
+import { Plus, Edit, Info } from 'lucide-react';
+import { Tooltip } from 'react-tooltip';
 import AddInventoryOverlay from '@/components/AddInventoryOverlay';
 
 export default function InventoryConvexClient() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [selectedItem, setSelectedItem] = useState<string | null>(null);
     const [showAddInventoryOverlay, setShowAddInventoryOverlay] = useState(false);
+    const [showItemInfo, setShowItemInfo] = useState<Record<string, boolean>>({});
+
+    // Initialize state from URL params
+    useEffect(() => {
+        const categoryParam = searchParams.get('category') || '';
+        const searchParam = searchParams.get('search') || '';
+        setSelectedCategory(categoryParam);
+        setSearchTerm(searchParam);
+    }, [searchParams]);
+
+    // Function to update URL with new params
+    const updateURLParams = (category: string, search: string) => {
+        const params = new URLSearchParams();
+        if (category) params.set('category', category);
+        if (search) params.set('search', search);
+        
+        const newUrl = params.toString() ? `/admin/inventory?${params.toString()}` : '/admin/inventory';
+        router.replace(newUrl);
+    };
+
+    // Handle category change
+    const handleCategoryChange = (newCategory: string) => {
+        setSelectedCategory(newCategory);
+        updateURLParams(newCategory, searchTerm);
+    };
+
+    // Handle search change
+    const handleSearchChange = (newSearch: string) => {
+        setSearchTerm(newSearch);
+        updateURLParams(selectedCategory, newSearch);
+    };
 
     const inventory = useQuery(api.inventory.getInventory, {
         category: selectedCategory || undefined,
@@ -33,6 +66,13 @@ export default function InventoryConvexClient() {
 
     const handleEditImages = (inventoryOId: number) => {
         router.push(`/admin/edit?id=${inventoryOId}`);
+    };
+
+    const toggleItemInfo = (itemId: string) => {
+        setShowItemInfo(prev => ({
+            ...prev,
+            [itemId]: !prev[itemId]
+        }));
     };
 
     if (inventory === undefined || categories === undefined) {
@@ -66,13 +106,13 @@ export default function InventoryConvexClient() {
                         type="text"
                         placeholder="Search inventory..."
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={(e) => handleSearchChange(e.target.value)}
                         className="flex-1 min-w-[200px] rounded border border-stone-600 bg-stone-700 px-3 py-2 text-stone-100 focus:border-primary focus:outline-none"
                     />
                     
                     <select
                         value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        onChange={(e) => handleCategoryChange(e.target.value)}
                         className="rounded border border-stone-600 bg-stone-700 px-3 py-2 text-stone-100 focus:border-primary focus:outline-none"
                     >
                         <option value="">All Categories</option>
@@ -83,69 +123,99 @@ export default function InventoryConvexClient() {
                         ))}
                     </select>
                     
-                    <button
-                        onClick={() => setShowAddInventoryOverlay(true)}
-                        className="rounded border-2 bg-transparent border-primary text-primary px-4 py-2 font-medium transition-colors hover:bg-secondary hover:border-secondary hover:text-stone-300"
-                    >
-                        Add New Item
-                    </button>
                 </div>
 
                 {/* Inventory Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredInventory.map((item) => (
                         <div
                             key={item._id}
-                            className="bg-stone-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
-                            onClick={() => handleItemClick(item.oId)}
+                            className="bg-stone-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
                         >
+                            {/* Image or Info Display */}
                             <div className="relative h-48">
-                                <Image
-                                    src={item.smallImagePath}
-                                    alt={item.name}
-                                    fill
-                                    className="object-cover"
-                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                                />
-                                <div className="absolute top-2 right-2 bg-secondary text-white px-2 py-1 rounded text-sm">
-                                    ${item.price}
-                                </div>
-                                {!item.active && (
-                                    <div className="absolute top-2 left-2 bg-red-600 text-white px-2 py-1 rounded text-sm">
-                                        Inactive
+                                {showItemInfo[item._id] ? (
+                                    // Show item info
+                                    <div className="flex h-full flex-col justify-center bg-gradient-to-br from-stone-800 to-stone-900 p-4 text-stone-100">
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <div className="text-sm font-bold text-primary">${item.price}</div>
+                                                <div className="text-xs text-stone-400">{item.category}</div>
+                                            </div>
+                                            <div className="text-xs text-stone-300">
+                                                <span className="font-medium">Size:</span> {item.realWidth}" × {item.realHeight}" × {item.realDepth}"
+                                            </div>
+                                            <div className="text-xs text-stone-300">
+                                                <span className="font-medium">Available:</span> {item.count - item.inUse} of {item.count}
+                                            </div>
+                                            {item.location && (
+                                                <div className="text-xs text-stone-400">
+                                                    📍 {item.location}
+                                                </div>
+                                            )}
+                                            {item.description && (
+                                                <div className="text-xs text-stone-400 border-t border-stone-700 pt-2">
+                                                    {item.description}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
+                                ) : (
+                                    // Show item image
+                                    <>
+                                        <Image
+                                            src={item.smallImagePath}
+                                            alt={item.name}
+                                            fill
+                                            className="object-cover"
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                        />
+                                        <div className="absolute top-2 right-2 bg-secondary text-white px-2 py-1 rounded text-sm">
+                                            ${item.price}
+                                        </div>
+                                        {!item.active && (
+                                            <div className="absolute top-2 left-2 bg-red-600 text-white px-2 py-1 rounded text-sm">
+                                                Inactive
+                                            </div>
+                                        )}
+                                    </>
                                 )}
                             </div>
                             
                             <div className="p-4">
-                                <h3 className="font-semibold text-stone-100 mb-2 truncate">{item.name}</h3>
-                                <p className="text-sm text-stone-400 mb-2">{item.category}</p>
-                                <p className="text-xs text-stone-500 mb-3 line-clamp-2">{item.description}</p>
+                                <h3 className="font-semibold text-stone-100 mb-3 truncate">{item.name}</h3>
                                 
-                                <div className="flex justify-between items-center text-xs text-stone-400">
-                                    <span>Available: {item.count - item.inUse}</span>
-                                    <span>In Use: {item.inUse}</span>
-                                </div>
-                                
-                                <div className="flex gap-2 mt-3">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleEditItem(item.oId);
-                                        }}
-                                        className="flex-1 rounded bg-primary text-secondary_dark px-2 py-1 text-sm font-medium hover:bg-secondary hover:text-primary transition-colors"
-                                    >
-                                        Edit Details
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleEditImages(item.oId);
-                                        }}
-                                        className="flex-1 rounded bg-stone-600 text-stone-200 px-2 py-1 text-sm font-medium hover:bg-stone-500 transition-colors"
-                                    >
-                                        Edit Images
-                                    </button>
+                                {/* Availability and buttons on same row */}
+                                <div className="flex items-center justify-between">
+                                    <div className="text-xs text-stone-400">
+                                        <span>Available: {item.count - item.inUse} / {item.count}</span>
+                                    </div>
+                                    
+                                    {/* Edit and Info buttons */}
+                                    <div className="flex gap-1">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleItemInfo(item._id);
+                                            }}
+                                            className="w-6 h-6 rounded border border-blue-500 bg-transparent text-blue-400 transition-colors hover:border-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center"
+                                            data-tooltip-id="info-tooltip"
+                                            data-tooltip-content="Show item info"
+                                        >
+                                            <Info size={10} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleEditItem(item.oId);
+                                            }}
+                                            className="w-6 h-6 rounded border border-primary bg-transparent text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-stone-300 flex items-center justify-center"
+                                            data-tooltip-id="edit-tooltip"
+                                            data-tooltip-content="Edit item"
+                                        >
+                                            <Edit size={10} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -176,6 +246,10 @@ export default function InventoryConvexClient() {
                     defaultAction="stay"
                 />
             )}
+            
+            {/* Tooltips */}
+            <Tooltip id="info-tooltip" place="top" />
+            <Tooltip id="edit-tooltip" place="top" />
         </div>
     );
 }

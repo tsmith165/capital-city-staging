@@ -2,6 +2,8 @@ import React from 'react';
 import type { Metadata } from 'next';
 
 import { ConvexClientProvider } from '@/components/ConvexClientProvider';
+import { ClerkProvider } from '@clerk/nextjs';
+import { dark } from '@clerk/themes';
 import { PHProvider } from '@/app/providers';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
@@ -18,11 +20,13 @@ interface RootLayoutProps {
 
 const RootProvider = ({ children }: RootLayoutProps) => {
     return (
-        <ConvexClientProvider>
-            <PHProvider>
-                <NuqsAdapter>{children}</NuqsAdapter>
-            </PHProvider>
-        </ConvexClientProvider>
+        <ClerkProvider appearance={{ baseTheme: dark }}>
+            <ConvexClientProvider>
+                <PHProvider>
+                    <NuqsAdapter>{children}</NuqsAdapter>
+                </PHProvider>
+            </ConvexClientProvider>
+        </ClerkProvider>
     );
 };
 

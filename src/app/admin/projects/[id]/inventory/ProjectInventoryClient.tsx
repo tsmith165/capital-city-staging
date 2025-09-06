@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Id } from '@/convex/_generated/dataModel';
 import { useUser } from '@clerk/nextjs';
 import Image from 'next/image';
-import { Search, Package, ShoppingCart, X, ZoomIn, Trash2, ChevronLeft } from 'lucide-react';
+import { Search, Package, ShoppingCart, X, ZoomIn, Trash2, ChevronLeft, Info } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
 
 export default function ProjectInventoryClient({ projectId }: { projectId: string }) {
@@ -32,6 +32,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
     const [cartCategoryFilter, setCartCategoryFilter] = useState('');
     const [quantityOverlay, setQuantityOverlay] = useState<string | null>(null);
     const [overlayQuantity, setOverlayQuantity] = useState<number>(1);
+    const [showItemInfo, setShowItemInfo] = useState<Record<string, boolean>>({});
     const overlayRef = useRef<HTMLDivElement>(null);
 
     // Close overlay when clicking outside
@@ -76,6 +77,13 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
             console.error('Error returning inventory:', error);
             alert('Error returning inventory. Please try again.');
         }
+    };
+
+    const toggleItemInfo = (itemId: string) => {
+        setShowItemInfo(prev => ({
+            ...prev,
+            [itemId]: !prev[itemId]
+        }));
     };
 
     const handleUpdateQuantity = async (assignmentId: string, newQuantity: number) => {
@@ -243,7 +251,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                 )}
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                                 {filteredInventory.map((item) => {
                                     const available = item.count - item.inUse;
                                     const quantity = quantities[item._id] || 1;
@@ -253,30 +261,50 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                             key={item._id}
                                             className="overflow-hidden rounded-lg bg-stone-700 transition-colors hover:bg-stone-600"
                                         >
-                                            {/* Item Image */}
+                                            {/* Item Image or Info Display */}
                                             <div className="relative aspect-square">
-                                                <Image
-                                                    src={item.smallImagePath}
-                                                    alt={item.name}
-                                                    fill
-                                                    className="object-cover"
-                                                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
-                                                />
-                                                {/* Category tag */}
-                                                <div className="absolute right-2 top-2 rounded bg-secondary px-2 py-1 text-xs font-medium text-white">
-                                                    {item.category}
-                                                </div>
-                                                {/* Quantity available tag */}
-                                                <div className="absolute left-2 top-2 rounded bg-black bg-opacity-70 px-2 py-1 text-xs font-medium text-white">
-                                                    {available}
-                                                </div>
-                                                {/* Enlarge button */}
-                                                <button
-                                                    onClick={() => setSelectedImage(item.imagePath)}
-                                                    className="absolute bottom-2 right-2 rounded bg-black bg-opacity-70 p-1 text-white transition-opacity hover:bg-opacity-90"
-                                                >
-                                                    <ZoomIn size={14} />
-                                                </button>
+                                                {showItemInfo[item._id] ? (
+                                                    // Show item info
+                                                    <div className="h-full p-4 bg-stone-800 text-stone-100 text-xs overflow-auto">
+                                                        <div className="space-y-2">
+                                                            <div><span className="font-semibold">Price:</span> ${item.price}</div>
+                                                            <div><span className="font-semibold">Cost:</span> ${item.cost || 'N/A'}</div>
+                                                            <div><span className="font-semibold">Dimensions:</span> {item.realWidth}"W × {item.realHeight}"H × {item.realDepth}"D</div>
+                                                            <div><span className="font-semibold">Category:</span> {item.category}</div>
+                                                            <div><span className="font-semibold">Vendor:</span> {item.vendor || 'N/A'}</div>
+                                                            <div><span className="font-semibold">Location:</span> {item.location || 'N/A'}</div>
+                                                            <div><span className="font-semibold">Count:</span> {item.count}</div>
+                                                            <div><span className="font-semibold">In Use:</span> {item.inUse}</div>
+                                                            {item.description && <div><span className="font-semibold">Description:</span> {item.description}</div>}
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    // Show item image
+                                                    <>
+                                                        <Image
+                                                            src={item.smallImagePath}
+                                                            alt={item.name}
+                                                            fill
+                                                            className="object-cover"
+                                                            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
+                                                        />
+                                                        {/* Category tag */}
+                                                        <div className="absolute right-2 top-2 rounded bg-secondary px-2 py-1 text-xs font-medium text-white">
+                                                            {item.category}
+                                                        </div>
+                                                        {/* Quantity available tag */}
+                                                        <div className="absolute left-2 top-2 rounded bg-black bg-opacity-70 px-2 py-1 text-xs font-medium text-white">
+                                                            {available}
+                                                        </div>
+                                                        {/* Enlarge button */}
+                                                        <button
+                                                            onClick={() => setSelectedImage(item.imagePath)}
+                                                            className="absolute bottom-2 right-2 rounded bg-black bg-opacity-70 p-1 text-white transition-opacity hover:bg-opacity-90"
+                                                        >
+                                                            <ZoomIn size={14} />
+                                                        </button>
+                                                    </>
+                                                )}
                                             </div>
 
                                             <div className="p-4">
@@ -286,14 +314,26 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                                     const cartAssignment = getItemCartAssignment(item._id);
 
                                                     if (cartAssignment) {
-                                                        // Item is already in cart - show remove button
+                                                        // Item is already in cart - show info and trash buttons
                                                         return (
-                                                            <button
-                                                                onClick={() => handleReturnInventory(cartAssignment._id)}
-                                                                className="w-full rounded border-2 border-red-500 bg-transparent px-3 py-2 text-sm font-medium text-red-400 transition-colors hover:border-red-600 hover:bg-red-600 hover:text-white"
-                                                            >
-                                                                Remove from Project
-                                                            </button>
+                                                            <div className="flex gap-2">
+                                                                <button
+                                                                    onClick={() => toggleItemInfo(item._id)}
+                                                                    className="flex-1 rounded border-2 border-blue-500 bg-transparent px-3 py-2 text-sm font-medium text-blue-400 transition-colors hover:border-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center"
+                                                                    data-tooltip-id="info-tooltip"
+                                                                    data-tooltip-content="Show item info"
+                                                                >
+                                                                    <Info size={16} />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleReturnInventory(cartAssignment._id)}
+                                                                    className="flex-1 rounded border-2 border-red-500 bg-transparent px-3 py-2 text-sm font-medium text-red-400 transition-colors hover:border-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center"
+                                                                    data-tooltip-id="remove-tooltip"
+                                                                    data-tooltip-content="Remove from project"
+                                                                >
+                                                                    <Trash2 size={16} />
+                                                                </button>
+                                                            </div>
                                                         );
                                                     }
 
@@ -595,6 +635,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
             <Tooltip id="update-tooltip" place="top" />
             <Tooltip id="remove-tooltip" place="top" />
             <Tooltip id="back-tooltip" place="top" />
+            <Tooltip id="info-tooltip" place="top" />
         </div>
     );
 }
