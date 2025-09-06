@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import PageLayout from '../../components/layout/PageLayout';
 import Contact from './contact';
+import ContactPageTracking from './ContactPageTracking';
 
 export const metadata: Metadata = {
     title: 'Contact Capital City Staging | Free Home Staging Consultation',
@@ -32,6 +33,7 @@ export const metadata: Metadata = {
 export default function ContactPage() {
     return (
         <PageLayout page="contact">
+            <ContactPageTracking />
             <Contact />
         </PageLayout>
     );

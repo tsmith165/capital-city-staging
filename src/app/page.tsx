@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import PageLayout from '@/components/layout/PageLayout';
 import MainView from './main_view';
+import HomePageTracking from './HomePageTracking';
 
 export const metadata: Metadata = {
     title: 'Capital City Staging',
@@ -32,6 +33,7 @@ export const metadata: Metadata = {
 export default function Home() {
     return (
         <PageLayout page="home">
+            <HomePageTracking />
             <MainView />
         </PageLayout>
     );
