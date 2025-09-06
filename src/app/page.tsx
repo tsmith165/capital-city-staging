@@ -2,7 +2,6 @@ import React from 'react';
 import type { Metadata } from 'next';
 import PageLayout from '@/components/layout/PageLayout';
 import MainView from './main_view';
-import { captureEvent, captureDistictId } from '@/utils/posthog';
 
 export const metadata: Metadata = {
     title: 'Capital City Staging',
@@ -30,10 +29,7 @@ export const metadata: Metadata = {
     },
 };
 
-export default async function Home() {
-    const distinctId = await captureDistictId();
-    captureEvent('Home page was loaded', { distinctId });
-
+export default function Home() {
     return (
         <PageLayout page="home">
             <MainView />

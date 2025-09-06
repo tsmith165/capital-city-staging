@@ -3,8 +3,6 @@ import type { Metadata } from 'next';
 import PageLayout from '../../components/layout/PageLayout';
 import Contact from './contact';
 
-import { captureEvent, captureDistictId } from '@/utils/posthog';
-
 export const metadata: Metadata = {
     title: 'Contact Capital City Staging | Free Home Staging Consultation',
     description:
@@ -31,10 +29,7 @@ export const metadata: Metadata = {
     },
 };
 
-export default async function ContactPage() {
-    const distinctId = await captureDistictId();
-    captureEvent('Contact page was loaded', { distinctId });
-
+export default function ContactPage() {
     return (
         <PageLayout page="contact">
             <Contact />
