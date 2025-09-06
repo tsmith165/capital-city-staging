@@ -21,7 +21,14 @@ export const metadata: Metadata = {
         locale: 'en_US',
         type: 'website',
     },
-    metadataBase: new URL('https://www.capitalcitystaging.com'),
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Contact Capital City Staging | Free Home Staging Consultation',
+        description:
+            "Get in touch with Capital City Staging for your free consultation. Professional home staging services in Sacramento to help you sell faster and for more money.",
+        site: '@capitalcitystaging',
+        creator: '@capitalcitystaging',
+    },
 };
 
 export default async function ContactPage() {

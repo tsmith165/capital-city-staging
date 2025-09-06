@@ -20,7 +20,14 @@ export const metadata: Metadata = {
         locale: 'en_US',
         type: 'website',
     },
-    metadataBase: new URL('https://www.capitalcitystaging.com'),
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Capital City Staging',
+        description:
+            "Capital City Staging allows you to focus on your next moves, we'll handle your history. With a home staged by Mia, you can trust that every room tells your story.",
+        site: '@capitalcitystaging',
+        creator: '@capitalcitystaging',
+    },
 };
 
 export default async function Home() {

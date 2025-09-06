@@ -18,7 +18,14 @@ export const metadata: Metadata = {
         type: 'website',
         locale: 'en_US',
     },
-    metadataBase: new URL('https://www.capitalcitystaging.com'),
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Home Staging Resources & Information | Capital City Staging',
+        description:
+            'Explore our collection of home staging articles, tips, and insights. Learn how to maximize your property value with professional staging advice.',
+        site: '@capitalcitystaging',
+        creator: '@capitalcitystaging',
+    },
 };
 
 export default function InfoPage() {
