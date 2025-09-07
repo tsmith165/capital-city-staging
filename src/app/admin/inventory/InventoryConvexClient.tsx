@@ -5,7 +5,7 @@ import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { Plus, Edit, Info } from 'lucide-react';
+import { Plus, Edit, Info, ExternalLink } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
 import AddInventoryOverlay from '@/components/AddInventoryOverlay';
 
@@ -136,11 +136,20 @@ export default function InventoryConvexClient() {
                             <div className="relative h-48">
                                 {showItemInfo[item._id] ? (
                                     // Show item info
-                                    <div className="flex h-full flex-col justify-center bg-gradient-to-br from-stone-800 to-stone-900 p-4 text-stone-100">
+                                    <div className="flex h-full flex-col justify-start bg-gradient-to-br from-stone-800 to-stone-900 p-4 text-stone-100">
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between">
                                                 <div className="text-sm font-bold text-primary">${item.price}</div>
-                                                <div className="text-xs text-stone-400">{item.category}</div>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        router.push(`/admin/edit?id=${item.oId}`);
+                                                    }}
+                                                    className="flex items-center gap-1 px-2 py-1 text-xs text-primary hover:text-secondary transition-colors"
+                                                >
+                                                    <ExternalLink size={8} />
+                                                    <span className="text-[10px]">Edit</span>
+                                                </button>
                                             </div>
                                             <div className="text-xs text-stone-300">
                                                 <span className="font-medium">Size:</span> {item.realWidth}" × {item.realHeight}" × {item.realDepth}"

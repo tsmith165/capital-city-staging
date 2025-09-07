@@ -6,7 +6,7 @@ import { api } from '@/convex/_generated/api';
 import { useRouter } from 'next/navigation';
 import ProjectResizeUploader from '@/components/ProjectResizeUploader';
 import { Id } from '@/convex/_generated/dataModel';
-import { ChevronDown, ChevronRight, Plus, Bell, Loader2, Info, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Bell, Loader2, Info, Trash2, ExternalLink } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import Image from 'next/image';
 import { Tooltip } from 'react-tooltip';
@@ -515,13 +515,26 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                                         <div className="relative aspect-square overflow-hidden">
                                                             {showItemInfo[assignment._id] ? (
                                                                 // Show item info
-                                                                <div className="flex h-full flex-col justify-center bg-gradient-to-br from-stone-800 to-stone-900 p-4 text-stone-100">
+                                                                <div className="flex h-full flex-col justify-start bg-gradient-to-br from-stone-800 to-stone-900 p-4 text-stone-100">
                                                                     <div className="space-y-2">
                                                                         <div className="flex items-center justify-between">
                                                                             <div className="text-sm font-bold text-primary">
                                                                                 ${assignment.inventory?.price}
                                                                             </div>
-                                                                            <div className="text-xs text-stone-400">{assignment.inventory?.category}</div>
+                                                                            <button
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    // Find the inventory item to get its oId
+                                                                                    const inventoryItem = availableInventory?.find(item => item._id === assignment.inventoryId);
+                                                                                    if (inventoryItem) {
+                                                                                        router.push(`/admin/edit?id=${inventoryItem.oId}`);
+                                                                                    }
+                                                                                }}
+                                                                                className="flex items-center gap-1 px-2 py-1 text-xs text-primary hover:text-secondary transition-colors"
+                                                                            >
+                                                                                <ExternalLink size={8} />
+                                                                                <span className="text-[10px]">Edit</span>
+                                                                            </button>
                                                                         </div>
                                                                         <div className="text-xs text-stone-300">
                                                                             <span className="font-medium">Size:</span>{' '}
