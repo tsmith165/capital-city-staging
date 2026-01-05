@@ -11,7 +11,6 @@
     "sync-users": "tsx scripts/sync-clerk-users.ts"
   },
   "dependencies": {
-    "@clerk/clerk-sdk-node": "^5.1.6",
     "@clerk/nextjs": "^6.0.2",
     "@clerk/themes": "^2.1.39",
     "@neondatabase/serverless": "^0.9.5",
@@ -22,7 +21,7 @@
     "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1",
     "@uploadthing/react": "^7.1.2",
     "autoprefixer": "^10.4.20",
-    "axios": "^1.7.7",
+    "axios": "^1.13.2",
     "convex": "^1.25.4",
     "dotenv": "^16.4.5",
     "drizzle-orm": "0.29.0",
