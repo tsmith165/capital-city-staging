@@ -34,8 +34,8 @@ if (typeof document !== 'undefined') {
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { sendContactFormEmail } from './actions';
-import { calculateStagingQuote, formatPrice, type QuoteDetails } from '@/utils/calculateQuote';
-import { Calculator, Send, CheckCircle, AlertCircle, Info, Ruler, Bed, MapPin, Trees, Building, Home, Users, Bath, Sofa, Briefcase, UtensilsCrossed } from 'lucide-react';
+import { calculateStagingQuote, formatPrice } from '@/utils/calculateQuote';
+import { Calculator, Send, CheckCircle, AlertCircle, Info, Ruler, Bed, MapPin, Trees, Building, Home, Users, Bath, Sofa, Briefcase, UtensilsCrossed, Phone } from 'lucide-react';
 
 const schema = z.object({
     name: z.string().nonempty('Name is required'),
@@ -505,183 +505,286 @@ const ContactForm = () => {
                                         </div>
                                     </div>
 
-                                    {/* Main Quote Display */}
-                                    <div className="mb-6 rounded-xl bg-gradient-to-br from-primary/10 via-primary_dark/15 to-primary/10 border border-primary/30 p-6 text-center">
-                                        <div className="mb-2">
-                                            <div className="text-sm uppercase tracking-wider text-stone-400 mb-2">Estimated Price Range</div>
-                                            <div className="text-3xl font-bold gradient-gold-main-text">
-                                                {formatPrice(quote.priceRange.min)} - {formatPrice(quote.priceRange.max)}
-                                            </div>
-                                        </div>
-                                        <div className="text-xs text-stone-400 mt-3">
-                                            Final pricing determined after consultation
-                                        </div>
-                                    </div>
-
-                                    {/* Price Breakdown */}
-                                    <div className="mb-6 rounded-xl bg-stone-900/70 p-5 backdrop-blur-sm border border-stone-700/50">
-                                        <h4 className="mb-4 text-center text-lg font-bold text-secondary">Price Breakdown</h4>
-                                        
-                                        <div className="space-y-3">
-                                            {/* Base Price */}
-                                            <div className="flex justify-between items-center">
-                                                <div>
-                                                    <span className="text-stone-300 font-medium">Base {formData.stagingType} staging package</span>
-                                                    <div className="text-sm text-stone-400">Kitchen + entryway</div>
+                                    {/* Custom Quote Required Message */}
+                                    {quote.requiresCustomQuote ? (
+                                        <>
+                                            <div className="mb-6 rounded-xl bg-gradient-to-br from-amber-500/10 via-amber-600/15 to-amber-500/10 border border-amber-500/30 p-6 text-center">
+                                                <div className="mb-4">
+                                                    <Phone className="mx-auto text-amber-400 mb-3" size={40} />
+                                                    <div className="text-xl font-bold text-amber-200 mb-2">Custom Quote Required</div>
+                                                    <div className="text-sm text-amber-200/80">
+                                                        {quote.customQuoteReason}
+                                                    </div>
                                                 </div>
-                                                <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.basePrice)}</span>
+                                                <div className="text-stone-300 text-sm">
+                                                    Please submit your information below and Mia will provide a personalized quote for your property.
+                                                </div>
                                             </div>
 
-                                            {/* Bedrooms */}
-                                            {quote.bedroomCount > 0 && (
-                                                <div className="flex justify-between items-center">
-                                                    <div>
-                                                        <span className="text-stone-300 font-medium">Bedrooms</span>
-                                                        <div className="text-sm text-stone-400">
-                                                            {quote.bedroomCount} × {formatPrice(quote.bedroomRate)} each
-                                                        </div>
+                                            {/* Submit Button for Custom Quote */}
+                                            <div className="flex justify-center">
+                                                <button
+                                                    type="submit"
+                                                    disabled={isSubmitting}
+                                                    className={`flex transform items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-all hover:scale-[1.02] hover:rotate-1 ${
+                                                        isSubmitting
+                                                            ? 'cursor-not-allowed bg-stone-600 text-stone-400'
+                                                            : 'bg-gradient-to-r from-primary via-primary_dark to-primary text-white shadow-2xl hover:shadow-primary/40 hover:shadow-2xl border-2 border-primary_dark/50'
+                                                    }`}
+                                                >
+                                                    {isSubmitting ? (
+                                                        <>
+                                                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-stone-400 border-t-transparent" />
+                                                            <span>Sending Your Request...</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Send size={24} />
+                                                            <span>Request Custom Quote from Mia</span>
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            {/* Main Quote Display */}
+                                            <div className="mb-6 rounded-xl bg-gradient-to-br from-primary/10 via-primary_dark/15 to-primary/10 border border-primary/30 p-6 text-center">
+                                                <div className="mb-2">
+                                                    <div className="text-sm uppercase tracking-wider text-stone-400 mb-2">Estimated Price Range</div>
+                                                    <div className="text-3xl font-bold gradient-gold-main-text">
+                                                        {formatPrice(quote.priceRange.min)} - {formatPrice(quote.priceRange.max)}
                                                     </div>
-                                                    <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.bedroomTotal)}</span>
                                                 </div>
-                                            )}
-
-                                            {/* Bathrooms */}
-                                            {quote.bathroomCount > 0 && (
-                                                <div className="flex justify-between items-center">
-                                                    <div>
-                                                        <span className="text-stone-300 font-medium">Bathrooms</span>
-                                                        <div className="text-sm text-stone-400">
-                                                            {quote.bathroomCount} × {formatPrice(quote.bathroomRate)} each
-                                                        </div>
-                                                    </div>
-                                                    <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.bathroomTotal)}</span>
+                                                <div className="text-xs text-stone-400 mt-3">
+                                                    Final pricing determined after consultation
                                                 </div>
-                                            )}
+                                            </div>
 
-                                            {/* Living Areas */}
-                                            {quote.livingAreaCount > 0 && (
-                                                <div className="flex justify-between items-center">
-                                                    <div>
-                                                        <span className="text-stone-300 font-medium">Living Areas</span>
-                                                        <div className="text-sm text-stone-400">
-                                                            {quote.livingAreaCount} × {formatPrice(quote.livingAreaRate)} each
+                                            {/* Price Breakdown */}
+                                            <div className="mb-6 rounded-xl bg-stone-900/70 p-5 backdrop-blur-sm border border-stone-700/50">
+                                                <h4 className="mb-4 text-center text-lg font-bold text-secondary">Price Breakdown</h4>
+
+                                                <div className="space-y-3">
+                                                    {/* Base Price - Different display for vacant vs occupied */}
+                                                    <div className="flex justify-between items-center">
+                                                        <div>
+                                                            <span className="text-stone-300 font-medium">
+                                                                {formData.stagingType === 'vacant' && quote.tierInfo
+                                                                    ? `Base Package (${quote.tierInfo.sqftRange})`
+                                                                    : `Base ${formData.stagingType} staging package`
+                                                                }
+                                                            </span>
+                                                            <div className="text-sm text-stone-400">
+                                                                {formData.stagingType === 'vacant' && quote.tierInfo
+                                                                    ? quote.tierInfo.includedRooms
+                                                                    : 'Kitchen + entryway'
+                                                                }
+                                                            </div>
                                                         </div>
+                                                        <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.basePrice)}</span>
                                                     </div>
-                                                    <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.livingAreaTotal)}</span>
-                                                </div>
-                                            )}
 
-                                            {/* Home Offices */}
-                                            {quote.officeCount > 0 && (
-                                                <div className="flex justify-between items-center">
-                                                    <div>
-                                                        <span className="text-stone-300 font-medium">Home Offices</span>
-                                                        <div className="text-sm text-stone-400">
-                                                            {quote.officeCount} × {formatPrice(quote.officeRate)} each
+                                                    {/* Living Areas - Always shown for both (never included in base) */}
+                                                    {quote.livingAreaCount > 0 && (
+                                                        <div className="flex justify-between items-center">
+                                                            <div>
+                                                                <span className="text-stone-300 font-medium">Living Areas</span>
+                                                                <div className="text-sm text-stone-400">
+                                                                    {quote.livingAreaCount} × {formatPrice(quote.livingAreaRate)} each
+                                                                </div>
+                                                            </div>
+                                                            <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.livingAreaTotal)}</span>
                                                         </div>
-                                                    </div>
-                                                    <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.officeTotal)}</span>
-                                                </div>
-                                            )}
+                                                    )}
 
-                                            {/* Dining Spaces */}
-                                            {quote.diningSpaceCount > 0 && (
-                                                <div className={`flex justify-between items-center ${hasAdditionalItems ? 'border-b border-stone-600/50 pb-3' : ''}`}>
-                                                    <div>
-                                                        <span className="text-stone-300 font-medium">Dining Spaces</span>
-                                                        <div className="text-sm text-stone-400">
-                                                            {quote.diningSpaceCount} × {formatPrice(quote.diningSpaceRate)} each
+                                                    {/* Dining Spaces - Always shown for both (never included in base) */}
+                                                    {quote.diningSpaceCount > 0 && (
+                                                        <div className="flex justify-between items-center">
+                                                            <div>
+                                                                <span className="text-stone-300 font-medium">Dining Spaces</span>
+                                                                <div className="text-sm text-stone-400">
+                                                                    {quote.diningSpaceCount} × {formatPrice(quote.diningSpaceRate)} each
+                                                                </div>
+                                                            </div>
+                                                            <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.diningSpaceTotal)}</span>
                                                         </div>
-                                                    </div>
-                                                    <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.diningSpaceTotal)}</span>
-                                                </div>
-                                            )}
+                                                    )}
 
-                                            {/* Additional Services */}
-                                            {quote.outdoorAdjustment > 0 && (
-                                                <div className="flex justify-between items-center">
-                                                    <div>
-                                                        <span className="text-stone-300 font-medium">Outdoor Staging</span>
-                                                        <div className="text-sm text-stone-400">Patio, deck, yard areas</div>
-                                                    </div>
-                                                    <span className="font-medium text-secondary text-lg">
-                                                        +{formatPrice(quote.outdoorAdjustment)}
+                                                    {/* Extra Bedrooms - For vacant, only show extras beyond included */}
+                                                    {formData.stagingType === 'vacant' ? (
+                                                        quote.extraBedroomCount > 0 && (
+                                                            <div className="flex justify-between items-center">
+                                                                <div>
+                                                                    <span className="text-stone-300 font-medium">Extra Bedrooms</span>
+                                                                    <div className="text-sm text-stone-400">
+                                                                        {quote.extraBedroomCount} beyond included × {formatPrice(quote.bedroomRate)} each
+                                                                    </div>
+                                                                </div>
+                                                                <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.bedroomTotal)}</span>
+                                                            </div>
+                                                        )
+                                                    ) : (
+                                                        quote.bedroomCount > 0 && (
+                                                            <div className="flex justify-between items-center">
+                                                                <div>
+                                                                    <span className="text-stone-300 font-medium">Bedrooms</span>
+                                                                    <div className="text-sm text-stone-400">
+                                                                        {quote.bedroomCount} × {formatPrice(quote.bedroomRate)} each
+                                                                    </div>
+                                                                </div>
+                                                                <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.bedroomTotal)}</span>
+                                                            </div>
+                                                        )
+                                                    )}
+
+                                                    {/* Extra Bathrooms - For vacant, only show extras beyond 2 included */}
+                                                    {formData.stagingType === 'vacant' ? (
+                                                        quote.extraBathroomCount > 0 && (
+                                                            <div className="flex justify-between items-center">
+                                                                <div>
+                                                                    <span className="text-stone-300 font-medium">Extra Bathrooms</span>
+                                                                    <div className="text-sm text-stone-400">
+                                                                        {quote.extraBathroomCount} beyond included × {formatPrice(quote.bathroomRate)} each
+                                                                    </div>
+                                                                </div>
+                                                                <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.bathroomTotal)}</span>
+                                                            </div>
+                                                        )
+                                                    ) : (
+                                                        quote.bathroomCount > 0 && (
+                                                            <div className="flex justify-between items-center">
+                                                                <div>
+                                                                    <span className="text-stone-300 font-medium">Bathrooms</span>
+                                                                    <div className="text-sm text-stone-400">
+                                                                        {quote.bathroomCount} × {formatPrice(quote.bathroomRate)} each
+                                                                    </div>
+                                                                </div>
+                                                                <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.bathroomTotal)}</span>
+                                                            </div>
+                                                        )
+                                                    )}
+
+                                                    {/* Extra Offices - For vacant, only show extras beyond included */}
+                                                    {formData.stagingType === 'vacant' ? (
+                                                        quote.extraOfficeCount > 0 && (
+                                                            <div className={`flex justify-between items-center ${hasAdditionalItems ? 'border-b border-stone-600/50 pb-3' : ''}`}>
+                                                                <div>
+                                                                    <span className="text-stone-300 font-medium">Extra Home Offices</span>
+                                                                    <div className="text-sm text-stone-400">
+                                                                        {quote.extraOfficeCount} beyond included × {formatPrice(quote.officeRate)} each
+                                                                    </div>
+                                                                </div>
+                                                                <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.officeTotal)}</span>
+                                                            </div>
+                                                        )
+                                                    ) : (
+                                                        quote.officeCount > 0 && (
+                                                            <div className={`flex justify-between items-center ${hasAdditionalItems ? 'border-b border-stone-600/50 pb-3' : ''}`}>
+                                                                <div>
+                                                                    <span className="text-stone-300 font-medium">Home Offices</span>
+                                                                    <div className="text-sm text-stone-400">
+                                                                        {quote.officeCount} × {formatPrice(quote.officeRate)} each
+                                                                    </div>
+                                                                </div>
+                                                                <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.officeTotal)}</span>
+                                                            </div>
+                                                        )
+                                                    )}
+
+                                                    {/* Additional Services */}
+                                                    {quote.outdoorAdjustment > 0 && (
+                                                        <div className="flex justify-between items-center">
+                                                            <div>
+                                                                <span className="text-stone-300 font-medium">Outdoor Staging</span>
+                                                                <div className="text-sm text-stone-400">Patio, deck, yard areas</div>
+                                                            </div>
+                                                            <span className="font-medium text-secondary text-lg">
+                                                                +{formatPrice(quote.outdoorAdjustment)}
+                                                            </span>
+                                                        </div>
+                                                    )}
+
+                                                    {quote.multiFloorAdjustment > 0 && (
+                                                        <div className="flex justify-between items-center">
+                                                            <div>
+                                                                <span className="text-stone-300 font-medium">Multi-Floor Fee</span>
+                                                                <div className="text-sm text-stone-400">Additional story surcharge</div>
+                                                            </div>
+                                                            <span className="font-medium text-secondary text-lg">
+                                                                +{formatPrice(quote.multiFloorAdjustment)}
+                                                            </span>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Large home fee - only for occupied */}
+                                                    {quote.largeSquareFootageAdjustment > 0 && (
+                                                        <div className="flex justify-between items-center">
+                                                            <div>
+                                                                <span className="text-stone-300 font-medium">Very Large Home Fee</span>
+                                                                <div className="text-sm text-stone-400">Properties over 3,500 sq ft</div>
+                                                            </div>
+                                                            <span className="font-medium text-secondary text-lg">
+                                                                +{formatPrice(quote.largeSquareFootageAdjustment)}
+                                                            </span>
+                                                        </div>
+                                                    )}
+
+                                                    {quote.distanceAdjustment > 0 && (
+                                                        <div className="flex justify-between items-center">
+                                                            <div>
+                                                                <span className="text-stone-300 font-medium">Travel Fee</span>
+                                                                <div className="text-sm text-stone-400">
+                                                                    {formData.stagingType === 'vacant'
+                                                                        ? `${formData.distanceFromDowntown} miles from Sacramento`
+                                                                        : 'Properties over 20 miles away'
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                            <span className="font-medium text-secondary text-lg">
+                                                                +{formatPrice(quote.distanceAdjustment)}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Disclaimer */}
+                                            <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
+                                                <p className="flex items-start gap-2 text-sm text-amber-200">
+                                                    <Info size={18} className="mt-0.5 flex-shrink-0 text-amber-400" />
+                                                    <span>
+                                                        <strong>Important:</strong> This is an estimate only. Final pricing will be confirmed after Mia reviews your property details and conducts a walkthrough consultation.
                                                     </span>
-                                                </div>
-                                            )}
+                                                </p>
+                                            </div>
 
-                                            {quote.multiFloorAdjustment > 0 && (
-                                                <div className="flex justify-between items-center">
-                                                    <div>
-                                                        <span className="text-stone-300 font-medium">Multi-Floor Fee</span>
-                                                        <div className="text-sm text-stone-400">Additional story surcharge</div>
-                                                    </div>
-                                                    <span className="font-medium text-secondary text-lg">
-                                                        +{formatPrice(quote.multiFloorAdjustment)}
-                                                    </span>
-                                                </div>
-                                            )}
-
-                                            {quote.largeSquareFootageAdjustment > 0 && (
-                                                <div className="flex justify-between items-center">
-                                                    <div>
-                                                        <span className="text-stone-300 font-medium">Very Large Home Fee</span>
-                                                        <div className="text-sm text-stone-400">Properties over 3,500 sq ft</div>
-                                                    </div>
-                                                    <span className="font-medium text-secondary text-lg">
-                                                        +{formatPrice(quote.largeSquareFootageAdjustment)}
-                                                    </span>
-                                                </div>
-                                            )}
-
-                                            {quote.distanceAdjustment > 0 && (
-                                                <div className="flex justify-between items-center">
-                                                    <div>
-                                                        <span className="text-stone-300 font-medium">Distance Fee</span>
-                                                        <div className="text-sm text-stone-400">Properties over 20 miles away</div>
-                                                    </div>
-                                                    <span className="font-medium text-secondary text-lg">
-                                                        +{formatPrice(quote.distanceAdjustment)}
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Disclaimer */}
-                                    <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
-                                        <p className="flex items-start gap-2 text-sm text-amber-200">
-                                            <Info size={18} className="mt-0.5 flex-shrink-0 text-amber-400" />
-                                            <span>
-                                                <strong>Important:</strong> This is an estimate only. Final pricing will be confirmed after Mia reviews your property details and conducts a walkthrough consultation.
-                                            </span>
-                                        </p>
-                                    </div>
-
-                                    {/* Submit Button */}
-                                    <div className="flex justify-center">
-                                        <button
-                                            type="submit"
-                                            disabled={isSubmitting}
-                                            className={`flex transform items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-all hover:scale-[1.02] hover:rotate-1 ${
-                                                isSubmitting
-                                                    ? 'cursor-not-allowed bg-stone-600 text-stone-400'
-                                                    : 'bg-gradient-to-r from-primary via-primary_dark to-primary text-white shadow-2xl hover:shadow-primary/40 hover:shadow-2xl border-2 border-primary_dark/50'
-                                            }`}
-                                        >
-                                            {isSubmitting ? (
-                                                <>
-                                                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-stone-400 border-t-transparent" />
-                                                    <span>Sending Your Quote...</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Send size={24} />
-                                                    <span>Send Your Estimate to Mia!</span>
-                                                </>
-                                            )}
-                                        </button>
-                                    </div>
+                                            {/* Submit Button */}
+                                            <div className="flex justify-center">
+                                                <button
+                                                    type="submit"
+                                                    disabled={isSubmitting}
+                                                    className={`flex transform items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-all hover:scale-[1.02] hover:rotate-1 ${
+                                                        isSubmitting
+                                                            ? 'cursor-not-allowed bg-stone-600 text-stone-400'
+                                                            : 'bg-gradient-to-r from-primary via-primary_dark to-primary text-white shadow-2xl hover:shadow-primary/40 hover:shadow-2xl border-2 border-primary_dark/50'
+                                                    }`}
+                                                >
+                                                    {isSubmitting ? (
+                                                        <>
+                                                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-stone-400 border-t-transparent" />
+                                                            <span>Sending Your Quote...</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Send size={24} />
+                                                            <span>Send Your Estimate to Mia!</span>
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
                                 </motion.div>
                             )}
                         </AnimatePresence>
