@@ -3,9 +3,9 @@ import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
     schema: './src/db/schema.ts',
-    driver: 'pg',
+    dialect: 'postgresql',
     dbCredentials: {
-        connectionString: process.env.NEON_DATABASE_URL!,
+        url: process.env.NEON_DATABASE_URL!,
     },
     out: './src/drizzle',
     verbose: true,

@@ -7,7 +7,7 @@ import ContactFormEmail from '@/utils/emails/templates/contactFormEmail';
 
 export async function sendContactFormEmail(formData: any) {
     const contact_form_email_template = React.createElement(ContactFormEmail, formData);
-    const email_html = render(contact_form_email_template);
+    const email_html = await render(contact_form_email_template);
 
     const admin_emails = [
         'mdofflemyer.realestate@gmail.com',
