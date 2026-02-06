@@ -3,6 +3,8 @@ import type { Metadata } from 'next';
 import PageLayout from '@/components/layout/PageLayout';
 import MainView from './main_view';
 import HomePageTracking from './HomePageTracking';
+import { preloadQuery, preloadedQueryResult } from 'convex/nextjs';
+import { api } from '@/convex/_generated/api';
 
 export const metadata: Metadata = {
     title: 'Capital City Staging',
@@ -30,11 +32,27 @@ export const metadata: Metadata = {
     },
 };
 
-export default function Home() {
+export default async function Home() {
+    // Preload homepage images at SSR time so they're available instantly on the client
+    let initialHomepageImages: Array<{ imagePath: string; width: number; height: number }> | null = null;
+    try {
+        const preloaded = await preloadQuery(api.homepageImages.getHomepageImages);
+        const result = preloadedQueryResult(preloaded);
+        if (result && result.length > 0) {
+            initialHomepageImages = result.map((img: any) => ({
+                imagePath: img.imagePath,
+                width: img.width,
+                height: img.height,
+            }));
+        }
+    } catch {
+        // If preloading fails, the client will fall back to hardcoded images
+    }
+
     return (
         <PageLayout page="home">
             <HomePageTracking />
-            <MainView />
+            <MainView initialHomepageImages={initialHomepageImages} />
         </PageLayout>
     );
 }

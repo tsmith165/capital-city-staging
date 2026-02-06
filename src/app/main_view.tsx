@@ -1,15 +1,12 @@
 'use client';
 
 import React, { useRef, useLayoutEffect, useEffect, useState } from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
 import { useStore } from '@/stores/store';
 
 import Home from '@/app/_main_components/home';
 import About from '@/app/_main_components/about';
 import Portfolio from '@/app/_main_components/portfolio';
 import Services from '@/app/_main_components/services';
-// import Testimonials from '@/app/_main_components/testimonials';
 
 import dynamic from 'next/dynamic';
 const PostHogPageView = dynamic(() => import('@/app/PostHogPageView'), {
@@ -24,11 +21,20 @@ const components = [
     { id: 'portfolio', component: Portfolio },
     { id: 'where', component: Where },
     { id: 'services', component: Services },
-    //{ id: 'testimonials', component: Testimonials },
     { id: 'about', component: About },
 ];
 
-export default function MainView() {
+interface InitialHomepageImage {
+    imagePath: string;
+    width: number;
+    height: number;
+}
+
+export default function MainView({
+    initialHomepageImages,
+}: {
+    initialHomepageImages?: InitialHomepageImage[] | null;
+}) {
     const [layoutLoaded, setLayoutLoaded] = useState(false);
     const componentRefs = useStore((state) => state.componentRefs);
     const setComponentRefs = useStore((state) => state.setComponentRefs);
@@ -67,12 +73,13 @@ export default function MainView() {
     return (
         <div className="flex h-full flex-col overflow-y-auto">
             <PostHogPageView />
-            <Head>
-                <link rel="preload" as="image" href="/portfolio/stock/staging-stock-3.jpg" imageSizes="100vw" />
-            </Head>
             {components.map(({ id, component: Component }, index) => (
                 <div key={id} ref={refs.current[index]} id={id} className="h-auto w-full bg-stone-900">
-                    <Component />
+                    {id === 'home' ? (
+                        <Component initialHomepageImages={initialHomepageImages} />
+                    ) : (
+                        <Component />
+                    )}
                 </div>
             ))}
         </div>

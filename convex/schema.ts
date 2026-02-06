@@ -126,4 +126,23 @@ export default defineSchema({
   })
     .index("by_created", ["createdAt"])
     .index("by_responded", ["responded"]),
+
+  homepageImages: defineTable({
+    imagePath: v.string(),
+    width: v.number(),
+    height: v.number(),
+    thumbnailPath: v.optional(v.string()),
+    thumbnailWidth: v.optional(v.number()),
+    thumbnailHeight: v.optional(v.number()),
+    title: v.optional(v.string()),
+    active: v.boolean(),
+    displayOrder: v.number(),
+    sourceType: v.union(v.literal("upload"), v.literal("project")),
+    sourceProjectId: v.optional(v.id("projects")),
+    sourceProjectImageId: v.optional(v.id("projectImages")),
+    createdAt: v.number(),
+  })
+    .index("by_active_order", ["active", "displayOrder"])
+    .index("by_order", ["displayOrder"])
+    .index("by_source_project_image", ["sourceProjectImageId"]),
 });

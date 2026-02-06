@@ -1,10 +1,18 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
-const images = [
+type HomepageImage = {
+    src: string;
+    width: number;
+    height: number;
+};
+
+const FALLBACK_IMAGES: HomepageImage[] = [
     { src: '/portfolio/stock/staging-stock-3.jpg', width: 2560, height: 1695 },
     { src: '/portfolio/stock/staging-stock-7.jpg', width: 564, height: 705 },
     { src: '/portfolio/stock/staging-stock-1.png', width: 2048, height: 1366 },
@@ -14,11 +22,55 @@ const images = [
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export default function Home() {
+interface InitialHomepageImage {
+    imagePath: string;
+    width: number;
+    height: number;
+}
+
+export default function Home({
+    initialHomepageImages,
+}: {
+    initialHomepageImages?: InitialHomepageImage[] | null;
+}) {
+    // Client-side query for real-time updates after hydration
+    const homepageImagesData = useQuery(api.homepageImages.getHomepageImages);
+
     const [isLogoVisible, setLogoVisible] = useState(true);
     const [isStagingImageVisible, setStagingImageVisible] = useState(true);
     const currentImageIndexRef = useRef(0);
 
+    // Priority: live Convex data > SSR-preloaded data > hardcoded fallback
+    const images: HomepageImage[] = useMemo(() => {
+        // 1. Use live Convex data once available (real-time, always up-to-date)
+        if (homepageImagesData && homepageImagesData.length > 0) {
+            return homepageImagesData.map((img: { imagePath: string; width: number; height: number }) => ({
+                src: img.imagePath,
+                width: img.width,
+                height: img.height,
+            }));
+        }
+        // 2. Use SSR-preloaded data (available immediately, no loading delay)
+        if (initialHomepageImages && initialHomepageImages.length > 0) {
+            return initialHomepageImages.map((img) => ({
+                src: img.imagePath,
+                width: img.width,
+                height: img.height,
+            }));
+        }
+        // 3. Ultimate fallback to hardcoded local images
+        return FALLBACK_IMAGES;
+    }, [homepageImagesData, initialHomepageImages]);
+
+    // Preload all images for smooth transitions
+    useEffect(() => {
+        images.forEach((image) => {
+            const img = new window.Image();
+            img.src = image.src;
+        });
+    }, [images]);
+
+    // Image rotation interval
     useEffect(() => {
         const interval = setInterval(async () => {
             setStagingImageVisible(false);
@@ -28,7 +80,16 @@ export default function Home() {
         }, 5500);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [images.length]);
+
+    // Reset image index if images array shrinks below current index
+    useEffect(() => {
+        if (currentImageIndexRef.current >= images.length) {
+            currentImageIndexRef.current = 0;
+            setStagingImageVisible(false);
+            setTimeout(() => setStagingImageVisible(true), 100);
+        }
+    }, [images.length]);
 
     const circularFadeVariants = {
         hidden: {

@@ -53,7 +53,15 @@ export const admin_menu_list: MenuItem[] = [
         ],
     },
     { id: 'users', label: 'Users', url: '/admin/users' },
-    { id: 'manage', label: 'Manage', url: '/admin/manage' },
+    {
+        id: 'manage',
+        label: 'Manage',
+        url: '/admin/manage',
+        subMenu: [
+            { id: 'manage-inventory', label: 'Inventory', url: '/admin/manage' },
+            { id: 'manage-homepage', label: 'Homepage', url: '/admin/manage/homepage' },
+        ],
+    },
 ];
 
 export default { navbar_menu_list, menu_list, admin_menu_list };
