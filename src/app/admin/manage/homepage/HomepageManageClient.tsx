@@ -65,7 +65,7 @@ function LivePreviewStrip({ images }: { images: HomepageImageDoc[] }) {
 
     if (images.length === 0) {
         return (
-            <div className="relative mx-4 mt-4 flex h-48 items-center justify-center overflow-hidden rounded-xl border border-stone-700 bg-stone-800/50">
+            <div className="mx-auto mt-4 flex aspect-[16/9] max-h-[350px] w-full max-w-3xl items-center justify-center overflow-hidden rounded-xl border border-stone-700 bg-stone-800/50">
                 <p className="text-sm text-stone-500">No active images to preview</p>
             </div>
         );
@@ -73,7 +73,7 @@ function LivePreviewStrip({ images }: { images: HomepageImageDoc[] }) {
 
     return (
         <div
-            className="relative mx-4 mt-4 h-48 overflow-hidden rounded-xl border border-stone-700"
+            className="relative mx-auto mt-4 aspect-[16/9] max-h-[350px] w-full max-w-3xl overflow-hidden rounded-xl border border-stone-700"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
         >
