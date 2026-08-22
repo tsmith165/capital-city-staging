@@ -6,7 +6,7 @@ import { Mail, Phone, MessageSquare } from 'lucide-react';
 
 export default function About() {
     return (
-        <div className="flex h-fit w-full flex-col items-center justify-center p-4 md:h-[calc(100dvh-50px)] md:flex-row">
+        <div className="flex h-fit w-full flex-col items-center justify-center p-4 md:min-section-viewport md:flex-row">
             <div className="md:max-w-1/3 flex h-full w-full items-center justify-center md:h-auto md:w-fit">
                 <Image
                     src="/bio/bio_pic.jpg"
@@ -17,7 +17,7 @@ export default function About() {
                 />
             </div>
 
-            <div className="flex h-full w-full flex-col justify-center space-y-6 rounded-lg p-6 text-stone-300 md:w-2/3 lg:p-8">
+            <div className="flex h-full w-full flex-col justify-center space-y-6 rounded-lg p-6 text-body-muted md:w-2/3 lg:p-8">
                 {/* Name and RESA Badge */}
                 <div className="flex items-center gap-3">
                     <h1 className="text-4xl font-bold gradient-gold-main-text lg:text-5xl">Mia Dofflemyer</h1>
@@ -40,11 +40,11 @@ export default function About() {
                 {/* Professional Title */}
                 <div className="space-y-1">
                     <p className="text-lg font-medium text-primary">Founder, Capital City Staging</p>
-                    <p className="text-sm text-stone-400">Licensed Real Estate Professional • Home Staging Expert</p>
+                    <p className="text-sm text-body-subtle">Licensed Real Estate Professional • Home Staging Expert</p>
                 </div>
 
                 {/* Bio - Split into paragraphs for better readability */}
-                <div className="space-y-3 text-stone-300">
+                <div className="space-y-3 text-body-muted">
                     <p className="text-base leading-relaxed">
                         Hello! I'm Mia Dofflemyer, the founder of Capital City Staging. Raised in the valley and educated at UC Davis, 
                         I later settled in Sacramento to pursue my passion for real estate.
@@ -63,14 +63,14 @@ export default function About() {
                 </div>
 
                 {/* Contact Info with Icons */}
-                <div className="space-y-3 border-t border-stone-700 pt-4">
-                    <div className="flex items-center gap-3 text-stone-300 hover:text-primary transition-colors">
+                <div className="space-y-3 border-t border-line pt-4">
+                    <div className="flex items-center gap-3 text-body-muted hover:text-primary transition-colors">
                         <Mail size={18} className="text-primary" />
                         <a href="mailto:mdofflemyer.realestate@gmail.com" className="text-base">
                             mdofflemyer.realestate@gmail.com
                         </a>
                     </div>
-                    <div className="flex items-center gap-3 text-stone-300 hover:text-primary transition-colors">
+                    <div className="flex items-center gap-3 text-body-muted hover:text-primary transition-colors">
                         <Phone size={18} className="text-primary" />
                         <a href="tel:12098174240" className="text-base">
                             (209) 817-4240

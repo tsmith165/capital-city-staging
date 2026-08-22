@@ -96,7 +96,7 @@ export default function Home({
     };
 
     return (
-        <div className="relative h-[calc(100dvh-50px)] w-full overflow-hidden">
+        <div className="section-viewport relative w-full overflow-hidden">
             <AnimatePresence>
                 {isStagingImageVisible && (
                     <motion.div
@@ -124,7 +124,7 @@ export default function Home({
                 initial="hidden"
                 animate={isStagingImageVisible ? 'visible' : 'hidden'}
                 transition={{ duration: 2 }}
-                className="absolute inset-0 bg-stone-900"
+                className="absolute inset-0 bg-surface"
             ></motion.div>
             <motion.div
                 initial={{ opacity: 0 }}
@@ -132,7 +132,7 @@ export default function Home({
                 transition={{ duration: 1 }}
                 className="absolute inset-0 flex items-center justify-center"
             >
-                <div className="relative flex h-[350px] w-[350px] items-center justify-center rounded-full bg-stone-900 opacity-70">
+                <div className="relative flex h-[350px] w-[350px] items-center justify-center rounded-full bg-surface opacity-70">
                     <Image src={'/logo/CCS_logo.png'} alt="Capital City Staging Logo" width={300} height={300} />
                 </div>
             </motion.div>

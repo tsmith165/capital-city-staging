@@ -115,7 +115,7 @@ const Where: React.FC = () => {
     };
 
     return (
-        <div ref={containerRef} className="flex h-[calc(100dvh-50px)] w-full flex-col space-y-2 p-4">
+        <div ref={containerRef} className="section-viewport flex w-full flex-col space-y-2 p-4">
             <div className="flex w-full items-center justify-center text-center">
                 <h1 className="w-fit text-4xl font-bold gradient-secondary-main-text">Where We Work</h1>
             </div>

@@ -66,3 +66,15 @@ export const articles: Article[] = [
         datePublished: '2023-10-22',
     },
 ];
+
+/**
+ * Article pages previously repeated their own title, description, image dimensions and
+ * canonical URL inline, which is how the index card and the page itself fell out of sync.
+ */
+export function getArticle(id: string): Article {
+    const article = articles.find((entry) => entry.id === id);
+    if (!article) {
+        throw new Error(`Unknown article id: ${id}`);
+    }
+    return article;
+}

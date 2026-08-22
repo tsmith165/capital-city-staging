@@ -16,9 +16,9 @@ export default function Portfolio() {
 
     if (!projects || projects.length === 0) {
         return (
-            <div className="flex min-h-[calc(100dvh-50px)] flex-col items-center justify-center space-y-4 p-4">
+            <div className="min-section-viewport flex flex-col items-center justify-center space-y-4 p-4">
                 <h1 className="text-4xl font-bold gradient-secondary-main-text">Portfolio Coming Soon</h1>
-                <p className="text-stone-400">Check back soon to see our latest staging projects!</p>
+                <p className="text-body-muted">Check back soon to see our latest staging projects!</p>
             </div>
         );
     }
@@ -45,7 +45,7 @@ export default function Portfolio() {
     };
 
     return (
-        <div className="min-h-[calc(100dvh-50px)] p-4">
+        <div className="min-section-viewport p-4">
             {/* Header Section */}
             <div className="text-center mb-8">
                 <h1 className="text-4xl font-bold gradient-secondary-main-text mb-6">Staged by Mia</h1>
@@ -59,8 +59,8 @@ export default function Portfolio() {
                                 onClick={() => setSelectedProjectIndex(index)}
                                 className={`rounded-full border-2 px-4 py-2 font-medium transition-all ${
                                     index === selectedProjectIndex
-                                        ? 'border-secondary bg-secondary text-stone-300'
-                                        : 'border-primary bg-transparent text-primary hover:border-secondary hover:bg-secondary hover:text-stone-300'
+                                        ? 'border-secondary bg-secondary text-body-muted'
+                                        : 'border-primary bg-transparent text-primary hover:border-secondary hover:bg-secondary hover:text-body-muted'
                                 }`}
                             >
                                 {project.name}
@@ -92,7 +92,7 @@ export default function Portfolio() {
                 </div>
             ) : (
                 <div className="text-center py-12">
-                    <p className="text-stone-400 text-lg">No images available for this project yet.</p>
+                    <p className="text-body-subtle text-lg">No images available for this project yet.</p>
                 </div>
             )}
             <AnimatePresence>

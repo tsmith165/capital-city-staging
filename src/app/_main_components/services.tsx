@@ -48,7 +48,7 @@ export default function Services() {
     ];
 
     return (
-        <div className="flex h-auto w-full flex-col items-center justify-evenly md:min-h-[calc(100dvh-50px)]">
+        <div className="flex h-auto w-full flex-col items-center justify-evenly md:min-section-viewport">
             <div className="flex h-fit w-full flex-col items-center justify-center p-4 lg:w-[90%]">
                 {/* Animated Header */}
                 <motion.div 
@@ -67,7 +67,7 @@ export default function Services() {
                     <h2 className="text-3xl font-bold gradient-secondary-main-text lg:text-4xl">
                         We'll handle the rest.
                     </h2>
-                    <p className="mt-4 text-lg text-stone-300 max-w-2xl mx-auto">
+                    <p className="mt-4 text-lg text-body-muted max-w-2xl mx-auto">
                         With professional staging expertise, we transform spaces into buyer-ready homes that sell faster and for top dollar.
                     </p>
                 </motion.div>
@@ -85,7 +85,7 @@ export default function Services() {
                             className="relative"
                         >
                             <div className={`
-                                h-full rounded-2xl border-2 bg-stone-900/50 backdrop-blur-sm p-8
+                                h-full rounded-2xl border-2 bg-surface/50 backdrop-blur-sm p-8
                                 transition-all duration-300 transform
                                 ${hoveredCard === index ? 'scale-105 shadow-2xl' : 'shadow-lg'}
                                 ${service.color === 'primary' 
@@ -114,7 +114,7 @@ export default function Services() {
                                 </div>
                                 
                                 {/* Description */}
-                                <p className="text-stone-300 leading-relaxed mb-6 min-h-[4.5rem]">
+                                <p className="text-body-muted leading-relaxed mb-6 min-h-[4.5rem]">
                                     {service.description}
                                 </p>
 
@@ -138,7 +138,7 @@ export default function Services() {
                                                     }
                                                 `} 
                                             />
-                                            <span className="text-stone-300 group-hover:text-white transition-colors">
+                                            <span className="text-body-muted group-hover:text-white transition-colors">
                                                 {item}
                                             </span>
                                         </motion.div>
@@ -186,7 +186,7 @@ export default function Services() {
                     transition={{ duration: 0.6, delay: 0.6 }}
                     className="mt-12 text-center"
                 >
-                    <p className="text-stone-400 mb-4">Ready to transform your home?</p>
+                    <p className="text-body-subtle mb-4">Ready to transform your home?</p>
                     <Link href="/contact">
                         <button className="group inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary to-primary_dark px-8 py-3 font-semibold text-white shadow-lg transition-all hover:shadow-xl hover:scale-105">
                             <Home size={20} />

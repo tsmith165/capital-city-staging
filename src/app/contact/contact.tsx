@@ -5,7 +5,7 @@ import ContactForm from './contact_form';
 
 export default function Contact() {
     return (
-        <div className="h-full w-full overflow-y-auto bg-stone-900">
+        <div className="h-full w-full overflow-y-auto bg-surface">
             {/* Top Section - Image and Header */}
             <div className="flex flex-col items-center justify-center gap-8 p-6 lg:flex-row lg:p-8">
                 {/* Left side - Mia's Image */}
@@ -25,19 +25,19 @@ export default function Contact() {
                         <h1 className="mb-4 pb-2 overflow-visible text-center text-4xl font-bold gradient-gold-main-text leading-tight lg:text-left lg:text-5xl lg:leading-tight">
                             Let's Stage Your Home
                         </h1>
-                        <p className="text-center text-lg leading-relaxed text-stone-300 lg:text-left">
+                        <p className="text-center text-lg leading-relaxed text-body-muted lg:text-left">
                             Ready to transform your property into a buyer's dream? Get in touch below!
                         </p>
                     </div>
 
                     {/* Quick Contact Card */}
-                    <div className="space-y-4 rounded-lg border border-stone-700 bg-stone-800/50 p-6">
+                    <div className="space-y-4 rounded-lg border border-line bg-surface-raised/50 p-6">
                         <h3 className="mb-4 text-xl font-bold gradient-gold-main-text">Quick Contact</h3>
 
                         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                             <a
                                 href="mailto:mdofflemyer.realestate@gmail.com"
-                                className="group flex items-center gap-3 text-stone-300 transition-colors hover:text-primary"
+                                className="group flex items-center gap-3 text-body-muted transition-colors hover:text-primary"
                             >
                                 <Mail size={18} className="text-primary" />
                                 <span className="text-sm">mdofflemyer.realestate@gmail.com</span>
@@ -45,25 +45,25 @@ export default function Contact() {
 
                             <a
                                 href="tel:12098174240"
-                                className="group flex items-center gap-3 text-stone-300 transition-colors hover:text-primary"
+                                className="group flex items-center gap-3 text-body-muted transition-colors hover:text-primary"
                             >
                                 <Phone size={18} className="text-primary" />
                                 <span className="text-sm">(209) 817-4240</span>
                             </a>
 
-                            <div className="flex items-center gap-3 text-stone-300">
+                            <div className="flex items-center gap-3 text-body-muted">
                                 <MapPin size={18} className="text-primary" />
                                 <span className="text-sm">Sacramento, California</span>
                             </div>
 
-                            <div className="flex items-center gap-3 text-stone-300">
+                            <div className="flex items-center gap-3 text-body-muted">
                                 <Clock size={18} className="text-primary" />
                                 <span className="text-sm">Mon-Fri: 9AM-6PM PST</span>
                             </div>
                         </div>
 
-                        <div className="border-t border-stone-700 pt-3 text-center">
-                            <p className="text-xs italic text-stone-400">Response time: Within 24 hours</p>
+                        <div className="border-t border-line pt-3 text-center">
+                            <p className="text-xs italic text-body-subtle">Response time: Within 24 hours</p>
                         </div>
                     </div>
                 </div>

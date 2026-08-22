@@ -71,10 +71,10 @@ export default function MainView({
     }, [selectedComponent, componentRefs, layoutLoaded]);
 
     return (
-        <div className="flex h-full flex-col overflow-y-auto">
+        <div className="flex flex-col">
             <PostHogPageView />
             {components.map(({ id, component: Component }, index) => (
-                <div key={id} ref={refs[index]} id={id} className="h-auto w-full bg-stone-900">
+                <div key={id} ref={refs[index]} id={id} className="w-full scroll-mt-[var(--nav-height)] bg-ink">
                     {id === 'home' ? <Component initialHomepageImages={initialHomepageImages} /> : <Component />}
                 </div>
             ))}

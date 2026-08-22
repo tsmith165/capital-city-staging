@@ -5,6 +5,10 @@ export interface MenuItem {
     subMenu?: MenuItem[];
 }
 
+/**
+ * Sections of the homepage. These scroll in place when you are already on the homepage and
+ * navigate to it otherwise, so each one keeps a real href for crawlers and middle-click.
+ */
 export const navbar_menu_list: [string, string][] = [
     ['portfolio', 'Portfolio'],
     ['where', 'Where'],
@@ -14,9 +18,9 @@ export const navbar_menu_list: [string, string][] = [
 
 export const menu_list: MenuItem[] = [
     { id: 'portfolio', label: 'Portfolio', url: '/?component=portfolio' },
-    { id: 'where', label: 'Where', url: '/?component=where' },
+    { id: 'where', label: 'Where We Work', url: '/?component=where' },
     { id: 'services', label: 'Services', url: '/?component=services' },
-    { id: 'contact', label: 'Contact', url: '/contact' },
+    { id: 'contact', label: 'Get a Quote', url: '/contact' },
     {
         id: 'info',
         label: 'Articles',
@@ -31,37 +35,8 @@ export const menu_list: MenuItem[] = [
     },
 ];
 
-export const admin_menu_list: MenuItem[] = [
-    ...menu_list,
-    {
-        id: 'projects',
-        label: 'Projects',
-        url: '/admin/projects',
-        subMenu: [
-            { id: 'all-projects', label: 'All Projects', url: '/admin/projects' },
-            { id: 'new-project', label: 'New Project', url: '/admin/projects/new' },
-            { id: 'edit-project', label: 'Edit Project', url: '/admin/projects/edit' },
-        ],
-    },
-    {
-        id: 'inventory',
-        label: 'Inventory',
-        url: '/admin/inventory',
-        subMenu: [
-            { id: 'all-inventory', label: 'All Inventory', url: '/admin/inventory' },
-            { id: 'edit-details', label: 'Edit Details', url: '/admin/inventory/edit' },
-        ],
-    },
-    { id: 'users', label: 'Users', url: '/admin/users' },
-    {
-        id: 'manage',
-        label: 'Manage',
-        url: '/admin/manage',
-        subMenu: [
-            { id: 'manage-inventory', label: 'Inventory', url: '/admin/manage' },
-            { id: 'manage-homepage', label: 'Homepage', url: '/admin/manage/homepage' },
-        ],
-    },
-];
-
-export default { navbar_menu_list, menu_list, admin_menu_list };
+/**
+ * The admin console carries its own navigation, so the public menu only needs a way in.
+ * This list previously restated every admin route and had already drifted from the real ones.
+ */
+export const admin_menu_list: MenuItem[] = [...menu_list, { id: 'admin', label: 'Admin Console', url: '/admin' }];

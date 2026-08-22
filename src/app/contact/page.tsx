@@ -3,14 +3,17 @@ import type { Metadata } from 'next';
 import PageLayout from '../../components/layout/PageLayout';
 import Contact from './contact';
 import ContactPageTracking from './ContactPageTracking';
+import JsonLd from '@/components/seo/JsonLd';
+import { localBusinessSchema, SITE_URL } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
-    title: 'Contact Capital City Staging | Free Home Staging Consultation',
+    title: 'Contact Us',
     description:
         "Get in touch with Capital City Staging for your free consultation. Professional home staging services in Sacramento to help you sell faster and for more money.",
     keywords:
         'Contact Capital City Staging, Home Staging Sacramento, home staging consultation, staging quote, Mia Dofflemyer, Sacramento staging services, real estate staging contact',
     applicationName: 'Capital City Staging',
+    alternates: { canonical: `${SITE_URL}/contact` },
     openGraph: {
         title: 'Contact Capital City Staging | Free Home Staging Consultation',
         description:
@@ -33,6 +36,7 @@ export const metadata: Metadata = {
 export default function ContactPage() {
     return (
         <PageLayout page="contact">
+            <JsonLd data={localBusinessSchema()} />
             <ContactPageTracking />
             <Contact />
         </PageLayout>

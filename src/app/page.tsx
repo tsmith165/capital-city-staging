@@ -3,11 +3,13 @@ import type { Metadata } from 'next';
 import PageLayout from '@/components/layout/PageLayout';
 import MainView from './main_view';
 import HomePageTracking from './HomePageTracking';
+import JsonLd from '@/components/seo/JsonLd';
+import { localBusinessSchema } from '@/lib/structuredData';
 import { preloadQuery, preloadedQueryResult } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 
 export const metadata: Metadata = {
-    title: 'Capital City Staging',
+    title: { absolute: 'Capital City Staging | Home Staging in Sacramento' },
     description:
         "Capital City Staging allows you to focus on your next moves, we'll handle your history. With a home staged by Mia, you can trust that every room tells your story.",
     keywords:
@@ -51,6 +53,7 @@ export default async function Home() {
 
     return (
         <PageLayout page="home">
+            <JsonLd data={localBusinessSchema()} />
             <HomePageTracking />
             <MainView initialHomepageImages={initialHomepageImages} />
         </PageLayout>

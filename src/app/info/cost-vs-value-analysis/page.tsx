@@ -1,145 +1,90 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import PageLayout from '@/components/layout/PageLayout';
-import Image from 'next/image';
-import Head from 'next/head';
+import ArticleShell from '@/components/content/ArticleShell';
+import ContactCallout from '@/components/content/ContactCallout';
+import JsonLd from '@/components/seo/JsonLd';
+import { articleSchema } from '@/lib/structuredData';
+import { getArticle } from '@/app/info/articles_spec';
+import { articleMetadata } from '@/app/info/article.metadata';
 
-export const metadata: Metadata = {
-    title: 'Home Staging Cost vs. Value Analysis | Capital City Staging',
-    description:
-        'Understand the return on investment for home staging. Learn how staging costs compare to the increased value and faster sale of your property.',
-    keywords:
-        'home staging cost, staging ROI, value analysis, Capital City Staging, sell home faster, increase home value, real estate investment',
-    openGraph: {
-        title: 'Home Staging Cost vs. Value Analysis | Capital City Staging',
-        description:
-            'Understand the return on investment for home staging. Learn how staging costs compare to the increased value and faster sale of your property.',
-        url: 'https://www.capitalcitystaging.com/info/cost-vs-value-analysis',
-        images: [
-            {
-                url: '/favicon/CCS_og_image.png',
-                width: 1200,
-                height: 630,
-                alt: 'Illustration of home value increase with staging',
-            },
-        ],
-        type: 'article',
-        locale: 'en_US',
-    },
-};
+const article = getArticle('cost-vs-value-analysis');
+
+export const metadata: Metadata = articleMetadata(
+    article,
+    'home staging cost, staging ROI, value analysis, Capital City Staging, sell home faster, increase home value, real estate investment',
+);
 
 export default function CostVsValueAnalysis() {
     return (
         <PageLayout page="cost-vs-value-analysis">
-            <Head>
-                <script type="application/ld+json">
-                    {JSON.stringify({
-                        '@context': 'https://schema.org',
-                        '@type': 'Article',
-                        headline: 'Home Staging Cost vs. Value Analysis | Capital City Staging',
-                        description:
-                            'Understand the return on investment for home staging. Learn how staging costs compare to the increased value and faster sale of your property.',
-                        image: 'https://www.capitalcitystaging.com/images/cost-vs-value-analysis.jpg',
-                        author: {
-                            '@type': 'Organization',
-                            name: 'Capital City Staging',
-                        },
-                        publisher: {
-                            '@type': 'Organization',
-                            name: 'Capital City Staging',
-                            logo: {
-                                '@type': 'ImageObject',
-                                url: 'https://www.capitalcitystaging.com/logo/CCS_logo_152x152.png',
-                            },
-                        },
-                        datePublished: '2023-10-22',
-                    })}
-                </script>
-            </Head>
-            <div className="flex h-fit w-full flex-col items-center space-y-8 bg-stone-900 px-8 py-16">
-                <h1 className="bg-clip-text text-center text-4xl font-bold text-transparent gradient-gold-main">
-                    Home Staging Cost vs. Value Analysis
-                </h1>
-                <div className="relative mx-auto w-full max-w-4xl">
-                    <Image
-                        src="/info/cost-vs-value-analysis.jpg"
-                        alt="Home Staging Tips and Tricks"
-                        width={750}
-                        height={500}
-                        className="h-auto w-full rounded-md"
+            <JsonLd data={articleSchema({ headline: article.title, description: article.description, path: article.url })} />
+            <ArticleShell
+                eyebrow="Resources"
+                title={article.title}
+                lead="Staging is an expense on the front end and a return on the back end. Here is how the two compare."
+                image={{
+                    src: article.imageSrc,
+                    alt: 'A staged home used to illustrate the return on investment of staging',
+                    width: article.imageWidth,
+                    height: article.imageHeight,
+                }}
+                aside={
+                    <ContactCallout
+                        heading="Ready to invest wisely?"
+                        body="We will walk you through the numbers for your property before you commit to anything."
                     />
-                </div>
-                <div className="flex max-w-4xl flex-col space-y-6 text-stone-300">
-                    <p className="text-lg text-stone-300">
-                        One of the most common questions homeowners ask is whether the cost of home staging is worth the investment. At
-                        Capital City Staging, we believe that understanding the cost-benefit analysis is crucial. This page delves into how
-                        staging can provide a significant return on investment (ROI) by increasing your home's value and reducing time on
-                        the market.
-                    </p>
+                }
+            >
+                <p>
+                    One of the most common questions homeowners ask is whether the cost of home staging is worth the investment. This page
+                    covers how staging can provide a return by increasing your home&rsquo;s value and reducing time on the market.
+                </p>
 
-                    <h2 className="text-2xl font-semibold text-primary">The Financial Impact of Home Staging</h2>
-                    <p className="text-stone-300">
-                        Home staging is more than an expense; it's an investment. According to industry statistics, staged homes often sell
-                        for 6-20% more than non-staged homes. Additionally, they spend 73% less time on the market. These factors can
-                        greatly offset the initial staging costs.
-                    </p>
+                <h2>The financial impact of home staging</h2>
+                <p>
+                    Staging is an investment rather than an expense. Staged homes often sell for 6 to 20% more than non-staged homes and
+                    spend 73% less time on the market. Those two factors together comfortably offset the initial cost.
+                </p>
 
-                    <h2 className="text-2xl font-semibold text-primary">Breakdown of Staging Costs</h2>
-                    <p className="text-stone-300">
-                        The cost of staging varies depending on the size of your home, the amount of work needed, and the duration the home
-                        will be on the market. Typical costs include:
-                    </p>
-                    <ul className="list-inside list-disc space-y-2 pl-2">
-                        <li className="text-secondary_light">Initial Consultation Fee</li>
-                        <li className="text-secondary_light">Design and Planning</li>
-                        <li className="text-secondary_light">Furniture and Decor Rental</li>
-                        <li className="text-secondary_light">Staging Implementation</li>
-                        <li className="text-secondary_light">Monthly Maintenance (if applicable)</li>
-                    </ul>
+                <h2>Breakdown of staging costs</h2>
+                <p>Cost varies with the size of your home, the amount of work needed, and how long the home will be listed. Typical items:</p>
+                <ul>
+                    <li>Initial consultation fee</li>
+                    <li>Design and planning</li>
+                    <li>Furniture and decor rental</li>
+                    <li>Staging implementation</li>
+                    <li>Monthly maintenance, if applicable</li>
+                </ul>
 
-                    <h2 className="text-2xl font-semibold text-primary">Potential Returns on Investment</h2>
-                    <p className="text-stone-300">Let's consider an example:</p>
-                    <p className="text-stone-300">
-                        <strong className="text-secondary_light">Without Staging:</strong> Home listed at $500,000. After several months on
-                        the market, the price is reduced to $480,000 to attract buyers.
-                    </p>
-                    <p className="text-stone-300">
-                        <strong className="text-secondary_light">With Staging:</strong> Initial staging cost is $3,000. The home sells
-                        within a few weeks at $510,000.
-                    </p>
-                    <p className="text-stone-300">
-                        In this scenario, staging not only prevented a price reduction but also resulted in a higher sale price, yielding a
-                        net gain of $27,000 after subtracting staging costs.
-                    </p>
+                <h2>Potential returns on investment</h2>
+                <p>A worked example:</p>
+                <ul>
+                    <li>
+                        <strong>Without staging.</strong> Home listed at $500,000. After several months on the market, the price is reduced
+                        to $480,000 to attract buyers.
+                    </li>
+                    <li>
+                        <strong>With staging.</strong> Initial staging cost is $3,000. The home sells within a few weeks at $510,000.
+                    </li>
+                </ul>
+                <p>
+                    Staging not only prevented a price reduction but produced a higher sale price, a net gain of $27,000 after subtracting
+                    the staging cost.
+                </p>
 
-                    <h2 className="text-2xl font-semibold text-primary">Time Savings Equals Money Saved</h2>
-                    <p className="text-stone-300">
-                        Every day your home sits on the market costs you money in terms of mortgage payments, utilities, and maintenance. By
-                        selling your home faster, staging can reduce these carrying costs significantly.
-                    </p>
+                <h2>Time savings equals money saved</h2>
+                <p>
+                    Every day your home sits on the market costs you money in mortgage payments, utilities, and maintenance. Selling faster
+                    reduces those carrying costs.
+                </p>
 
-                    <h2 className="text-2xl font-semibold text-primary">Avoiding Price Reductions</h2>
-                    <p className="text-stone-300">
-                        Homes that linger on the market often face price reductions. Buyers may perceive a long-listed home as less
-                        desirable. Staging can help you avoid these reductions by generating interest quickly.
-                    </p>
-
-                    <h2 className="text-2xl font-semibold text-primary">Investing in Your Success</h2>
-                    <p className="text-stone-300">
-                        At Capital City Staging, we view staging as an investment in your success. Our team works diligently to maximize
-                        your home's appeal, ensuring you receive the best possible return.
-                    </p>
-
-                    <h2 className="text-2xl font-semibold text-primary">Ready to Invest Wisely?</h2>
-                    <p className="text-stone-300">
-                        If you're considering selling your home and want to understand how staging can benefit you,{' '}
-                        <a href="/contact" className="text-secondary_light hover:underline">
-                            contact us
-                        </a>{' '}
-                        today for a personalized consultation.
-                    </p>
-                </div>
-            </div>
+                <h2>Avoiding price reductions</h2>
+                <p>
+                    Homes that linger on the market often face price reductions, and buyers perceive a long-listed home as less desirable.
+                    Staging helps you avoid that by generating interest quickly.
+                </p>
+            </ArticleShell>
         </PageLayout>
     );
 }
