@@ -2,39 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 
-// Custom slider styles
-const sliderStyles = `
-  .custom-slider::-webkit-slider-thumb {
-    appearance: none;
-    height: 20px;
-    width: 20px;
-    border-radius: 50%;
-    background: #355e3b;
-    border: 2px solid #fff;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  }
-
-  .custom-slider::-moz-range-thumb {
-    height: 20px;
-    width: 20px;
-    border-radius: 50%;
-    background: #355e3b;
-    border: 2px solid #fff;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  }
-`;
-
-if (typeof document !== 'undefined') {
-    const styleElement = document.createElement('style');
-    styleElement.innerHTML = sliderStyles;
-    document.head.appendChild(styleElement);
-}
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import { sendContactFormEmail } from './actions';
+import { buildSubmissionRecord } from './contact_form.utils';
 import { calculateStagingQuote, formatPrice } from '@/utils/calculateQuote';
+import { track, trackOnce } from '@/lib/analytics';
 import { Calculator, Send, CheckCircle, AlertCircle, Info, Ruler, Bed, MapPin, Trees, Building, Home, Users, Bath, Sofa, Briefcase, UtensilsCrossed, Phone } from 'lucide-react';
 
 const schema = z.object({
@@ -60,6 +35,9 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+/** The quote fields carried no `id`, `name` or label association, so nothing announced them. */
+const fieldId = (label: string) => label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
 // Custom Toggle Component
 const Toggle = ({
     enabled,
@@ -72,23 +50,30 @@ const Toggle = ({
     label: string;
     icon: React.ReactNode;
 }) => (
-    <div className="flex items-center gap-4 rounded-lg border border-stone-600 bg-stone-700/50 p-4">
+    <div className="flex items-center gap-4 rounded-lg border border-line-strong bg-surface-overlay/50 p-4">
         <button
             type="button"
+            role="switch"
+            aria-checked={enabled}
+            aria-labelledby={`toggle-label-${fieldId(label)}`}
             onClick={() => onChange(!enabled)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                enabled ? 'bg-secondary' : 'bg-stone-600'
+            className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
+                enabled ? 'bg-forest-400' : 'bg-surface-hover'
             }`}
         >
             <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                className={`inline-block h-4 w-4 transform rounded-full bg-body transition-transform ${
                     enabled ? 'translate-x-6' : 'translate-x-1'
                 }`}
             />
         </button>
         <div className="flex items-center gap-3">
-            <div className="text-primary">{icon}</div>
-            <span className="font-medium text-stone-300">{label}</span>
+            <div className="text-forest-200" aria-hidden="true">
+                {icon}
+            </div>
+            <span id={`toggle-label-${fieldId(label)}`} className="font-medium text-body-muted">
+                {label}
+            </span>
         </div>
     </div>
 );
@@ -112,37 +97,47 @@ const Slider = ({
     label: string;
     icon: React.ReactNode;
     formatValue?: (value: number) => string;
-}) => (
+}) => {
+    const id = `slider-${fieldId(label)}`;
+
+    return (
     <div className="space-y-3">
         <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-                <div className="text-primary">{icon}</div>
-                <span className="font-medium text-stone-300">{label}</span>
-            </div>
+            <label htmlFor={id} className="flex items-center gap-2">
+                <span className="text-primary" aria-hidden="true">
+                    {icon}
+                </span>
+                <span className="font-medium text-body-muted">{label}</span>
+            </label>
             <span className="font-bold text-primary">{formatValue ? formatValue(value) : value}</span>
         </div>
         <div className="relative">
             <input
+                id={id}
+                name={id}
                 type="range"
                 min={min}
                 max={max}
                 step={step}
                 value={value}
+                aria-valuetext={formatValue ? formatValue(value) : String(value)}
                 onChange={(e) => onChange(Number(e.target.value))}
-                className="custom-slider h-2 w-full cursor-pointer appearance-none rounded-lg bg-stone-600"
+                className="custom-slider h-2 w-full cursor-pointer appearance-none rounded-lg bg-surface-hover"
                 style={{
                     background: `linear-gradient(to right, #b99727 0%, #b99727 ${((value - min) / (max - min)) * 100}%, #57534e ${((value - min) / (max - min)) * 100}%, #57534e 100%)`,
                 }}
             />
-            <div className="mt-1 flex justify-between text-xs text-stone-500">
+            <div className="mt-1 flex justify-between text-xs text-body-subtle">
                 <span>{formatValue ? formatValue(min) : min}</span>
                 <span>{formatValue ? formatValue(max) : max}</span>
             </div>
         </div>
     </div>
-);
+    );
+};
 
 const ContactForm = () => {
+    const createSubmission = useMutation(api.contactSubmissions.createSubmission);
     const [mounted, setMounted] = useState(false);
     const [formData, setFormData] = useState<FormData>({
         name: '',
@@ -162,7 +157,7 @@ const ContactForm = () => {
     });
     const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-    const [showQuote, setShowQuote] = useState(true);
+    const [showQuote] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
@@ -170,6 +165,7 @@ const ContactForm = () => {
     }, []);
 
     const handleChange = (field: keyof FormData, value: any) => {
+        trackOnce('quote_started', { placement: 'contact_page' });
         setFormData((prev) => ({
             ...prev,
             [field]: value,
@@ -203,6 +199,19 @@ const ContactForm = () => {
             schema.parse(formData);
             setErrors({});
 
+            // Record the lead before attempting delivery. Email is rate limited and can fail
+            // outright, and a lost quote request is worse than a missing notification.
+            try {
+                await createSubmission({
+                    name: formData.name,
+                    email: formData.email,
+                    phone: formData.phone || undefined,
+                    message: buildSubmissionRecord(formData, quote),
+                });
+            } catch (persistError) {
+                console.error('Could not record the contact submission:', persistError);
+            }
+
             const response = await sendContactFormEmail({
                 ...formData,
                 quote: quote,
@@ -212,9 +221,20 @@ const ContactForm = () => {
                 throw new Error('Failed to submit form');
             }
 
+            track('quote_submitted', {
+                estimate: quote.totalEstimate,
+                staging_type: formData.stagingType,
+                square_footage: formData.squareFootage,
+                bedrooms: formData.bedrooms,
+                bathrooms: formData.bathrooms,
+                distance_miles: formData.distanceFromDowntown,
+                outdoor_staging: formData.outdoorStaging,
+                multi_floor: formData.multiFloor,
+            });
+
             setSubmitMessage({
                 type: 'success',
-                message: 'Your quote request has been sent! Mia will contact you within 24 hours.',
+                message: 'Your quote request has been sent. Mia will get back to you within one business day.',
             });
 
             // Reset form
@@ -246,11 +266,13 @@ const ContactForm = () => {
                     }
                 });
                 setErrors(newErrors);
+                track('quote_failed', { reason: 'validation', fields: Object.keys(newErrors) });
             } else {
                 console.error('Error submitting form:', error);
+                track('quote_failed', { reason: 'delivery' });
                 setSubmitMessage({
                     type: 'error',
-                    message: 'An error occurred. Please try again or call us directly.',
+                    message: "Something went wrong sending that. Try again, or call (209) 817-4240 and we’ll take the details over the phone.",
                 });
             }
         } finally {
@@ -266,16 +288,19 @@ const ContactForm = () => {
         <div className="w-full space-y-8">
             {/* Header */}
             <div className="text-center">
-                <div className="mb-4 flex items-center justify-center gap-3">
-                    <Calculator className="text-primary" size={32} />
-                    <h2 className="text-3xl font-bold gradient-gold-main-text">Instant Quote Calculator</h2>
+                <div className="mb-3 flex items-center justify-center gap-3">
+                    <Calculator className="text-forest-200" size={28} aria-hidden="true" />
+                    <h2 className="font-display text-3xl font-bold gradient-gold-main-text">Estimate your staging</h2>
                 </div>
-                <p className="text-stone-400">Get an instant estimate and submit for your personalized consultation</p>
+                <p className="mx-auto max-w-xl text-pretty text-body-muted">
+                    Answer a few questions and you&rsquo;ll see a price range before you send anything. The final number is
+                    confirmed at the walkthrough.
+                </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Contact Information */}
-                <div className="space-y-6 rounded-xl border border-stone-700 bg-stone-800/30 p-6">
+                <div className="space-y-6 rounded-xl border border-line bg-surface-raised/30 p-6">
                     <h3 className="flex items-center gap-2 text-xl font-semibold text-primary">
                         <Info size={24} />
                         Contact Information
@@ -285,60 +310,107 @@ const ContactForm = () => {
                         {/* Name and Phone Row */}
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             <div>
-                                <label className="mb-2 block text-sm font-medium text-stone-300">Full Name *</label>
+                                <label htmlFor="contact-name" className="mb-2 block text-sm font-medium text-body-muted">
+                                    Full Name *
+                                </label>
                                 <input
+                                    id="contact-name"
+                                    name="name"
                                     type="text"
+                                    autoComplete="name"
+                                    required
+                                    aria-invalid={errors.name ? true : undefined}
+                                    aria-describedby={errors.name ? 'contact-name-error' : undefined}
                                     value={formData.name}
                                     onChange={(e) => handleChange('name', e.target.value)}
-                                    className="w-full rounded-lg border border-stone-600 bg-stone-700 px-4 py-3 text-white placeholder-stone-400 transition-colors focus:border-primary focus:outline-none"
+                                    className="w-full rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-body placeholder-body-subtle transition-colors focus:border-gold-400"
                                     placeholder="John Doe"
                                 />
-                                {errors.name && <p className="mt-1 text-xs text-red-400">{errors.name}</p>}
+                                {errors.name && (
+                                    <p id="contact-name-error" className="mt-1 text-xs text-danger">
+                                        {errors.name}
+                                    </p>
+                                )}
                             </div>
 
                             <div>
-                                <label className="mb-2 block text-sm font-medium text-stone-300">Phone Number *</label>
+                                <label htmlFor="contact-phone" className="mb-2 block text-sm font-medium text-body-muted">
+                                    Phone Number *
+                                </label>
                                 <input
+                                    id="contact-phone"
+                                    name="phone"
                                     type="tel"
+                                    autoComplete="tel"
+                                    required
+                                    aria-invalid={errors.phone ? true : undefined}
+                                    aria-describedby={errors.phone ? 'contact-phone-error' : undefined}
                                     value={formData.phone}
                                     onChange={(e) => handleChange('phone', e.target.value)}
-                                    className="w-full rounded-lg border border-stone-600 bg-stone-700 px-4 py-3 text-white placeholder-stone-400 transition-colors focus:border-primary focus:outline-none"
+                                    className="w-full rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-body placeholder-body-subtle transition-colors focus:border-gold-400"
                                     placeholder="(555) 123-4567"
                                 />
-                                {errors.phone && <p className="mt-1 text-xs text-red-400">{errors.phone}</p>}
+                                {errors.phone && (
+                                    <p id="contact-phone-error" className="mt-1 text-xs text-danger">
+                                        {errors.phone}
+                                    </p>
+                                )}
                             </div>
                         </div>
 
                         {/* Email Row */}
                         <div>
-                            <label className="mb-2 block text-sm font-medium text-stone-300">Email Address *</label>
+                            <label htmlFor="contact-email" className="mb-2 block text-sm font-medium text-body-muted">
+                                Email Address *
+                            </label>
                             <input
+                                id="contact-email"
+                                name="email"
                                 type="email"
+                                autoComplete="email"
+                                required
+                                aria-invalid={errors.email ? true : undefined}
+                                aria-describedby={errors.email ? 'contact-email-error' : undefined}
                                 value={formData.email}
                                 onChange={(e) => handleChange('email', e.target.value)}
-                                className="w-full rounded-lg border border-stone-600 bg-stone-700 px-4 py-3 text-white placeholder-stone-400 transition-colors focus:border-primary focus:outline-none"
+                                className="w-full rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-body placeholder-body-subtle transition-colors focus:border-gold-400"
                                 placeholder="john@example.com"
                             />
-                            {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
+                            {errors.email && (
+                                <p id="contact-email-error" className="mt-1 text-xs text-danger">
+                                    {errors.email}
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>
 
                 {/* Message */}
-                <div className="space-y-4 rounded-xl border border-stone-700 bg-stone-800/30 p-6">
-                    <h3 className="text-xl font-semibold text-primary">Tell us about your project</h3>
+                <div className="space-y-4 rounded-xl border border-line bg-surface-raised/30 p-6">
+                    <h3 className="text-xl font-semibold text-primary">
+                        <label htmlFor="contact-message">Tell us about your project</label>
+                    </h3>
                     <textarea
+                        id="contact-message"
+                        name="message"
+                        required
+                        aria-invalid={errors.message ? true : undefined}
+                        aria-describedby={errors.message ? 'contact-message-error' : undefined}
                         value={formData.message}
                         onChange={(e) => handleChange('message', e.target.value)}
                         rows={3}
-                        className="w-full resize-none rounded-lg border border-stone-600 bg-stone-700 px-4 py-3 text-white placeholder-stone-400 transition-colors focus:border-primary focus:outline-none"
+                        className="w-full resize-none rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-body placeholder-body-subtle transition-colors focus:border-gold-400"
                         placeholder="Tell us about your timeline, specific needs, or any questions you have..."
                     />
-                    {errors.message && <p className="text-xs text-red-400">{errors.message}</p>}
+                    {errors.message && (
+                        <p id="contact-message-error" className="text-xs text-danger">
+                            {errors.message}
+                        </p>
+                    )}
                 </div>
 
                 {/* Property Details */}
-                <div className="space-y-6 rounded-xl border border-stone-700 bg-stone-800/30 p-6">
+                <div className="space-y-6 rounded-xl border border-line bg-surface-raised/30 p-6">
                         <h3 className="flex items-center gap-2 text-xl font-semibold text-primary">
                             <Home size={24} />
                             Property Details
@@ -437,7 +509,7 @@ const ContactForm = () => {
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2">
                                         <Home className="text-primary" size={20} />
-                                        <span className="font-medium text-stone-300">Staging Type</span>
+                                        <span className="font-medium text-body-muted">Staging Type</span>
                                     </div>
                                     <div className="flex gap-4">
                                         <button
@@ -445,8 +517,8 @@ const ContactForm = () => {
                                             onClick={() => handleChange('stagingType', 'vacant')}
                                             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 font-medium transition-all ${
                                                 formData.stagingType === 'vacant'
-                                                    ? 'border-primary bg-primary text-stone-300'
-                                                    : 'border-primary bg-transparent text-primary hover:bg-primary/70 hover:text-stone-300'
+                                                    ? 'border-primary bg-primary text-body-muted'
+                                                    : 'border-primary bg-transparent text-primary hover:bg-primary/70 hover:text-body-muted'
                                             } border`}
                                         >
                                             <Building size={18} />
@@ -457,8 +529,8 @@ const ContactForm = () => {
                                             onClick={() => handleChange('stagingType', 'occupied')}
                                             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 font-medium transition-all ${
                                                 formData.stagingType === 'occupied'
-                                                    ? 'border-primary bg-primary text-stone-300'
-                                                    : 'border-primary bg-transparent text-primary hover:bg-primary/70 hover:text-stone-300'
+                                                    ? 'border-primary bg-primary text-body-muted'
+                                                    : 'border-primary bg-transparent text-primary hover:bg-primary/70 hover:text-body-muted'
                                             } border`}
                                         >
                                             <Users size={18} />
@@ -516,7 +588,7 @@ const ContactForm = () => {
                                                         {quote.customQuoteReason}
                                                     </div>
                                                 </div>
-                                                <div className="text-stone-300 text-sm">
+                                                <div className="text-body-muted text-sm">
                                                     Please submit your information below and Mia will provide a personalized quote for your property.
                                                 </div>
                                             </div>
@@ -526,21 +598,21 @@ const ContactForm = () => {
                                                 <button
                                                     type="submit"
                                                     disabled={isSubmitting}
-                                                    className={`flex transform items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-all hover:scale-[1.02] hover:rotate-1 ${
+                                                    className={`flex items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-colors ${
                                                         isSubmitting
-                                                            ? 'cursor-not-allowed bg-stone-600 text-stone-400'
-                                                            : 'bg-gradient-to-r from-primary via-primary_dark to-primary text-white shadow-2xl hover:shadow-primary/40 hover:shadow-2xl border-2 border-primary_dark/50'
+                                                            ? 'cursor-not-allowed bg-surface-hover text-body-subtle'
+                                                            : 'bg-gold-400 text-body-inverse shadow-card hover:bg-gold-300'
                                                     }`}
                                                 >
                                                     {isSubmitting ? (
                                                         <>
-                                                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-stone-400 border-t-transparent" />
-                                                            <span>Sending Your Request...</span>
+                                                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-body-inverse/40 border-t-transparent" />
+                                                            <span>Sending&hellip;</span>
                                                         </>
                                                     ) : (
                                                         <>
                                                             <Send size={24} />
-                                                            <span>Request Custom Quote from Mia</span>
+                                                            <span>Request a custom quote</span>
                                                         </>
                                                     )}
                                                 </button>
@@ -551,50 +623,50 @@ const ContactForm = () => {
                                             {/* Main Quote Display */}
                                             <div className="mb-6 rounded-xl bg-gradient-to-br from-primary/10 via-primary_dark/15 to-primary/10 border border-primary/30 p-6 text-center">
                                                 <div className="mb-2">
-                                                    <div className="text-sm uppercase tracking-wider text-stone-400 mb-2">Estimated Price Range</div>
+                                                    <div className="text-sm uppercase tracking-wider text-body-subtle mb-2">Estimated Price Range</div>
                                                     <div className="text-3xl font-bold gradient-gold-main-text">
                                                         {formatPrice(quote.priceRange.min)} - {formatPrice(quote.priceRange.max)}
                                                     </div>
                                                 </div>
-                                                <div className="text-xs text-stone-400 mt-3">
+                                                <div className="text-xs text-body-subtle mt-3">
                                                     Final pricing determined after consultation
                                                 </div>
                                             </div>
 
                                             {/* Price Breakdown */}
-                                            <div className="mb-6 rounded-xl bg-stone-900/70 p-5 backdrop-blur-sm border border-stone-700/50">
+                                            <div className="mb-6 rounded-xl bg-surface/70 p-5 backdrop-blur-sm border border-line/50">
                                                 <h4 className="mb-4 text-center text-lg font-bold text-secondary">Price Breakdown</h4>
 
                                                 <div className="space-y-3">
                                                     {/* Base Price - Different display for vacant vs occupied */}
                                                     <div className="flex justify-between items-center">
                                                         <div>
-                                                            <span className="text-stone-300 font-medium">
+                                                            <span className="text-body-muted font-medium">
                                                                 {formData.stagingType === 'vacant' && quote.tierInfo
                                                                     ? `Base Package (${quote.tierInfo.sqftRange})`
                                                                     : `Base ${formData.stagingType} staging package`
                                                                 }
                                                             </span>
-                                                            <div className="text-sm text-stone-400">
+                                                            <div className="text-sm text-body-subtle">
                                                                 {formData.stagingType === 'vacant' && quote.tierInfo
                                                                     ? quote.tierInfo.includedRooms
                                                                     : 'Kitchen + entryway'
                                                                 }
                                                             </div>
                                                         </div>
-                                                        <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.basePrice)}</span>
+                                                        <span className="font-bold text-body text-lg">{formatPrice(quote.basePrice)}</span>
                                                     </div>
 
                                                     {/* Living Areas - Always shown for both (never included in base) */}
                                                     {quote.livingAreaCount > 0 && (
                                                         <div className="flex justify-between items-center">
                                                             <div>
-                                                                <span className="text-stone-300 font-medium">Living Areas</span>
-                                                                <div className="text-sm text-stone-400">
+                                                                <span className="text-body-muted font-medium">Living Areas</span>
+                                                                <div className="text-sm text-body-subtle">
                                                                     {quote.livingAreaCount} × {formatPrice(quote.livingAreaRate)} each
                                                                 </div>
                                                             </div>
-                                                            <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.livingAreaTotal)}</span>
+                                                            <span className="font-bold text-body text-lg">{formatPrice(quote.livingAreaTotal)}</span>
                                                         </div>
                                                     )}
 
@@ -602,12 +674,12 @@ const ContactForm = () => {
                                                     {quote.diningSpaceCount > 0 && (
                                                         <div className="flex justify-between items-center">
                                                             <div>
-                                                                <span className="text-stone-300 font-medium">Dining Spaces</span>
-                                                                <div className="text-sm text-stone-400">
+                                                                <span className="text-body-muted font-medium">Dining Spaces</span>
+                                                                <div className="text-sm text-body-subtle">
                                                                     {quote.diningSpaceCount} × {formatPrice(quote.diningSpaceRate)} each
                                                                 </div>
                                                             </div>
-                                                            <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.diningSpaceTotal)}</span>
+                                                            <span className="font-bold text-body text-lg">{formatPrice(quote.diningSpaceTotal)}</span>
                                                         </div>
                                                     )}
 
@@ -616,24 +688,24 @@ const ContactForm = () => {
                                                         quote.extraBedroomCount > 0 && (
                                                             <div className="flex justify-between items-center">
                                                                 <div>
-                                                                    <span className="text-stone-300 font-medium">Extra Bedrooms</span>
-                                                                    <div className="text-sm text-stone-400">
+                                                                    <span className="text-body-muted font-medium">Extra Bedrooms</span>
+                                                                    <div className="text-sm text-body-subtle">
                                                                         {quote.extraBedroomCount} beyond included × {formatPrice(quote.bedroomRate)} each
                                                                     </div>
                                                                 </div>
-                                                                <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.bedroomTotal)}</span>
+                                                                <span className="font-bold text-body text-lg">{formatPrice(quote.bedroomTotal)}</span>
                                                             </div>
                                                         )
                                                     ) : (
                                                         quote.bedroomCount > 0 && (
                                                             <div className="flex justify-between items-center">
                                                                 <div>
-                                                                    <span className="text-stone-300 font-medium">Bedrooms</span>
-                                                                    <div className="text-sm text-stone-400">
+                                                                    <span className="text-body-muted font-medium">Bedrooms</span>
+                                                                    <div className="text-sm text-body-subtle">
                                                                         {quote.bedroomCount} × {formatPrice(quote.bedroomRate)} each
                                                                     </div>
                                                                 </div>
-                                                                <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.bedroomTotal)}</span>
+                                                                <span className="font-bold text-body text-lg">{formatPrice(quote.bedroomTotal)}</span>
                                                             </div>
                                                         )
                                                     )}
@@ -643,24 +715,24 @@ const ContactForm = () => {
                                                         quote.extraBathroomCount > 0 && (
                                                             <div className="flex justify-between items-center">
                                                                 <div>
-                                                                    <span className="text-stone-300 font-medium">Extra Bathrooms</span>
-                                                                    <div className="text-sm text-stone-400">
+                                                                    <span className="text-body-muted font-medium">Extra Bathrooms</span>
+                                                                    <div className="text-sm text-body-subtle">
                                                                         {quote.extraBathroomCount} beyond included × {formatPrice(quote.bathroomRate)} each
                                                                     </div>
                                                                 </div>
-                                                                <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.bathroomTotal)}</span>
+                                                                <span className="font-bold text-body text-lg">{formatPrice(quote.bathroomTotal)}</span>
                                                             </div>
                                                         )
                                                     ) : (
                                                         quote.bathroomCount > 0 && (
                                                             <div className="flex justify-between items-center">
                                                                 <div>
-                                                                    <span className="text-stone-300 font-medium">Bathrooms</span>
-                                                                    <div className="text-sm text-stone-400">
+                                                                    <span className="text-body-muted font-medium">Bathrooms</span>
+                                                                    <div className="text-sm text-body-subtle">
                                                                         {quote.bathroomCount} × {formatPrice(quote.bathroomRate)} each
                                                                     </div>
                                                                 </div>
-                                                                <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.bathroomTotal)}</span>
+                                                                <span className="font-bold text-body text-lg">{formatPrice(quote.bathroomTotal)}</span>
                                                             </div>
                                                         )
                                                     )}
@@ -668,26 +740,26 @@ const ContactForm = () => {
                                                     {/* Extra Offices - For vacant, only show extras beyond included */}
                                                     {formData.stagingType === 'vacant' ? (
                                                         quote.extraOfficeCount > 0 && (
-                                                            <div className={`flex justify-between items-center ${hasAdditionalItems ? 'border-b border-stone-600/50 pb-3' : ''}`}>
+                                                            <div className={`flex justify-between items-center ${hasAdditionalItems ? 'border-b border-line-strong/50 pb-3' : ''}`}>
                                                                 <div>
-                                                                    <span className="text-stone-300 font-medium">Extra Home Offices</span>
-                                                                    <div className="text-sm text-stone-400">
+                                                                    <span className="text-body-muted font-medium">Extra Home Offices</span>
+                                                                    <div className="text-sm text-body-subtle">
                                                                         {quote.extraOfficeCount} beyond included × {formatPrice(quote.officeRate)} each
                                                                     </div>
                                                                 </div>
-                                                                <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.officeTotal)}</span>
+                                                                <span className="font-bold text-body text-lg">{formatPrice(quote.officeTotal)}</span>
                                                             </div>
                                                         )
                                                     ) : (
                                                         quote.officeCount > 0 && (
-                                                            <div className={`flex justify-between items-center ${hasAdditionalItems ? 'border-b border-stone-600/50 pb-3' : ''}`}>
+                                                            <div className={`flex justify-between items-center ${hasAdditionalItems ? 'border-b border-line-strong/50 pb-3' : ''}`}>
                                                                 <div>
-                                                                    <span className="text-stone-300 font-medium">Home Offices</span>
-                                                                    <div className="text-sm text-stone-400">
+                                                                    <span className="text-body-muted font-medium">Home Offices</span>
+                                                                    <div className="text-sm text-body-subtle">
                                                                         {quote.officeCount} × {formatPrice(quote.officeRate)} each
                                                                     </div>
                                                                 </div>
-                                                                <span className="font-bold text-stone-100 text-lg">{formatPrice(quote.officeTotal)}</span>
+                                                                <span className="font-bold text-body text-lg">{formatPrice(quote.officeTotal)}</span>
                                                             </div>
                                                         )
                                                     )}
@@ -696,8 +768,8 @@ const ContactForm = () => {
                                                     {quote.outdoorAdjustment > 0 && (
                                                         <div className="flex justify-between items-center">
                                                             <div>
-                                                                <span className="text-stone-300 font-medium">Outdoor Staging</span>
-                                                                <div className="text-sm text-stone-400">Patio, deck, yard areas</div>
+                                                                <span className="text-body-muted font-medium">Outdoor Staging</span>
+                                                                <div className="text-sm text-body-subtle">Patio, deck, yard areas</div>
                                                             </div>
                                                             <span className="font-medium text-secondary text-lg">
                                                                 +{formatPrice(quote.outdoorAdjustment)}
@@ -708,8 +780,8 @@ const ContactForm = () => {
                                                     {quote.multiFloorAdjustment > 0 && (
                                                         <div className="flex justify-between items-center">
                                                             <div>
-                                                                <span className="text-stone-300 font-medium">Multi-Floor Fee</span>
-                                                                <div className="text-sm text-stone-400">Additional story surcharge</div>
+                                                                <span className="text-body-muted font-medium">Multi-Floor Fee</span>
+                                                                <div className="text-sm text-body-subtle">Additional story surcharge</div>
                                                             </div>
                                                             <span className="font-medium text-secondary text-lg">
                                                                 +{formatPrice(quote.multiFloorAdjustment)}
@@ -721,8 +793,8 @@ const ContactForm = () => {
                                                     {quote.largeSquareFootageAdjustment > 0 && (
                                                         <div className="flex justify-between items-center">
                                                             <div>
-                                                                <span className="text-stone-300 font-medium">Very Large Home Fee</span>
-                                                                <div className="text-sm text-stone-400">Properties over 3,500 sq ft</div>
+                                                                <span className="text-body-muted font-medium">Very Large Home Fee</span>
+                                                                <div className="text-sm text-body-subtle">Properties over 3,500 sq ft</div>
                                                             </div>
                                                             <span className="font-medium text-secondary text-lg">
                                                                 +{formatPrice(quote.largeSquareFootageAdjustment)}
@@ -733,8 +805,8 @@ const ContactForm = () => {
                                                     {quote.distanceAdjustment > 0 && (
                                                         <div className="flex justify-between items-center">
                                                             <div>
-                                                                <span className="text-stone-300 font-medium">Travel Fee</span>
-                                                                <div className="text-sm text-stone-400">
+                                                                <span className="text-body-muted font-medium">Travel Fee</span>
+                                                                <div className="text-sm text-body-subtle">
                                                                     {formData.stagingType === 'vacant'
                                                                         ? `${formData.distanceFromDowntown} miles from Sacramento`
                                                                         : 'Properties over 20 miles away'
@@ -764,21 +836,21 @@ const ContactForm = () => {
                                                 <button
                                                     type="submit"
                                                     disabled={isSubmitting}
-                                                    className={`flex transform items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-all hover:scale-[1.02] hover:rotate-1 ${
+                                                    className={`flex items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-colors ${
                                                         isSubmitting
-                                                            ? 'cursor-not-allowed bg-stone-600 text-stone-400'
-                                                            : 'bg-gradient-to-r from-primary via-primary_dark to-primary text-white shadow-2xl hover:shadow-primary/40 hover:shadow-2xl border-2 border-primary_dark/50'
+                                                            ? 'cursor-not-allowed bg-surface-hover text-body-subtle'
+                                                            : 'bg-gold-400 text-body-inverse shadow-card hover:bg-gold-300'
                                                     }`}
                                                 >
                                                     {isSubmitting ? (
                                                         <>
-                                                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-stone-400 border-t-transparent" />
-                                                            <span>Sending Your Quote...</span>
+                                                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-body-inverse/40 border-t-transparent" />
+                                                            <span>Sending&hellip;</span>
                                                         </>
                                                     ) : (
                                                         <>
                                                             <Send size={24} />
-                                                            <span>Send Your Estimate to Mia!</span>
+                                                            <span>Send quote request</span>
                                                         </>
                                                     )}
                                                 </button>

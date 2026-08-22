@@ -52,7 +52,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
         <AnimatePresence>
             {selectedItem && (
                 <motion.div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/75"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -99,7 +99,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                                             <div
                                                 key={`dot-${index}`}
                                                 className={`h-3 w-3 rounded-full text-2xl ${
-                                                    index === currentImageIndex ? 'bg-primary' : 'bg-stone-600'
+                                                    index === currentImageIndex ? 'bg-primary' : 'bg-surface-hover'
                                                 }`}
                                             ></div>
                                         ))}
@@ -136,7 +136,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
                                                                     step={100}
                                                                     value={speed}
                                                                     onChange={handleSpeedChange}
-                                                                    className="w-16 cursor-pointer appearance-none rounded-lg bg-stone-600 xs:w-20 md:w-24 [&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:rounded-lg [&::-webkit-slider-runnable-track]:bg-stone-600 [&::-webkit-slider-thumb]:mt-[-4px] [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
+                                                                    className="w-16 cursor-pointer appearance-none rounded-lg bg-surface-hover xs:w-20 md:w-24 [&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:rounded-lg [&::-webkit-slider-runnable-track]:bg-surface-hover [&::-webkit-slider-thumb]:mt-[-4px] [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
                                                                 />
                                                             </div>
                                                         </div>

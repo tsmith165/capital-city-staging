@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { Tooltip } from 'react-tooltip';
+import { FIELD_CONTROL_CLASSES, FIELD_LABEL_CLASSES } from './inputs.constants';
+import { formatFieldName } from './inputs.utils';
 
 interface InputTextAreaProps {
     idName: string;
@@ -12,25 +14,23 @@ interface InputTextAreaProps {
 }
 
 const InputTextArea: React.FC<InputTextAreaProps> = ({ idName, name, rows, value, onChange }) => {
-    const formatted_name = name
-        .split('_')
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
+    const formattedName = formatFieldName(name);
 
     return (
         <div className="m-0 flex w-full p-0">
-            <div 
-                className="flex min-w-28 max-w-28 items-center justify-center rounded-l-md bg-secondary_dark px-2.5 py-1.5"
+            <label
+                htmlFor={idName}
+                className={FIELD_LABEL_CLASSES}
                 data-tooltip-id={`tooltip-${idName}`}
-                data-tooltip-content={formatted_name}
+                data-tooltip-content={formattedName}
             >
-                <div className="text-stone-400 font-bold">{formatted_name}</div>
-            </div>
+                {formattedName}
+            </label>
             <Tooltip id={`tooltip-${idName}`} place="top" />
             <textarea
                 id={idName}
                 name={idName}
-                className="h-full w-full whitespace-pre-wrap rounded-r-md border-none bg-stone-400 py-1.5 pl-2.5 text-sm font-bold text-stone-950 placeholder-stone-700"
+                className={`whitespace-pre-wrap py-1.5 ${FIELD_CONTROL_CLASSES}`}
                 value={value}
                 rows={rows}
                 onChange={onChange}

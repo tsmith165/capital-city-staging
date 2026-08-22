@@ -150,14 +150,14 @@ const EditConvex: React.FC<EditConvexProps> = ({
 
     return (
         <>
-            <div className="flex h-full w-full bg-stone-900">
+            <div className="flex h-full w-full bg-surface">
                 <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row h-full">
                     {/* Images Section - Top on mobile, Left on desktop */}
                     <div className="w-full md:w-2/5 p-4 flex flex-col">
                         {/* Current Image Display */}
                         {allImages.length > 0 && (
                             <div className="flex-grow flex flex-col items-center justify-center">
-                                <div className="relative w-full max-w-md aspect-square bg-stone-800 rounded-lg overflow-hidden mb-4">
+                                <div className="relative w-full max-w-md aspect-square bg-surface-raised rounded-lg overflow-hidden mb-4">
                                     <Image 
                                         src={currentImage?.src || inventoryData.imagePath} 
                                         alt={currentImage?.label || inventoryData.name}
@@ -169,7 +169,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
 
                                 {/* Image Label */}
                                 <div className="text-center mb-4">
-                                    <span className="text-lg font-medium text-stone-200">
+                                    <span className="text-lg font-medium text-body">
                                         {currentImage?.label}
                                     </span>
                                 </div>
@@ -180,7 +180,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                         {/* Left Arrow */}
                                         <button
                                             onClick={handlePrevImage}
-                                            className="w-8 h-8 bg-stone-700 hover:bg-stone-600 rounded-full flex items-center justify-center text-stone-300 hover:text-stone-100 transition-colors"
+                                            className="w-8 h-8 bg-surface-overlay hover:bg-surface-hover rounded-full flex items-center justify-center text-body-muted hover:text-body transition-colors"
                                             data-tooltip-id="prev-image"
                                             data-tooltip-content="Previous Image"
                                         >
@@ -196,7 +196,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                                     className={`w-3 h-3 rounded-full transition-colors ${
                                                         index === currentImageIndex 
                                                             ? 'bg-secondary' 
-                                                            : 'bg-stone-700 hover:bg-stone-600'
+                                                            : 'bg-surface-overlay hover:bg-surface-hover'
                                                     }`}
                                                     data-tooltip-id={`dot-${index}`}
                                                     data-tooltip-content={`View ${allImages[index].label}`}
@@ -207,7 +207,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                         {/* Right Arrow */}
                                         <button
                                             onClick={handleNextImage}
-                                            className="w-8 h-8 bg-stone-700 hover:bg-stone-600 rounded-full flex items-center justify-center text-stone-300 hover:text-stone-100 transition-colors"
+                                            className="w-8 h-8 bg-surface-overlay hover:bg-surface-hover rounded-full flex items-center justify-center text-body-muted hover:text-body transition-colors"
                                             data-tooltip-id="next-image"
                                             data-tooltip-content="Next Image"
                                         >
@@ -221,7 +221,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                     <div className="flex space-x-3">
                                         <button
                                             onClick={handleChangeMainImage}
-                                            className="flex items-center space-x-2 px-4 py-2 bg-stone-700 hover:bg-stone-600 text-stone-300 hover:text-stone-100 rounded-lg transition-colors"
+                                            className="flex items-center space-x-2 px-4 py-2 bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body rounded-lg transition-colors"
                                             data-tooltip-id="change-main"
                                             data-tooltip-content="Change the main image"
                                         >
@@ -230,7 +230,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                         </button>
                                         <button
                                             onClick={handleAddExtraImage}
-                                            className="flex items-center space-x-2 px-4 py-2 bg-secondary hover:bg-secondary_light text-stone-200 hover:text-white rounded-lg transition-colors"
+                                            className="flex items-center space-x-2 px-4 py-2 bg-secondary hover:bg-secondary_light text-body hover:text-white rounded-lg transition-colors"
                                             data-tooltip-id="add-extra"
                                             data-tooltip-content="Add an extra image"
                                         >
@@ -240,7 +240,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                     </div>
                                     <button
                                         onClick={() => setShowAddInventoryOverlay(true)}
-                                        className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary hover:bg-primary_dark text-stone-900 hover:text-stone-800 rounded-lg transition-colors font-medium"
+                                        className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary hover:bg-primary_dark text-body-inverse hover:text-body-inverse rounded-lg transition-colors font-medium"
                                         data-tooltip-id="add-inventory"
                                         data-tooltip-content="Create new inventory item"
                                     >
@@ -262,7 +262,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                     disabled={!nextOId}
                                     className={`h-[22px] w-8 cursor-pointer rounded-lg flex items-center justify-center ${
                                         nextOId 
-                                            ? 'bg-secondary text-stone-400 hover:bg-primary hover:text-secondary_dark' 
+                                            ? 'bg-secondary text-body-subtle hover:bg-primary hover:text-secondary_dark' 
                                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     }`}
                                     data-tooltip-id="next-item"
@@ -275,7 +275,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                     disabled={!prevOId}
                                     className={`h-[22px] w-8 cursor-pointer rounded-lg flex items-center justify-center ${
                                         prevOId 
-                                            ? 'bg-secondary text-stone-400 hover:bg-primary hover:text-secondary_dark' 
+                                            ? 'bg-secondary text-body-subtle hover:bg-primary hover:text-secondary_dark' 
                                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     }`}
                                     data-tooltip-id="prev-item"
@@ -286,7 +286,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
                             </div>
                             <Link href={`/admin/inventory/?item=${currentOId}`}>
                                 <MdPageview 
-                                    className="h-[48px] w-[48px] cursor-pointer rounded-lg bg-secondary text-stone-400 p-1 hover:bg-primary hover:text-secondary_dark" 
+                                    className="h-[48px] w-[48px] cursor-pointer rounded-lg bg-secondary text-body-subtle p-1 hover:bg-primary hover:text-secondary_dark" 
                                     data-tooltip-id="view-item"
                                     data-tooltip-content="View in inventory"
                                 />
@@ -297,11 +297,11 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                     name="newTitle"
                                     value={titleInput}
                                     onChange={(e) => setTitleInput(e.target.value)}
-                                    className="flex-grow rounded-lg border-none bg-secondary_dark px-3 py-1 text-2xl font-bold text-stone-400 outline-none"
+                                    className="flex-grow rounded-lg border-none bg-secondary_dark px-3 py-1 text-2xl font-bold text-body-subtle outline-none"
                                 />
                                 <button
                                     type="submit"
-                                    className="ml-2 rounded-md bg-secondary px-3 py-1 font-bold text-stone-400 hover:bg-primary_dark hover:text-secondary_dark"
+                                    className="ml-2 rounded-md bg-secondary px-3 py-1 font-bold text-body-subtle hover:bg-primary_dark hover:text-secondary_dark"
                                 >
                                     Save
                                 </button>
@@ -341,7 +341,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
             {showAddInventoryOverlay && (
                 <AddInventoryOverlay
                     onClose={() => setShowAddInventoryOverlay(false)}
-                    onSuccess={(oId) => {
+                    onSuccess={() => {
                         // Refresh the current page to see the new inventory
                         router.refresh();
                     }}

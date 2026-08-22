@@ -1,138 +1,94 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import PageLayout from '@/components/layout/PageLayout';
-import Image from 'next/image';
-import Head from 'next/head';
+import ArticleShell from '@/components/content/ArticleShell';
+import ContactCallout from '@/components/content/ContactCallout';
+import JsonLd from '@/components/seo/JsonLd';
+import { articleSchema } from '@/lib/structuredData';
+import { getArticle } from '@/app/info/articles_spec';
+import { articleMetadata } from '@/app/info/article.metadata';
 
-export const metadata: Metadata = {
-    title: 'Home Staging Tips and Tricks | Capital City Staging',
-    description:
-        'Discover expert tips and tricks for staging your home to sell faster and for a higher price. Learn from the professionals at Capital City Staging.',
-    keywords:
-        'home staging tips, staging tricks, sell home faster, increase home value, DIY staging, Capital City Staging, real estate advice',
-    openGraph: {
-        title: 'Home Staging Tips and Tricks | Capital City Staging',
-        description:
-            'Discover expert tips and tricks for staging your home to sell faster and for a higher price. Learn from the professionals at Capital City Staging.',
-        url: 'https://www.capitalcitystaging.com/info/home-staging-tips',
-        images: [
-            {
-                url: '/favicon/CCS_og_image.png',
-                width: 1200,
-                height: 630,
-                alt: 'Home Staging Tips and Tricks',
-            },
-        ],
-        type: 'article',
-        locale: 'en_US',
-    },
-};
+const article = getArticle('home-staging-tips');
+
+export const metadata: Metadata = articleMetadata(
+    article,
+    'home staging tips, staging tricks, sell home faster, increase home value, DIY staging, Capital City Staging, real estate advice',
+);
 
 export default function HomeStagingTips() {
     return (
         <PageLayout page="home-staging-tips">
-            <Head>
-                <script type="application/ld+json">
-                    {JSON.stringify({
-                        '@context': 'https://schema.org',
-                        '@type': 'Article',
-                        headline: 'Home Staging Tips and Tricks | Capital City Staging',
-                        description:
-                            'Discover expert tips and tricks for staging your home to sell faster and for a higher price. Learn from the professionals at Capital City Staging.',
-                        image: 'https://www.capitalcitystaging.com/images/home-staging-tips.jpg',
-                        author: {
-                            '@type': 'Organization',
-                            name: 'Capital City Staging',
-                        },
-                        publisher: {
-                            '@type': 'Organization',
-                            name: 'Capital City Staging',
-                            logo: {
-                                '@type': 'ImageObject',
-                                url: 'https://www.capitalcitystaging.com/logo/CCS_logo_152x152.png',
-                            },
-                        },
-                        datePublished: '2023-10-22',
-                    })}
-                </script>
-            </Head>
-            <div className="flex h-fit w-full flex-col items-center space-y-8 bg-stone-900 px-8 py-16">
-                <h1 className="bg-clip-text text-center text-4xl font-bold text-transparent gradient-gold-main">
-                    Home Staging Tips and Tricks
-                </h1>
-                <div className="relative mx-auto w-full max-w-4xl">
-                    <Image
-                        src="/info/home-staging-tips.jpg"
-                        alt="Home Staging Tips and Tricks"
-                        width={720}
-                        height={720}
-                        className="h-auto w-full rounded-md"
+            <JsonLd data={articleSchema({ headline: article.title, description: article.description, path: article.url })} />
+            <ArticleShell
+                eyebrow="Resources"
+                title={article.title}
+                lead="Eight things you can do before a professional ever walks through the door."
+                image={{
+                    src: article.imageSrc,
+                    alt: 'A tidy, decluttered room prepared for listing photos',
+                    width: article.imageWidth,
+                    height: article.imageHeight,
+                }}
+                aside={
+                    <ContactCallout
+                        heading="Need professional help?"
+                        body="These tips get you started. Professional staging takes the property the rest of the way."
                     />
-                </div>
-                <div className="flex max-w-4xl flex-col space-y-6 text-stone-300">
-                    <p className="text-lg text-stone-300">
-                        Preparing your home for sale can be a daunting task. At Capital City Staging, we've compiled a list of expert tips
-                        and tricks to help you stage your home effectively and attract potential buyers.
-                    </p>
+                }
+            >
+                <p>
+                    Preparing your home for sale can be daunting. We have compiled a list of expert tips to help you stage your home
+                    effectively and attract potential buyers.
+                </p>
 
-                    <h2 className="text-2xl font-semibold text-primary">1. Declutter Your Space</h2>
-                    <p className="text-stone-300">
-                        Remove unnecessary items to create a sense of space. A clutter-free home appears larger and allows buyers to focus
-                        on the property's features.
-                    </p>
+                <h3>1. Declutter your space</h3>
+                <p>
+                    Remove unnecessary items to create a sense of space. A clutter-free home appears larger and lets buyers focus on the
+                    property&rsquo;s features.
+                </p>
 
-                    <h2 className="text-2xl font-semibold text-primary">2. Depersonalize the Home</h2>
-                    <p className="text-stone-300">
-                        Take down personal photographs and mementos. This helps buyers envision themselves living in the space, which can
-                        increase their emotional connection to the property.
-                    </p>
+                <h3>2. Depersonalize the home</h3>
+                <p>
+                    Take down personal photographs and mementos. This helps buyers envision themselves living in the space, which increases
+                    their emotional connection to the property.
+                </p>
 
-                    <h2 className="text-2xl font-semibold text-primary">3. Make Minor Repairs</h2>
-                    <p className="text-stone-300">
-                        Fix leaky faucets, squeaky doors, and chipped paint. Small repairs can significantly improve the overall impression
-                        of your home.
-                    </p>
+                <h3>3. Make minor repairs</h3>
+                <p>
+                    Fix leaky faucets, squeaky doors, and chipped paint. Small repairs significantly improve the overall impression of your
+                    home.
+                </p>
 
-                    <h2 className="text-2xl font-semibold text-primary">4. Enhance Curb Appeal</h2>
-                    <p className="text-stone-300">
-                        First impressions matter. Mow the lawn, trim hedges, and consider adding potted plants near the entrance to make
-                        your home inviting from the outside.
-                    </p>
+                <h3>4. Enhance curb appeal</h3>
+                <p>
+                    Mow the lawn, trim hedges, and consider adding potted plants near the entrance to make your home inviting from the
+                    outside.
+                </p>
 
-                    <h2 className="text-2xl font-semibold text-primary">5. Optimize Lighting</h2>
-                    <p className="text-stone-300">
-                        Open curtains and blinds to let in natural light. Ensure all bulbs are working and consider using higher wattage
-                        bulbs to brighten rooms.
-                    </p>
+                <h3>5. Optimize lighting</h3>
+                <p>
+                    Open curtains and blinds to let in natural light. Make sure all bulbs work, and consider higher wattage bulbs to
+                    brighten rooms.
+                </p>
 
-                    <h2 className="text-2xl font-semibold text-primary">6. Neutralize Color Schemes</h2>
-                    <p className="text-stone-300">
-                        Use neutral colors for walls and décor to appeal to a broader range of buyers. Neutral tones create a blank canvas
-                        for buyers to imagine their own style.
-                    </p>
+                <h3>6. Neutralize color schemes</h3>
+                <p>
+                    Use neutral colors for walls and decor to appeal to a broader range of buyers. Neutral tones create a blank canvas for
+                    buyers to imagine their own style.
+                </p>
 
-                    <h2 className="text-2xl font-semibold text-primary">7. Arrange Furniture Strategically</h2>
-                    <p className="text-stone-300">
-                        Position furniture to highlight the flow of the room and create cozy conversation areas. Avoid blocking windows or
-                        natural pathways.
-                    </p>
+                <h3>7. Arrange furniture strategically</h3>
+                <p>
+                    Position furniture to highlight the flow of the room and create cozy conversation areas. Avoid blocking windows or
+                    natural pathways.
+                </p>
 
-                    <h2 className="text-2xl font-semibold text-primary">8. Keep It Clean</h2>
-                    <p className="text-stone-300">
-                        A spotless home signals to buyers that the property has been well-maintained. Pay attention to details like clean
-                        windows, dust-free surfaces, and fresh-smelling air.
-                    </p>
-
-                    <h2 className="text-2xl font-semibold text-primary">Need Professional Help?</h2>
-                    <p className="text-stone-300">
-                        While these tips can get you started, professional home staging can take your property to the next level.{' '}
-                        <a href="/contact" className="text-secondary_light hover:underline">
-                            Contact us
-                        </a>{' '}
-                        at Capital City Staging to learn how we can help you sell your home faster and for a higher price.
-                    </p>
-                </div>
-            </div>
+                <h3>8. Keep it clean</h3>
+                <p>
+                    A spotless home signals that the property has been well maintained. Pay attention to details like clean windows,
+                    dust-free surfaces, and fresh-smelling air.
+                </p>
+            </ArticleShell>
         </PageLayout>
     );
 }

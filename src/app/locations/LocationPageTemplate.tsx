@@ -1,26 +1,11 @@
 import React from 'react';
-import PageLayout from '@/components/layout/PageLayout';
-import Image from 'next/image';
 import Link from 'next/link';
-
-const SERVICED_CITIES = [
-    'Sacramento',
-    'West Sacramento',
-    'Roseville',
-    'Rocklin',
-    'Rio Linda',
-    'Rancho Cordova',
-    'Orangevale',
-    'North Highlands',
-    'Loomis',
-    'Granite Bay',
-    'Gold River',
-    'Folsom',
-    'Fair Oaks',
-    'Citrus Heights',
-    'Carmichael',
-    'Antelope',
-];
+import PageLayout from '@/components/layout/PageLayout';
+import ArticleShell from '@/components/content/ArticleShell';
+import ContactCallout from '@/components/content/ContactCallout';
+import JsonLd from '@/components/seo/JsonLd';
+import { serviceSchema, SITE_URL } from '@/lib/structuredData';
+import { SERVICE_AREAS } from '@/components/layout/Footer.constants';
 
 interface LocationPageProps {
     locationName: string;
@@ -43,56 +28,60 @@ export default function LocationPageTemplate({
     services,
     contactText,
 }: LocationPageProps) {
-    const serviceAreaSlug = (city: string) => city.toLowerCase().replace(/\s+/g, '-');
-
     return (
         <PageLayout page={pageSlug}>
-            <div className="flex h-fit w-full flex-col items-center space-y-8 bg-stone-900 px-8 py-16">
-                <h1 className="bg-clip-text text-center text-4xl font-bold text-transparent gradient-gold-main">
-                    Professional Home Staging in {locationName}, CA
-                </h1>
-                <div className="relative h-64 w-full max-w-4xl sm:h-72 md:h-96">
-                    <Image src={imageUrl} alt={imageAlt} fill className="rounded-md object-cover" />
-                </div>
-                <p className="max-w-3xl text-center text-lg text-stone-300">{description}</p>
-                <div className="flex max-w-4xl flex-col space-y-6 px-8">
-                    <h2 className="text-2xl font-semibold text-primary">Why Home Staging in {locationName}?</h2>
-                    <p className="text-stone-300">{whyStaging}</p>
-                    <h2 className="text-2xl font-semibold text-primary">Our {locationName} Services Include:</h2>
-                    <ul className="list-inside list-disc space-y-2 text-stone-300">
-                        {services.map((service, index) => (
-                            <li key={index} className="text-stone-300">
-                                {service}
-                            </li>
-                        ))}
-                    </ul>
-                    <h2 className="text-2xl font-semibold text-primary">Contact Us</h2>
-                    <p className="text-stone-300">
-                        {contactText}{' '}
-                        <a href="/contact" className="text-secondary hover:underline">
-                            Contact us
-                        </a>{' '}
-                        today to schedule a consultation.
-                    </p>
-
-                    <div className="mt-12 border-t border-stone-700 pt-8">
-                        <h2 className="mb-4 text-2xl font-semibold text-primary">Our Service Areas</h2>
-                        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                            {SERVICED_CITIES.map((city) => (
-                                <Link
-                                    key={city}
-                                    href={`/locations/${serviceAreaSlug(city)}`}
-                                    className={`text-stone-300 transition-colors hover:text-secondary ${
-                                        city === locationName ? 'font-semibold text-secondary' : ''
-                                    }`}
-                                >
-                                    {city}, CA
-                                </Link>
-                            ))}
-                        </div>
+            <JsonLd
+                data={serviceSchema({
+                    name: `Home Staging in ${locationName}, CA`,
+                    description,
+                    image: `${SITE_URL}${imageUrl}`,
+                    areaName: `${locationName}, CA`,
+                })}
+            />
+            <ArticleShell
+                eyebrow="Service area"
+                title={`Professional Home Staging in ${locationName}, CA`}
+                lead={description}
+                image={{ src: imageUrl, alt: imageAlt, width: 1280, height: 720 }}
+                aside={
+                    <div className="space-y-12">
+                        <ContactCallout heading={`Staging in ${locationName}`} body={contactText} />
+                        <nav aria-label="Other service areas" className="border-t border-line pt-8">
+                            <h2 className="font-display text-xl font-semibold text-gold-300">Our service areas</h2>
+                            <ul className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
+                                {SERVICE_AREAS.map(({ slug, name }) => {
+                                    const isCurrent = name === locationName;
+                                    return (
+                                        <li key={slug}>
+                                            <Link
+                                                href={`/locations/${slug}`}
+                                                aria-current={isCurrent ? 'page' : undefined}
+                                                className={
+                                                    isCurrent
+                                                        ? 'text-sm font-semibold text-gold-300'
+                                                        : 'text-sm text-body-muted transition-colors hover:text-gold-300'
+                                                }
+                                            >
+                                                {name}, CA
+                                            </Link>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </nav>
                     </div>
-                </div>
-            </div>
+                }
+            >
+                <h2>Why home staging in {locationName}?</h2>
+                <p>{whyStaging}</p>
+
+                <h2>Our {locationName} services include</h2>
+                <ul>
+                    {services.map((service) => (
+                        <li key={service}>{service}</li>
+                    ))}
+                </ul>
+            </ArticleShell>
         </PageLayout>
     );
 }

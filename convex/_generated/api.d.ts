@@ -13,6 +13,8 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as contactSubmissions from "../contactSubmissions.js";
+import type * as dashboard from "../dashboard.js";
 import type * as homepageImages from "../homepageImages.js";
 import type * as inventory from "../inventory.js";
 import type * as projects from "../projects.js";
@@ -27,6 +29,8 @@ import type * as users from "../users.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  contactSubmissions: typeof contactSubmissions;
+  dashboard: typeof dashboard;
   homepageImages: typeof homepageImages;
   inventory: typeof inventory;
   projects: typeof projects;

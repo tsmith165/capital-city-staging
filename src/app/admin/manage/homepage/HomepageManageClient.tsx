@@ -65,15 +65,15 @@ function LivePreviewStrip({ images }: { images: HomepageImageDoc[] }) {
 
     if (images.length === 0) {
         return (
-            <div className="mx-auto mt-4 flex aspect-[16/9] max-h-[350px] w-full max-w-3xl items-center justify-center overflow-hidden rounded-xl border border-stone-700 bg-stone-800/50">
-                <p className="text-sm text-stone-500">No active images to preview</p>
+            <div className="mx-auto mt-4 flex aspect-[16/9] max-h-[350px] w-full max-w-3xl items-center justify-center overflow-hidden rounded-xl border border-line bg-surface-raised/50">
+                <p className="text-sm text-body-subtle">No active images to preview</p>
             </div>
         );
     }
 
     return (
         <div
-            className="relative mx-auto mt-4 aspect-[16/9] max-h-[350px] w-full max-w-3xl overflow-hidden rounded-xl border border-stone-700"
+            className="relative mx-auto mt-4 aspect-[16/9] max-h-[350px] w-full max-w-3xl overflow-hidden rounded-xl border border-line"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
         >
@@ -102,7 +102,7 @@ function LivePreviewStrip({ images }: { images: HomepageImageDoc[] }) {
             <div className="absolute inset-0 bg-gradient-to-r from-stone-900/50 via-transparent to-stone-900/50" />
 
             <div className="absolute bottom-3 left-4">
-                <span className="rounded-full bg-stone-900/70 px-3 py-1 text-xs font-medium text-primary">
+                <span className="rounded-full bg-surface/70 px-3 py-1 text-xs font-medium text-primary">
                     Live Preview
                 </span>
             </div>
@@ -148,7 +148,7 @@ function HomepageImageCard({
             onDragStart={onDragStart}
             onDragOver={onDragOver}
             onDrop={onDrop}
-            className={`group relative cursor-grab overflow-hidden rounded-xl bg-stone-800 shadow-lg transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 active:cursor-grabbing ${
+            className={`group relative cursor-grab overflow-hidden rounded-xl bg-surface-raised shadow-lg transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 active:cursor-grabbing ${
                 !image.active ? 'opacity-50 grayscale' : ''
             } ${isDragTarget ? 'ring-2 ring-primary ring-offset-2 ring-offset-stone-900' : ''}`}
         >
@@ -164,27 +164,27 @@ function HomepageImageCard({
                 />
 
                 {/* Position badge */}
-                <div className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-primary font-bold text-stone-900 text-sm shadow-md">
+                <div className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-primary font-bold text-body-inverse text-sm shadow-md">
                     {position}
                 </div>
 
                 {/* Active/Inactive badge */}
                 <div
                     className={`absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        image.active ? 'bg-secondary/90 text-white' : 'bg-stone-600/90 text-stone-300'
+                        image.active ? 'bg-secondary/90 text-white' : 'bg-surface-hover/90 text-body-muted'
                     }`}
                 >
                     {image.active ? 'Active' : 'Inactive'}
                 </div>
 
                 {/* Hover overlay with actions */}
-                <div className="absolute inset-0 flex items-center justify-center gap-3 bg-stone-900/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                <div className="absolute inset-0 flex items-center justify-center gap-3 bg-surface/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             onToggleActive();
                         }}
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-stone-800/90 text-stone-300 transition-colors hover:bg-secondary hover:text-white"
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-raised/90 text-body-muted transition-colors hover:bg-secondary hover:text-white"
                         data-tooltip-id="homepage-tooltip"
                         data-tooltip-content={image.active ? 'Set Inactive' : 'Set Active'}
                     >
@@ -196,7 +196,7 @@ function HomepageImageCard({
                             e.stopPropagation();
                             onEditCaption();
                         }}
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-stone-800/90 text-stone-300 transition-colors hover:bg-primary hover:text-stone-900"
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-raised/90 text-body-muted transition-colors hover:bg-primary hover:text-body-inverse"
                         data-tooltip-id="homepage-tooltip"
                         data-tooltip-content="Edit caption"
                     >
@@ -208,7 +208,7 @@ function HomepageImageCard({
                             e.stopPropagation();
                             onRemove();
                         }}
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-stone-800/90 text-stone-300 transition-colors hover:bg-red-600 hover:text-white"
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-raised/90 text-body-muted transition-colors hover:bg-red-600 hover:text-white"
                         data-tooltip-id="homepage-tooltip"
                         data-tooltip-content="Remove from homepage"
                     >
@@ -219,9 +219,9 @@ function HomepageImageCard({
 
             {/* Caption */}
             <div className="px-3 py-2">
-                <p className="truncate text-sm text-stone-400">{image.title || 'No caption'}</p>
+                <p className="truncate text-sm text-body-subtle">{image.title || 'No caption'}</p>
                 {image.sourceType === 'project' && (
-                    <p className="mt-0.5 truncate text-xs text-stone-500">From project</p>
+                    <p className="mt-0.5 truncate text-xs text-body-subtle">From project</p>
                 )}
             </div>
         </div>
@@ -422,7 +422,7 @@ export default function HomepageManageClient() {
 
     if (homepageImages === undefined) {
         return (
-            <div className="flex h-full items-center justify-center bg-stone-900">
+            <div className="flex h-full items-center justify-center bg-surface">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         );
@@ -431,7 +431,7 @@ export default function HomepageManageClient() {
     const currentProject = availableProjects?.[selectedProject] as ProjectWithImages | undefined;
 
     return (
-        <div className="flex h-full w-full flex-col bg-stone-900" onDragEnd={handleDragEnd}>
+        <div className="flex h-full w-full flex-col bg-surface" onDragEnd={handleDragEnd}>
             {/* Live Preview Strip */}
             <LivePreviewStrip images={activeImages} />
 
@@ -440,26 +440,26 @@ export default function HomepageManageClient() {
                 {/* ─── Current Homepage Images ──────────────────────────────── */}
                 <div className="mt-6">
                     <div className="mb-4 flex items-center justify-between">
-                        <h2 className="text-xl font-semibold text-stone-200">
+                        <h2 className="text-xl font-semibold text-body">
                             Homepage Slideshow
-                            <span className="ml-2 text-sm font-normal text-stone-500">
+                            <span className="ml-2 text-sm font-normal text-body-subtle">
                                 ({activeImages.length} active of {homepageImages.length} total)
                             </span>
                         </h2>
-                        <p className="text-xs text-stone-500">Drag to reorder</p>
+                        <p className="text-xs text-body-subtle">Drag to reorder</p>
                     </div>
 
                     {homepageImages.length === 0 ? (
                         /* Empty State */
-                        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-stone-700 py-16 text-center">
+                        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-line py-16 text-center">
                             <ImageIcon size={64} className="mb-4 text-stone-600" />
-                            <h3 className="text-xl font-semibold text-stone-300">No Homepage Images Yet</h3>
-                            <p className="mt-2 max-w-md text-stone-500">
+                            <h3 className="text-xl font-semibold text-body-muted">No Homepage Images Yet</h3>
+                            <p className="mt-2 max-w-md text-body-subtle">
                                 Add images from your projects or upload new ones to create a stunning hero slideshow.
                             </p>
                             <button
                                 onClick={() => setAddTab('projects')}
-                                className="mt-6 rounded-lg bg-primary px-6 py-2.5 font-medium text-stone-900 transition-colors hover:bg-primary_dark"
+                                className="mt-6 rounded-lg bg-primary px-6 py-2.5 font-medium text-body-inverse transition-colors hover:bg-primary_dark"
                             >
                                 Browse Project Images
                             </button>
@@ -494,33 +494,33 @@ export default function HomepageManageClient() {
                 {/* ─── Caption Edit Modal ───────────────────────────────────── */}
                 {editingCaptionId && (
                     <div
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/80"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-surface/80"
                         onClick={() => setEditingCaptionId(null)}
                     >
                         <div
                             onClick={(e) => e.stopPropagation()}
-                            className="w-full max-w-md rounded-xl bg-stone-800 p-6 shadow-2xl"
+                            className="w-full max-w-md rounded-xl bg-surface-raised p-6 shadow-2xl"
                         >
-                            <h3 className="mb-4 text-lg font-semibold text-stone-200">Edit Caption</h3>
+                            <h3 className="mb-4 text-lg font-semibold text-body">Edit Caption</h3>
                             <input
                                 type="text"
                                 value={captionInput}
                                 onChange={(e) => setCaptionInput(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && saveCaption()}
-                                className="w-full rounded-lg border border-stone-600 bg-stone-700 px-4 py-2.5 text-stone-100 focus:border-primary focus:outline-none"
+                                className="w-full rounded-lg border border-line-strong bg-surface-overlay px-4 py-2.5 text-body focus:border-primary focus:outline-none"
                                 placeholder="Enter a caption..."
                                 autoFocus
                             />
                             <div className="mt-4 flex justify-end gap-3">
                                 <button
                                     onClick={() => setEditingCaptionId(null)}
-                                    className="rounded-lg px-4 py-2 text-sm text-stone-400 transition-colors hover:text-stone-200"
+                                    className="rounded-lg px-4 py-2 text-sm text-body-subtle transition-colors hover:text-body"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={saveCaption}
-                                    className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-stone-900 transition-colors hover:bg-primary_dark"
+                                    className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-body-inverse transition-colors hover:bg-primary_dark"
                                 >
                                     Save
                                 </button>
@@ -530,18 +530,18 @@ export default function HomepageManageClient() {
                 )}
 
                 {/* ─── Divider ──────────────────────────────────────────────── */}
-                <div className="my-8 border-t border-stone-700" />
+                <div className="my-8 border-t border-line" />
 
                 {/* ─── Add Images Section ───────────────────────────────────── */}
                 <div>
-                    <h2 className="mb-4 text-xl font-semibold text-stone-200">Add Images</h2>
+                    <h2 className="mb-4 text-xl font-semibold text-body">Add Images</h2>
 
                     {/* Tab Navigation */}
-                    <div className="mb-6 flex gap-1 rounded-lg bg-stone-800 p-1">
+                    <div className="mb-6 flex gap-1 rounded-lg bg-surface-raised p-1">
                         <button
                             onClick={() => setAddTab('projects')}
                             className={`flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                                addTab === 'projects' ? 'bg-primary text-stone-900' : 'text-stone-400 hover:text-stone-200'
+                                addTab === 'projects' ? 'bg-primary text-body-inverse' : 'text-body-subtle hover:text-body'
                             }`}
                         >
                             <Images size={16} />
@@ -550,7 +550,7 @@ export default function HomepageManageClient() {
                         <button
                             onClick={() => setAddTab('upload')}
                             className={`flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                                addTab === 'upload' ? 'bg-primary text-stone-900' : 'text-stone-400 hover:text-stone-200'
+                                addTab === 'upload' ? 'bg-primary text-body-inverse' : 'text-body-subtle hover:text-body'
                             }`}
                         >
                             <Upload size={16} />
@@ -563,10 +563,10 @@ export default function HomepageManageClient() {
                         <div>
                             {!availableProjects ? (
                                 <div className="flex items-center justify-center py-12">
-                                    <Loader2 className="h-6 w-6 animate-spin text-stone-500" />
+                                    <Loader2 className="h-6 w-6 animate-spin text-body-subtle" />
                                 </div>
                             ) : availableProjects.length === 0 ? (
-                                <div className="py-12 text-center text-stone-500">
+                                <div className="py-12 text-center text-body-subtle">
                                     No highlighted projects available. Mark projects as highlighted in the Projects admin page.
                                 </div>
                             ) : (
@@ -582,8 +582,8 @@ export default function HomepageManageClient() {
                                                 }}
                                                 className={`rounded-full border-2 px-4 py-1.5 text-sm font-medium transition-all ${
                                                     index === selectedProject
-                                                        ? 'border-secondary bg-secondary text-stone-200'
-                                                        : 'border-stone-600 bg-transparent text-stone-400 hover:border-primary hover:text-primary'
+                                                        ? 'border-secondary bg-secondary text-body'
+                                                        : 'border-line-strong bg-transparent text-body-subtle hover:border-primary hover:text-primary'
                                                 }`}
                                             >
                                                 {project.projectName}
@@ -595,7 +595,7 @@ export default function HomepageManageClient() {
                                     {/* Batch action bar */}
                                     {currentProject && currentProject.images.length > 0 && (
                                         <div className="mb-4 flex items-center justify-between">
-                                            <span className="text-sm text-stone-400">
+                                            <span className="text-sm text-body-subtle">
                                                 {selectedProjectImages.size > 0
                                                     ? `${selectedProjectImages.size} selected`
                                                     : 'Click images to select'}
@@ -603,7 +603,7 @@ export default function HomepageManageClient() {
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={handleSelectAllFromProject}
-                                                    className="rounded bg-stone-700 px-3 py-1.5 text-xs text-stone-300 transition-colors hover:bg-stone-600"
+                                                    className="rounded bg-surface-overlay px-3 py-1.5 text-xs text-body-muted transition-colors hover:bg-surface-hover"
                                                 >
                                                     {currentProject.images.filter((img) => !img.alreadyOnHomepage).length ===
                                                         selectedProjectImages.size &&
@@ -614,7 +614,7 @@ export default function HomepageManageClient() {
                                                 <button
                                                     onClick={handleAddSelectedToHomepage}
                                                     disabled={selectedProjectImages.size === 0 || isAdding}
-                                                    className="rounded bg-primary px-4 py-1.5 text-xs font-medium text-stone-900 transition-colors hover:bg-primary_dark disabled:cursor-not-allowed disabled:opacity-50"
+                                                    className="rounded bg-primary px-4 py-1.5 text-xs font-medium text-body-inverse transition-colors hover:bg-primary_dark disabled:cursor-not-allowed disabled:opacity-50"
                                                 >
                                                     {isAdding ? (
                                                         <Loader2 size={14} className="inline animate-spin" />
@@ -658,15 +658,15 @@ export default function HomepageManageClient() {
 
                                                         {/* Selection check */}
                                                         {isSelected && (
-                                                            <div className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-stone-900">
+                                                            <div className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-body-inverse">
                                                                 <Check size={14} />
                                                             </div>
                                                         )}
 
                                                         {/* Already added overlay */}
                                                         {alreadyAdded && (
-                                                            <div className="absolute inset-0 flex items-center justify-center bg-stone-900/50">
-                                                                <span className="rounded bg-stone-700 px-2 py-1 text-xs text-stone-300">
+                                                            <div className="absolute inset-0 flex items-center justify-center bg-surface/50">
+                                                                <span className="rounded bg-surface-overlay px-2 py-1 text-xs text-body-muted">
                                                                     Already Added
                                                                 </span>
                                                             </div>
@@ -678,7 +678,7 @@ export default function HomepageManageClient() {
                                     )}
 
                                     {currentProject && currentProject.images.length === 0 && (
-                                        <div className="py-12 text-center text-stone-500">
+                                        <div className="py-12 text-center text-body-subtle">
                                             This project has no images yet.
                                         </div>
                                     )}
@@ -697,14 +697,14 @@ export default function HomepageManageClient() {
                                 />
 
                                 <div>
-                                    <label className="mb-1 block text-sm font-medium text-stone-300">
+                                    <label className="mb-1 block text-sm font-medium text-body-muted">
                                         Caption (optional)
                                     </label>
                                     <input
                                         type="text"
                                         value={uploadCaption}
                                         onChange={(e) => setUploadCaption(e.target.value)}
-                                        className="w-full rounded-lg border border-stone-600 bg-stone-700 px-3 py-2 text-stone-100 focus:border-primary focus:outline-none"
+                                        className="w-full rounded-lg border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
                                         placeholder="Enter a caption for this image..."
                                     />
                                 </div>
@@ -723,7 +723,7 @@ export default function HomepageManageClient() {
                             </div>
 
                             {/* Preview */}
-                            <div className="flex aspect-[16/10] items-center justify-center overflow-hidden rounded-xl bg-stone-800">
+                            <div className="flex aspect-[16/10] items-center justify-center overflow-hidden rounded-xl bg-surface-raised">
                                 {pendingUpload ? (
                                     <Image
                                         src={pendingUpload.originalImageUrl}
@@ -734,7 +734,7 @@ export default function HomepageManageClient() {
                                         sizes="50vw"
                                     />
                                 ) : (
-                                    <div className="text-center text-stone-500">
+                                    <div className="text-center text-body-subtle">
                                         <Upload size={48} className="mx-auto mb-3 opacity-40" />
                                         <p>Upload an image to see preview</p>
                                     </div>

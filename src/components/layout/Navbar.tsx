@@ -1,56 +1,57 @@
 'use client';
 
-import React, { useEffect, useCallback, useTransition, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { Menu } from 'lucide-react';
 
-import { navbar_menu_list } from '@/lib/menu_list';
+import { PRIMARY_CTA, PRIMARY_NAV } from '@/lib/menu_list';
+import { track } from '@/lib/analytics';
 import { useStore } from '@/stores/store';
-import { IoIosMenu } from 'react-icons/io';
 import { useIsAdmin } from '@/utils/auth/useIsAdmin';
 
-import dynamic from 'next/dynamic';
-const DynamicMenuOverlay = dynamic(() => import('./menu/MenuOverlay'), { ssr: false });
+import MobileNavPanel from './nav/MobileNavPanel';
+import NavDropdown from './nav/NavDropdown';
+import { CTA_CLASSES, NAV_LINK_ACTIVE, NAV_LINK_CLASSES, NAV_LINK_IDLE } from './nav/nav.constants';
 
 export default function Navbar({ page }: { page: string }) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
-    const [isPending, startTransition] = useTransition();
     const [showMenu, setShowMenu] = useState(false);
     const isAdmin = useIsAdmin();
 
-    const selectedComponent = useStore((state) => state.selectedComponent);
     const setSelectedComponent = useStore((state) => state.setSelectedComponent);
 
     const updateUrlWithoutNavigation = useCallback(
         (newValue: string) => {
-            startTransition(() => {
-                const params = new URLSearchParams(searchParams);
-                if (newValue) {
-                    params.set('component', newValue);
-                } else {
-                    params.delete('component');
-                }
-                const newUrl = `${pathname}${params.toString() ? `?${params.toString()}` : ''}`;
-                window.history.pushState(null, '', newUrl);
-            });
+            const params = new URLSearchParams(searchParams);
+            if (newValue) {
+                params.set('component', newValue);
+            } else {
+                params.delete('component');
+            }
+            window.history.pushState(null, '', `${pathname}${params.toString() ? `?${params.toString()}` : ''}`);
         },
         [searchParams, pathname],
     );
 
-    const handleClick = useCallback(
-        (menu_class_name: string) => {
-            if (menu_class_name === 'contact') {
-                router.push('/contact');
+    /**
+     * Section links keep a real href so they work without JS and can be opened in a new tab.
+     * When we are already on the homepage the click is intercepted to scroll instead of reload.
+     */
+    const handleSectionClick = useCallback(
+        (event: React.MouseEvent<HTMLAnchorElement>, section: string) => {
+            if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+
+            event.preventDefault();
+            setSelectedComponent(`${section}_${Date.now()}`);
+
+            if (page !== 'home') {
+                router.push(`/?component=${section}`);
             } else {
-                const updatedComponent = `${menu_class_name}_${Date.now()}`;
-                setSelectedComponent(updatedComponent);
-                if (page !== 'home') {
-                    router.push('/?component=' + menu_class_name);
-                } else {
-                    updateUrlWithoutNavigation(menu_class_name);
-                }
+                updateUrlWithoutNavigation(section);
             }
         },
         [page, router, setSelectedComponent, updateUrlWithoutNavigation],
@@ -62,57 +63,94 @@ export default function Navbar({ page }: { page: string }) {
         }
     }, [page, searchParams, setSelectedComponent]);
 
-    const navbar = navbar_menu_list.map(([menu_class_name, menu_full_name]) => (
-        <div
-            key={menu_class_name}
-            onClick={() => handleClick(menu_class_name)}
-            className={`h-full cursor-pointer bg-clip-text pb-1 font-bold text-transparent ${
-                menu_class_name === 'testimonials' || menu_class_name === 'portfolio' ? 'hidden xs:flex' : ''
-            } bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400 hover:from-yellow-500 hover:via-amber-600 hover:to-yellow-500`}
-        >
-            {menu_full_name}
-        </div>
-    ));
-
-    const halfLength = Math.ceil(navbar.length / 2);
-    const leftNavbar = navbar.slice(0, halfLength);
-    const rightNavbar = navbar.slice(halfLength);
+    const activeSection = pathname === '/' ? searchParams.get('component') : null;
+    const activeId =
+        PRIMARY_NAV.find((item) =>
+            item.section
+                ? item.section === activeSection
+                : pathname === item.href || pathname.startsWith(`${item.href}/`),
+        )?.id ?? null;
 
     return (
-        <nav className="h-[50px] w-full bg-stone-900 p-0">
-            <div className="flex flex-row items-center justify-between">
-                <div className="mx-4 flex pb-1 md:hidden" onClick={() => handleClick('home')}>
-                    <Image
-                        src="/logo/CCS_logo_text.png"
-                        alt="CCS Logo"
-                        width={247}
-                        height={88}
-                        className="max-h-[48px] w-fit object-contain pb-1 pt-2"
-                    />
-                </div>
-                <div className="hidden flex-1 flex-row items-center justify-end space-x-4 md:flex">{leftNavbar}</div>
-                <div className="mx-4 hidden items-center justify-center pb-1 md:flex" onClick={() => handleClick('home')}>
-                    <Image
-                        src="/logo/CCS_logo_text.png"
-                        alt="CCS Logo"
-                        width={247}
-                        height={88}
-                        className="max-h-[48px] w-fit object-contain pb-1 pt-2"
-                    />
-                </div>
-                <div className="hidden flex-1 flex-row items-center justify-start space-x-4 md:flex">{rightNavbar}</div>
-                <div className="flex w-full flex-row items-center justify-end space-x-4 pr-[55px] pt-[10px] md:hidden">{navbar}</div>
-            </div>
-            <div className="group p-0" onMouseEnter={() => setShowMenu(true)} onMouseLeave={() => setShowMenu(false)}>
-                <IoIosMenu
-                    className={`absolute right-0 top-0 h-[50px] w-[50px] fill-primary_dark py-[5px] pr-2 group-hover:fill-primary`}
-                />
-                {showMenu && (
-                    <div className="absolute right-0 top-[50px] z-50 h-fit w-[160px] rounded-bl-md border-b-2 border-l-2 border-primary_dark bg-secondary_light">
-                        <DynamicMenuOverlay currentPage={page} isAdmin={isAdmin} />
+        <>
+            <nav aria-label="Main" className="sticky top-0 z-40 h-16 w-full border-b border-line bg-ink/95 backdrop-blur">
+                <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between gap-4 px-4 sm:px-6">
+                    <Link href="/" aria-label="Capital City Staging home" className="flex shrink-0 items-center">
+                        <Image
+                            src="/logo/CCS_logo_text.png"
+                            alt="Capital City Staging"
+                            width={247}
+                            height={88}
+                            priority
+                            className="h-[38px] w-auto object-contain"
+                        />
+                    </Link>
+
+                    <div className="hidden items-center gap-7 tm:flex">
+                        {PRIMARY_NAV.map((item) => {
+                            const isActive = activeId === item.id;
+
+                            if (item.children) {
+                                return <NavDropdown key={item.id} item={item} isActive={isActive} />;
+                            }
+
+                            return (
+                                <Link
+                                    key={item.id}
+                                    href={item.href}
+                                    onClick={(event) => item.section && handleSectionClick(event, item.section)}
+                                    aria-current={isActive ? 'page' : undefined}
+                                    className={`${NAV_LINK_CLASSES} ${isActive ? NAV_LINK_ACTIVE : NAV_LINK_IDLE}`}
+                                >
+                                    {item.label}
+                                </Link>
+                            );
+                        })}
+
+                        {isAdmin ? (
+                            <Link href="/admin" className={`${NAV_LINK_CLASSES} text-forest-200 hover:text-gold-300`}>
+                                Admin
+                            </Link>
+                        ) : null}
+
+                        <Link
+                            href={PRIMARY_CTA.href}
+                            className={CTA_CLASSES}
+                            onClick={() => track('cta_clicked', { cta: 'get_a_quote', placement: 'nav' })}
+                        >
+                            {PRIMARY_CTA.label}
+                        </Link>
                     </div>
-                )}
-            </div>
-        </nav>
+
+                    <div className="flex items-center gap-2 tm:hidden">
+                        <Link
+                            href={PRIMARY_CTA.href}
+                            className={`${CTA_CLASSES} hidden xs:inline-flex`}
+                            onClick={() => track('cta_clicked', { cta: 'get_a_quote', placement: 'nav_mobile' })}
+                        >
+                            {PRIMARY_CTA.label}
+                        </Link>
+                        <button
+                            type="button"
+                            onClick={() => setShowMenu(true)}
+                            aria-expanded={showMenu}
+                            aria-controls="site-menu"
+                            aria-label="Open menu"
+                            className="grid h-10 w-10 place-items-center rounded-md text-body-muted transition-colors hover:bg-surface-raised hover:text-gold-300"
+                        >
+                            <Menu size={24} aria-hidden="true" />
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <MobileNavPanel
+                open={showMenu}
+                onClose={() => setShowMenu(false)}
+                isAdmin={isAdmin}
+                activeId={activeId}
+                onSectionClick={handleSectionClick}
+            />
+        </>
     );
 }

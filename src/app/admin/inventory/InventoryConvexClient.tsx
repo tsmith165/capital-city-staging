@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -12,19 +12,12 @@ import AddInventoryOverlay from '@/components/AddInventoryOverlay';
 export default function InventoryConvexClient() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [selectedCategory, setSelectedCategory] = useState<string>('');
-    const [searchTerm, setSearchTerm] = useState<string>('');
-    const [selectedItem, setSelectedItem] = useState<string | null>(null);
+    // Seeded from the URL once. The filter handlers below write the URL, so re-syncing state
+    // from `searchParams` on every change would feed the component its own output.
+    const [selectedCategory, setSelectedCategory] = useState<string>(() => searchParams.get('category') || '');
+    const [searchTerm, setSearchTerm] = useState<string>(() => searchParams.get('search') || '');
     const [showAddInventoryOverlay, setShowAddInventoryOverlay] = useState(false);
     const [showItemInfo, setShowItemInfo] = useState<Record<string, boolean>>({});
-
-    // Initialize state from URL params
-    useEffect(() => {
-        const categoryParam = searchParams.get('category') || '';
-        const searchParam = searchParams.get('search') || '';
-        setSelectedCategory(categoryParam);
-        setSearchTerm(searchParam);
-    }, [searchParams]);
 
     // Function to update URL with new params
     const updateURLParams = (category: string, search: string) => {
@@ -56,16 +49,8 @@ export default function InventoryConvexClient() {
     
     const categories = useQuery(api.inventory.getInventoryCategories);
 
-    const handleItemClick = (oId: number) => {
-        router.push(`/admin/edit?id=${oId}`);
-    };
-
     const handleEditItem = (oId: number) => {
         router.push(`/admin/edit?id=${oId}`);
-    };
-
-    const handleEditImages = (inventoryOId: number) => {
-        router.push(`/admin/edit?id=${inventoryOId}`);
     };
 
     const toggleItemInfo = (itemId: string) => {
@@ -78,7 +63,7 @@ export default function InventoryConvexClient() {
     if (inventory === undefined || categories === undefined) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <div className="text-stone-300">Loading inventory...</div>
+                <div className="text-body-muted">Loading inventory...</div>
             </div>
         );
     }
@@ -89,10 +74,10 @@ export default function InventoryConvexClient() {
         <div className="container mx-auto max-w-7xl p-4">
             <div className="mb-6">
                 <div className="flex items-center justify-between mb-4">
-                    <h1 className="text-3xl font-bold text-stone-100">Inventory Management</h1>
+                    <h1 className="text-3xl font-bold text-body">Inventory Management</h1>
                     <button
                         onClick={() => setShowAddInventoryOverlay(true)}
-                        className="flex items-center space-x-2 px-4 py-2 bg-primary hover:bg-primary_dark text-stone-900 hover:text-stone-800 rounded-lg transition-colors font-medium"
+                        className="flex items-center space-x-2 px-4 py-2 bg-primary hover:bg-primary_dark text-body-inverse hover:text-body-inverse rounded-lg transition-colors font-medium"
                         title="Create new inventory item"
                     >
                         <Plus size={20} />
@@ -107,13 +92,13 @@ export default function InventoryConvexClient() {
                         placeholder="Search inventory..."
                         value={searchTerm}
                         onChange={(e) => handleSearchChange(e.target.value)}
-                        className="flex-1 min-w-[200px] rounded border border-stone-600 bg-stone-700 px-3 py-2 text-stone-100 focus:border-primary focus:outline-none"
+                        className="flex-1 min-w-[200px] rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
                     />
                     
                     <select
                         value={selectedCategory}
                         onChange={(e) => handleCategoryChange(e.target.value)}
-                        className="rounded border border-stone-600 bg-stone-700 px-3 py-2 text-stone-100 focus:border-primary focus:outline-none"
+                        className="rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
                     >
                         <option value="">All Categories</option>
                         {categories.map(category => (
@@ -130,13 +115,13 @@ export default function InventoryConvexClient() {
                     {filteredInventory.map((item) => (
                         <div
                             key={item._id}
-                            className="bg-stone-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
+                            className="bg-surface-raised rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
                         >
                             {/* Image or Info Display */}
                             <div className="relative h-48">
                                 {showItemInfo[item._id] ? (
                                     // Show item info
-                                    <div className="flex h-full flex-col justify-start bg-gradient-to-br from-stone-800 to-stone-900 p-4 text-stone-100">
+                                    <div className="flex h-full flex-col justify-start bg-gradient-to-br from-stone-800 to-stone-900 p-4 text-body">
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between">
                                                 <div className="text-sm font-bold text-primary">${item.price}</div>
@@ -151,19 +136,19 @@ export default function InventoryConvexClient() {
                                                     <span className="text-[10px]">Edit</span>
                                                 </button>
                                             </div>
-                                            <div className="text-xs text-stone-300">
+                                            <div className="text-xs text-body-muted">
                                                 <span className="font-medium">Size:</span> {item.realWidth}" × {item.realHeight}" × {item.realDepth}"
                                             </div>
-                                            <div className="text-xs text-stone-300">
+                                            <div className="text-xs text-body-muted">
                                                 <span className="font-medium">Available:</span> {item.count - item.inUse} of {item.count}
                                             </div>
                                             {item.location && (
-                                                <div className="text-xs text-stone-400">
+                                                <div className="text-xs text-body-subtle">
                                                     📍 {item.location}
                                                 </div>
                                             )}
                                             {item.description && (
-                                                <div className="text-xs text-stone-400 border-t border-stone-700 pt-2">
+                                                <div className="text-xs text-body-subtle border-t border-line pt-2">
                                                     {item.description}
                                                 </div>
                                             )}
@@ -192,11 +177,11 @@ export default function InventoryConvexClient() {
                             </div>
                             
                             <div className="p-4">
-                                <h3 className="font-semibold text-stone-100 mb-3 truncate">{item.name}</h3>
+                                <h3 className="font-semibold text-body mb-3 truncate">{item.name}</h3>
                                 
                                 {/* Availability and buttons on same row */}
                                 <div className="flex items-center justify-between">
-                                    <div className="text-xs text-stone-400">
+                                    <div className="text-xs text-body-subtle">
                                         <span>Available: {item.count - item.inUse} / {item.count}</span>
                                     </div>
                                     
@@ -218,7 +203,7 @@ export default function InventoryConvexClient() {
                                                 e.stopPropagation();
                                                 handleEditItem(item.oId);
                                             }}
-                                            className="w-6 h-6 rounded border border-primary bg-transparent text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-stone-300 flex items-center justify-center"
+                                            className="w-6 h-6 rounded border border-primary bg-transparent text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-body-muted flex items-center justify-center"
                                             data-tooltip-id="edit-tooltip"
                                             data-tooltip-content="Edit item"
                                         >
@@ -233,10 +218,10 @@ export default function InventoryConvexClient() {
 
                 {filteredInventory.length === 0 && (
                     <div className="text-center py-12">
-                        <p className="text-stone-400 text-lg">No inventory items found</p>
+                        <p className="text-body-subtle text-lg">No inventory items found</p>
                         <button
                             onClick={() => setShowAddInventoryOverlay(true)}
-                            className="mt-4 rounded border-2 bg-transparent border-primary text-primary px-6 py-2 font-medium transition-colors hover:bg-secondary hover:border-secondary hover:text-stone-300"
+                            className="mt-4 rounded border-2 bg-transparent border-primary text-primary px-6 py-2 font-medium transition-colors hover:bg-secondary hover:border-secondary hover:text-body-muted"
                         >
                             Add First Item
                         </button>
@@ -248,7 +233,7 @@ export default function InventoryConvexClient() {
             {showAddInventoryOverlay && (
                 <AddInventoryOverlay
                     onClose={() => setShowAddInventoryOverlay(false)}
-                    onSuccess={(oId) => {
+                    onSuccess={() => {
                         // Refresh the inventory list to show the new item
                         router.refresh();
                     }}

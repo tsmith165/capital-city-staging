@@ -1,67 +1,39 @@
-export interface MenuItem {
+export interface NavItem {
     id: string;
     label: string;
-    url: string;
-    subMenu?: MenuItem[];
+    href: string;
+    /** Homepage sections scroll in place when you are already on the homepage. */
+    section?: string;
+    children?: NavItem[];
 }
 
-export const navbar_menu_list: [string, string][] = [
-    ['portfolio', 'Portfolio'],
-    ['where', 'Where'],
-    ['services', 'Services'],
-    ['contact', 'Contact'],
-];
-
-export const menu_list: MenuItem[] = [
-    { id: 'portfolio', label: 'Portfolio', url: '/?component=portfolio' },
-    { id: 'where', label: 'Where', url: '/?component=where' },
-    { id: 'services', label: 'Services', url: '/?component=services' },
-    { id: 'contact', label: 'Contact', url: '/contact' },
+/**
+ * One source for the header, the mobile panel and the footer. The site previously kept three
+ * overlapping lists: a tuple array for the navbar, a nested list for the dropdown menu, and a
+ * separate admin copy that had already drifted from the real admin routes.
+ */
+export const PRIMARY_NAV: NavItem[] = [
+    { id: 'services', label: 'Services', href: '/?component=services', section: 'services' },
+    { id: 'portfolio', label: 'Portfolio', href: '/?component=portfolio', section: 'portfolio' },
+    { id: 'where', label: 'Where We Work', href: '/?component=where', section: 'where' },
     {
         id: 'info',
         label: 'Articles',
-        url: '/info',
-        subMenu: [
-            { id: 'staging-tips', label: 'Staging Tips', url: '/info/home-staging-tips' },
-            { id: 'statistics', label: 'Statistics', url: '/info/home-staging-statistics' },
-            { id: 'buyer-psychology', label: 'Buyer Psychology', url: '/info/understanding-buyer-psychology' },
-            { id: 'cost-analysis', label: 'Cost Analysis', url: '/info/cost-vs-value-analysis' },
-            { id: 'staging-benefits', label: 'Staging Benefits', url: '/info/benefits-of-home-staging' },
+        href: '/info',
+        children: [
+            { id: 'staging-tips', label: 'Staging Tips', href: '/info/home-staging-tips' },
+            { id: 'statistics', label: 'Statistics', href: '/info/home-staging-statistics' },
+            { id: 'buyer-psychology', label: 'Buyer Psychology', href: '/info/understanding-buyer-psychology' },
+            { id: 'cost-analysis', label: 'Cost vs. Value', href: '/info/cost-vs-value-analysis' },
+            { id: 'staging-benefits', label: 'Staging Benefits', href: '/info/benefits-of-home-staging' },
         ],
     },
 ];
 
-export const admin_menu_list: MenuItem[] = [
-    ...menu_list,
-    {
-        id: 'projects',
-        label: 'Projects',
-        url: '/admin/projects',
-        subMenu: [
-            { id: 'all-projects', label: 'All Projects', url: '/admin/projects' },
-            { id: 'new-project', label: 'New Project', url: '/admin/projects/new' },
-            { id: 'edit-project', label: 'Edit Project', url: '/admin/projects/edit' },
-        ],
-    },
-    {
-        id: 'inventory',
-        label: 'Inventory',
-        url: '/admin/inventory',
-        subMenu: [
-            { id: 'all-inventory', label: 'All Inventory', url: '/admin/inventory' },
-            { id: 'edit-details', label: 'Edit Details', url: '/admin/inventory/edit' },
-        ],
-    },
-    { id: 'users', label: 'Users', url: '/admin/users' },
-    {
-        id: 'manage',
-        label: 'Manage',
-        url: '/admin/manage',
-        subMenu: [
-            { id: 'manage-inventory', label: 'Inventory', url: '/admin/manage' },
-            { id: 'manage-homepage', label: 'Homepage', url: '/admin/manage/homepage' },
-        ],
-    },
-];
+export const PRIMARY_CTA = { label: 'Get a Quote', href: '/contact' } as const;
 
-export default { navbar_menu_list, menu_list, admin_menu_list };
+export const CONTACT_DETAILS = {
+    phone: '(209) 817-4240',
+    phoneHref: 'tel:+12098174240',
+    email: 'mdofflemyer.realestate@gmail.com',
+} as const;

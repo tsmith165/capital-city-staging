@@ -1,54 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { MdArrowForwardIos, MdArrowBackIos } from 'react-icons/md';
-import { statistics } from '../../lib/statistics';
+import React from 'react';
 
-function shuffleArray<T>(array: T[]): T[] {
-    const shuffledArray = [...array];
-    for (let i = shuffledArray.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
-    }
-    return shuffledArray;
-}
+import { statistics } from '@/lib/statistics';
 
-export default function Statistics({ arrows }: { arrows?: boolean }) {
-    const [current, setCurrent] = useState(0);
-    const [shuffledStats, setShuffledStats] = useState(statistics);
-
-    const nextStat = () => setCurrent((prev) => (prev + 1) % shuffledStats.length);
-    const prevStat = () => setCurrent((prev) => (prev - 1 + shuffledStats.length) % shuffledStats.length);
-
-    useEffect(() => {
-        setShuffledStats(shuffleArray(statistics));
-    }, []);
-
-    useEffect(() => {
-        const interval = setInterval(nextStat, 5000);
-        return () => clearInterval(interval);
-    }, [shuffledStats]);
-
+/**
+ * What staging does to buyer behaviour, with the numbers attributed. Shallower vertical padding
+ * than the surrounding sections: a single row of numbers does not need 160px of air around it.
+ */
+export default function Statistics() {
     return (
-        <div className="relative flex max-h-full min-h-full w-full items-center justify-center p-4">
-            {arrows && (
-                <button
-                    onClick={prevStat}
-                    className="absolute left-4 flex items-center justify-center font-bold text-secondary hover:text-secondary_light"
-                >
-                    <MdArrowBackIos size={48} />
-                </button>
-            )}
-            <div className="flex-grow px-2 text-center md:px-16">
-                <div className="text-3xl font-bold gradient-gold-main-text md:text-4xl">{`"${shuffledStats[current].text}"`}</div>
-                <div className="mt-2 text-lg gradient-secondary-main-text">{`- ${shuffledStats[current].attributor}`}</div>
-            </div>
-            {arrows && (
-                <button
-                    onClick={nextStat}
-                    className="absolute right-4 flex items-center justify-center font-bold text-secondary hover:text-secondary_light"
-                >
-                    <MdArrowForwardIos size={48} />
-                </button>
-            )}
+        <div className="w-full px-5 py-12 sm:px-8">
+            <section
+                aria-labelledby="staging-impact"
+                className="mx-auto w-full max-w-[1200px] rounded-xl border border-line bg-surface-raised p-7 shadow-card"
+            >
+                <h3 id="staging-impact" className="text-center text-xs font-bold tracking-[0.2em] text-forest-200 uppercase">
+                    How buyers respond
+                </h3>
+
+                {/* Numbers are the one thing on this page that should stay centred. */}
+                <dl className="mx-auto mt-7 grid max-w-3xl gap-8 sm:grid-cols-2">
+                    {statistics.map((stat) => (
+                        <div key={stat.value + stat.claim} className="text-center">
+                            <dt className="font-display text-4xl font-bold gradient-gold-main-text">{stat.value}</dt>
+                            <dd className="mt-2 text-sm text-pretty text-body-muted">
+                                {stat.claim}
+                                <span className="mt-2 block text-xs text-body-subtle">{stat.source}</span>
+                            </dd>
+                        </div>
+                    ))}
+                </dl>
+            </section>
         </div>
     );
 }

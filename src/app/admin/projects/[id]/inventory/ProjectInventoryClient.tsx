@@ -118,7 +118,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
     if (!isLoaded) {
         return (
             <div className="flex min-h-screen items-center justify-center">
-                <div className="text-stone-300">Loading...</div>
+                <div className="text-body-muted">Loading...</div>
             </div>
         );
     }
@@ -128,7 +128,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
         router.push('/sign-in');
         return (
             <div className="flex min-h-screen items-center justify-center">
-                <div className="text-stone-300">Redirecting to login...</div>
+                <div className="text-body-muted">Redirecting to login...</div>
             </div>
         );
     }
@@ -137,7 +137,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
     if (project === undefined || inventory === undefined || projectInventory === undefined) {
         return (
             <div className="flex min-h-screen items-center justify-center">
-                <div className="text-stone-300">Loading project data...</div>
+                <div className="text-body-muted">Loading project data...</div>
             </div>
         );
     }
@@ -145,7 +145,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
     if (project === null) {
         return (
             <div className="flex min-h-screen items-center justify-center">
-                <div className="text-stone-300">Project not found</div>
+                <div className="text-body-muted">Project not found</div>
             </div>
         );
     }
@@ -176,7 +176,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
     return (
         <div className="flex h-[calc(100vh-50px)] flex-col">
             {/* Fixed Header */}
-            <div className="flex-shrink-0 border-b border-stone-700 bg-stone-800">
+            <div className="flex-shrink-0 border-b border-line bg-surface-raised">
                 <div className="container mx-auto max-w-7xl p-4">
                     <div className="mb-4 flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -188,14 +188,14 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                             >
                                 <ChevronLeft size={24} />
                             </button>
-                            <h2 className="text-2xl font-bold text-stone-100">Select Inventory</h2>
-                            <span className="text-sm text-stone-400">(showing {filteredInventory.length} items)</span>
+                            <h2 className="text-2xl font-bold text-body">Select Inventory</h2>
+                            <span className="text-sm text-body-subtle">(showing {filteredInventory.length} items)</span>
                         </div>
 
                         {/* Cart Button */}
                         <button
                             onClick={() => setIsCartOpen(!isCartOpen)}
-                            className="relative flex items-center gap-2 rounded-lg border-2 border-primary bg-transparent px-4 py-2 font-medium text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-stone-300"
+                            className="relative flex items-center gap-2 rounded-lg border-2 border-primary bg-transparent px-4 py-2 font-medium text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-body-muted"
                         >
                             <ShoppingCart size={20} />
                             <span className="hidden sm:inline">Project Cart</span>
@@ -210,19 +210,19 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                     {/* Search and Filter */}
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 transform text-stone-400" size={16} />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 transform text-body-subtle" size={16} />
                             <input
                                 type="text"
                                 placeholder="Search inventory..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full rounded border border-stone-600 bg-stone-700 px-3 py-2 pl-10 text-stone-100 focus:border-primary focus:outline-none"
+                                className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 pl-10 text-body focus:border-primary focus:outline-none"
                             />
                         </div>
                         <select
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="w-full rounded border border-stone-600 bg-stone-700 px-3 py-2 text-stone-100 focus:border-primary focus:outline-none"
+                            className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
                         >
                             <option value="">All Categories</option>
                             {categories.map((category) => (
@@ -236,12 +236,12 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto bg-stone-900">
+            <div className="flex-1 overflow-y-auto bg-surface">
                 <div className="container mx-auto max-w-7xl">
                     {/* Inventory Grid */}
                     <div className="p-6">
                         {filteredInventory.length === 0 ? (
-                            <div className="py-12 text-center text-stone-400">
+                            <div className="py-12 text-center text-body-subtle">
                                 <Package size={48} className="mx-auto mb-4 opacity-50" />
                                 <p>No available inventory found</p>
                                 {searchTerm && (
@@ -259,13 +259,13 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                     return (
                                         <div
                                             key={item._id}
-                                            className="overflow-hidden rounded-lg bg-stone-700 transition-colors hover:bg-stone-600"
+                                            className="overflow-hidden rounded-lg bg-surface-overlay transition-colors hover:bg-surface-hover"
                                         >
                                             {/* Item Image or Info Display */}
                                             <div className="relative aspect-square">
                                                 {showItemInfo[item._id] ? (
                                                     // Show item info
-                                                    <div className="h-full p-4 bg-stone-800 text-stone-100 text-xs overflow-auto">
+                                                    <div className="h-full p-4 bg-surface-raised text-body text-xs overflow-auto">
                                                         <div className="space-y-2">
                                                             <div><span className="font-semibold">Price:</span> ${item.price}</div>
                                                             <div><span className="font-semibold">Cost:</span> ${item.cost || 'N/A'}</div>
@@ -293,13 +293,13 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                                             {item.category}
                                                         </div>
                                                         {/* Quantity available tag */}
-                                                        <div className="absolute left-2 top-2 rounded bg-black bg-opacity-70 px-2 py-1 text-xs font-medium text-white">
+                                                        <div className="absolute left-2 top-2 rounded bg-black/70 px-2 py-1 text-xs font-medium text-white">
                                                             {available}
                                                         </div>
                                                         {/* Enlarge button */}
                                                         <button
                                                             onClick={() => setSelectedImage(item.imagePath)}
-                                                            className="absolute bottom-2 right-2 rounded bg-black bg-opacity-70 p-1 text-white transition-opacity hover:bg-opacity-90"
+                                                            className="absolute bottom-2 right-2 rounded bg-black/70 p-1 text-white transition-colors hover:bg-black/90"
                                                         >
                                                             <ZoomIn size={14} />
                                                         </button>
@@ -308,7 +308,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                             </div>
 
                                             <div className="p-4">
-                                                <h3 className="mb-3 line-clamp-2 min-h-[2.5rem] font-medium text-stone-100">{item.name}</h3>
+                                                <h3 className="mb-3 line-clamp-2 min-h-[2.5rem] font-medium text-body">{item.name}</h3>
 
                                                 {(() => {
                                                     const cartAssignment = getItemCartAssignment(item._id);
@@ -342,7 +342,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                                         return (
                                                             <button
                                                                 onClick={() => handleAssignInventory(item._id)}
-                                                                className="w-full rounded border-2 border-primary bg-transparent px-3 py-2 text-sm font-medium text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-stone-300"
+                                                                className="w-full rounded border-2 border-primary bg-transparent px-3 py-2 text-sm font-medium text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-body-muted"
                                                             >
                                                                 Add to Project
                                                             </button>
@@ -361,12 +361,12 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                                                             [item._id]: parseInt(e.target.value) || 1,
                                                                         })
                                                                     }
-                                                                    className="w-16 rounded border border-stone-600 bg-stone-600 px-2 py-1 text-center text-stone-100 focus:border-primary focus:outline-none"
+                                                                    className="w-16 rounded border border-line-strong bg-surface-hover px-2 py-1 text-center text-body focus:border-primary focus:outline-none"
                                                                 />
                                                                 <button
                                                                     onClick={() => handleAssignInventory(item._id)}
                                                                     disabled={quantity > available}
-                                                                    className="flex-1 rounded border-2 border-primary bg-transparent px-3 py-1 text-sm font-medium text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-stone-300 disabled:cursor-not-allowed disabled:opacity-50"
+                                                                    className="flex-1 rounded border-2 border-primary bg-transparent px-3 py-1 text-sm font-medium text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-body-muted disabled:cursor-not-allowed disabled:opacity-50"
                                                                 >
                                                                     Add to Project
                                                                 </button>
@@ -389,23 +389,23 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                 {isCartOpen && (
                     <>
                         {/* Backdrop */}
-                        <div className="fixed inset-0 z-40 bg-black bg-opacity-50" onClick={() => setIsCartOpen(false)} />
+                        <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setIsCartOpen(false)} />
 
                         {/* Sidebar */}
-                        <div className="fixed right-0 top-0 z-50 flex h-full w-full transform flex-col overflow-hidden bg-stone-800 shadow-2xl transition-transform duration-300 ease-in-out sm:w-3/5 lg:w-2/5 xl:w-1/3">
+                        <div className="fixed right-0 top-0 z-50 flex h-full w-full transform flex-col overflow-hidden bg-surface-raised shadow-2xl transition-transform duration-300 ease-in-out sm:w-3/5 lg:w-2/5 xl:w-1/3">
                             {/* Cart Header */}
-                            <div className="border-b border-stone-700 p-6">
+                            <div className="border-b border-line p-6">
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center gap-3">
                                         <ShoppingCart className="text-primary" size={24} />
-                                        <h2 className="text-2xl font-bold text-stone-100">Project Cart</h2>
-                                        <span className="text-sm text-stone-400">
+                                        <h2 className="text-2xl font-bold text-body">Project Cart</h2>
+                                        <span className="text-sm text-body-subtle">
                                             ({cartItems.length} items)
                                         </span>
                                     </div>
                                     <button
                                         onClick={() => setIsCartOpen(false)}
-                                        className="rounded-lg p-2 text-stone-400 transition-colors hover:bg-stone-700 hover:text-stone-200"
+                                        className="rounded-lg p-2 text-body-subtle transition-colors hover:bg-surface-overlay hover:text-body"
                                     >
                                         <X size={20} />
                                     </button>
@@ -416,7 +416,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                     <select
                                         value={cartCategoryFilter}
                                         onChange={(e) => setCartCategoryFilter(e.target.value)}
-                                        className="w-full rounded border border-stone-600 bg-stone-700 px-3 py-2 text-stone-100 focus:border-primary focus:outline-none"
+                                        className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
                                     >
                                         <option value="">All Categories ({cartItems.length} items)</option>
                                         {cartCategories.map((category) => (
@@ -432,7 +432,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                             <div className="flex-1 overflow-y-auto">
                                 <div className="p-6">
                                     {filteredCartItems.length === 0 ? (
-                                        <div className="py-12 text-center text-stone-400">
+                                        <div className="py-12 text-center text-body-subtle">
                                             <ShoppingCart size={48} className="mx-auto mb-4 opacity-50" />
                                             {cartCategoryFilter ? (
                                                 <>
@@ -456,7 +456,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                             {filteredCartItems.map((assignment) => (
                                                 <div
                                                     key={assignment._id}
-                                                    className="relative rounded-lg bg-stone-700 transition-colors hover:bg-stone-600"
+                                                    className="relative rounded-lg bg-surface-overlay transition-colors hover:bg-surface-hover"
                                                 >
                                                     <div className="flex h-20">
                                                         {/* Item Image - Full Height */}
@@ -469,7 +469,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                                                 sizes="80px"
                                                             />
                                                             {/* Zoom overlay on hover */}
-                                                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
+                                                            <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/30 flex items-center justify-center">
                                                                 <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity" size={16} />
                                                             </div>
                                                         </div>
@@ -477,12 +477,12 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                                         {/* Item Details */}
                                                         <div className="flex-1 p-3 flex flex-col justify-between">
                                                             <div>
-                                                                <h3 className="font-medium text-stone-100 leading-tight line-clamp-2">
+                                                                <h3 className="font-medium text-body leading-tight line-clamp-2">
                                                                     {assignment.inventory?.name}
                                                                 </h3>
                                                             </div>
                                                             <div className="flex items-center justify-between">
-                                                                <div className="flex items-center gap-2 text-sm text-stone-300">
+                                                                <div className="flex items-center gap-2 text-sm text-body-muted">
                                                                     <span className="bg-secondary text-white px-2 py-1 rounded text-xs font-medium">
                                                                         {assignment.inventory?.category}
                                                                     </span>
@@ -493,7 +493,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                                                             setOverlayQuantity(assignment.quantity);
                                                                             setQuantityOverlay(quantityOverlay === assignment._id ? null : assignment._id);
                                                                         }}
-                                                                        className="bg-secondary text-white px-2 py-1 rounded text-xs font-medium hover:bg-opacity-80 cursor-pointer transition-colors"
+                                                                        className="cursor-pointer rounded bg-forest-400 px-2 py-1 text-xs font-medium text-body transition-colors hover:bg-forest-300"
                                                                     >
                                                                         Quantity: {assignment.quantity}
                                                                     </button>
@@ -512,14 +512,14 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                                                 const hasChanged = overlayQuantity !== currentQuantity;
                                                                 
                                                                 return (
-                                                                    <div ref={overlayRef} className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-stone-800 border border-stone-600 rounded-md p-2 shadow-lg z-[100] w-48">
+                                                                    <div ref={overlayRef} className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-surface-raised border border-line-strong rounded-md p-2 shadow-lg z-[100] w-48">
                                                                         <div className="mb-2">
-                                                                            <div className="text-xs text-stone-200 font-medium mb-1 text-center">
+                                                                            <div className="text-xs text-body font-medium mb-1 text-center">
                                                                                 Update quantity (max {maxAvailable})
                                                                             </div>
                                                                             <div className="flex justify-between items-center mb-1">
-                                                                                <span className="text-xs text-stone-400">1</span>
-                                                                                <span className="text-xs text-stone-400">{maxAvailable}</span>
+                                                                                <span className="text-xs text-body-subtle">1</span>
+                                                                                <span className="text-xs text-body-subtle">{maxAvailable}</span>
                                                                             </div>
                                                                             <input
                                                                                 type="range"
@@ -529,7 +529,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                                                                 onChange={(e) => {
                                                                                     setOverlayQuantity(parseInt(e.target.value));
                                                                                 }}
-                                                                                className="w-full h-1.5 bg-stone-700 rounded appearance-none cursor-pointer"
+                                                                                className="w-full h-1.5 bg-surface-overlay rounded appearance-none cursor-pointer"
                                                                                 style={{
                                                                                     background: `linear-gradient(to right, #10b981 0%, #10b981 ${((overlayQuantity - 1) / (maxAvailable - 1)) * 100}%, #374151 ${((overlayQuantity - 1) / (maxAvailable - 1)) * 100}%, #374151 100%)`
                                                                                 }}
@@ -547,7 +547,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                                                                 className={`flex-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
                                                                                     hasChanged 
                                                                                         ? 'bg-primary text-white hover:bg-primary_dark' 
-                                                                                        : 'bg-stone-600 text-stone-400 hover:bg-stone-500'
+                                                                                        : 'bg-surface-hover text-body-subtle hover:bg-stone-500'
                                                                                 }`}
                                                                                 data-tooltip-id="update-tooltip"
                                                                                 data-tooltip-content={hasChanged ? `Update quantity to ${overlayQuantity}` : 'Close overlay'}
@@ -577,9 +577,9 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
 
                             {/* Cart Footer - Total */}
                             {cartItems.length > 0 && (
-                                <div className="bg-stone-750 border-t border-stone-700 p-6">
+                                <div className="bg-surface-raised border-t border-line p-6">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-lg font-medium text-stone-200">
+                                        <span className="text-lg font-medium text-body">
                                             {cartCategoryFilter ? `${cartCategoryFilter} Total:` : 'Total Project Cost:'}
                                         </span>
                                         <span className="text-xl font-bold text-primary">
@@ -593,7 +593,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                         <div className="text-center mt-2">
                                             <button
                                                 onClick={() => setCartCategoryFilter('')}
-                                                className="text-sm text-stone-400 hover:text-primary transition-colors"
+                                                className="text-sm text-body-subtle hover:text-primary transition-colors"
                                             >
                                                 View all items (${cartItems.reduce((sum, a) => sum + a.quantity * a.pricePerItem, 0).toFixed(2)} total)
                                             </button>
@@ -609,7 +609,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                 {selectedImage && (
                     <>
                         <div
-                            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4"
+                            className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4"
                             onClick={() => setSelectedImage(null)}
                         >
                             <div className="relative max-h-full max-w-4xl">
@@ -622,7 +622,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                 />
                                 <button
                                     onClick={() => setSelectedImage(null)}
-                                    className="absolute right-4 top-4 rounded-full bg-black bg-opacity-50 p-2 text-white transition-opacity hover:bg-opacity-75"
+                                    className="absolute right-4 top-4 rounded-full bg-black/50 p-2 text-white transition-colors hover:bg-black/75"
                                 >
                                     <X size={20} />
                                 </button>

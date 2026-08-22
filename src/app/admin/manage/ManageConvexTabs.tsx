@@ -26,7 +26,7 @@ export default function ManageConvexTabs() {
     if (!inventory || !archivedInventory || !allInventory) {
         return (
             <div className="flex h-full w-full items-center justify-center">
-                <div className="text-stone-400">Loading inventory...</div>
+                <div className="text-body-subtle">Loading inventory...</div>
             </div>
         );
     }
@@ -109,7 +109,7 @@ export default function ManageConvexTabs() {
     const renderInventoryItem = (item: any, index: number, isArchived: boolean = false) => (
         <div 
             key={item._id}
-            className="flex items-center border-b border-stone-700 py-3 hover:bg-stone-800/50 transition-colors"
+            className="flex items-center border-b border-line py-3 hover:bg-surface-raised/50 transition-colors"
         >
             {/* Image */}
             <div className="w-32 h-20 relative mr-4">
@@ -124,11 +124,11 @@ export default function ManageConvexTabs() {
             
             {/* Item Details */}
             <div className="flex-grow">
-                <h3 className="text-stone-100 font-medium">{item.name}</h3>
-                <p className="text-stone-400 text-sm">
+                <h3 className="text-body font-medium">{item.name}</h3>
+                <p className="text-body-subtle text-sm">
                     {item.category} • ${item.price} • Count: {item.count}
                 </p>
-                <p className="text-stone-500 text-xs">
+                <p className="text-body-subtle text-xs">
                     In Use: {item.inUse} • Location: {item.location || 'N/A'}
                 </p>
             </div>
@@ -139,7 +139,7 @@ export default function ManageConvexTabs() {
                     <>
                         <button
                             onClick={() => handleMoveUp(index)}
-                            className="p-2 rounded bg-stone-600 text-stone-300 hover:bg-secondary hover:text-white"
+                            className="p-2 rounded bg-surface-hover text-body-muted hover:bg-secondary hover:text-white"
                             data-tooltip-id={`move-up-${item._id}`}
                             data-tooltip-content="Move up in order (wraps to end)"
                         >
@@ -153,7 +153,7 @@ export default function ManageConvexTabs() {
                         
                         <button
                             onClick={() => handleMoveDown(index)}
-                            className="p-2 rounded bg-stone-600 text-stone-300 hover:bg-secondary hover:text-white"
+                            className="p-2 rounded bg-surface-hover text-body-muted hover:bg-secondary hover:text-white"
                             data-tooltip-id={`move-down-${item._id}`}
                             data-tooltip-content="Move down in order (wraps to start)"
                         >
@@ -164,7 +164,7 @@ export default function ManageConvexTabs() {
                 
                 <Link
                     href={`/admin/edit?id=${item.oId}`}
-                    className="p-2 rounded bg-stone-600 text-stone-300 hover:bg-secondary hover:text-white"
+                    className="p-2 rounded bg-surface-hover text-body-muted hover:bg-secondary hover:text-white"
                     data-tooltip-id={`edit-${item._id}`}
                     data-tooltip-content="Edit this item"
                 >
@@ -174,7 +174,7 @@ export default function ManageConvexTabs() {
                 {isArchived ? (
                     <button
                         onClick={() => handleSetActive(item._id)}
-                        className="p-2 rounded bg-stone-600 text-stone-300 hover:bg-green-600 hover:text-white"
+                        className="p-2 rounded bg-surface-hover text-body-muted hover:bg-green-600 hover:text-white"
                         data-tooltip-id={`restore-${item._id}`}
                         data-tooltip-content="Restore this item"
                     >
@@ -183,7 +183,7 @@ export default function ManageConvexTabs() {
                 ) : (
                     <button
                         onClick={() => handleSetInactive(item._id)}
-                        className="p-2 rounded bg-stone-600 text-stone-300 hover:bg-red-600 hover:text-white"
+                        className="p-2 rounded bg-surface-hover text-body-muted hover:bg-red-600 hover:text-white"
                         data-tooltip-id={`archive-${item._id}`}
                         data-tooltip-content="Archive Item"
                         disabled={item.inUse > 0}
@@ -196,10 +196,10 @@ export default function ManageConvexTabs() {
     );
     
     return (
-        <div className="flex h-full w-full flex-col bg-stone-900">
+        <div className="flex h-full w-full flex-col bg-surface">
             {/* Header */}
-            <div className="p-4 border-b border-stone-700">
-                <h1 className="text-2xl font-bold text-stone-100">Manage Inventory</h1>
+            <div className="p-4 border-b border-line">
+                <h1 className="text-2xl font-bold text-body">Manage Inventory</h1>
             </div>
             
             {/* Tabs */}
@@ -208,8 +208,8 @@ export default function ManageConvexTabs() {
                     onClick={() => setActiveTab('order')}
                     className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${
                         activeTab === 'order'
-                            ? 'bg-stone-800 text-stone-100 border-b-2 border-secondary'
-                            : 'bg-stone-800/50 text-stone-400 hover:bg-stone-800 hover:text-stone-200'
+                            ? 'bg-surface-raised text-body border-b-2 border-secondary'
+                            : 'bg-surface-raised/50 text-body-subtle hover:bg-surface-raised hover:text-body'
                     }`}
                 >
                     Order ({inventory.length})
@@ -218,8 +218,8 @@ export default function ManageConvexTabs() {
                     onClick={() => setActiveTab('archived')}
                     className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${
                         activeTab === 'archived'
-                            ? 'bg-stone-800 text-stone-100 border-b-2 border-secondary'
-                            : 'bg-stone-800/50 text-stone-400 hover:bg-stone-800 hover:text-stone-200'
+                            ? 'bg-surface-raised text-body border-b-2 border-secondary'
+                            : 'bg-surface-raised/50 text-body-subtle hover:bg-surface-raised hover:text-body'
                     }`}
                 >
                     Archived ({archivedInventory.length})
@@ -227,11 +227,11 @@ export default function ManageConvexTabs() {
             </div>
             
             {/* Tab Content */}
-            <div className="flex-grow overflow-y-auto bg-stone-800 mx-4 mb-4 rounded-b-lg p-4">
+            <div className="flex-grow overflow-y-auto bg-surface-raised mx-4 mb-4 rounded-b-lg p-4">
                 {activeTab === 'order' && (
                     <div className="space-y-1">
                         {inventory.length === 0 ? (
-                            <p className="text-stone-400 text-center py-8">No active inventory items</p>
+                            <p className="text-body-subtle text-center py-8">No active inventory items</p>
                         ) : (
                             inventory.map((item, index) => renderInventoryItem(item, index))
                         )}
@@ -241,7 +241,7 @@ export default function ManageConvexTabs() {
                 {activeTab === 'archived' && (
                     <div className="space-y-1">
                         {archivedInventory.length === 0 ? (
-                            <p className="text-stone-400 text-center py-8">No archived inventory items</p>
+                            <p className="text-body-subtle text-center py-8">No archived inventory items</p>
                         ) : (
                             archivedInventory.map((item, index) => renderInventoryItem(item, index, true))
                         )}

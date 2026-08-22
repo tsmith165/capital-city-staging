@@ -20,7 +20,6 @@ interface AddInventoryOverlayProps {
 const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
     onClose,
     onSuccess,
-    defaultAction = 'stay'
 }) => {
     const [imageUrl, setImageUrl] = useState('Not yet uploaded');
     const [width, setWidth] = useState(0);
@@ -120,7 +119,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
         try {
             const nextOId = (mostRecentOId || 0) + 1;
 
-            const inventoryId = await createInventory({
+            await createInventory({
                 oId: nextOId,
                 pId: nextOId,
                 active: true,
@@ -182,17 +181,17 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
 
     return (
         <>
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
-                <div className="relative w-full max-w-3xl mx-4 max-h-[90vh] bg-stone-900 rounded-lg shadow-2xl overflow-hidden">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
+                <div className="relative w-full max-w-3xl mx-4 max-h-[90vh] bg-surface rounded-lg shadow-2xl overflow-hidden">
                     {/* Header */}
-                    <div className="flex items-center justify-between p-6 bg-stone-800 border-b border-stone-700">
+                    <div className="flex items-center justify-between p-6 bg-surface-raised border-b border-line">
                         <h2 className="text-2xl font-bold gradient-secondary-main-text">
                             Create New Inventory
                         </h2>
                         <button
                             onClick={onClose}
                             disabled={isSubmitting}
-                            className="p-2 rounded-full bg-stone-700 hover:bg-stone-600 text-stone-300 hover:text-stone-100 transition-colors disabled:opacity-50"
+                            className="p-2 rounded-full bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body transition-colors disabled:opacity-50"
                             data-tooltip-id="close-btn"
                             data-tooltip-content="Close"
                         >
@@ -205,7 +204,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
                             {/* Preview Section - Left Side */}
                             <div className="p-6 space-y-4">
-                                <div className="aspect-square bg-stone-800 rounded-lg overflow-hidden flex items-center justify-center">
+                                <div className="aspect-square bg-surface-raised rounded-lg overflow-hidden flex items-center justify-center">
                                     {previewUrl ? (
                                         <img
                                             src={previewUrl}
@@ -221,7 +220,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                                             className="w-full h-full object-cover"
                                         />
                                     ) : (
-                                        <div className="text-center text-stone-400">
+                                        <div className="text-center text-body-subtle">
                                             <Upload size={48} className="mx-auto mb-2 opacity-50" />
                                             <p>Image preview will appear here</p>
                                         </div>
@@ -230,13 +229,13 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                                 
                                 {imageUrl && imageUrl !== 'Not yet uploaded' && (
                                     <>
-                                        <div className="grid grid-cols-2 gap-4 text-sm text-stone-400 bg-stone-800 p-4 rounded-lg">
+                                        <div className="grid grid-cols-2 gap-4 text-sm text-body-subtle bg-surface-raised p-4 rounded-lg">
                                             <div>
-                                                <span className="block font-medium text-stone-300">Dimensions:</span>
+                                                <span className="block font-medium text-body-muted">Dimensions:</span>
                                                 <span>{width} × {height}px</span>
                                             </div>
                                             <div>
-                                                <span className="block font-medium text-stone-300">Small:</span>
+                                                <span className="block font-medium text-body-muted">Small:</span>
                                                 <span>{smallWidth} × {smallHeight}px</span>
                                             </div>
                                         </div>
@@ -267,9 +266,9 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                                         <>
                                             {/* Upload Status */}
                                             {isUploading && (
-                                                <div className="flex items-center space-x-2 p-3 bg-stone-800 rounded-lg border border-stone-600">
+                                                <div className="flex items-center space-x-2 p-3 bg-surface-raised rounded-lg border border-line-strong">
                                                     <Loader2 size={20} className="animate-spin text-secondary" />
-                                                    <span className="text-stone-300">Processing image...</span>
+                                                    <span className="text-body-muted">Processing image...</span>
                                                 </div>
                                             )}
                                             
@@ -382,13 +381,13 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                     )}
 
                     {/* Footer */}
-                    <div className="flex justify-between items-center p-6 bg-stone-800 border-t border-stone-700">
+                    <div className="flex justify-between items-center p-6 bg-surface-raised border-t border-line">
                         <div>
                             {imageUrl !== 'Not yet uploaded' && (
                                 <button
                                     onClick={handleResetInputs}
                                     disabled={isSubmitting}
-                                    className="flex items-center space-x-2 px-4 py-2 bg-stone-700 hover:bg-stone-600 text-stone-300 hover:text-stone-100 rounded-lg transition-colors disabled:opacity-50"
+                                    className="flex items-center space-x-2 px-4 py-2 bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body rounded-lg transition-colors disabled:opacity-50"
                                     data-tooltip-id="change-image-btn"
                                     data-tooltip-content="Change the selected image"
                                 >
@@ -402,7 +401,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                             <button
                                 onClick={onClose}
                                 disabled={isSubmitting}
-                                className="px-4 py-2 bg-stone-600 hover:bg-stone-500 text-stone-300 hover:text-stone-100 rounded-lg transition-colors disabled:opacity-50"
+                                className="px-4 py-2 bg-surface-hover hover:bg-stone-500 text-body-muted hover:text-body rounded-lg transition-colors disabled:opacity-50"
                                 data-tooltip-id="cancel-btn"
                                 data-tooltip-content="Cancel creation"
                             >
@@ -414,7 +413,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                                     <button
                                         onClick={() => handleCreateInventory('stay')}
                                         disabled={!isFormValid}
-                                        className="flex items-center space-x-2 px-4 py-2 bg-stone-700 hover:bg-stone-600 text-stone-300 hover:text-stone-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="flex items-center space-x-2 px-4 py-2 bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         data-tooltip-id="create-stay-btn"
                                         data-tooltip-content="Create and stay on current page"
                                     >
@@ -434,7 +433,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                                     <button
                                         onClick={() => handleCreateInventory('edit')}
                                         disabled={!isFormValid}
-                                        className="flex items-center space-x-2 px-4 py-2 bg-secondary hover:bg-secondary_light text-stone-200 hover:text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="flex items-center space-x-2 px-4 py-2 bg-secondary hover:bg-secondary_light text-body hover:text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         data-tooltip-id="create-edit-btn"
                                         data-tooltip-content="Create and go to edit page"
                                     >
@@ -454,7 +453,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                                     <button
                                         onClick={() => handleCreateInventory('view')}
                                         disabled={!isFormValid}
-                                        className="flex items-center space-x-2 px-4 py-2 bg-primary hover:bg-primary_dark text-stone-900 hover:text-stone-800 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="flex items-center space-x-2 px-4 py-2 bg-primary hover:bg-primary_dark text-body-inverse hover:text-body-inverse rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         data-tooltip-id="create-view-btn"
                                         data-tooltip-content="Create and view in inventory"
                                     >

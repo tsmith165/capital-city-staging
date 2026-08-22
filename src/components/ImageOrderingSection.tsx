@@ -56,7 +56,7 @@ const ImageOrderingSection: React.FC<ImageOrderingSectionProps> = ({
         }
     };
 
-    const handleDelete = async (imageId: string | null, position: number) => {
+    const handleDelete = async (imageId: string | null, _position: number) => {
         if (!imageId) return; // Can't delete main image
         
         if (!confirm('Are you sure you want to delete this image? This action cannot be undone.')) {
@@ -85,7 +85,7 @@ const ImageOrderingSection: React.FC<ImageOrderingSectionProps> = ({
     return (
         <>
             <div className="w-full mt-6">
-                <h3 className="text-lg font-semibold text-stone-200 mb-4">Image Order</h3>
+                <h3 className="text-lg font-semibold text-body mb-4">Image Order</h3>
                 <div className="space-y-2">
                     {allImages.map((image, index) => {
                         const position = index + 1;
@@ -95,7 +95,7 @@ const ImageOrderingSection: React.FC<ImageOrderingSectionProps> = ({
                         return (
                             <div
                                 key={`${image.src}-${position}`}
-                                className={`flex items-center p-3 bg-stone-800 rounded-lg transition-opacity ${
+                                className={`flex items-center p-3 bg-surface-raised rounded-lg transition-opacity ${
                                     isProcessing || isDeletingThis ? 'opacity-50' : 'opacity-100'
                                 }`}
                             >
@@ -112,14 +112,14 @@ const ImageOrderingSection: React.FC<ImageOrderingSectionProps> = ({
 
                                 {/* Position Badge */}
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3 ${
-                                    image.isMain ? 'bg-secondary' : 'bg-stone-600'
+                                    image.isMain ? 'bg-secondary' : 'bg-surface-hover'
                                 }`}>
                                     {position}
                                 </div>
 
                                 {/* Filename */}
                                 <div className="flex-grow min-w-0">
-                                    <span className="text-stone-200 text-sm truncate block">
+                                    <span className="text-body text-sm truncate block">
                                         {getImageFilename(image.src)}
                                     </span>
                                     {image.isMain && (
@@ -132,7 +132,7 @@ const ImageOrderingSection: React.FC<ImageOrderingSectionProps> = ({
                                     <button
                                         onClick={() => handleMove(position, 'up')}
                                         disabled={isProcessing || isDeletingThis}
-                                        className="w-8 h-8 bg-stone-700 hover:bg-stone-600 rounded flex items-center justify-center text-stone-300 hover:text-stone-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-8 h-8 bg-surface-overlay hover:bg-surface-hover rounded flex items-center justify-center text-body-muted hover:text-body transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         data-tooltip-id={`move-up-${position}`}
                                         data-tooltip-content={`Move ${position === 1 ? 'main image to end (makes next image main)' : 'up one position'}`}
                                     >
@@ -141,7 +141,7 @@ const ImageOrderingSection: React.FC<ImageOrderingSectionProps> = ({
                                     <button
                                         onClick={() => handleMove(position, 'down')}
                                         disabled={isProcessing || isDeletingThis}
-                                        className="w-8 h-8 bg-stone-700 hover:bg-stone-600 rounded flex items-center justify-center text-stone-300 hover:text-stone-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-8 h-8 bg-surface-overlay hover:bg-surface-hover rounded flex items-center justify-center text-body-muted hover:text-body transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         data-tooltip-id={`move-down-${position}`}
                                         data-tooltip-content={`Move ${position === allImages.length ? 'to start (may become main image)' : 'down one position'}`}
                                     >
@@ -152,8 +152,8 @@ const ImageOrderingSection: React.FC<ImageOrderingSectionProps> = ({
                                         disabled={isProcessing || isDeletingThis || image.isMain}
                                         className={`w-8 h-8 rounded flex items-center justify-center transition-colors ${
                                             image.isMain
-                                                ? 'bg-stone-700 text-stone-500 cursor-not-allowed'
-                                                : 'bg-stone-700 hover:bg-red-600 text-stone-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed'
+                                                ? 'bg-surface-overlay text-body-subtle cursor-not-allowed'
+                                                : 'bg-surface-overlay hover:bg-red-600 text-body-muted hover:text-white disabled:opacity-50 disabled:cursor-not-allowed'
                                         }`}
                                         data-tooltip-id={`delete-${position}`}
                                         data-tooltip-content={
@@ -172,7 +172,7 @@ const ImageOrderingSection: React.FC<ImageOrderingSectionProps> = ({
                     })}
                 </div>
                 
-                <div className="mt-3 text-xs text-stone-400">
+                <div className="mt-3 text-xs text-body-subtle">
                     Use the arrows to reorder images. Position #1 is the main image. When you move the main image, the image that takes position #1 becomes the new main image.
                 </div>
             </div>

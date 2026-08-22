@@ -1,173 +1,31 @@
-interface SitemapEntry {
-    url: string;
-    lastModified: Date;
-    changeFrequency: 'yearly' | 'monthly' | 'weekly' | 'daily' | 'hourly' | 'always';
-    priority: number;
-}
+import type { MetadataRoute } from 'next';
+import { SERVICE_AREAS } from '@/components/layout/Footer.constants';
+import { articles } from '@/app/info/articles_spec';
+import { SITE_URL } from '@/lib/structuredData';
 
-export default function sitemap(): SitemapEntry[] {
+const SERVICE_SLUGS = ['home-staging', 'home-decorating'] as const;
+
+export default function sitemap(): MetadataRoute.Sitemap {
+    const lastModified = new Date();
+
     return [
-        {
-            url: 'https://www.capitalcitystaging.com',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 1,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/contact',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 1,
-        },
-
-        // Services pages
-        {
-            url: 'https://www.capitalcitystaging.com/services/home-staging',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
+        { url: SITE_URL, changeFrequency: 'monthly' as const, priority: 1 },
+        { url: `${SITE_URL}/contact`, changeFrequency: 'monthly' as const, priority: 0.9 },
+        { url: `${SITE_URL}/info`, changeFrequency: 'weekly' as const, priority: 0.8 },
+        ...SERVICE_SLUGS.map((slug) => ({
+            url: `${SITE_URL}/services/${slug}`,
+            changeFrequency: 'monthly' as const,
             priority: 0.9,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/services/home-decorating',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.9,
-        },
-
-        // Location pages
-        {
-            url: 'https://www.capitalcitystaging.com/locations/west-sacramento',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
+        })),
+        ...SERVICE_AREAS.map(({ slug }) => ({
+            url: `${SITE_URL}/locations/${slug}`,
+            changeFrequency: 'monthly' as const,
             priority: 0.8,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/locations/sacramento',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/locations/roseville',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/locations/rocklin',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/locations/rio-linda',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/locations/rancho-cordova',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/locations/orangevale',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/locations/north-highlands',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/locations/loomis',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/locations/granite-bay',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/locations/gold-river',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/locations/folsom',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/locations/fair-oaks',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/locations/citrus-heights',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/locations/carmichael',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/locations/antelope',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.8,
-        },
-
-        // Info pages
-        {
-            url: 'https://www.capitalcitystaging.com/info',
-            lastModified: new Date(),
-            changeFrequency: 'weekly',
-            priority: 1,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/info/understanding-buyer-psychology',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
+        })),
+        ...articles.map(({ url }) => ({
+            url: `${SITE_URL}${url}`,
+            changeFrequency: 'monthly' as const,
             priority: 0.7,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/info/home-staging-tips',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.7,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/info/home-staging-statistics',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.7,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/info/cost-vs-value-analysis',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.7,
-        },
-        {
-            url: 'https://www.capitalcitystaging.com/info/benefits-of-home-staging',
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.7,
-        },
-    ];
+        })),
+    ].map((entry) => ({ ...entry, lastModified }));
 }

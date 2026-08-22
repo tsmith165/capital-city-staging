@@ -7,16 +7,6 @@ import { api } from '@/convex/_generated/api';
 import ResizeUploader from '@/app/admin/edit/ResizeUploader';
 import InputTextbox from '@/components/inputs/InputTextbox';
 
-interface NewInventoryData {
-    name: string;
-    imagePath: string;
-    width: number;
-    height: number;
-    smallImagePath: string;
-    smallWidth: number;
-    smallHeight: number;
-}
-
 export default function CreateInventoryConvex() {
     const [imageUrl, setImageUrl] = useState('Not yet uploaded');
     const [width, setWidth] = useState(0);
@@ -78,7 +68,7 @@ export default function CreateInventoryConvex() {
 
             const nextOId = (mostRecentOId || 0) + 1;
 
-            const inventoryId = await createInventory({
+            await createInventory({
                 oId: nextOId,
                 pId: nextOId, // Use same value for pId
                 active: true,
@@ -137,8 +127,8 @@ export default function CreateInventoryConvex() {
     const isFormValid = imageUrl !== 'Not yet uploaded' && title !== 'Not yet uploaded' && !isSubmitting;
 
     return (
-        <div className="flex h-full w-full flex-col items-center justify-center bg-stone-900">
-            <div className="flex w-4/5 flex-col items-center justify-center rounded-lg bg-stone-900">
+        <div className="flex h-full w-full flex-col items-center justify-center bg-surface">
+            <div className="flex w-4/5 flex-col items-center justify-center rounded-lg bg-surface">
                 <div id="header" className="w-fit rounded-t-lg text-center text-4xl font-bold gradient-secondary-main-text">
                     Create New Inventory
                 </div>
@@ -171,7 +161,7 @@ export default function CreateInventoryConvex() {
                             className={
                                 'relative rounded-md px-4 py-1 text-lg font-bold ' +
                                 (isFormValid
-                                    ? ' bg-primary_dark text-stone-300 hover:bg-primary hover:text-stone-950'
+                                    ? ' bg-primary_dark text-body-muted hover:bg-primary hover:text-body-inverse'
                                     : 'cursor-not-allowed bg-stone-300 text-secondary_dark hover:bg-stone-300 hover:text-red-600')
                             }
                         >
@@ -184,7 +174,7 @@ export default function CreateInventoryConvex() {
                             className={
                                 'relative rounded-md px-4 py-1 text-lg font-bold ' +
                                 (isFormValid
-                                    ? ' bg-primary_dark text-stone-300 hover:bg-primary hover:text-stone-950'
+                                    ? ' bg-primary_dark text-body-muted hover:bg-primary hover:text-body-inverse'
                                     : 'cursor-not-allowed bg-stone-300 text-secondary_dark hover:bg-stone-300 hover:text-red-600')
                             }
                         >
@@ -197,7 +187,7 @@ export default function CreateInventoryConvex() {
                             className={
                                 'relative rounded-md px-4 py-1 text-lg font-bold ' +
                                 (isFormValid
-                                    ? ' bg-primary_dark text-stone-300 hover:bg-primary hover:text-stone-950'
+                                    ? ' bg-primary_dark text-body-muted hover:bg-primary hover:text-body-inverse'
                                     : 'cursor-not-allowed bg-stone-300 text-secondary_dark hover:bg-stone-300 hover:text-red-600')
                             }
                         >

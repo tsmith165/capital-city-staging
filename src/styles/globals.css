@@ -1,114 +1,354 @@
-a {
-    color: inherit;
-    text-decoration: none;
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+/*
+ * Capital City Staging design tokens.
+ *
+ * The brand stays exactly where it was: deep forest green and antique gold on a near-black
+ * ground. What changed is the execution. Surfaces, lines, text and state colours are now a
+ * deliberate scale instead of ad hoc hex values, so contrast and elevation stay consistent
+ * across the public site and the admin console.
+ *
+ * The `primary` / `secondary` aliases at the bottom are the original palette names. Several
+ * hundred utility usages depend on them, so they remain first-class tokens rather than being
+ * renamed in the same change that redesigns the surfaces.
+ */
+@theme {
+    /* Type */
+    --font-sans: var(--font-lato-face), ui-sans-serif, system-ui, sans-serif;
+    --font-display: var(--font-alegreya-face), ui-sans-serif, system-ui, sans-serif;
+    --font-lato: var(--font-lato-face), ui-sans-serif, system-ui, sans-serif;
+
+    --text-4xl: 2.25rem;
+    --text-4xl--line-height: 2.75rem;
+
+    /* Ground and surfaces, darkest to lightest */
+    --color-ink: #0a0c0a;
+    --color-surface: #12150f;
+    --color-surface-raised: #1a1f18;
+    --color-surface-overlay: #232a20;
+    --color-surface-hover: #2b3327;
+
+    --color-line: #2c332b;
+    --color-line-strong: #3d473b;
+
+    /* Text */
+    --color-body: #e8e6df;
+    --color-body-muted: #b4b8ae;
+    --color-body-subtle: #868b81;
+    --color-body-inverse: #0a0c0a;
+
+    /* Gold */
+    --color-gold-50: #f7efd5;
+    --color-gold-100: #ead9a4;
+    --color-gold-200: #dcc274;
+    --color-gold-300: #d4af37;
+    --color-gold-400: #b99727;
+    --color-gold-500: #96791c;
+    --color-gold-600: #6d5713;
+
+    /* Green */
+    --color-forest-50: #dcebdd;
+    --color-forest-100: #9dc4a2;
+    --color-forest-200: #6ba372;
+    --color-forest-300: #498352;
+    --color-forest-400: #355e3b;
+    --color-forest-500: #2c4e31;
+    --color-forest-600: #1d3421;
+
+    /* Status */
+    --color-success: #6ba372;
+    --color-success-soft: #16301b;
+    --color-warning: #d9a441;
+    --color-warning-soft: #33260c;
+    --color-danger: #d97066;
+    --color-danger-soft: #341714;
+    --color-info: #6fa8bd;
+    --color-info-soft: #12262d;
+
+    /* Radii */
+    --radius-xs: 0.25rem;
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+
+    /* Elevation. Dark UI reads depth from a lifted surface plus a hairline, not heavy shadow. */
+    --shadow-raised: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-card: 0 4px 16px -4px rgb(0 0 0 / 0.5);
+    --shadow-overlay: 0 24px 48px -12px rgb(0 0 0 / 0.7);
+
+    /* Breakpoints. `tm` is the existing custom nav breakpoint and must not move. */
+    --breakpoint-xs: 480px;
+    --breakpoint-tm: 864px;
+
+    --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+    --animate-fade-in: fade-in 0.5s var(--ease-out-soft) forwards;
+    --animate-rise-in: rise-in 0.5s var(--ease-out-soft) forwards;
+
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes rise-in {
+        from {
+            opacity: 0;
+            transform: translateY(0.75rem);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Original palette names. Retained because ~500 utility usages reference them. */
+    --color-primary: #b99727;
+    --color-primary_dark: #d4af37;
+    --color-secondary_light: #498352;
+    --color-secondary: #355e3b;
+    --color-secondary_dark: #2c4e31;
+    --color-accent_color: #44403c;
+    --color-grey: #d3d3d3;
 }
 
-/* Webkit Scrollbar Styles */
+@utility gradient-primary-main-text {
+    @apply from-primary via-primary_dark to-primary bg-gradient-to-r bg-clip-text text-transparent;
+}
+
+@utility gradient-secondary-main-text {
+    @apply from-secondary via-secondary_light to-secondary bg-gradient-to-r bg-clip-text text-transparent;
+}
+
+@utility gradient-gold-main-text {
+    @apply bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 bg-clip-text text-transparent;
+}
+
+@utility gradient-gold-main {
+    @apply bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400;
+}
+
+/*
+ * Long-form body copy. The service, location and info pages previously repeated a colour
+ * utility on every paragraph, list item and `<strong>`, which is why they drifted apart.
+ * Typography now reads from the tokens in one place.
+ */
+@utility prose-ccs {
+    --tw-prose-body: var(--color-body-muted);
+    --tw-prose-headings: var(--color-gold-300);
+    --tw-prose-lead: var(--color-body-muted);
+    --tw-prose-links: var(--color-gold-300);
+    --tw-prose-bold: var(--color-body);
+    --tw-prose-counters: var(--color-gold-400);
+    --tw-prose-bullets: var(--color-forest-300);
+    --tw-prose-hr: var(--color-line);
+    --tw-prose-quotes: var(--color-body);
+    --tw-prose-quote-borders: var(--color-gold-400);
+    --tw-prose-captions: var(--color-body-subtle);
+    --tw-prose-code: var(--color-body);
+    --tw-prose-pre-code: var(--color-body);
+    --tw-prose-pre-bg: var(--color-surface-raised);
+    --tw-prose-th-borders: var(--color-line-strong);
+    --tw-prose-td-borders: var(--color-line);
+
+    h2 {
+        font-family: var(--font-display);
+        letter-spacing: 0.01em;
+    }
+
+    h3 {
+        color: var(--color-forest-200);
+    }
+
+    a {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+        text-decoration-color: color-mix(in srgb, var(--color-gold-300) 45%, transparent);
+        transition: text-decoration-color 150ms var(--ease-out-soft);
+    }
+
+    a:hover {
+        text-decoration-color: var(--color-gold-300);
+    }
+}
+
+/*
+ * Full-height public sections. The navbar height was hardcoded as `calc(100dvh - 50px)` in
+ * eight separate files, so changing the header meant hunting every one of them down.
+ */
+@utility section-viewport {
+    height: calc(100dvh - var(--nav-height));
+}
+
+@utility min-section-viewport {
+    min-height: calc(100dvh - var(--nav-height));
+}
+
+:root {
+    --nav-height: 64px;
+    --scrollbar-color: var(--color-forest-300);
+    --scrollbar-hover-color: var(--color-gold-400);
+    --track-color: var(--color-ink);
+
+    color-scheme: dark;
+}
+
+/*
+ * Element defaults belong in the base layer. Left unlayered they outrank every Tailwind
+ * utility regardless of specificity, which silently killed `text-*` colours on every anchor
+ * in the application.
+ */
+@layer base {
+    html,
+    body {
+        padding: 0;
+        margin: 0;
+        min-height: 100%;
+        overflow-x: hidden;
+        background: var(--track-color);
+        color: var(--color-body);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+}
+
+/*
+ * One visible focus treatment for the whole application. The previous build relied on the
+ * browser default, which is effectively invisible against the dark ground on most surfaces.
+ */
+:focus-visible {
+    outline: 2px solid var(--color-gold-300);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+}
+
+::selection {
+    background: var(--color-gold-400);
+    color: var(--color-body-inverse);
+}
+
+/* Keyboard users get a real bypass link instead of tabbing the whole nav on every page. */
+.skip-link {
+    position: absolute;
+    left: 0.75rem;
+    top: -3rem;
+    z-index: 100;
+    padding: 0.5rem 0.875rem;
+    border-radius: var(--radius-sm);
+    background: var(--color-gold-300);
+    color: var(--color-body-inverse);
+    font-weight: 700;
+    transition: top 0.15s var(--ease-out-soft);
+}
+
+.skip-link:focus-visible {
+    top: 0.75rem;
+}
+
+/* Webkit scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
-    color: #333739;
+    height: 8px;
+    background: var(--track-color);
 }
 
 ::-webkit-scrollbar-track {
-    background-color: #333739;
+    background: var(--track-color);
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #54786d;
+    background-color: var(--scrollbar-color);
     border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background-color: #365349;
+    background-color: var(--scrollbar-hover-color);
 }
 
-/* Firefox Scrollbar Styles */
+::-webkit-scrollbar-corner {
+    background: var(--track-color);
+}
+
+/* Firefox scrollbar */
 * {
     scrollbar-width: thin;
-    scrollbar-color: var(--bg-primary) transparent;
+    scrollbar-color: var(--scrollbar-color) var(--track-color);
 }
 
-/* Date Picker Styles */
-.react-datepicker-wrapper,
-.react-datepicker__input-container,
-.react-datepicker-wrapper .react-datepicker__input-container input {
-    width: 100%;
-}
-
-/* Leaflet Map Styles */
+/* Leaflet */
 .leaflet-control-attribution {
     display: none !important;
 }
 
-/* Slider Thumb Styles */
-.slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    background-color: var(--bg-primary);
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.slider::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    background-color: var(--bg-primary);
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.slider::-ms-thumb {
-    width: 16px;
-    height: 16px;
-    background-color: var(--bg-primary);
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-/* Slideshow Slider Thumb Styles */
+/* Range inputs */
+.slider::-webkit-slider-thumb,
 .slider-slideshow::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
     width: 16px;
     height: 16px;
-    background-color: var(--bg-primary);
+    background-color: var(--color-gold-400);
     border-radius: 50%;
     cursor: pointer;
 }
 
+.slider::-moz-range-thumb,
 .slider-slideshow::-moz-range-thumb {
     width: 16px;
     height: 16px;
-    background-color: var(--bg-primary);
+    background-color: var(--color-gold-400);
     border-radius: 50%;
     cursor: pointer;
 }
 
-.slider-slideshow::-ms-thumb {
-    width: 16px;
-    height: 16px;
-    background-color: var(--bg-primary);
+/*
+ * Quote-calculator sliders. These rules used to be a template string that the contact form
+ * appended to `document.head` on every import.
+ */
+.custom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 20px;
+    width: 20px;
     border-radius: 50%;
+    background: var(--color-forest-300);
+    border: 2px solid var(--color-body);
     cursor: pointer;
+    box-shadow: var(--shadow-raised);
 }
 
-/* Masonry Grid Styles */
-.my-masonry-grid {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    margin-left: -15px;
-    width: 100%;
+.custom-slider::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: var(--color-forest-300);
+    border: 2px solid var(--color-body);
+    cursor: pointer;
+    box-shadow: var(--shadow-raised);
 }
 
-.my-masonry-grid_column {
-    padding-left: 30px;
-    background-clip: padding-box;
-}
-
-.my-masonry-grid_column > div {
-    background: grey;
-    margin-bottom: 30px;
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

@@ -1,26 +1,37 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import PageLayout from '@/components/layout/PageLayout';
-import Image from 'next/image';
-import Head from 'next/head';
+import ArticleShell from '@/components/content/ArticleShell';
+import ContactCallout from '@/components/content/ContactCallout';
+import JsonLd from '@/components/seo/JsonLd';
+import { serviceSchema, SITE_URL } from '@/lib/structuredData';
+
+/*
+ * This page keeps the /services/home-decorating URL it has always had, but the content is
+ * occupied staging. It used to describe decorating a home you intend to keep living in, which is
+ * not a service the business sells and not what the "Occupied staging" card links here for.
+ */
+const TITLE = 'Occupied Home Staging in Sacramento';
+const HEADING = 'Occupied staging';
+const DESCRIPTION =
+    'Occupied home staging and decorating across Sacramento, Placer and Yolo counties. Mia Dofflemyer restyles the home you are still living in so it is ready to list.';
 
 export const metadata: Metadata = {
-    title: 'Expert Home Decoration Services in Sacramento | Capital City Staging',
-    description:
-        'Transform your living space with our expert home decoration services in Sacramento. Capital City Staging brings style and functionality to your home.',
+    title: TITLE,
+    description: DESCRIPTION,
     keywords:
-        'home decoration Sacramento, Sacramento home decoration, interior design, Capital City Staging, home styling, home decor services, enhance living space',
+        'occupied home staging Sacramento, home decorating Sacramento, Sacramento home staging, home styling, Capital City Staging, staging while living at home, real estate staging',
+    alternates: { canonical: `${SITE_URL}/services/home-decorating` },
     openGraph: {
-        title: 'Expert Home Decoration Services in Sacramento | Capital City Staging',
-        description:
-            'Transform your living space with our expert home decoration services in Sacramento. Capital City Staging brings style and functionality to your home.',
-        url: 'https://www.capitalcitystaging.com/services/home-decoration',
+        title: `${TITLE} | Capital City Staging`,
+        description: DESCRIPTION,
+        url: `${SITE_URL}/services/home-decorating`,
         images: [
             {
-                url: 'favicon/CCS_og_image.png',
+                url: '/favicon/CCS_og_image.png',
                 width: 1200,
                 height: 630,
-                alt: 'Home Decoration in Sacramento',
+                alt: 'Occupied Home Staging in Sacramento',
             },
         ],
         type: 'website',
@@ -28,72 +39,71 @@ export const metadata: Metadata = {
     },
 };
 
-export default function HomeDecorationServices() {
+export default function OccupiedStagingServices() {
     return (
         <PageLayout page="home-decoration">
-            <Head>
-                <script type="application/ld+json">
-                    {JSON.stringify({
-                        '@context': 'https://schema.org',
-                        '@type': 'Service',
-                        name: 'Expert Home Decoration Services in Sacramento',
-                        description:
-                            'Transform your living space with our expert home decoration services in Sacramento. Capital City Staging brings style and functionality to your home.',
-                        image: 'https://www.capitalcitystaging.com/images/home-decoration.jpg',
-                        provider: {
-                            '@type': 'Organization',
-                            name: 'Capital City Staging',
-                        },
-                        areaServed: {
-                            '@type': 'Place',
-                            name: 'Sacramento, CA',
-                        },
-                    })}
-                </script>
-            </Head>
-            <div className="flex h-fit w-full flex-col items-center space-y-8 bg-stone-900 px-8 py-16">
-                <h1 className="bg-clip-text text-center text-4xl font-bold text-transparent gradient-gold-main">
-                    Expert Home Decoration Services in Sacramento
-                </h1>
-                <div className="relative mx-auto w-full max-w-4xl">
-                    <Image
-                        src="/services/home-decoration.jpg"
-                        alt="Home Decoration in Sacramento"
-                        width={1280}
-                        height={720}
-                        className="h-auto w-full rounded-md"
+            <JsonLd
+                data={serviceSchema({
+                    name: TITLE,
+                    description: DESCRIPTION,
+                    image: `${SITE_URL}/services/home-decoration.jpg`,
+                })}
+            />
+            <ArticleShell
+                eyebrow="Our services"
+                title={HEADING}
+                lead="You’re still living there. We work with what you own, clear what’s in the way, and add only what’s missing."
+                image={{
+                    src: '/services/home-decoration.jpg',
+                    alt: 'Occupied Home Staging in Sacramento',
+                    width: 1280,
+                    height: 720,
+                }}
+                aside={
+                    <ContactCallout
+                        heading="Still living in the home?"
+                        body="Tell us about the property and you’ll get a price range right away."
+                        action="Get a free quote"
                     />
-                </div>
-                <div className="flex max-w-4xl flex-col space-y-6 text-stone-300">
-                    <p className="text-center text-lg text-stone-300">
-                        Capital City Staging offers professional home decoration services to transform your living space into a stylish and
-                        functional environment that reflects your personal taste.
-                    </p>
+                }
+            >
+                <h2>Who this is for</h2>
+                <p>
+                    Sellers living in the home while it&rsquo;s listed. You keep using the house, so the plan has to survive
+                    daily life &mdash; and it has to work around what you already own.
+                </p>
 
-                    <h2 className="text-2xl font-semibold text-primary">Our Home Decoration Services Include:</h2>
-                    <ul className="list-inside list-disc space-y-2 text-secondary_light">
-                        <li className="text-secondary_light">Personalized interior design consultations.</li>
-                        <li className="text-secondary_light">Space planning and furniture arrangement.</li>
-                        <li className="text-secondary_light">Color scheme selection and coordination.</li>
-                        <li className="text-secondary_light">Selection of furnishings, artwork, and accessories.</li>
-                    </ul>
+                <h2>How it works</h2>
+                <ol>
+                    <li>
+                        <strong>Walkthrough.</strong> Mia goes room by room and writes down what stays, what moves, and what is
+                        missing.
+                    </li>
+                    <li>
+                        <strong>Plan and price.</strong> You get that plan priced to your budget before anything moves.
+                    </li>
+                    <li>
+                        <strong>Restyle.</strong> Rearranging and restyling what you own, with rental pieces only where they are
+                        needed.
+                    </li>
+                    <li>
+                        <strong>Photo day.</strong> A final pass so the rooms are right before the camera arrives.
+                    </li>
+                </ol>
 
-                    <h2 className="text-2xl font-semibold text-primary">Why Choose Us?</h2>
-                    <p className="text-stone-300">
-                        With years of experience in home decoration and staging, our team brings a keen eye for detail and a passion for
-                        design to every project. We work closely with you to bring your vision to life.
-                    </p>
+                <h2>What it changes</h2>
+                <ul>
+                    <li>Rooms stop reading as somebody else&rsquo;s house and start reading as available space.</li>
+                    <li>Furniture is placed for the camera and for a walkthrough, which are not the same thing.</li>
+                    <li>You spend on the few pieces that move the listing rather than furnishing a home you are leaving.</li>
+                </ul>
 
-                    <h2 className="text-2xl font-semibold text-primary">Get Started Today</h2>
-                    <p className="text-stone-300">
-                        Ready to transform your home?{' '}
-                        <a href="/contact" className="text-secondary_light hover:underline">
-                            Contact us
-                        </a>{' '}
-                        to schedule a consultation.
-                    </p>
-                </div>
-            </div>
+                <h2>Who you&rsquo;ll be working with</h2>
+                <p>
+                    Mia Dofflemyer, directly. She is a RESA-certified stager and has been a licensed California real estate
+                    agent since 2020. There is no account manager and no handoff.
+                </p>
+            </ArticleShell>
         </PageLayout>
     );
 }

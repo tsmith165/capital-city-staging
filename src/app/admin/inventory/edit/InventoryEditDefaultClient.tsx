@@ -27,7 +27,7 @@ export default function InventoryEditDefaultClient() {
     if (inventory === undefined) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <div className="text-stone-300">Loading inventory...</div>
+                <div className="text-body-muted">Loading inventory...</div>
             </div>
         );
     }
@@ -35,14 +35,14 @@ export default function InventoryEditDefaultClient() {
     if (inventory.length === 0) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <div className="text-stone-300">No inventory found. Redirecting to create new inventory...</div>
+                <div className="text-body-muted">No inventory found. Redirecting to create new inventory...</div>
             </div>
         );
     }
 
     return (
         <div className="flex items-center justify-center min-h-screen">
-            <div className="text-stone-300">Redirecting to newest inventory item...</div>
+            <div className="text-body-muted">Redirecting to newest inventory item...</div>
         </div>
     );
 }

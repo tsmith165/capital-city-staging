@@ -1,26 +1,17 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import { ArrowRight, Images } from 'lucide-react';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 
-type HomepageImage = {
-    src: string;
-    width: number;
-    height: number;
-};
+import { PRIMARY_ACTION, SECONDARY_ACTION } from '@/components/content/content.constants';
+import { track } from '@/lib/analytics';
+import { HERO_FALLBACK_IMAGES, HERO_PROOF, HERO_ROTATE_MS } from './home.constants';
 
-const FALLBACK_IMAGES: HomepageImage[] = [
-    { src: '/portfolio/stock/staging-stock-3.jpg', width: 2560, height: 1695 },
-    { src: '/portfolio/stock/staging-stock-7.jpg', width: 564, height: 705 },
-    { src: '/portfolio/stock/staging-stock-1.png', width: 2048, height: 1366 },
-    { src: '/portfolio/stock/staging-stock-4.png', width: 828, height: 984 },
-    { src: '/portfolio/stock/staging-stock-6.jpg', width: 1280, height: 960 },
-];
-
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+type HomepageImage = { src: string; width: number; height: number };
 
 interface InitialHomepageImage {
     imagePath: string;
@@ -28,122 +19,105 @@ interface InitialHomepageImage {
     height: number;
 }
 
-export default function Home({
-    initialHomepageImages,
-}: {
-    initialHomepageImages?: InitialHomepageImage[] | null;
-}) {
-    // Client-side query for real-time updates after hydration
+export default function Home({ initialHomepageImages }: { initialHomepageImages?: InitialHomepageImage[] | null }) {
     const homepageImagesData = useQuery(api.homepageImages.getHomepageImages);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-    const [isLogoVisible, setLogoVisible] = useState(true);
-    const [isStagingImageVisible, setStagingImageVisible] = useState(true);
-    const currentImageIndexRef = useRef(0);
-
-    // Priority: live Convex data > SSR-preloaded data > hardcoded fallback
+    // Live Convex data once it arrives, the SSR preload before that, local stills as a last resort.
     const images: HomepageImage[] = useMemo(() => {
-        // 1. Use live Convex data once available (real-time, always up-to-date)
-        if (homepageImagesData && homepageImagesData.length > 0) {
-            return homepageImagesData.map((img: { imagePath: string; width: number; height: number }) => ({
-                src: img.imagePath,
-                width: img.width,
-                height: img.height,
-            }));
+        const source = homepageImagesData?.length ? homepageImagesData : initialHomepageImages;
+        if (source?.length) {
+            return source.map((img: InitialHomepageImage) => ({ src: img.imagePath, width: img.width, height: img.height }));
         }
-        // 2. Use SSR-preloaded data (available immediately, no loading delay)
-        if (initialHomepageImages && initialHomepageImages.length > 0) {
-            return initialHomepageImages.map((img) => ({
-                src: img.imagePath,
-                width: img.width,
-                height: img.height,
-            }));
-        }
-        // 3. Ultimate fallback to hardcoded local images
-        return FALLBACK_IMAGES;
+        return [...HERO_FALLBACK_IMAGES];
     }, [homepageImagesData, initialHomepageImages]);
 
-    // Preload all images for smooth transitions
     useEffect(() => {
-        images.forEach((image) => {
-            const img = new window.Image();
-            img.src = image.src;
-        });
-    }, [images]);
+        if (images.length < 2) return;
 
-    // Image rotation interval
-    useEffect(() => {
-        const interval = setInterval(async () => {
-            setStagingImageVisible(false);
-            await delay(1500);
-            currentImageIndexRef.current = (currentImageIndexRef.current + 1) % images.length;
-            setStagingImageVisible(true);
-        }, 5500);
+        const interval = setInterval(() => {
+            setCurrentImageIndex((index) => (index + 1) % images.length);
+        }, HERO_ROTATE_MS);
 
         return () => clearInterval(interval);
     }, [images.length]);
 
-    // Reset image index if images array shrinks below current index
-    useEffect(() => {
-        if (currentImageIndexRef.current >= images.length) {
-            currentImageIndexRef.current = 0;
-            setStagingImageVisible(false);
-            setTimeout(() => setStagingImageVisible(true), 100);
-        }
-    }, [images.length]);
-
-    const circularFadeVariants = {
-        hidden: {
-            background: 'radial-gradient(circle, transparent 0%, rgba(23, 23, 23, 0) 60%)',
-        },
-        visible: {
-            background: 'radial-gradient(circle, transparent 20%, rgba(23, 23, 23, 1) 100%)',
-            transition: { duration: 2 },
-        },
-    };
+    // The list can shrink underneath us when an admin removes a homepage image.
+    const activeIndex = currentImageIndex % images.length;
 
     return (
-        <div className="relative h-[calc(100dvh-50px)] w-full overflow-hidden">
-            <AnimatePresence>
-                {isStagingImageVisible && (
-                    <motion.div
-                        key={currentImageIndexRef.current}
-                        initial={{ opacity: 0, scale: 1 }}
-                        animate={{ opacity: 1, scale: 1.3 }}
-                        exit={{ opacity: 0, scale: 1 }}
-                        transition={{ duration: 3 }}
-                        className="absolute inset-0 h-full w-full"
-                    >
-                        <Image
-                            src={images[currentImageIndexRef.current].src}
-                            width={images[currentImageIndexRef.current].width}
-                            height={images[currentImageIndexRef.current].height}
-                            className="absolute inset-0 h-full w-full object-cover"
-                            alt="One of our recently staged homes"
-                            priority
-                            sizes="100vw"
-                        />
-                    </motion.div>
-                )}
-            </AnimatePresence>
-            <motion.div
-                variants={circularFadeVariants}
-                initial="hidden"
-                animate={isStagingImageVisible ? 'visible' : 'hidden'}
-                transition={{ duration: 2 }}
-                className="absolute inset-0 bg-stone-900"
-            ></motion.div>
-            {isLogoVisible && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1 }}
-                    className="absolute inset-0 flex items-center justify-center"
-                >
-                    <div className="relative flex h-[350px] w-[350px] items-center justify-center rounded-full bg-stone-900 opacity-70">
-                        <Image src={'/logo/CCS_logo.png'} alt="Capital City Staging Logo" width={300} height={300} />
+        <section className="relative w-full overflow-hidden min-section-viewport">
+            {/*
+             * The background used to animate a 1.3x scale across three seconds on every rotation.
+             * A full-bleed image being transformed forever is the most expensive thing a page can
+             * do at idle, and it moved the composition under the copy. It crossfades in place now.
+             */}
+            <div className="absolute inset-0">
+                {images.map((image, index) => (
+                    <Image
+                        key={image.src}
+                        src={image.src}
+                        width={image.width}
+                        height={image.height}
+                        alt=""
+                        aria-hidden="true"
+                        priority={index === 0}
+                        sizes="100vw"
+                        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
+                            index === activeIndex ? 'opacity-100' : 'opacity-0'
+                        }`}
+                    />
+                ))}
+            </div>
+
+            {/* A readable ground for the copy rather than a radial vignette over the whole frame. */}
+            <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/80 to-transparent" aria-hidden="true" />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-ink/40" aria-hidden="true" />
+
+            <div className="relative mx-auto flex min-h-[inherit] w-full max-w-[1400px] flex-col justify-center px-5 py-16 sm:px-8 lg:py-24">
+                <div className="max-w-2xl">
+                    <p className="text-xs font-bold tracking-[0.2em] text-forest-200 uppercase">
+                        Home staging in Sacramento
+                    </p>
+
+                    <h1 className="mt-4 text-4xl leading-[1.1] font-bold text-balance text-body sm:text-5xl lg:text-[3.5rem]">
+                        Your home, staged to <span className="gradient-gold-main-text">sell faster</span> and for more.
+                    </h1>
+
+                    <p className="mt-5 max-w-xl text-lg text-pretty text-body-muted">
+                        Mia Dofflemyer is a RESA-certified stager and licensed agent serving Sacramento, Placer and Yolo
+                        counties. Vacant or occupied, we stage for the buyers your home is competing for.
+                    </p>
+
+                    <div className="mt-8 flex flex-wrap items-center gap-3">
+                        <Link
+                            href="/contact"
+                            className={PRIMARY_ACTION}
+                            onClick={() => track('cta_clicked', { cta: 'get_a_quote', placement: 'hero' })}
+                        >
+                            Get a free quote
+                            <ArrowRight size={17} aria-hidden="true" />
+                        </Link>
+                        <Link
+                            href="/?component=portfolio"
+                            className={SECONDARY_ACTION}
+                            onClick={() => track('cta_clicked', { cta: 'see_our_work', placement: 'hero' })}
+                        >
+                            <Images size={17} aria-hidden="true" />
+                            See our work
+                        </Link>
                     </div>
-                </motion.div>
-            )}
-        </div>
+
+                    <dl className="mt-12 flex flex-wrap gap-x-10 gap-y-5 border-t border-line/70 pt-6">
+                        {HERO_PROOF.map(({ value, label }) => (
+                            <div key={label}>
+                                <dt className="font-display text-2xl font-bold text-gold-300">{value}</dt>
+                                <dd className="mt-0.5 text-xs tracking-wide text-body-subtle uppercase">{label}</dd>
+                            </div>
+                        ))}
+                    </dl>
+                </div>
+            </div>
+        </section>
     );
 }
