@@ -22,7 +22,7 @@ export default function AdminDashboardClient() {
     const projectsNeedingAttention = useQuery(api.dashboard.getProjectsNeedingAttention);
     const recentSubmissions = useQuery(api.contactSubmissions.getRecentSubmissions, { limit: 5 });
 
-    if (summary === undefined) {
+    if (!summary) {
         return (
             <AdminShell title="Today">
                 <div className="flex h-full items-center justify-center p-8 text-sm text-body-subtle">Loading your workspace…</div>

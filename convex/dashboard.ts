@@ -1,4 +1,5 @@
 import { query } from "./_generated/server";
+import { isAdmin } from "./authz";
 
 const PLACEHOLDER_IMAGE_VALUES = ["", "Not yet uploaded"];
 
@@ -34,6 +35,8 @@ export function inventoryAttentionReasons(item: {
 export const getDashboardSummary = query({
   args: {},
   handler: async (ctx) => {
+    if (!(await isAdmin(ctx))) return null;
+
     const [inventory, projects, submissions] = await Promise.all([
       ctx.db.query("inventory").collect(),
       ctx.db.query("projects").collect(),
@@ -79,6 +82,8 @@ export const getDashboardSummary = query({
 export const getInventoryNeedingAttention = query({
   args: {},
   handler: async (ctx) => {
+    if (!(await isAdmin(ctx))) return [];
+
     const inventory = await ctx.db.query("inventory").withIndex("by_active", (q) => q.eq("active", true)).collect();
 
     return inventory
@@ -100,6 +105,8 @@ export const getInventoryNeedingAttention = query({
 export const getProjectsNeedingAttention = query({
   args: {},
   handler: async (ctx) => {
+    if (!(await isAdmin(ctx))) return [];
+
     const projects = await ctx.db.query("projects").withIndex("by_created").order("desc").collect();
 
     return projects

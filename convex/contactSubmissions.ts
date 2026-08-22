@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { isAdmin, requireAdmin } from "./authz";
 
 // The contact form previously only sent email. A Resend outage or the daily send cap
 // silently lost the lead, so every submission is now persisted before the email is attempted.
@@ -27,6 +28,8 @@ export const getSubmissions = query({
     responded: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
+    if (!(await isAdmin(ctx))) return [];
+
     if (args.responded !== undefined) {
       return await ctx.db
         .query("contactSubmissions")
@@ -44,6 +47,8 @@ export const getRecentSubmissions = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    if (!(await isAdmin(ctx))) return [];
+
     return await ctx.db
       .query("contactSubmissions")
       .withIndex("by_created")
@@ -55,6 +60,8 @@ export const getRecentSubmissions = query({
 export const getNewSubmissionCount = query({
   args: {},
   handler: async (ctx) => {
+    if (!(await isAdmin(ctx))) return 0;
+
     const unanswered = await ctx.db
       .query("contactSubmissions")
       .withIndex("by_responded", (q) => q.eq("responded", false))
@@ -70,6 +77,8 @@ export const setResponded = mutation({
     responded: v.boolean(),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
     await ctx.db.patch(args.id, {
       responded: args.responded,
       respondedAt: args.responded ? Date.now() : undefined,
@@ -82,6 +91,8 @@ export const deleteSubmission = mutation({
     id: v.id("contactSubmissions"),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
     await ctx.db.delete(args.id);
   },
 });
