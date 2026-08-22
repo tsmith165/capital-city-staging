@@ -85,8 +85,8 @@ export default function Home({ initialHomepageImages }: { initialHomepageImages?
                     </h1>
 
                     <p className="mt-5 max-w-xl text-lg text-pretty text-body-muted">
-                        Mia Dofflemyer is a RESA-certified stager and licensed agent working across Sacramento, Placer and Yolo
-                        counties. Vacant or occupied, we style the home around the buyers it is actually competing for.
+                        Mia Dofflemyer is a RESA-certified stager and licensed agent serving Sacramento, Placer and Yolo
+                        counties. Vacant or occupied, we stage for the buyers your home is competing for.
                     </p>
 
                     <div className="mt-8 flex flex-wrap items-center gap-3">

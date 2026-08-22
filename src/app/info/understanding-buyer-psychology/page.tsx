@@ -37,7 +37,7 @@ export default function UnderstandingBuyerPsychology() {
                 }
             >
                 <p>
-                    Selling a home is not just about showcasing physical attributes; it is about connecting with buyers emotionally.
+                    Selling a home isn’t just about showcasing square footage; it’s about connecting with buyers emotionally.
                     Understanding buyer psychology is what makes a staging strategy resonate and motivates an offer.
                 </p>
 

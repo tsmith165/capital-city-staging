@@ -45,7 +45,7 @@ export default function About() {
                 </div>
 
                 <div>
-                    <p className="text-xs font-bold tracking-[0.2em] text-forest-200 uppercase">Who you will work with</p>
+                    <p className="text-xs font-bold tracking-[0.2em] text-forest-200 uppercase">Who you&rsquo;ll work with</p>
                     <h2 className="mt-3 font-display text-3xl font-bold gradient-gold-main-text sm:text-4xl">Mia Dofflemyer</h2>
                     <p className="mt-1.5 text-body-muted">Founder, Capital City Staging</p>
                     <p className="text-sm text-body-subtle">Licensed California real estate agent since 2020</p>
@@ -53,16 +53,15 @@ export default function About() {
                     <div className="mt-6 space-y-4 text-body-muted">
                         <p>
                             I grew up in the valley, studied at UC Davis, and have spent the years since helping people in Sacramento
-                            buy and sell homes. Staging is the part of that work I kept coming back to, because it is the part that
-                            most reliably changes the outcome.
+                            buy and sell homes. Staging is the part I kept coming back to &mdash; it&rsquo;s what most reliably changes
+                            the outcome.
                         </p>
                         <p>
-                            Selling a house is a transaction to everyone except the person who lived in it. I stage with both in mind:
-                            what a buyer needs to see in the first ten seconds, and what it takes to hand your home over well.
+                            Selling a house is a transaction to everyone except the person who lived in it. I stage for the buyer&rsquo;s
+                            first impression without forgetting whose home it still is.
                         </p>
                         <p>
-                            You deal with me directly, from the walkthrough through to collection. There is no account manager and no
-                            handoff.
+                            You deal with me directly, from walkthrough to pickup. No account manager, no handoff.
                         </p>
                     </div>
 

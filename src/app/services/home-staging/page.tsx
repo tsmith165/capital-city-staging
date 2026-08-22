@@ -6,15 +6,16 @@ import ContactCallout from '@/components/content/ContactCallout';
 import JsonLd from '@/components/seo/JsonLd';
 import { serviceSchema, SITE_URL } from '@/lib/structuredData';
 
-const TITLE = 'Professional Home Staging Services in Sacramento';
+const TITLE = 'Vacant Home Staging in Sacramento';
+const HEADING = 'Vacant staging';
 const DESCRIPTION =
-    'Enhance your Sacramento property with our professional home staging services. Attract more buyers and sell faster with Capital City Staging.';
+    'Vacant home staging across Sacramento, Placer and Yolo counties. Mia Dofflemyer furnishes empty listings so they photograph well and sell faster.';
 
 export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
     keywords:
-        'home staging Sacramento, Sacramento home staging, professional home staging, Capital City Staging, sell home fast, attract buyers, real estate staging',
+        'home staging Sacramento, Sacramento home staging, vacant home staging, professional home staging, Capital City Staging, sell home fast, attract buyers, real estate staging',
     alternates: { canonical: `${SITE_URL}/services/home-staging` },
     openGraph: {
         title: `${TITLE} | Capital City Staging`,
@@ -45,40 +46,54 @@ export default function HomeStagingServices() {
             />
             <ArticleShell
                 eyebrow="Our services"
-                title={TITLE}
-                lead="We transform homes to attract buyers and sell faster, creating beautiful, functional spaces that highlight your property's best features."
+                title={HEADING}
+                lead="Empty rooms photograph small and cold. We furnish the whole home so buyers see how each room lives, not just how big it is."
                 image={{ src: '/services/home-staging.jpg', alt: 'Home Staging in Sacramento', width: 1280, height: 721 }}
                 aside={
                     <ContactCallout
-                        heading="Ready to make your property stand out?"
-                        body="Tell us about your listing and we will put together a staging plan and quote."
-                        action="Get a free consultation"
+                        heading="Ready to list?"
+                        body="Tell us about the listing and you’ll get a price range right away."
+                        action="Get a free quote"
                     />
                 }
             >
-                <h2>Why choose our home staging services?</h2>
-                <ul>
-                    <li>Increase the perceived value of your home.</li>
-                    <li>Make a strong first impression on potential buyers.</li>
-                    <li>Highlight the best features of your property.</li>
-                    <li>Sell your home faster and for a higher price.</li>
-                </ul>
+                <h2>Who this is for</h2>
+                <p>
+                    Empty listings, new builds, and homes the sellers have moved out of. If a buyer is going to walk through
+                    bare rooms, or scroll past photographs of them, this is the service you want.
+                </p>
 
-                <h2>Our home staging process</h2>
+                <h2>How it works</h2>
                 <ol>
                     <li>
-                        <strong>Consultation.</strong> We assess your property and discuss your goals.
+                        <strong>Walkthrough.</strong> Mia measures the rooms on site and asks what the listing is competing
+                        against.
                     </li>
                     <li>
-                        <strong>Design plan.</strong> Our team creates a customized staging plan.
+                        <strong>Plan and price.</strong> You get a room-by-room plan with the cost attached, before anything is
+                        rented or moved.
                     </li>
                     <li>
-                        <strong>Implementation.</strong> We stage your home using high-quality furnishings and decor.
+                        <strong>Install.</strong> Furniture, art and accessories go in ahead of the photography date, not after
+                        it.
                     </li>
                     <li>
-                        <strong>Review.</strong> A final walkthrough to make sure everything is right.
+                        <strong>Removal.</strong> Everything comes back out once the home closes.
                     </li>
                 </ol>
+
+                <h2>What it changes</h2>
+                <ul>
+                    <li>Rooms read at their real scale instead of looking undersized.</li>
+                    <li>Every space has an obvious use, so nothing gets written off as wasted square footage.</li>
+                    <li>The listing photographs like a home rather than a floor plan.</li>
+                </ul>
+
+                <h2>Who you&rsquo;ll be working with</h2>
+                <p>
+                    Mia Dofflemyer, directly. She is a RESA-certified stager and has been a licensed California real estate
+                    agent since 2020. There is no account manager and no handoff between the walkthrough and the pickup.
+                </p>
             </ArticleShell>
         </PageLayout>
     );

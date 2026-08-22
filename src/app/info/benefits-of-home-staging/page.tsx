@@ -82,8 +82,8 @@ export default function BenefitsOfHomeStaging() {
 
                 <h2>Why choose Capital City Staging?</h2>
                 <p>
-                    Our team works closely with you to understand your goals and tailor our services to meet them, combining design
-                    principles with market insight to create spaces that resonate with buyers.
+                    You work with Mia Dofflemyer directly. She is a RESA-certified stager and a licensed California real estate
+                    agent, so the plan for your home is built on what is actually selling in your market, not on a generic look.
                 </p>
             </ArticleShell>
         </PageLayout>

@@ -6,15 +6,21 @@ import ContactCallout from '@/components/content/ContactCallout';
 import JsonLd from '@/components/seo/JsonLd';
 import { serviceSchema, SITE_URL } from '@/lib/structuredData';
 
-const TITLE = 'Expert Home Decoration Services in Sacramento';
+/*
+ * This page keeps the /services/home-decorating URL it has always had, but the content is
+ * occupied staging. It used to describe decorating a home you intend to keep living in, which is
+ * not a service the business sells and not what the "Occupied staging" card links here for.
+ */
+const TITLE = 'Occupied Home Staging in Sacramento';
+const HEADING = 'Occupied staging';
 const DESCRIPTION =
-    'Transform your living space with our expert home decoration services in Sacramento. Capital City Staging brings style and functionality to your home.';
+    'Occupied home staging and decorating across Sacramento, Placer and Yolo counties. Mia Dofflemyer restyles the home you are still living in so it is ready to list.';
 
 export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
     keywords:
-        'home decoration Sacramento, Sacramento home decoration, interior design, Capital City Staging, home styling, home decor services, enhance living space',
+        'occupied home staging Sacramento, home decorating Sacramento, Sacramento home staging, home styling, Capital City Staging, staging while living at home, real estate staging',
     alternates: { canonical: `${SITE_URL}/services/home-decorating` },
     openGraph: {
         title: `${TITLE} | Capital City Staging`,
@@ -25,7 +31,7 @@ export const metadata: Metadata = {
                 url: '/favicon/CCS_og_image.png',
                 width: 1200,
                 height: 630,
-                alt: 'Home Decoration in Sacramento',
+                alt: 'Occupied Home Staging in Sacramento',
             },
         ],
         type: 'website',
@@ -33,7 +39,7 @@ export const metadata: Metadata = {
     },
 };
 
-export default function HomeDecorationServices() {
+export default function OccupiedStagingServices() {
     return (
         <PageLayout page="home-decoration">
             <JsonLd
@@ -45,29 +51,57 @@ export default function HomeDecorationServices() {
             />
             <ArticleShell
                 eyebrow="Our services"
-                title={TITLE}
-                lead="Professional decorating that turns your living space into a stylish, functional environment reflecting your own taste."
-                image={{ src: '/services/home-decoration.jpg', alt: 'Home Decoration in Sacramento', width: 1280, height: 720 }}
+                title={HEADING}
+                lead="You’re still living there. We work with what you own, clear what’s in the way, and add only what’s missing."
+                image={{
+                    src: '/services/home-decoration.jpg',
+                    alt: 'Occupied Home Staging in Sacramento',
+                    width: 1280,
+                    height: 720,
+                }}
                 aside={
                     <ContactCallout
-                        heading="Ready to transform your home?"
-                        body="Share a few photos and what you have in mind, and we will walk you through the options."
-                        action="Schedule a consultation"
+                        heading="Still living in the home?"
+                        body="Tell us about the property and you’ll get a price range right away."
+                        action="Get a free quote"
                     />
                 }
             >
-                <h2>Our home decoration services include</h2>
+                <h2>Who this is for</h2>
+                <p>
+                    Sellers living in the home while it&rsquo;s listed. You keep using the house, so the plan has to survive
+                    daily life &mdash; and it has to work around what you already own.
+                </p>
+
+                <h2>How it works</h2>
+                <ol>
+                    <li>
+                        <strong>Walkthrough.</strong> Mia goes room by room and writes down what stays, what moves, and what is
+                        missing.
+                    </li>
+                    <li>
+                        <strong>Plan and price.</strong> You get that plan priced to your budget before anything moves.
+                    </li>
+                    <li>
+                        <strong>Restyle.</strong> Rearranging and restyling what you own, with rental pieces only where they are
+                        needed.
+                    </li>
+                    <li>
+                        <strong>Photo day.</strong> A final pass so the rooms are right before the camera arrives.
+                    </li>
+                </ol>
+
+                <h2>What it changes</h2>
                 <ul>
-                    <li>Personalized interior design consultations.</li>
-                    <li>Space planning and furniture arrangement.</li>
-                    <li>Color scheme selection and coordination.</li>
-                    <li>Selection of furnishings, artwork, and accessories.</li>
+                    <li>Rooms stop reading as somebody else&rsquo;s house and start reading as available space.</li>
+                    <li>Furniture is placed for the camera and for a walkthrough, which are not the same thing.</li>
+                    <li>You spend on the few pieces that move the listing rather than furnishing a home you are leaving.</li>
                 </ul>
 
-                <h2>Why choose us?</h2>
+                <h2>Who you&rsquo;ll be working with</h2>
                 <p>
-                    With years of experience in home decoration and staging, our team brings a keen eye for detail and a passion for design
-                    to every project. We work closely with you to bring your vision to life.
+                    Mia Dofflemyer, directly. She is a RESA-certified stager and has been a licensed California real estate
+                    agent since 2020. There is no account manager and no handoff.
                 </p>
             </ArticleShell>
         </PageLayout>

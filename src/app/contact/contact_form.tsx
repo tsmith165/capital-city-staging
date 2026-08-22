@@ -272,7 +272,7 @@ const ContactForm = () => {
                 track('quote_failed', { reason: 'delivery' });
                 setSubmitMessage({
                     type: 'error',
-                    message: 'Something went wrong sending that. Try again, or call (209) 817-4240 and we will take the details over the phone.',
+                    message: "Something went wrong sending that. Try again, or call (209) 817-4240 and we’ll take the details over the phone.",
                 });
             }
         } finally {
@@ -293,8 +293,8 @@ const ContactForm = () => {
                     <h2 className="font-display text-3xl font-bold gradient-gold-main-text">Estimate your staging</h2>
                 </div>
                 <p className="mx-auto max-w-xl text-pretty text-body-muted">
-                    Answer a few questions about the property and you will see a price range before you send anything. The final
-                    number is confirmed at the walkthrough.
+                    Answer a few questions and you&rsquo;ll see a price range before you send anything. The final number is
+                    confirmed at the walkthrough.
                 </p>
             </div>
 
@@ -598,7 +598,7 @@ const ContactForm = () => {
                                                 <button
                                                     type="submit"
                                                     disabled={isSubmitting}
-                                                    className={`flex transform items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-all hover:scale-[1.02] hover:rotate-1 ${
+                                                    className={`flex items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-colors ${
                                                         isSubmitting
                                                             ? 'cursor-not-allowed bg-surface-hover text-body-subtle'
                                                             : 'bg-gold-400 text-body-inverse shadow-card hover:bg-gold-300'
@@ -607,12 +607,12 @@ const ContactForm = () => {
                                                     {isSubmitting ? (
                                                         <>
                                                             <div className="h-6 w-6 animate-spin rounded-full border-2 border-body-inverse/40 border-t-transparent" />
-                                                            <span>Sending Your Request...</span>
+                                                            <span>Sending&hellip;</span>
                                                         </>
                                                     ) : (
                                                         <>
                                                             <Send size={24} />
-                                                            <span>Request Custom Quote from Mia</span>
+                                                            <span>Request a custom quote</span>
                                                         </>
                                                     )}
                                                 </button>
@@ -836,7 +836,7 @@ const ContactForm = () => {
                                                 <button
                                                     type="submit"
                                                     disabled={isSubmitting}
-                                                    className={`flex transform items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-all hover:scale-[1.02] hover:rotate-1 ${
+                                                    className={`flex items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-colors ${
                                                         isSubmitting
                                                             ? 'cursor-not-allowed bg-surface-hover text-body-subtle'
                                                             : 'bg-gold-400 text-body-inverse shadow-card hover:bg-gold-300'
@@ -845,12 +845,12 @@ const ContactForm = () => {
                                                     {isSubmitting ? (
                                                         <>
                                                             <div className="h-6 w-6 animate-spin rounded-full border-2 border-body-inverse/40 border-t-transparent" />
-                                                            <span>Sending Your Quote...</span>
+                                                            <span>Sending&hellip;</span>
                                                         </>
                                                     ) : (
                                                         <>
                                                             <Send size={24} />
-                                                            <span>Send Your Estimate to Mia!</span>
+                                                            <span>Send quote request</span>
                                                         </>
                                                     )}
                                                 </button>

@@ -44,7 +44,7 @@ export default function InfoPage() {
                         </h1>
                         <p className="mt-5 text-lg text-pretty text-body-muted">
                             The numbers behind staging, what it costs, and how buyers read a room. Written for sellers deciding
-                            whether it is worth it.
+                            whether it’s worth it.
                         </p>
                     </header>
 

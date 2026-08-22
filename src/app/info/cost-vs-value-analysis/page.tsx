@@ -32,7 +32,7 @@ export default function CostVsValueAnalysis() {
                 aside={
                     <ContactCallout
                         heading="Ready to invest wisely?"
-                        body="We will walk you through the numbers for your property before you commit to anything."
+                        body="We’ll walk you through the numbers for your property before you commit to anything."
                     />
                 }
             >

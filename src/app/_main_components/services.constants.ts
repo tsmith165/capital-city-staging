@@ -13,13 +13,13 @@ export const SERVICES: ServiceSpec[] = [
         title: 'Vacant staging',
         href: '/services/home-staging',
         summary:
-            'An empty house photographs as a set of dimensions. We furnish it so buyers can read the scale of each room and picture living in it.',
-        bestFor: 'Empty listings, new builds, and homes the sellers have already moved out of.',
+            'Empty rooms photograph small and cold. We furnish the whole home so buyers see how each room lives, not just how big it is.',
+        bestFor: 'Empty listings, new builds, and homes sellers have moved out of.',
         includedItems: [
             'On-site measurement and a room-by-room plan',
             'Furniture, art and accessories selected for the listing',
-            'Full install before the photography date',
-            'Collection once the home closes',
+            'Full install before photos',
+            'Removal after closing',
         ],
     },
     {
@@ -27,13 +27,13 @@ export const SERVICES: ServiceSpec[] = [
         title: 'Occupied staging',
         href: '/services/home-decorating',
         summary:
-            'You are still living there. We work with the furniture you own, edit what is in the way, and add only what the rooms are missing.',
-        bestFor: 'Sellers staying in the home through the listing period.',
+            "You’re still living there. We work with what you own, clear what’s in the way, and add only what’s missing.",
+        bestFor: "Sellers living in the home while it’s listed.",
         includedItems: [
-            'Walkthrough and a written room-by-room brief',
-            'A plan costed to your budget before anything moves',
-            'Editing, rearranging and restyling what you already own',
-            'Targeted rental pieces only where they earn their place',
+            'Walkthrough and a written room-by-room plan',
+            'A priced plan before anything moves',
+            'Rearranging and restyling what you already own',
+            "Rental pieces only where they’re needed",
         ],
     },
 ];

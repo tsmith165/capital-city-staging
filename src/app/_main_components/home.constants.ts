@@ -1,5 +1,5 @@
 export const HERO_PROOF = [
-    { value: '73%', label: 'less time on the market' },
+    { value: '73%', label: 'less time on market' },
     { value: '6-20%', label: 'higher sale price' },
     { value: 'RESA', label: 'certified stager' },
 ] as const;

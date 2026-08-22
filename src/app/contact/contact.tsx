@@ -25,7 +25,7 @@ export default function Contact() {
                             Let&rsquo;s stage your home
                         </h1>
                         <p className="mt-4 max-w-xl text-lg text-pretty text-body-muted">
-                            Tell us about the property and you will get a price range straight away. Mia reviews every request
+                            Tell us about the property and you&rsquo;ll get a price range right away. Mia reviews every request
                             personally and follows up with a walkthrough date.
                         </p>
 
