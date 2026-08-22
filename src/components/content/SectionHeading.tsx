@@ -12,8 +12,11 @@ interface SectionHeadingProps {
  * Every homepage section previously stacked its own heading treatment: an h2, a second
  * paragraph styled larger than the h2, and a lead. Three competing sizes read as three
  * headings rather than one.
+ *
+ * Left is the default axis. The hero and the bio were always left-aligned, so centring the
+ * sections between them gave the page two spines and left every wrapped lead ragged.
  */
-export default function SectionHeading({ eyebrow, title, lead, align = 'center', id }: SectionHeadingProps) {
+export default function SectionHeading({ eyebrow, title, lead, align = 'left', id }: SectionHeadingProps) {
     const alignment = align === 'center' ? 'items-center text-center' : 'items-start text-left';
 
     return (
@@ -24,7 +27,7 @@ export default function SectionHeading({ eyebrow, title, lead, align = 'center',
             <h2 id={id} className="font-display text-3xl font-bold text-balance gradient-gold-main-text sm:text-4xl">
                 {title}
             </h2>
-            {lead ? <p className="max-w-2xl text-base text-pretty text-body-muted sm:text-lg">{lead}</p> : null}
+            {lead ? <p className="max-w-xl text-base text-pretty text-body-muted sm:text-lg">{lead}</p> : null}
         </div>
     );
 }

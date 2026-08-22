@@ -7,7 +7,6 @@ import { ArrowRight, Check, Sofa, Users } from 'lucide-react';
 import SectionHeading from '@/components/content/SectionHeading';
 import { PRIMARY_ACTION, QUIET_ACTION } from '@/components/content/content.constants';
 import { track } from '@/lib/analytics';
-import Statistics from '@/app/_main_components/statistics';
 import { SERVICES } from './services.constants';
 
 const ICONS = { vacant: Sofa, occupied: Users } as const;
@@ -15,11 +14,11 @@ const ICONS = { vacant: Sofa, occupied: Users } as const;
 export default function Services() {
     return (
         <section className="w-full px-5 py-20 sm:px-8">
-            <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center">
+            <div className="mx-auto flex w-full max-w-[1200px] flex-col">
                 <SectionHeading
                     eyebrow="What we do"
-                    title="Two ways to stage, one goal"
-                    lead="Every quote starts with a walkthrough and a written plan. You see the cost and the reasoning before anything is moved or rented."
+                    title="Two ways to stage"
+                    lead="Every quote starts with a walkthrough and a written plan — you see the cost before anything is moved or rented."
                 />
 
                 <div className="mt-12 grid w-full gap-6 md:grid-cols-2">
@@ -74,10 +73,6 @@ export default function Services() {
                             </article>
                         );
                     })}
-                </div>
-
-                <div className="mt-16 w-full">
-                    <Statistics />
                 </div>
             </div>
         </section>

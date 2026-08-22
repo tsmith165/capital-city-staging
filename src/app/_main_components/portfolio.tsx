@@ -39,7 +39,7 @@ export default function Portfolio() {
                     <SectionHeading
                         eyebrow="Recent work"
                         title="Portfolio coming soon"
-                        lead="Recent projects are being photographed. Call or send a message in the meantime and we will walk you through comparable work."
+                        lead="Recent projects are being photographed. Call or email in the meantime and we’ll walk you through comparable work."
                     />
                 </div>
             </section>
@@ -51,15 +51,15 @@ export default function Portfolio() {
 
     return (
         <section className="w-full px-5 py-20 sm:px-8">
-            <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center">
+            <div className="mx-auto flex w-full max-w-[1200px] flex-col">
                 <SectionHeading
                     eyebrow="Recent work"
                     title="Staged by Mia"
-                    lead="Real Sacramento-area listings, photographed after install. Select a project to see the rooms."
+                    lead="Sacramento-area listings, photographed after install. Select a project to see the rooms."
                 />
 
                 {projects.length > 1 ? (
-                    <div role="tablist" aria-label="Projects" className="mt-8 flex flex-wrap justify-center gap-2.5">
+                    <div role="tablist" aria-label="Projects" className="mt-8 flex flex-wrap gap-2.5">
                         {projects.map((project, index) => {
                             const isSelected = index === selectedProjectIndex;
 
