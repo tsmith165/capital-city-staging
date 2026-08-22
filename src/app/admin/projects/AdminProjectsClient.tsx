@@ -7,6 +7,10 @@ import { Edit3, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { Tooltip } from 'react-tooltip';
 
+import { SkeletonBlock, SkeletonTable } from '@/components/admin/AdminSkeleton';
+
+const PROJECT_COLUMNS = ['Order', 'Name', 'Status', 'Address', 'Started', 'Highlighted', 'Actions'] as const;
+
 export default function AdminProjectsClient() {
     const projects = useQuery(api.projects.getAllProjects);
     const toggleHighlight = useMutation(api.projects.toggleProjectHighlight);
@@ -68,8 +72,12 @@ export default function AdminProjectsClient() {
 
     if (projects === undefined) {
         return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="text-body-muted">Loading...</div>
+            <div className="container mx-auto p-4">
+                <div className="mb-6 flex items-center justify-between">
+                    <h1 className="text-3xl font-bold text-body">Manage Projects</h1>
+                    <SkeletonBlock className="h-10 w-40 rounded" />
+                </div>
+                <SkeletonTable headers={PROJECT_COLUMNS} rows={6} label="Loading projects" />
             </div>
         );
     }

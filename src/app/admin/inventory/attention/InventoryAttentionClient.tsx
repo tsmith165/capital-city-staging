@@ -7,7 +7,8 @@ import { ArrowLeft, CheckCircle2, ImageOff, Pencil } from 'lucide-react';
 
 import { api } from '@/convex/_generated/api';
 import AdminShell from '@/components/admin/AdminShell';
-import { AdminEmpty, AdminHeading, AdminStatus } from '@/components/admin/AdminPrimitives';
+import { AdminHeading, AdminStatus } from '@/components/admin/AdminPrimitives';
+import { SkeletonTiles } from '@/components/admin/AdminSkeleton';
 
 export default function InventoryAttentionClient() {
     const items = useQuery(api.dashboard.getInventoryNeedingAttention);
@@ -30,7 +31,7 @@ export default function InventoryAttentionClient() {
                 />
 
                 {items === undefined ? (
-                    <AdminEmpty>Checking the catalog…</AdminEmpty>
+                    <SkeletonTiles count={6} label="Checking the catalog" />
                 ) : items.length === 0 ? (
                     <div className="flex flex-col items-center gap-3 rounded-lg border border-line bg-surface-raised px-5 py-12 text-center">
                         <CheckCircle2 size={28} aria-hidden="true" className="text-success" />

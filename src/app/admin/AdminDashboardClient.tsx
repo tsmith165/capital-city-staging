@@ -7,6 +7,12 @@ import { ArrowRight, ChevronRight, FileWarning, Home, Inbox, Plus } from 'lucide
 import { api } from '@/convex/_generated/api';
 import AdminShell from '@/components/admin/AdminShell';
 import { AdminCard, AdminEmpty, AdminHeading, AdminMetric, AdminPanel, AdminStatus } from '@/components/admin/AdminPrimitives';
+import {
+    SkeletonCardGrid,
+    SkeletonHeading,
+    SkeletonListRows,
+    SkeletonMetricGrid,
+} from '@/components/admin/AdminSkeleton';
 
 const number = new Intl.NumberFormat('en-US');
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
@@ -22,10 +28,27 @@ export default function AdminDashboardClient() {
     const projectsNeedingAttention = useQuery(api.dashboard.getProjectsNeedingAttention);
     const recentSubmissions = useQuery(api.contactSubmissions.getRecentSubmissions, { limit: 5 });
 
+    /*
+     * The dashboard used to collapse to a single centred line of text, so arriving here meant
+     * watching the layout appear from nothing. The real structure is drawn straight away and each
+     * region fills in place.
+     */
     if (!summary) {
         return (
             <AdminShell title="Today">
-                <div className="flex h-full items-center justify-center p-8 text-sm text-body-subtle">Loading your workspace…</div>
+                <div className="flex flex-col gap-8 p-5 sm:p-8">
+                    <SkeletonHeading />
+                    <SkeletonCardGrid count={3} label="Loading what needs attention" />
+                    <SkeletonMetricGrid count={4} columns={4} label="Loading the business overview" />
+                    <div className="grid gap-5 xl:grid-cols-2">
+                        <AdminPanel eyebrow="Projects" title="Needs your attention" href="/admin/projects">
+                            <SkeletonListRows rows={5} label="Loading projects" />
+                        </AdminPanel>
+                        <AdminPanel eyebrow="Inbox" title="Recent quote requests" href="/admin/inbox">
+                            <SkeletonListRows rows={4} label="Loading recent messages" />
+                        </AdminPanel>
+                    </div>
+                </div>
             </AdminShell>
         );
     }
@@ -124,7 +147,7 @@ export default function AdminDashboardClient() {
                 <div className="grid gap-5 xl:grid-cols-2">
                     <AdminPanel eyebrow="Projects" title="Needs your attention" href="/admin/projects">
                         {projectsNeedingAttention === undefined ? (
-                            <AdminEmpty>Loading projects…</AdminEmpty>
+                            <SkeletonListRows rows={5} label="Loading projects" />
                         ) : projectsNeedingAttention.length === 0 ? (
                             <AdminEmpty>No active or unpaid projects.</AdminEmpty>
                         ) : (
@@ -161,7 +184,7 @@ export default function AdminDashboardClient() {
 
                     <AdminPanel eyebrow="Inbox" title="Recent quote requests" href="/admin/inbox">
                         {recentSubmissions === undefined ? (
-                            <AdminEmpty>Loading messages…</AdminEmpty>
+                            <SkeletonListRows rows={4} label="Loading recent messages" />
                         ) : recentSubmissions.length === 0 ? (
                             <AdminEmpty>No messages yet. New contact form submissions appear here.</AdminEmpty>
                         ) : (

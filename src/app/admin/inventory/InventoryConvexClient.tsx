@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { Plus, Edit, Info, ExternalLink } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
 import AddInventoryOverlay from '@/components/AddInventoryOverlay';
+import { SkeletonBlock, SkeletonTiles } from '@/components/admin/AdminSkeleton';
 
 export default function InventoryConvexClient() {
     const router = useRouter();
@@ -62,8 +63,16 @@ export default function InventoryConvexClient() {
 
     if (inventory === undefined || categories === undefined) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-body-muted">Loading inventory...</div>
+            <div className="container mx-auto max-w-7xl p-4">
+                <div className="mb-6 flex items-center justify-between">
+                    <h1 className="text-3xl font-bold text-body">Inventory Management</h1>
+                    <SkeletonBlock className="h-10 w-44 rounded-lg" />
+                </div>
+                <div className="mb-6 flex flex-wrap gap-4">
+                    <SkeletonBlock className="h-10 min-w-[200px] flex-1 rounded" />
+                    <SkeletonBlock className="h-10 w-40 rounded" />
+                </div>
+                <SkeletonTiles count={9} label="Loading inventory" />
             </div>
         );
     }
