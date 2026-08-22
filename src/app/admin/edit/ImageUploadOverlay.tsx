@@ -140,7 +140,7 @@ const ImageUploadOverlay: React.FC<ImageUploadOverlayProps> = ({
 
     return (
         <>
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
                 <div className="relative w-full max-w-4xl mx-4 max-h-[90vh] bg-surface rounded-lg shadow-2xl overflow-hidden">
                     {/* Header */}
                     <div className="flex items-center justify-between p-6 bg-surface-raised border-b border-line">

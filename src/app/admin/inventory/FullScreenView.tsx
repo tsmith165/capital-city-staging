@@ -52,7 +52,7 @@ const FullScreenView: React.FC<FullScreenViewProps> = ({
         <AnimatePresence>
             {selectedItem && (
                 <motion.div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/75"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}

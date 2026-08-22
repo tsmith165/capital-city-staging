@@ -293,13 +293,13 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                                             {item.category}
                                                         </div>
                                                         {/* Quantity available tag */}
-                                                        <div className="absolute left-2 top-2 rounded bg-black bg-opacity-70 px-2 py-1 text-xs font-medium text-white">
+                                                        <div className="absolute left-2 top-2 rounded bg-black/70 px-2 py-1 text-xs font-medium text-white">
                                                             {available}
                                                         </div>
                                                         {/* Enlarge button */}
                                                         <button
                                                             onClick={() => setSelectedImage(item.imagePath)}
-                                                            className="absolute bottom-2 right-2 rounded bg-black bg-opacity-70 p-1 text-white transition-opacity hover:bg-opacity-90"
+                                                            className="absolute bottom-2 right-2 rounded bg-black/70 p-1 text-white transition-colors hover:bg-black/90"
                                                         >
                                                             <ZoomIn size={14} />
                                                         </button>
@@ -389,7 +389,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                 {isCartOpen && (
                     <>
                         {/* Backdrop */}
-                        <div className="fixed inset-0 z-40 bg-black bg-opacity-50" onClick={() => setIsCartOpen(false)} />
+                        <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setIsCartOpen(false)} />
 
                         {/* Sidebar */}
                         <div className="fixed right-0 top-0 z-50 flex h-full w-full transform flex-col overflow-hidden bg-surface-raised shadow-2xl transition-transform duration-300 ease-in-out sm:w-3/5 lg:w-2/5 xl:w-1/3">
@@ -469,7 +469,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                                                 sizes="80px"
                                                             />
                                                             {/* Zoom overlay on hover */}
-                                                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
+                                                            <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/30 flex items-center justify-center">
                                                                 <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity" size={16} />
                                                             </div>
                                                         </div>
@@ -493,7 +493,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                                                             setOverlayQuantity(assignment.quantity);
                                                                             setQuantityOverlay(quantityOverlay === assignment._id ? null : assignment._id);
                                                                         }}
-                                                                        className="bg-secondary text-white px-2 py-1 rounded text-xs font-medium hover:bg-opacity-80 cursor-pointer transition-colors"
+                                                                        className="cursor-pointer rounded bg-forest-400 px-2 py-1 text-xs font-medium text-body transition-colors hover:bg-forest-300"
                                                                     >
                                                                         Quantity: {assignment.quantity}
                                                                     </button>
@@ -609,7 +609,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                 {selectedImage && (
                     <>
                         <div
-                            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4"
+                            className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4"
                             onClick={() => setSelectedImage(null)}
                         >
                             <div className="relative max-h-full max-w-4xl">
@@ -622,7 +622,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                                 />
                                 <button
                                     onClick={() => setSelectedImage(null)}
-                                    className="absolute right-4 top-4 rounded-full bg-black bg-opacity-50 p-2 text-white transition-opacity hover:bg-opacity-75"
+                                    className="absolute right-4 top-4 rounded-full bg-black/50 p-2 text-white transition-colors hover:bg-black/75"
                                 >
                                     <X size={20} />
                                 </button>

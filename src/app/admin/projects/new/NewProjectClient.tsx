@@ -231,7 +231,7 @@ export default function NewProjectClient() {
                                                 >
                                                     ×
                                                 </button>
-                                                <div className="absolute bottom-2 left-2 rounded bg-black bg-opacity-60 px-2 py-1 text-xs text-white">
+                                                <div className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs text-white">
                                                     {image.originalWidth}×{image.originalHeight}
                                                 </div>
                                             </div>

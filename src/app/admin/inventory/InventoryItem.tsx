@@ -26,7 +26,7 @@ const InventoryItem = ({ item, handleItemClick }: InventoryItemProps) => {
                 className="h-auto w-full rounded-md bg-surface-hover object-cover p-1"
                 priority
             />
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 p-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 p-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <p className="text-center text-xl font-bold text-white">{item.name}</p>
             </div>
             {item.count === 0 && <div className="absolute bottom-6 right-6 h-2 w-2 rounded-full bg-red-600 shadow-md" />}
