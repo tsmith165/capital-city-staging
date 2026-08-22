@@ -1,41 +1,14 @@
-import { Metadata } from 'next';
-import React from 'react';
-import PageLayout from '@/components/layout/PageLayout';
+import { adminMetadata } from '@/app/admin/admin.metadata';
+import AdminShell from '@/components/admin/AdminShell';
+
 import InventoryConvexClient from './InventoryConvexClient';
 
-export const metadata: Metadata = {
-    title: 'Capital City Staging - Inventory Management',
-    description: 'Manage inventory for Capital City Staging.',
-    keywords: 'Capital City Staging, Sacramento Staging, Inventory Management, Home Staging',
-    applicationName: 'Capital City Staging',
-    icons: {
-        icon: '/logo/CCS_logo_152x152.png',
-        shortcut: '/logo/CCS_logo_152x152.png',
-        apple: '/logo/apple-touch-icon-152x152.png',
-    },
-    openGraph: {
-        title: 'Capital City Staging - Inventory Management',
-        description: 'Manage inventory for Capital City Staging.',
-        siteName: 'Capital City Staging',
-        url: 'https://www.capitalcitystaging.com',
-        images: [
-            {
-                url: '/favicon/CCS_og_image.png',
-                width: 1200,
-                height: 630,
-                alt: 'Capital City Staging',
-            },
-        ],
-        locale: 'en_US',
-        type: 'website',
-    },
-    metadataBase: new URL('https://www.capitalcitystaging.com'),
-};
+export const metadata = adminMetadata('Inventory', 'Manage the Capital City Staging furniture and decor catalog.');
 
 export default function InventoryPage() {
     return (
-        <PageLayout page="/admin/inventory">
+        <AdminShell title="Inventory">
             <InventoryConvexClient />
-        </PageLayout>
+        </AdminShell>
     );
 }

@@ -1,0 +1,153 @@
+'use client';
+
+import { useState } from 'react';
+import { useMutation, useQuery } from 'convex/react';
+import { Check, Mail, Phone, RotateCcw, Trash2 } from 'lucide-react';
+
+import { api } from '@/convex/_generated/api';
+import type { Id } from '@/convex/_generated/dataModel';
+import AdminShell from '@/components/admin/AdminShell';
+import { AdminEmpty, AdminHeading, AdminStatus } from '@/components/admin/AdminPrimitives';
+
+import { INBOX_FILTERS } from './AdminInbox.constants';
+import type { InboxFilter } from './AdminInbox.types';
+
+const fullDate = new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+});
+
+export default function AdminInboxClient() {
+    const [filter, setFilter] = useState<InboxFilter>('unanswered');
+
+    const submissions = useQuery(
+        api.contactSubmissions.getSubmissions,
+        filter === 'all' ? {} : { responded: filter === 'answered' },
+    );
+    const setResponded = useMutation(api.contactSubmissions.setResponded);
+    const deleteSubmission = useMutation(api.contactSubmissions.deleteSubmission);
+
+    const handleDelete = async (id: Id<'contactSubmissions'>, name: string) => {
+        if (!window.confirm(`Delete the message from ${name}? This cannot be undone.`)) return;
+        await deleteSubmission({ id });
+    };
+
+    return (
+        <AdminShell title="Inbox">
+            <div className="flex flex-col gap-6 p-5 sm:p-8">
+                <AdminHeading
+                    eyebrow="Clients"
+                    title="Inbox"
+                    description="Every quote request submitted through the contact form, saved here whether or not its notification email went out."
+                />
+
+                <div className="flex flex-wrap gap-2" role="group" aria-label="Filter messages">
+                    {INBOX_FILTERS.map(({ value, label }) => (
+                        <button
+                            key={value}
+                            type="button"
+                            onClick={() => setFilter(value)}
+                            aria-pressed={filter === value}
+                            className={`rounded-md border px-3.5 py-2 text-xs font-bold transition-colors ${
+                                filter === value
+                                    ? 'border-gold-400 bg-gold-400/10 text-gold-300'
+                                    : 'border-line text-body-muted hover:bg-surface-raised hover:text-body'
+                            }`}
+                        >
+                            {label}
+                        </button>
+                    ))}
+                </div>
+
+                {submissions === undefined ? (
+                    <AdminEmpty>Loading messages…</AdminEmpty>
+                ) : submissions.length === 0 ? (
+                    <div className="rounded-lg border border-line bg-surface-raised">
+                        <AdminEmpty>
+                            {filter === 'unanswered'
+                                ? 'No unanswered messages. Everything has been replied to.'
+                                : filter === 'answered'
+                                  ? 'No answered messages yet.'
+                                  : 'No messages yet. Submissions from the contact form appear here.'}
+                        </AdminEmpty>
+                    </div>
+                ) : (
+                    <ul className="flex flex-col gap-3">
+                        {submissions.map((submission) => (
+                            <li
+                                key={submission._id}
+                                className="flex flex-col gap-3 rounded-lg border border-line bg-surface-raised p-5 shadow-card"
+                            >
+                                <div className="flex flex-wrap items-start justify-between gap-3">
+                                    <div className="flex min-w-0 flex-col gap-1">
+                                        <strong className="font-display text-lg font-normal leading-tight text-body">
+                                            {submission.name}
+                                        </strong>
+                                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-body-muted">
+                                            <a
+                                                href={`mailto:${submission.email}`}
+                                                className="inline-flex items-center gap-1.5 transition-colors hover:text-gold-300"
+                                            >
+                                                <Mail size={13} aria-hidden="true" /> {submission.email}
+                                            </a>
+                                            {submission.phone && (
+                                                <a
+                                                    href={`tel:${submission.phone}`}
+                                                    className="inline-flex items-center gap-1.5 transition-colors hover:text-gold-300"
+                                                >
+                                                    <Phone size={13} aria-hidden="true" /> {submission.phone}
+                                                </a>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <AdminStatus tone={submission.responded ? 'good' : 'warning'}>
+                                        {submission.responded ? 'Answered' : 'New'}
+                                    </AdminStatus>
+                                </div>
+
+                                <p className="whitespace-pre-wrap text-sm leading-relaxed text-body-muted">{submission.message}</p>
+
+                                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
+                                    <small className="text-[11px] text-body-subtle">
+                                        Received {fullDate.format(new Date(submission.createdAt))}
+                                        {submission.respondedAt
+                                            ? ` · answered ${fullDate.format(new Date(submission.respondedAt))}`
+                                            : ''}
+                                    </small>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setResponded({ id: submission._id, responded: !submission.responded })}
+                                            className="inline-flex items-center gap-1.5 rounded-md border border-line px-3 py-1.5 text-xs font-bold text-body-muted transition-colors hover:bg-surface-overlay hover:text-body"
+                                        >
+                                            {submission.responded ? (
+                                                <>
+                                                    <RotateCcw size={13} aria-hidden="true" /> Mark unanswered
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Check size={13} aria-hidden="true" /> Mark answered
+                                                </>
+                                            )}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDelete(submission._id, submission.name)}
+                                            aria-label={`Delete message from ${submission.name}`}
+                                            className="inline-flex items-center gap-1.5 rounded-md border border-line px-3 py-1.5 text-xs font-bold text-body-muted transition-colors hover:border-danger/40 hover:bg-danger-soft hover:text-danger"
+                                        >
+                                            <Trash2 size={13} aria-hidden="true" /> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+        </AdminShell>
+    );
+}
