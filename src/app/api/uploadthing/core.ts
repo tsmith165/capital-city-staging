@@ -1,4 +1,5 @@
 import { createUploadthing, type FileRouter } from 'uploadthing/next';
+import { UploadThingError } from 'uploadthing/server';
 import { getAuth } from '@clerk/nextjs/server';
 import { isClerkUserIdAdmin } from '@/utils/auth/ClerkUtils';
 
@@ -22,27 +23,23 @@ const f = createUploadthing({
 export const ourFileRouter = {
     imageUploader: f({ image: { maxFileSize: '4MB', maxFileCount: 20 } })
         .middleware(async ({ req }) => {
-            // Get the authenticated user from Clerk
             const { userId } = getAuth(req);
-            console.log('Middleware: User ID:', userId);
 
-            // If the user is not authenticated, allow the request to proceed (for webhook callback)
             if (!userId) {
-                console.log('User is not authenticated. Allowing request to proceed.');
-                return {};
+                throw new UploadThingError({
+                    code: 'FORBIDDEN',
+                    message: 'You must be signed in as an admin to upload images.',
+                });
             }
-
-            console.log('User is authenticated. Continuing...');
 
             const hasAdminRole = await isClerkUserIdAdmin(userId);
-            console.log('User hasAdminRole: ' + hasAdminRole);
             if (!hasAdminRole) {
-                console.log('User does not have admin role. Redirecting to home page.');
-                return {};
+                throw new UploadThingError({
+                    code: 'FORBIDDEN',
+                    message: 'Your account does not have the admin role required to upload images.',
+                });
             }
-            console.log('User has admin role. Continuing...');
 
-            // Return the authenticated user ID
             return { userId };
         })
         .onUploadComplete(async ({ metadata, file }) => {
