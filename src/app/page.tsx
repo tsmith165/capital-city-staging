@@ -2,7 +2,6 @@ import React from 'react';
 import type { Metadata } from 'next';
 import PageLayout from '@/components/layout/PageLayout';
 import MainView from './main_view';
-import HomePageTracking from './HomePageTracking';
 import JsonLd from '@/components/seo/JsonLd';
 import { localBusinessSchema } from '@/lib/structuredData';
 import { preloadQuery, preloadedQueryResult } from 'convex/nextjs';
@@ -54,7 +53,6 @@ export default async function Home() {
     return (
         <PageLayout page="home">
             <JsonLd data={localBusinessSchema()} />
-            <HomePageTracking />
             <MainView initialHomepageImages={initialHomepageImages} />
         </PageLayout>
     );

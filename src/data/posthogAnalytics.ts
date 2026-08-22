@@ -1,4 +1,11 @@
-import { POSTHOG_RANGES, type AnalyticsEntry, type AnalyticsTrendPoint, type PostHogAnalytics, type PostHogRange } from './posthogAnalytics.types';
+import {
+    POSTHOG_RANGES,
+    type AnalyticsConversions,
+    type AnalyticsEntry,
+    type AnalyticsTrendPoint,
+    type PostHogAnalytics,
+    type PostHogRange,
+} from './posthogAnalytics.types';
 
 export { POSTHOG_RANGES } from './posthogAnalytics.types';
 export type { PostHogAnalytics, PostHogRange } from './posthogAnalytics.types';
@@ -69,6 +76,19 @@ function publicPageviewWhere(range: PostHogRange): string {
         AND properties.$current_url NOT LIKE '%/signin%'
         AND properties.$current_url NOT LIKE '%/signup%'
         AND properties.$current_url NOT LIKE '%/signout%'`;
+}
+
+/** Conversion events are emitted from the public site only, so no URL filtering is needed. */
+function conversionWhere(range: PostHogRange): string {
+    return `event IN ('quote_started', 'quote_submitted', 'contact_channel_clicked', 'cta_clicked')
+        AND ${RANGE_CONFIG[range].sql}`;
+}
+
+function countFor(results: unknown, event: string): number {
+    for (const row of rows(results)) {
+        if (String(row[0]) === event) return numberAt(row, 1);
+    }
+    return 0;
 }
 
 function toPath(value: unknown): string | null {
@@ -155,14 +175,17 @@ export async function readPostHogAnalytics(range: PostHogRange): Promise<PostHog
         return {
             status: 'unconfigured',
             message:
-                'Website traffic is captured but cannot be read back yet. Add a read-only PostHog personal API key as POSTHOG_PERSONAL_API_KEY and the project ID as POSTHOG_PROJECT_ID to show traffic here.',
+                'Traffic and quote conversions are being recorded, but this page cannot read them back yet. Add a read-only PostHog personal API key as POSTHOG_PERSONAL_API_KEY and the project ID as POSTHOG_PROJECT_ID.',
         };
     }
 
     const where = publicPageviewWhere(range);
 
     try {
-        const [metricResults, trendResults, pageResults, sourceResults] = await Promise.all([
+        const conversions = conversionWhere(range);
+
+        const [metricResults, trendResults, pageResults, sourceResults, eventResults, valueResults, ctaResults, channelResults] =
+            await Promise.all([
             hogql(
                 projectId,
                 apiKey,
@@ -191,9 +214,43 @@ export async function readPostHogAnalytics(range: PostHogRange): Promise<PostHog
                  GROUP BY coalesce(nullIf(properties.$referring_domain, ''), 'Direct')
                  ORDER BY count() DESC LIMIT 12`,
             ),
+            hogql(projectId, apiKey, `SELECT event, count() FROM events WHERE ${conversions} GROUP BY event`),
+            hogql(
+                projectId,
+                apiKey,
+                `SELECT sum(toFloat(properties.estimate))
+                 FROM events WHERE event = 'quote_submitted' AND ${RANGE_CONFIG[range].sql}`,
+            ),
+            hogql(
+                projectId,
+                apiKey,
+                `SELECT concat(toString(properties.cta), ' \u00b7 ', toString(properties.placement)), count()
+                 FROM events WHERE event = 'cta_clicked' AND ${RANGE_CONFIG[range].sql}
+                 GROUP BY concat(toString(properties.cta), ' \u00b7 ', toString(properties.placement))
+                 ORDER BY count() DESC LIMIT 8`,
+            ),
+            hogql(
+                projectId,
+                apiKey,
+                `SELECT toString(properties.channel), count()
+                 FROM events WHERE event = 'contact_channel_clicked' AND ${RANGE_CONFIG[range].sql}
+                 GROUP BY toString(properties.channel)`,
+            ),
         ]);
 
         const metricRow = rows(metricResults)[0] ?? [];
+        const visitors = numberAt(metricRow, 1);
+        const quotesSubmitted = countFor(eventResults, 'quote_submitted');
+
+        const conversionSummary: AnalyticsConversions = {
+            quotesStarted: countFor(eventResults, 'quote_started'),
+            quotesSubmitted,
+            quoteValue: numberAt(rows(valueResults)[0] ?? [], 0),
+            phoneClicks: countFor(channelResults, 'phone'),
+            emailClicks: countFor(channelResults, 'email'),
+            conversionRate: visitors > 0 ? (quotesSubmitted / visitors) * 100 : 0,
+            topCtas: rows(ctaResults).map((row) => ({ label: String(row[0] ?? ''), value: numberAt(row, 1) })),
+        };
 
         return {
             status: 'ready',
@@ -205,6 +262,7 @@ export async function readPostHogAnalytics(range: PostHogRange): Promise<PostHog
             trend: toTrend(trendResults),
             topPages: groupPages(pageResults),
             topSources: groupSources(sourceResults),
+            conversions: conversionSummary,
         };
     } catch (error) {
         return {

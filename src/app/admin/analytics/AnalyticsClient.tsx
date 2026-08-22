@@ -11,6 +11,12 @@ import { POSTHOG_RANGES, type PostHogAnalytics, type PostHogRange } from '@/data
 
 import BarList from './BarList';
 
+const currency = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+});
+
 const number = new Intl.NumberFormat('en-US');
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 
@@ -103,6 +109,37 @@ export default function AnalyticsClient({ analytics, range }: { analytics: PostH
                         </div>
                     ) : (
                         <>
+                            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                <AdminMetric
+                                    label="Quotes submitted"
+                                    value={number.format(analytics.conversions.quotesSubmitted)}
+                                    hint={`${analytics.conversions.conversionRate.toFixed(1)}% of visitors`}
+                                />
+                                <AdminMetric
+                                    label="Estimated value"
+                                    value={currency.format(analytics.conversions.quoteValue)}
+                                    hint="Sum of the quoted estimates"
+                                />
+                                <AdminMetric
+                                    label="Quotes started"
+                                    value={number.format(analytics.conversions.quotesStarted)}
+                                    hint={
+                                        analytics.conversions.quotesStarted
+                                            ? `${Math.round(
+                                                  (analytics.conversions.quotesSubmitted / analytics.conversions.quotesStarted) * 100,
+                                              )}% went on to send`
+                                            : 'Nobody opened the calculator yet'
+                                    }
+                                />
+                                <AdminMetric
+                                    label="Calls and emails"
+                                    value={number.format(analytics.conversions.phoneClicks + analytics.conversions.emailClicks)}
+                                    hint={`${number.format(analytics.conversions.phoneClicks)} phone, ${number.format(
+                                        analytics.conversions.emailClicks,
+                                    )} email`}
+                                />
+                            </div>
+
                             <div className="grid gap-3 sm:grid-cols-3">
                                 <AdminMetric label="Page views" value={number.format(analytics.pageViews)} hint={analytics.rangeLabel} />
                                 <AdminMetric label="Visitors" value={number.format(analytics.visitors)} hint={analytics.rangeLabel} />
@@ -130,6 +167,13 @@ export default function AnalyticsClient({ analytics, range }: { analytics: PostH
                                         <BarList entries={analytics.topSources} />
                                     ) : (
                                         <AdminEmpty>No referrers recorded in this range.</AdminEmpty>
+                                    )}
+                                </AdminPanel>
+                                <AdminPanel eyebrow="Conversion" title="Which buttons get pressed">
+                                    {analytics.conversions.topCtas.length ? (
+                                        <BarList entries={analytics.conversions.topCtas} />
+                                    ) : (
+                                        <AdminEmpty>No call-to-action clicks recorded in this range.</AdminEmpty>
                                     )}
                                 </AdminPanel>
                             </div>

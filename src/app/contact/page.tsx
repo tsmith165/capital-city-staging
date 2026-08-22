@@ -2,7 +2,6 @@ import React from 'react';
 import type { Metadata } from 'next';
 import PageLayout from '../../components/layout/PageLayout';
 import Contact from './contact';
-import ContactPageTracking from './ContactPageTracking';
 import JsonLd from '@/components/seo/JsonLd';
 import { localBusinessSchema, SITE_URL } from '@/lib/structuredData';
 
@@ -37,7 +36,6 @@ export default function ContactPage() {
     return (
         <PageLayout page="contact">
             <JsonLd data={localBusinessSchema()} />
-            <ContactPageTracking />
             <Contact />
         </PageLayout>
     );
