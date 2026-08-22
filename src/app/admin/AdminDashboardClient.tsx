@@ -2,17 +2,12 @@
 
 import Link from 'next/link';
 import { useQuery } from 'convex/react';
-import { ArrowRight, ChevronRight, FileWarning, Home, Inbox, Plus } from 'lucide-react';
+import { ArrowRight, ChevronRight, FileWarning, Home, Inbox, Plus, Undo2 } from 'lucide-react';
 
 import { api } from '@/convex/_generated/api';
 import AdminShell from '@/components/admin/AdminShell';
 import { AdminCard, AdminEmpty, AdminHeading, AdminMetric, AdminPanel, AdminStatus } from '@/components/admin/AdminPrimitives';
-import {
-    SkeletonCardGrid,
-    SkeletonHeading,
-    SkeletonListRows,
-    SkeletonMetricGrid,
-} from '@/components/admin/AdminSkeleton';
+import { SkeletonCardGrid, SkeletonHeading, SkeletonListRows, SkeletonMetricGrid } from '@/components/admin/AdminSkeleton';
 
 const number = new Intl.NumberFormat('en-US');
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
@@ -56,6 +51,7 @@ export default function AdminDashboardClient() {
     const attentionAreas =
         Number(summary.projects.awaitingPayment > 0) +
         Number(summary.inventory.needsAttention > 0) +
+        Number(summary.inventory.awaitingCheckIn > 0) +
         Number(summary.inbox.unanswered > 0);
 
     return (
@@ -72,7 +68,7 @@ export default function AdminDashboardClient() {
                     action={
                         <Link
                             href="/admin/projects/new"
-                            className="inline-flex shrink-0 items-center gap-2 rounded-md bg-gold-400 px-4 py-2.5 text-sm font-bold text-body-inverse transition-colors hover:bg-gold-300"
+                            className="bg-gold-400 text-body-inverse hover:bg-gold-300 inline-flex shrink-0 items-center gap-2 rounded-md px-4 py-2.5 text-sm font-bold transition-colors"
                         >
                             <Plus size={16} aria-hidden="true" /> New project
                         </Link>
@@ -80,6 +76,21 @@ export default function AdminDashboardClient() {
                 />
 
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    {/*
+                     * Furniture stranded on a finished job is the one problem that makes every other
+                     * inventory number wrong, so it takes the first card whenever it exists.
+                     */}
+                    {summary.inventory.awaitingCheckIn > 0 && (
+                        <AdminCard
+                            icon={Undo2}
+                            label="Inventory"
+                            headline={`${number.format(summary.inventory.awaitingCheckIn)} ${plural(summary.inventory.awaitingCheckIn, 'unit is', 'units are')} still checked out to finished houses`}
+                            description={`Assigned to ${summary.inventory.strandedProjects} ${plural(summary.inventory.strandedProjects, 'job that has', 'jobs that have')} already closed, so what you have free reads lower than it is.`}
+                            href="/admin/inventory/check-in"
+                            linkLabel="Check them in"
+                            tone="warning"
+                        />
+                    )}
                     <AdminCard
                         icon={Home}
                         label="Projects"
@@ -101,9 +112,9 @@ export default function AdminDashboardClient() {
                                 ? `${summary.inventory.needsAttention} ${plural(summary.inventory.needsAttention, 'item needs', 'items need')} attention`
                                 : 'Catalog is complete'
                         }
-                        description="Missing photos, dimensions, and prices are collected into a single queue."
+                        description="Items with no photo, or unpriced while out on a job. Prices can be fixed straight from the queue."
                         href="/admin/inventory/attention"
-                        linkLabel="Review catalog"
+                        linkLabel="Open fix queue"
                         tone={summary.inventory.needsAttention ? 'warning' : 'good'}
                     />
                     <AdminCard
@@ -133,14 +144,20 @@ export default function AdminDashboardClient() {
                         hint={`${number.format(summary.projects.completed)} completed ${plural(summary.projects.completed, 'project', 'projects')}`}
                     />
                     <AdminMetric
-                        label="Active inventory"
-                        value={number.format(summary.inventory.active)}
-                        hint={`${number.format(summary.inventory.units)} total units`}
+                        label="Free to stage"
+                        value={`${number.format(summary.inventory.free)} units`}
+                        hint={`of ${number.format(summary.inventory.units)} owned`}
                     />
                     <AdminMetric
-                        label="Currently staged"
-                        value={number.format(summary.inventory.inUse)}
-                        hint="Units assigned to a project"
+                        label="Out staging"
+                        value={`${number.format(summary.inventory.out)} units`}
+                        hint={
+                            summary.inventory.out === 0
+                                ? 'Nothing is at a house right now'
+                                : summary.projects.activeName
+                                  ? `At ${summary.projects.activeName}`
+                                  : `Across ${number.format(summary.inventory.outProjects)} houses`
+                        }
                     />
                 </div>
 
@@ -151,30 +168,31 @@ export default function AdminDashboardClient() {
                         ) : projectsNeedingAttention.length === 0 ? (
                             <AdminEmpty>No active or unpaid projects.</AdminEmpty>
                         ) : (
-                            <ul className="divide-y divide-line">
+                            <ul className="divide-line divide-y">
                                 {projectsNeedingAttention.slice(0, 6).map((project) => (
                                     <li key={project._id}>
                                         <Link
                                             href={`/admin/projects/${project._id}/edit`}
-                                            className="flex items-center gap-3 px-5 py-3.5 transition-colors hover:bg-surface-overlay"
+                                            className="hover:bg-surface-overlay flex items-center gap-3 px-5 py-3.5 transition-colors"
                                         >
                                             <span className="flex min-w-0 flex-col gap-0.5">
-                                                <strong className="truncate text-sm font-bold text-body">{project.name}</strong>
-                                                <small className="truncate text-xs text-body-subtle">
+                                                <strong className="text-body truncate text-sm font-bold">{project.name}</strong>
+                                                <small className="text-body-subtle truncate text-xs">
                                                     {project.address || 'No address recorded'}
                                                 </small>
                                             </span>
                                             <span className="ml-auto flex shrink-0 items-center gap-3">
                                                 {project.revenue ? (
-                                                    <strong className="text-sm font-bold text-body">
-                                                        {money.format(project.revenue)}
-                                                    </strong>
+                                                    <strong className="text-body text-sm font-bold">{money.format(project.revenue)}</strong>
                                                 ) : null}
+                                                {project.awaitingCheckIn && (
+                                                    <AdminStatus tone="warning">{project.openUnits} to check in</AdminStatus>
+                                                )}
                                                 <AdminStatus tone={project.awaitingPayment ? 'warning' : 'info'}>
-                                                    {project.awaitingPayment ? 'Unpaid' : 'Active'}
+                                                    {project.awaitingPayment ? 'Unpaid' : project.status === 'active' ? 'Active' : 'Closed'}
                                                 </AdminStatus>
                                             </span>
-                                            <ChevronRight size={16} aria-hidden="true" className="shrink-0 text-body-subtle" />
+                                            <ChevronRight size={16} aria-hidden="true" className="text-body-subtle shrink-0" />
                                         </Link>
                                     </li>
                                 ))}
@@ -188,13 +206,13 @@ export default function AdminDashboardClient() {
                         ) : recentSubmissions.length === 0 ? (
                             <AdminEmpty>No messages yet. New contact form submissions appear here.</AdminEmpty>
                         ) : (
-                            <ul className="divide-y divide-line">
+                            <ul className="divide-line divide-y">
                                 {recentSubmissions.map((submission) => (
                                     <li key={submission._id} className="flex items-start gap-3 px-5 py-3.5">
                                         <span className="flex min-w-0 flex-col gap-1">
-                                            <strong className="truncate text-sm font-bold text-body">{submission.name}</strong>
-                                            <p className="line-clamp-2 text-xs text-body-muted">{submission.message}</p>
-                                            <small className="text-[11px] text-body-subtle">
+                                            <strong className="text-body truncate text-sm font-bold">{submission.name}</strong>
+                                            <p className="text-body-muted line-clamp-2 text-xs">{submission.message}</p>
+                                            <small className="text-body-subtle text-[11px]">
                                                 {shortDate.format(new Date(submission.createdAt))}
                                             </small>
                                         </span>
@@ -212,7 +230,7 @@ export default function AdminDashboardClient() {
 
                 <Link
                     href="/admin/analytics"
-                    className="inline-flex w-fit items-center gap-1.5 text-xs font-bold text-gold-300 transition-colors hover:text-gold-200"
+                    className="text-gold-300 hover:text-gold-200 inline-flex w-fit items-center gap-1.5 text-xs font-bold transition-colors"
                 >
                     See traffic and engagement analytics <ArrowRight size={14} aria-hidden="true" />
                 </Link>

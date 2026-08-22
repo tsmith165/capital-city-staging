@@ -4,11 +4,13 @@ import Link from 'next/link';
 import { AdminHeading, AdminPanel } from '@/components/admin/AdminPrimitives';
 
 import DataBackup from './DataBackup';
+import DataHealth from './DataHealth';
 import ImageProcessing from './ImageProcessing';
 import { TOOL_TABS } from './tools.constants';
 
 const PANELS: Record<string, ComponentType> = {
     backup: DataBackup,
+    health: DataHealth,
     images: ImageProcessing,
 };
 
@@ -52,7 +54,7 @@ export default function Tools({ activeTab }: { activeTab: string }) {
                 </nav>
 
                 <AdminPanel eyebrow={tab.eyebrow} title={tab.title}>
-                    <p className="border-b border-line px-5 py-3.5 text-sm text-body-muted">{tab.description}</p>
+                    <p className="border-line text-body-muted border-b px-5 py-3.5 text-sm">{tab.description}</p>
                     <Panel />
                 </AdminPanel>
             </div>

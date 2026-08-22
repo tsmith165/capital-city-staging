@@ -60,12 +60,7 @@ export default defineSchema({
   projects: defineTable({
     ownerId: v.string(),
     name: v.string(),
-    status: v.union(
-      v.literal("draft"),
-      v.literal("active"),
-      v.literal("completed"),
-      v.literal("cancelled")
-    ),
+    status: v.union(v.literal("draft"), v.literal("active"), v.literal("completed"), v.literal("cancelled")),
     startDate: v.optional(v.number()),
     endDate: v.optional(v.number()),
     revenue: v.optional(v.number()),
@@ -113,7 +108,8 @@ export default defineSchema({
   })
     .index("by_project", ["projectId"])
     .index("by_inventory", ["inventoryId"])
-    .index("by_active", ["projectId", "returnedAt"]),
+    .index("by_active", ["projectId", "returnedAt"])
+    .index("by_inventory_active", ["inventoryId", "returnedAt"]),
 
   contactSubmissions: defineTable({
     name: v.string(),

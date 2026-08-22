@@ -1,5 +1,8 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { requireAdmin, isAdmin } from "./authz";
+import { availabilityByItem, availabilityForItem, openAssignmentsForItem } from "./availability";
+import { attentionReasons, highestTier } from "./inventoryRules";
 
 // Get all inventory (admin only)
 export const getAllInventory = query({
@@ -32,15 +35,11 @@ export const getInventory = query({
     let inventoryQuery = ctx.db.query("inventory");
 
     if (args.active !== undefined) {
-      inventoryQuery = inventoryQuery.filter((q) =>
-        q.eq(q.field("active"), args.active)
-      );
+      inventoryQuery = inventoryQuery.filter((q) => q.eq(q.field("active"), args.active));
     }
 
     if (args.category) {
-      inventoryQuery = inventoryQuery.filter((q) =>
-        q.eq(q.field("category"), args.category)
-      );
+      inventoryQuery = inventoryQuery.filter((q) => q.eq(q.field("category"), args.category));
     }
 
     const inventory = await inventoryQuery.collect();
@@ -49,9 +48,8 @@ export const getInventory = query({
     let filtered = inventory;
     if (args.search) {
       const searchLower = args.search.toLowerCase();
-      filtered = inventory.filter((item) =>
-        item.name.toLowerCase().includes(searchLower) ||
-        item.description.toLowerCase().includes(searchLower)
+      filtered = inventory.filter(
+        (item) => item.name.toLowerCase().includes(searchLower) || item.description.toLowerCase().includes(searchLower),
       );
     }
 
@@ -90,7 +88,7 @@ export const getInventoryItemByOId = query({
       .query("inventory")
       .filter((q) => q.eq(q.field("oId"), args.oId))
       .first();
-    
+
     if (!item) return null;
 
     const extraImages = await ctx.db
@@ -224,12 +222,18 @@ export const deleteInventory = mutation({
       throw new Error("Not authorized");
     }
 
-    // Check if item is in use
     const item = await ctx.db.get(args.id);
     if (!item) throw new Error("Item not found");
 
-    if (item.inUse > 0) {
-      throw new Error("Cannot delete item that is currently in use");
+    /*
+     * This used to guard on `item.inUse`, which was `0` on every row in the table, so the check
+     * never fired and deleting a staged item silently orphaned its assignment rows. Ask the join
+     * table instead, and name the house so the message is actionable.
+     */
+    const openRows = await openAssignmentsForItem(ctx, args.id);
+    if (openRows.length > 0) {
+      const holder = await ctx.db.get(openRows[0].projectId);
+      throw new Error(`Cannot delete this item while it is checked out to ${holder?.name ?? "a project"}. Check it in first.`);
     }
 
     // Delete extra images first
@@ -247,18 +251,14 @@ export const deleteInventory = mutation({
   },
 });
 
-// Get inventory availability
+/** Derived availability for one item, plus which houses are holding it. */
 export const getInventoryAvailability = query({
   args: { id: v.id("inventory") },
   handler: async (ctx, args) => {
     const item = await ctx.db.get(args.id);
     if (!item) return null;
 
-    return {
-      total: item.count,
-      inUse: item.inUse,
-      available: item.count - item.inUse,
-    };
+    return availabilityForItem(ctx, args.id);
   },
 });
 
@@ -266,7 +266,7 @@ export const getInventoryAvailability = query({
 export const getInventoryCategories = query({
   handler: async (ctx) => {
     const inventory = await ctx.db.query("inventory").collect();
-    const categories = [...new Set(inventory.map(item => item.category))];
+    const categories = [...new Set(inventory.map((item) => item.category))];
     return categories.sort();
   },
 });
@@ -275,24 +275,22 @@ export const getInventoryCategories = query({
 export const getAdjacentInventoryOIds = query({
   args: { oId: v.number() },
   handler: async (ctx, args) => {
-    const inventory = await ctx.db
-      .query("inventory")
-      .collect();
-    
+    const inventory = await ctx.db.query("inventory").collect();
+
     // Sort by oId descending (most recent first)
     const sorted = inventory.sort((a, b) => b.oId - a.oId);
-    
+
     // Find current index
-    const currentIndex = sorted.findIndex(item => item.oId === args.oId);
-    
+    const currentIndex = sorted.findIndex((item) => item.oId === args.oId);
+
     if (currentIndex === -1) {
       return { nextOId: null, prevOId: null };
     }
-    
+
     // Get adjacent oIds
     const nextOId = currentIndex > 0 ? sorted[currentIndex - 1].oId : null;
     const prevOId = currentIndex < sorted.length - 1 ? sorted[currentIndex + 1].oId : null;
-    
+
     return { nextOId, prevOId };
   },
 });
@@ -300,17 +298,13 @@ export const getAdjacentInventoryOIds = query({
 // Get most recent inventory oId
 export const getMostRecentOId = query({
   handler: async (ctx) => {
-    const inventory = await ctx.db
-      .query("inventory")
-      .collect();
-    
+    const inventory = await ctx.db.query("inventory").collect();
+
     if (inventory.length === 0) return null;
-    
+
     // Find the item with the highest oId
-    const mostRecent = inventory.reduce((max, item) => 
-      item.oId > max.oId ? item : max
-    );
-    
+    const mostRecent = inventory.reduce((max, item) => (item.oId > max.oId ? item : max));
+
     return mostRecent.oId;
   },
 });
@@ -346,8 +340,8 @@ export const addExtraImage = mutation({
       .query("extraImages")
       .withIndex("by_inventory", (q) => q.eq("inventoryId", args.inventoryId))
       .collect();
-    
-    const maxOrder = Math.max(...extraImages.map(img => img.displayOrder || 0), 0);
+
+    const maxOrder = Math.max(...extraImages.map((img) => img.displayOrder || 0), 0);
 
     // Create extra image
     const imageId = await ctx.db.insert("extraImages", {
@@ -384,7 +378,7 @@ export const deleteExtraImage = mutation({
 
 // Reorder images by swapping two positions (admin only)
 export const reorderImagesBySwapping = mutation({
-  args: { 
+  args: {
     inventoryId: v.id("inventory"),
     position1: v.number(), // 1-based position (1 = main image, 2+ = extra images)
     position2: v.number(), // 1-based position
@@ -404,7 +398,7 @@ export const reorderImagesBySwapping = mutation({
     }
 
     const { inventoryId, position1, position2 } = args;
-    
+
     if (position1 === position2) {
       return; // No swap needed
     }
@@ -423,7 +417,7 @@ export const reorderImagesBySwapping = mutation({
 
     // Helper function to extract filename from path
     const getFilename = (path: string) => {
-      return path.split('/').pop() || path;
+      return path.split("/").pop() || path;
     };
 
     // Create image array: [mainImage, ...extraImages]
@@ -440,7 +434,7 @@ export const reorderImagesBySwapping = mutation({
         _id: null, // Main image doesn't have an _id in extraImages
         displayOrder: 0,
       },
-      ...extraImages.map(img => ({
+      ...extraImages.map((img) => ({
         isMain: false,
         title: img.title || getFilename(img.imagePath),
         imagePath: img.imagePath,
@@ -451,7 +445,7 @@ export const reorderImagesBySwapping = mutation({
         smallHeight: img.smallHeight,
         _id: img._id,
         displayOrder: img.displayOrder,
-      }))
+      })),
     ];
 
     // Validate positions
@@ -469,7 +463,7 @@ export const reorderImagesBySwapping = mutation({
 
     // Update the database
     const newMainImage = allImages[0];
-    
+
     // Update main image in inventory table
     await ctx.db.patch(inventoryId, {
       imagePath: newMainImage.imagePath,
@@ -527,21 +521,24 @@ export const initializeImageOrder = mutation({
 
     // Get all extra images that don't have displayOrder set
     const extraImages = await ctx.db.query("extraImages").collect();
-    
+
     // Group by inventory ID
-    const imagesByInventory = extraImages.reduce((acc, img) => {
-      if (!acc[img.inventoryId]) {
-        acc[img.inventoryId] = [];
-      }
-      acc[img.inventoryId].push(img);
-      return acc;
-    }, {} as Record<string, typeof extraImages>);
+    const imagesByInventory = extraImages.reduce(
+      (acc, img) => {
+        if (!acc[img.inventoryId]) {
+          acc[img.inventoryId] = [];
+        }
+        acc[img.inventoryId].push(img);
+        return acc;
+      },
+      {} as Record<string, typeof extraImages>,
+    );
 
     // Update display order for each inventory's images
     for (const images of Object.values(imagesByInventory)) {
       // Sort by creation time to maintain original order
       const sortedImages = images.sort((a, b) => a.createdAt - b.createdAt);
-      
+
       for (let i = 0; i < sortedImages.length; i++) {
         const img = sortedImages[i];
         if (!img.displayOrder) {
@@ -554,3 +551,124 @@ export const initializeImageOrder = mutation({
   },
 });
 
+/**
+ * The catalog grid: every active item with derived availability and the house holding it.
+ *
+ * Filtering and sorting stay on the client. At ~400 items the whole catalog is one small payload,
+ * and keeping it whole is what lets the availability segmented control and the category counts stay
+ * in sync without a round trip per keystroke.
+ */
+export const getCatalog = query({
+  args: { includeInactive: v.optional(v.boolean()) },
+  handler: async (ctx, args) => {
+    if (!(await isAdmin(ctx))) return null;
+
+    const [items, availability, allAssignments] = await Promise.all([
+      ctx.db.query("inventory").collect(),
+      availabilityByItem(ctx),
+      ctx.db.query("projectInventory").collect(),
+    ]);
+
+    /* Lifetime staging count, including returned rows — this is what "never staged" is read off. */
+    const stagedCount = new Map<string, number>();
+    for (const row of allAssignments) {
+      stagedCount.set(row.inventoryId, (stagedCount.get(row.inventoryId) ?? 0) + 1);
+    }
+
+    const visible = args.includeInactive ? items : items.filter((item) => item.active);
+
+    return visible
+      .map((item) => {
+        const derived = availability.get(item._id);
+        const reasons = attentionReasons(item, derived);
+        const primaryHolder = derived?.holders[0];
+
+        return {
+          _id: item._id,
+          oId: item.oId,
+          name: item.name,
+          category: item.category,
+          location: item.location,
+          price: item.price,
+          active: item.active,
+          imagePath: item.imagePath,
+          smallImagePath: item.smallImagePath,
+          owned: item.count,
+          out: derived?.out ?? 0,
+          awaitingCheckIn: derived?.awaitingCheckIn ?? 0,
+          free: derived?.free ?? 0,
+          holderName: primaryHolder?.projectName ?? null,
+          holderId: primaryHolder?.projectId ?? null,
+          holderAwaitingCheckIn: primaryHolder?.awaitingCheckIn ?? false,
+          holderCount: derived?.holders.length ?? 0,
+          attentionTier: highestTier(reasons),
+          timesStaged: stagedCount.get(item._id) ?? 0,
+        };
+      })
+      .sort((a, b) => b.oId - a.oId);
+  },
+});
+
+/** Full detail for the catalog's item sheet, including derived availability. */
+export const getInventoryDetail = query({
+  args: { id: v.id("inventory") },
+  handler: async (ctx, args) => {
+    if (!(await isAdmin(ctx))) return null;
+
+    const item = await ctx.db.get(args.id);
+    if (!item) return null;
+
+    const [extraImages, availability] = await Promise.all([
+      ctx.db
+        .query("extraImages")
+        .withIndex("by_inventory", (q) => q.eq("inventoryId", args.id))
+        .collect(),
+      availabilityForItem(ctx, args.id),
+    ]);
+
+    return {
+      ...item,
+      extraImages: extraImages.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)),
+      availability,
+      attention: attentionReasons(item, availability),
+    };
+  },
+});
+
+/**
+ * Set the price on one item without loading the whole editor.
+ *
+ * The queue's dominant problem is a missing price on an item that is otherwise fine. Routing 102 of
+ * those through a full edit page is the reason none of them got fixed, so the queue row edits the
+ * field in place.
+ */
+export const setInventoryPrice = mutation({
+  args: { id: v.id("inventory"), price: v.number() },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    if (!Number.isFinite(args.price) || args.price < 0) throw new Error("Price must be zero or more");
+
+    await ctx.db.patch(args.id, { price: args.price, updatedAt: Date.now() });
+  },
+});
+
+/** Same idea for the measurements the will-it-fit categories need. */
+export const setInventoryDimensions = mutation({
+  args: {
+    id: v.id("inventory"),
+    realWidth: v.number(),
+    realHeight: v.number(),
+    realDepth: v.number(),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const { id, ...dimensions } = args;
+    for (const value of Object.values(dimensions)) {
+      if (!Number.isFinite(value) || value < 0) throw new Error("Measurements must be zero or more");
+    }
+
+    await ctx.db.patch(id, { ...dimensions, updatedAt: Date.now() });
+  },
+});

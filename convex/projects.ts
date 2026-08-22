@@ -1,6 +1,8 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 import { requireAdmin } from "./authz";
+import { syncItemCounter, syncProjectFlag } from "./availability";
 
 // Get highlighted projects for portfolio
 export const getHighlightedProjects = query({
@@ -12,7 +14,7 @@ export const getHighlightedProjects = query({
 
     // Sort by display order and get images for each project
     const sortedProjects = projects.sort((a, b) => (a.displayOrder || 999) - (b.displayOrder || 999));
-    
+
     const projectsWithImages = await Promise.all(
       sortedProjects.map(async (project) => {
         const images = await ctx.db
@@ -24,7 +26,7 @@ export const getHighlightedProjects = query({
           ...project,
           images: images.sort((a, b) => a.displayOrder - b.displayOrder),
         };
-      })
+      }),
     );
 
     return projectsWithImages;
@@ -125,7 +127,7 @@ export const getProject = query({
           ...assignment,
           inventory,
         };
-      })
+      }),
     );
 
     return {
@@ -140,12 +142,7 @@ export const getProject = query({
 export const createProject = mutation({
   args: {
     name: v.string(),
-    status: v.union(
-      v.literal("draft"),
-      v.literal("active"),
-      v.literal("completed"),
-      v.literal("cancelled")
-    ),
+    status: v.union(v.literal("draft"), v.literal("active"), v.literal("completed"), v.literal("cancelled")),
     startDate: v.optional(v.number()),
     endDate: v.optional(v.number()),
     revenue: v.optional(v.number()),
@@ -160,7 +157,7 @@ export const createProject = mutation({
 
     // Get the highest display order to append new project to end
     const projects = await ctx.db.query("projects").collect();
-    const maxOrder = Math.max(...projects.map(p => p.displayOrder || 0), 0);
+    const maxOrder = Math.max(...projects.map((p) => p.displayOrder || 0), 0);
 
     const projectId = await ctx.db.insert("projects", {
       ownerId: identity.subject,
@@ -181,7 +178,6 @@ export const createProject = mutation({
     return projectId;
   },
 });
-
 
 // Add image to project
 export const addProjectImage = mutation({
@@ -256,87 +252,6 @@ export const deleteProjectImage = mutation({
   },
 });
 
-// Assign inventory to project
-export const assignInventoryToProject = mutation({
-  args: {
-    projectId: v.id("projects"),
-    inventoryId: v.id("inventory"),
-    quantity: v.number(),
-  },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-
-    // Check project ownership or admin
-    const project = await ctx.db.get(args.projectId);
-    if (!project) throw new Error("Project not found");
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .first();
-
-    if (!user) throw new Error("User not found");
-
-    if (project.ownerId !== identity.subject && user.role !== "admin") {
-      throw new Error("Not authorized");
-    }
-
-    // Get inventory for price
-    const inventory = await ctx.db.get(args.inventoryId);
-    if (!inventory) throw new Error("Inventory not found");
-
-    // Create assignment (no inventory blocking)
-    await ctx.db.insert("projectInventory", {
-      projectId: args.projectId,
-      inventoryId: args.inventoryId,
-      quantity: args.quantity,
-      pricePerItem: inventory.price,
-      assignedAt: Date.now(),
-    });
-
-    // Update project
-    await ctx.db.patch(args.projectId, {
-      inventoryAssigned: true,
-      updatedAt: Date.now(),
-    });
-  },
-});
-
-// Return inventory from project
-export const returnInventoryFromProject = mutation({
-  args: {
-    projectInventoryId: v.id("projectInventory"),
-  },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-
-    const assignment = await ctx.db.get(args.projectInventoryId);
-    if (!assignment) throw new Error("Assignment not found");
-
-    // Check project ownership or admin
-    const project = await ctx.db.get(assignment.projectId);
-    if (!project) throw new Error("Project not found");
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .first();
-
-    if (!user) throw new Error("User not found");
-
-    if (project.ownerId !== identity.subject && user.role !== "admin") {
-      throw new Error("Not authorized");
-    }
-
-    // Mark assignment as returned
-    await ctx.db.patch(args.projectInventoryId, {
-      returnedAt: Date.now(),
-    });
-  },
-});
-
 // Get project by ID with images (admin only)
 export const getProjectById = query({
   args: { projectId: v.id("projects") },
@@ -374,6 +289,15 @@ export const getProjectById = query({
 });
 
 // Update project (admin only)
+/**
+ * Save a project, optionally checking its inventory in as part of the same transaction.
+ *
+ * The check-in is folded in here rather than fired as a second mutation because the two have to
+ * agree: a project that reads "completed" while its furniture still reads "at this house" is exactly
+ * the state that left 75 units stranded across five finished jobs. `checkInAssignmentIds` is the
+ * subset the operator confirmed is physically back — anything omitted stays assigned on purpose, so
+ * an item that sold with the house is not silently marked as returned to the warehouse.
+ */
 export const updateProject = mutation({
   args: {
     projectId: v.id("projects"),
@@ -385,27 +309,33 @@ export const updateProject = mutation({
     revenue: v.optional(v.number()),
     notes: v.optional(v.string()),
     highlighted: v.boolean(),
+    checkInAssignmentIds: v.optional(v.array(v.id("projectInventory"))),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
+    await requireAdmin(ctx);
 
-    // Check if user is admin
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .first();
+    const { projectId, checkInAssignmentIds, ...updates } = args;
+    const now = Date.now();
 
-    if (!user || user.role !== "admin") {
-      throw new Error("Not authorized");
+    await ctx.db.patch(projectId, { ...updates, updatedAt: now });
+
+    if (checkInAssignmentIds && checkInAssignmentIds.length > 0) {
+      /* Stamp the return with the job's end date when there is one, not the date of the paperwork. */
+      const returnedAt = updates.endDate ?? now;
+      const touchedItems = new Set<Id<"inventory">>();
+
+      for (const assignmentId of checkInAssignmentIds) {
+        const row = await ctx.db.get(assignmentId);
+        if (!row || row.projectId !== projectId || row.returnedAt !== undefined) continue;
+
+        await ctx.db.patch(assignmentId, { returnedAt });
+        touchedItems.add(row.inventoryId);
+      }
+
+      for (const inventoryId of touchedItems) await syncItemCounter(ctx, inventoryId);
     }
 
-    const { projectId, ...updates } = args;
-
-    await ctx.db.patch(projectId, {
-      ...updates,
-      updatedAt: Date.now(),
-    });
+    await syncProjectFlag(ctx, projectId);
 
     return { success: true };
   },
@@ -435,9 +365,9 @@ export const removeProjectImage = mutation({
 
 // Reorder project images (admin only)
 export const reorderProjectImages = mutation({
-  args: { 
-    projectId: v.id("projects"), 
-    imageIds: v.array(v.id("projectImages"))
+  args: {
+    projectId: v.id("projects"),
+    imageIds: v.array(v.id("projectImages")),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -461,45 +391,6 @@ export const reorderProjectImages = mutation({
     }
 
     return { success: true };
-  },
-});
-
-// Get project inventory assignments (admin only)
-export const getProjectInventory = query({
-  args: { projectId: v.id("projects") },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-
-    // Check if user is admin
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .first();
-
-    if (!user || user.role !== "admin") {
-      throw new Error("Not authorized");
-    }
-
-    // Get all inventory assignments for this project
-    const assignments = await ctx.db
-      .query("projectInventory")
-      .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
-      .collect();
-
-    // Get inventory details for each assignment
-    const assignmentsWithInventory = [];
-    for (const assignment of assignments) {
-      const inventory = await ctx.db.get(assignment.inventoryId);
-      if (inventory) {
-        assignmentsWithInventory.push({
-          ...assignment,
-          inventory,
-        });
-      }
-    }
-
-    return assignmentsWithInventory;
   },
 });
 
@@ -547,7 +438,7 @@ export const deleteProject = mutation({
       throw new Error("Not authorized");
     }
 
-    // Delete all project inventory assignments
+    // Delete all project inventory assignments, then rewrite the counters they were feeding.
     const assignments = await ctx.db
       .query("projectInventory")
       .withIndex("by_project", (q) => q.eq("projectId", args.id))
@@ -555,6 +446,10 @@ export const deleteProject = mutation({
 
     for (const assignment of assignments) {
       await ctx.db.delete(assignment._id);
+    }
+
+    for (const inventoryId of new Set(assignments.map((assignment) => assignment.inventoryId))) {
+      await syncItemCounter(ctx, inventoryId);
     }
 
     // Delete project images
@@ -594,13 +489,13 @@ export const moveProjectUp = mutation({
     // Find the project with the next lower order
     const projects = await ctx.db.query("projects").collect();
     const sortedProjects = projects.sort((a, b) => (a.displayOrder || 999) - (b.displayOrder || 999));
-    const currentIndex = sortedProjects.findIndex(p => p._id === args.projectId);
-    
+    const currentIndex = sortedProjects.findIndex((p) => p._id === args.projectId);
+
     if (currentIndex > 0) {
       const prevProject = sortedProjects[currentIndex - 1];
-      const currentOrder = project.displayOrder || (currentIndex + 1);
+      const currentOrder = project.displayOrder || currentIndex + 1;
       const prevOrder = prevProject.displayOrder || currentIndex;
-      
+
       // Swap display orders
       await ctx.db.patch(args.projectId, { displayOrder: prevOrder });
       await ctx.db.patch(prevProject._id, { displayOrder: currentOrder });
@@ -630,13 +525,13 @@ export const moveProjectDown = mutation({
     // Find the project with the next higher order
     const projects = await ctx.db.query("projects").collect();
     const sortedProjects = projects.sort((a, b) => (a.displayOrder || 999) - (b.displayOrder || 999));
-    const currentIndex = sortedProjects.findIndex(p => p._id === args.projectId);
-    
+    const currentIndex = sortedProjects.findIndex((p) => p._id === args.projectId);
+
     if (currentIndex < sortedProjects.length - 1) {
       const nextProject = sortedProjects[currentIndex + 1];
-      const currentOrder = project.displayOrder || (currentIndex + 1);
-      const nextOrder = nextProject.displayOrder || (currentIndex + 2);
-      
+      const currentOrder = project.displayOrder || currentIndex + 1;
+      const nextOrder = nextProject.displayOrder || currentIndex + 2;
+
       // Swap display orders
       await ctx.db.patch(args.projectId, { displayOrder: nextOrder });
       await ctx.db.patch(nextProject._id, { displayOrder: currentOrder });
@@ -661,14 +556,14 @@ export const initializeProjectOrder = mutation({
     }
 
     const projects = await ctx.db.query("projects").order("desc").collect();
-    
+
     for (let i = 0; i < projects.length; i++) {
       const project = projects[i];
       if (project.displayOrder === undefined || project.displayOrder === null) {
         await ctx.db.patch(project._id, { displayOrder: i + 1 });
       }
     }
-    
+
     return { success: true, updated: projects.length };
   },
 });
@@ -692,15 +587,15 @@ export const moveProjectToFirst = mutation({
     // Reorder all projects to maintain sequential order
     const projects = await ctx.db.query("projects").collect();
     const sortedProjects = projects.sort((a, b) => (a.displayOrder || 999) - (b.displayOrder || 999));
-    
+
     // Find the project being moved
-    const movingProject = projects.find(p => p._id === args.projectId);
+    const movingProject = projects.find((p) => p._id === args.projectId);
     if (!movingProject) throw new Error("Project not found");
-    
+
     // Remove from current position and add to beginning
-    const otherProjects = sortedProjects.filter(p => p._id !== args.projectId);
+    const otherProjects = sortedProjects.filter((p) => p._id !== args.projectId);
     const reorderedProjects = [movingProject, ...otherProjects];
-    
+
     // Update display orders to be sequential
     for (let i = 0; i < reorderedProjects.length; i++) {
       await ctx.db.patch(reorderedProjects[i]._id, { displayOrder: i + 1 });
@@ -727,15 +622,15 @@ export const moveProjectToLast = mutation({
     // Reorder all projects to maintain sequential order
     const projects = await ctx.db.query("projects").collect();
     const sortedProjects = projects.sort((a, b) => (a.displayOrder || 999) - (b.displayOrder || 999));
-    
+
     // Find the project being moved
-    const movingProject = projects.find(p => p._id === args.projectId);
+    const movingProject = projects.find((p) => p._id === args.projectId);
     if (!movingProject) throw new Error("Project not found");
-    
+
     // Remove from current position and add to end
-    const otherProjects = sortedProjects.filter(p => p._id !== args.projectId);
+    const otherProjects = sortedProjects.filter((p) => p._id !== args.projectId);
     const reorderedProjects = [...otherProjects, movingProject];
-    
+
     // Update display orders to be sequential
     for (let i = 0; i < reorderedProjects.length; i++) {
       await ctx.db.patch(reorderedProjects[i]._id, { displayOrder: i + 1 });

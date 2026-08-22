@@ -6,10 +6,12 @@ import { api } from '@/convex/_generated/api';
 import { useRouter } from 'next/navigation';
 import ProjectResizeUploader from '@/components/ProjectResizeUploader';
 import { Id } from '@/convex/_generated/dataModel';
-import { Plus, Bell, Loader2, Info, Trash2, ExternalLink } from 'lucide-react';
+import { Plus, Bell, Loader2 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
-import Image from 'next/image';
-import { Tooltip } from 'react-tooltip';
+
+import CheckInDialog from './CheckInDialog';
+import ProjectInventoryTab from './ProjectInventoryTab';
+import { CLOSING_STATUSES, type ProjectAssignmentLine, type ProjectStatus } from './project.types';
 
 interface UploadedImage {
     fileName: string;
@@ -27,21 +29,19 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
 
     // All hooks must be called at the top level before any conditional returns
     const project = useQuery(api.projects.getProjectById, isLoaded && user ? { projectId: projectId as Id<'projects'> } : 'skip');
-    const projectInventory = useQuery(
-        api.projects.getProjectInventory,
+    const assignments = useQuery(
+        api.assignments.getProjectAssignments,
         isLoaded && user ? { projectId: projectId as Id<'projects'> } : 'skip',
     );
-    const availableInventory = useQuery(api.inventory.getInventory, isLoaded && user ? { active: true } : 'skip');
 
     const updateProject = useMutation(api.projects.updateProject);
     const addProjectImage = useMutation(api.projects.addProjectImage);
     const removeProjectImage = useMutation(api.projects.removeProjectImage);
     const reorderProjectImages = useMutation(api.projects.reorderProjectImages);
-    const returnInventoryFromProject = useMutation(api.projects.returnInventoryFromProject);
 
     const [formData, setFormData] = useState({
         name: '',
-        status: 'draft' as const,
+        status: 'draft' as ProjectStatus,
         address: '',
         startDate: '',
         endDate: '',
@@ -57,17 +57,19 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
 
     // Tab state
     const [activeTab, setActiveTab] = useState<'details' | 'images' | 'inventory'>('details');
-    const [inventoryFilter, setInventoryFilter] = useState('');
-    const [showItemInfo, setShowItemInfo] = useState<Record<string, boolean>>({});
+    const [saveError, setSaveError] = useState<string | null>(null);
+    /* Held while the check-in dialog is open, so submitting again can carry the confirmed ids. */
+    const [pendingCheckIn, setPendingCheckIn] = useState<'completed' | 'cancelled' | null>(null);
 
     useEffect(() => {
         if (project) {
             setFormData({
                 name: project.name || '',
-                status:
-                    project.status === 'active' || project.status === 'completed' || project.status === 'cancelled'
-                        ? 'draft'
-                        : project.status || 'draft',
+                /*
+                 * This used to force every non-draft project back to 'draft' when the form loaded, so
+                 * opening a completed job and saving it silently reopened it.
+                 */
+                status: project.status ?? 'draft',
                 address: project.address || '',
                 startDate: project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
                 endDate: project.endDate ? new Date(project.endDate).toISOString().split('T')[0] : '',
@@ -138,9 +140,9 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
         setDraggedImageIndex(null);
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const save = async (checkInAssignmentIds?: string[]) => {
         setIsSubmitting(true);
+        setSaveError(null);
 
         try {
             await updateProject({
@@ -153,15 +155,36 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                 revenue: formData.revenue ? parseFloat(formData.revenue) : undefined,
                 notes: formData.notes || undefined,
                 highlighted: formData.highlighted,
+                checkInAssignmentIds: checkInAssignmentIds?.length ? (checkInAssignmentIds as Id<'projectInventory'>[]) : undefined,
             });
 
             router.push('/admin/projects');
         } catch (error) {
-            console.error('Error updating project:', error);
-            alert('Error updating project. Please try again.');
+            setSaveError(error instanceof Error ? error.message : 'Could not save this project. Try again.');
+            setPendingCheckIn(null);
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    /**
+     * Finishing a job is the moment its furniture should come home, so a closing status with
+     * inventory still assigned opens the check-in step first. Nothing about the save is blocked by
+     * it — the dialog offers a way through either way — but it stops the job from quietly closing
+     * while the catalog still believes the furniture is unavailable.
+     */
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        const closing = CLOSING_STATUSES.includes(formData.status);
+        const stillOut = assignments?.open ?? [];
+
+        if (closing && stillOut.length > 0 && project?.status !== formData.status) {
+            setPendingCheckIn(formData.status as 'completed' | 'cancelled');
+            return;
+        }
+
+        void save();
     };
 
     // Show loading while user auth is loading
@@ -201,28 +224,10 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
         );
     }
 
-    const handleReturnInventory = async (assignmentId: string) => {
-        try {
-            await returnInventoryFromProject({
-                projectInventoryId: assignmentId as Id<'projectInventory'>,
-            });
-        } catch (error) {
-            console.error('Error returning inventory:', error);
-            alert('Error returning inventory. Please try again.');
-        }
-    };
-
-    const toggleItemInfo = (itemId: string) => {
-        setShowItemInfo((prev) => ({
-            ...prev,
-            [itemId]: !prev[itemId],
-        }));
-    };
-
     return (
         <div className="container mx-auto max-w-5xl p-4">
             {/* Tab Navigation */}
-            <div className="mb-6 flex space-x-1 rounded-lg bg-surface-raised p-1">
+            <div className="bg-surface-raised mb-6 flex space-x-1 rounded-lg p-1">
                 <button
                     type="button"
                     onClick={() => setActiveTab('details')}
@@ -249,36 +254,34 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                     }`}
                 >
                     Inventory{' '}
-                    {projectInventory && projectInventory.length > 0 && (
-                        <span className="ml-1 text-xs">({projectInventory.filter((item) => !item.returnedAt).length})</span>
-                    )}
+                    {assignments && assignments.open.length > 0 && <span className="ml-1 text-xs">({assignments.open.length})</span>}
                 </button>
             </div>
 
             {/* Tab Content */}
-            <div className="rounded-lg bg-surface-raised">
+            <div className="bg-surface-raised rounded-lg">
                 {activeTab === 'details' && (
                     <form onSubmit={handleSubmit} className="p-6">
-                        <h2 className="mb-6 text-2xl font-bold text-body">Project Details</h2>
+                        <h2 className="text-body mb-6 text-2xl font-bold">Project Details</h2>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-body">Project Name *</label>
+                                <label className="text-body mb-1 block text-sm font-medium">Project Name *</label>
                                 <input
                                     type="text"
                                     required
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
+                                    className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
                                     placeholder="Enter project name"
                                 />
                             </div>
 
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-body">Status *</label>
+                                <label className="text-body mb-1 block text-sm font-medium">Status *</label>
                                 <select
                                     value={formData.status}
                                     onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                                    className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
+                                    className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
                                 >
                                     <option value="draft">Draft</option>
                                     <option value="active">Active</option>
@@ -288,58 +291,67 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                             </div>
 
                             <div className="md:col-span-2">
-                                <label className="mb-1 block text-sm font-medium text-body">Address</label>
+                                <label className="text-body mb-1 block text-sm font-medium">Address</label>
                                 <input
                                     type="text"
                                     value={formData.address}
                                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                    className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
+                                    className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
                                     placeholder="Project address"
                                 />
                             </div>
 
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-body">Start Date</label>
+                                <label className="text-body mb-1 block text-sm font-medium">Start Date</label>
                                 <input
                                     type="date"
                                     value={formData.startDate}
                                     onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                                    className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
+                                    className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
                                 />
                             </div>
 
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-body">End Date</label>
+                                <label className="text-body mb-1 block text-sm font-medium">End Date</label>
                                 <input
                                     type="date"
                                     value={formData.endDate}
                                     onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                                    className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
+                                    className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
                                 />
                             </div>
 
                             <div className="md:col-span-2">
-                                <label className="mb-1 block text-sm font-medium text-body">Revenue ($)</label>
+                                <label className="text-body mb-1 block text-sm font-medium">Revenue ($)</label>
                                 <input
                                     type="number"
                                     step="0.01"
                                     value={formData.revenue}
                                     onChange={(e) => setFormData({ ...formData, revenue: e.target.value })}
-                                    className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
+                                    className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
                                     placeholder="Project revenue"
                                 />
                             </div>
 
                             <div className="md:col-span-2">
-                                <label className="mb-1 block text-sm font-medium text-body">Notes</label>
+                                <label className="text-body mb-1 block text-sm font-medium">Notes</label>
                                 <textarea
                                     value={formData.notes}
                                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                                     rows={3}
-                                    className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
+                                    className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
                                     placeholder="Project notes..."
                                 />
                             </div>
+
+                            {saveError && (
+                                <p
+                                    role="alert"
+                                    className="border-danger/40 bg-danger-soft text-danger rounded-md border px-4 py-2.5 text-sm md:col-span-2"
+                                >
+                                    {saveError}
+                                </p>
+                            )}
 
                             <div className="md:col-span-2">
                                 <div className="flex items-center justify-between">
@@ -348,8 +360,8 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                         disabled={isSubmitting}
                                         className={`rounded px-4 py-2 font-medium transition-colors ${
                                             isSubmitting
-                                                ? 'cursor-not-allowed bg-surface-hover text-body-subtle'
-                                                : 'bg-primary text-white hover:bg-primary_dark'
+                                                ? 'bg-surface-hover text-body-subtle cursor-not-allowed'
+                                                : 'bg-primary hover:bg-primary_dark text-white'
                                         }`}
                                     >
                                         {isSubmitting ? 'Saving...' : 'Save Project'}
@@ -360,9 +372,9 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                             id="highlighted"
                                             checked={formData.highlighted}
                                             onChange={(e) => setFormData({ ...formData, highlighted: e.target.checked })}
-                                            className="mr-2 h-4 w-4 rounded border-line-strong bg-surface-overlay text-primary focus:ring-2 focus:ring-primary"
+                                            className="border-line-strong bg-surface-overlay text-primary focus:ring-primary mr-2 h-4 w-4 rounded focus:ring-2"
                                         />
-                                        <label htmlFor="highlighted" className="text-sm font-medium text-body">
+                                        <label htmlFor="highlighted" className="text-body text-sm font-medium">
                                             Show in portfolio (highlighted)
                                         </label>
                                     </div>
@@ -375,7 +387,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                 {activeTab === 'images' && (
                     <div className="p-6">
                         <div className="mb-6 flex items-center justify-between">
-                            <h2 className="text-2xl font-bold text-body">Project Images</h2>
+                            <h2 className="text-body text-2xl font-bold">Project Images</h2>
                             <button
                                 type="button"
                                 onClick={() => {
@@ -385,8 +397,8 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                 disabled={isUploadingImages}
                                 className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-colors ${
                                     isUploadingImages
-                                        ? 'cursor-not-allowed border-line-strong bg-surface-hover text-body-subtle'
-                                        : 'border-primary bg-transparent text-primary hover:border-secondary hover:bg-secondary hover:text-body-muted'
+                                        ? 'border-line-strong bg-surface-hover text-body-subtle cursor-not-allowed'
+                                        : 'border-primary text-primary hover:border-secondary hover:bg-secondary hover:text-body-muted bg-transparent'
                                 }`}
                                 title={isUploadingImages ? 'Processing images...' : 'Add images'}
                             >
@@ -407,9 +419,9 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                             {/* Upload Loading Spinner */}
                             {isUploadingImages && (
                                 <div className="flex items-center justify-center py-8">
-                                    <div className="flex items-center gap-3 rounded-lg bg-surface-overlay px-4 py-3">
-                                        <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                                        <span className="text-sm text-body">Processing uploaded images...</span>
+                                    <div className="bg-surface-overlay flex items-center gap-3 rounded-lg px-4 py-3">
+                                        <Loader2 className="text-primary h-5 w-5 animate-spin" />
+                                        <span className="text-body text-sm">Processing uploaded images...</span>
                                     </div>
                                 </div>
                             )}
@@ -417,7 +429,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                             {/* Existing Images */}
                             {project.images && project.images.length > 0 && (
                                 <div>
-                                    <div className="mb-3 flex items-center gap-2 rounded-lg bg-green-300/70 p-2 text-body-inverse">
+                                    <div className="text-body-inverse mb-3 flex items-center gap-2 rounded-lg bg-green-300/70 p-2">
                                         <Bell size={16} />
                                         <span className="text-sm">Drag and drop to reorder</span>
                                     </div>
@@ -440,7 +452,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                                     <button
                                                         type="button"
                                                         onClick={() => handleRemoveImage(image._id)}
-                                                        className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                                                        className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white opacity-0 transition-opacity group-hover:opacity-100"
                                                     >
                                                         ×
                                                     </button>
@@ -459,180 +471,21 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
 
                 {activeTab === 'inventory' && (
                     <div className="p-6">
-                        <div className="mb-6 flex items-center justify-between">
-                            <h2 className="text-2xl font-bold text-body">Project Inventory</h2>
-                            <div className="flex items-center gap-2">
-                                {/* Category Filter */}
-                                {projectInventory && projectInventory.filter((item) => !item.returnedAt).length > 0 && (
-                                    <select
-                                        value={inventoryFilter}
-                                        onChange={(e) => setInventoryFilter(e.target.value)}
-                                        className="rounded border border-line-strong bg-surface-overlay px-2 py-1 text-xs text-body focus:border-primary focus:outline-none"
-                                    >
-                                        <option value="">All Categories</option>
-                                        {[
-                                            ...new Set(
-                                                projectInventory
-                                                    .filter((item) => !item.returnedAt)
-                                                    .map((item) => item.inventory?.category)
-                                                    .filter(Boolean),
-                                            ),
-                                        ]
-                                            .sort()
-                                            .map((category) => (
-                                                <option key={category} value={category}>
-                                                    {category}
-                                                </option>
-                                            ))}
-                                    </select>
-                                )}
-                                <button
-                                    type="button"
-                                    onClick={() => router.push(`/admin/projects/${projectId}/inventory`)}
-                                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary bg-transparent text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-body-muted"
-                                    title="Assign inventory"
-                                >
-                                    <Plus size={16} />
-                                </button>
-                            </div>
-                        </div>
-                        <div className="px-6 pb-6 pt-4">
-                            <div className="space-y-4">
-                                {/* Assigned Inventory */}
-                                {projectInventory && projectInventory.filter((item) => !item.returnedAt).length > 0 ? (
-                                    <div className="max-h-120 overflow-y-auto">
-                                        <div className="grid grid-cols-1 gap-4 pr-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                                            {projectInventory
-                                                .filter((item) => !item.returnedAt)
-                                                .filter((item) => !inventoryFilter || item.inventory?.category === inventoryFilter)
-                                                .map((assignment) => (
-                                                    <div
-                                                        key={assignment._id}
-                                                        className="group relative overflow-hidden rounded-lg bg-surface-overlay transition-all hover:bg-surface-hover"
-                                                    >
-                                                        {/* Image or Info Display */}
-                                                        <div className="relative aspect-square overflow-hidden">
-                                                            {showItemInfo[assignment._id] ? (
-                                                                // Show item info
-                                                                <div className="flex h-full flex-col justify-start bg-gradient-to-br from-stone-800 to-stone-900 p-4 text-body">
-                                                                    <div className="space-y-2">
-                                                                        <div className="flex items-center justify-between">
-                                                                            <div className="text-sm font-bold text-primary">
-                                                                                ${assignment.inventory?.price}
-                                                                            </div>
-                                                                            <button
-                                                                                onClick={(e) => {
-                                                                                    e.stopPropagation();
-                                                                                    // Find the inventory item to get its oId
-                                                                                    const inventoryItem = availableInventory?.find(item => item._id === assignment.inventoryId);
-                                                                                    if (inventoryItem) {
-                                                                                        router.push(`/admin/edit?id=${inventoryItem.oId}`);
-                                                                                    }
-                                                                                }}
-                                                                                className="flex items-center gap-1 px-2 py-1 text-xs text-primary hover:text-secondary transition-colors"
-                                                                            >
-                                                                                <ExternalLink size={8} />
-                                                                                <span className="text-[10px]">Edit</span>
-                                                                            </button>
-                                                                        </div>
-                                                                        <div className="text-xs text-body-muted">
-                                                                            <span className="font-medium">Size:</span>{' '}
-                                                                            {assignment.inventory?.realWidth}" ×{' '}
-                                                                            {assignment.inventory?.realHeight}" ×{' '}
-                                                                            {assignment.inventory?.realDepth}"
-                                                                        </div>
-                                                                        <div className="text-xs text-body-muted">
-                                                                            <span className="font-medium">Available:</span>{' '}
-                                                                            {(assignment.inventory?.count || 0) -
-                                                                                (assignment.inventory?.inUse || 0)}{' '}
-                                                                            of {assignment.inventory?.count}
-                                                                        </div>
-                                                                        {assignment.inventory?.location && (
-                                                                            <div className="text-xs text-body-subtle">
-                                                                                📍 {assignment.inventory.location}
-                                                                            </div>
-                                                                        )}
-                                                                        {assignment.inventory?.description && (
-                                                                            <div className="text-xs text-body-subtle border-t border-line pt-2">
-                                                                                {assignment.inventory.description}
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                            ) : (
-                                                                // Show item image
-                                                                <>
-                                                                    <Image
-                                                                        src={assignment.inventory?.imagePath || '/placeholder-image.jpg'}
-                                                                        alt={assignment.inventory?.name || 'Inventory item'}
-                                                                        width={200}
-                                                                        height={200}
-                                                                        className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                                                                    />
-                                                                    {/* Category tag */}
-                                                                    {assignment.inventory?.category && (
-                                                                        <div className="absolute right-2 top-2 rounded bg-secondary px-2 py-1 text-xs font-medium text-white">
-                                                                            {assignment.inventory.category}
-                                                                        </div>
-                                                                    )}
-                                                                </>
-                                                            )}
-                                                        </div>
-
-                                                        {/* Info overlay */}
-                                                        <div className="p-3">
-                                                            <h3 className="mb-2 truncate font-medium text-body">
-                                                                {assignment.inventory?.name}
-                                                            </h3>
-
-                                                            {/* Quantity info and buttons on same row */}
-                                                            <div className="flex items-center justify-between">
-                                                                <p className="text-sm text-body-subtle">
-                                                                    Qty: {assignment.quantity} • ${assignment.pricePerItem} each
-                                                                </p>
-
-                                                                {/* Info and Trash buttons */}
-                                                                <div className="flex gap-1">
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => toggleItemInfo(assignment._id)}
-                                                                        className="flex h-6 w-6 items-center justify-center rounded border border-blue-500 bg-transparent text-blue-400 transition-colors hover:border-blue-600 hover:bg-blue-600 hover:text-white"
-                                                                        data-tooltip-id="info-tooltip"
-                                                                        data-tooltip-content="Show item info"
-                                                                    >
-                                                                        <Info size={10} />
-                                                                    </button>
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => handleReturnInventory(assignment._id)}
-                                                                        className="flex h-6 w-6 items-center justify-center rounded border border-red-500 bg-transparent text-red-400 transition-colors hover:border-red-600 hover:bg-red-600 hover:text-white"
-                                                                        data-tooltip-id="remove-tooltip"
-                                                                        data-tooltip-content="Remove from project"
-                                                                    >
-                                                                        <Trash2 size={10} />
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="py-8 text-center text-body-subtle">
-                                        <p>No inventory assigned to this project</p>
-                                        <p className="mt-1 text-sm">Click the + button to assign inventory</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                        <ProjectInventoryTab projectId={projectId} />
                     </div>
                 )}
             </div>
 
-            {/* Tooltips */}
-            <Tooltip id="info-tooltip" place="top" />
-            <Tooltip id="remove-tooltip" place="top" />
+            {pendingCheckIn && (
+                <CheckInDialog
+                    projectName={project.name}
+                    status={pendingCheckIn}
+                    lines={(assignments?.open ?? []) as ProjectAssignmentLine[]}
+                    saving={isSubmitting}
+                    onCancel={() => setPendingCheckIn(null)}
+                    onConfirm={(checkInIds) => void save(checkInIds)}
+                />
+            )}
         </div>
     );
 }

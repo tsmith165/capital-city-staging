@@ -19,6 +19,13 @@ export const TOOL_TABS: readonly ToolTab[] = [
         description: 'Export every inventory record to a spreadsheet, including items that are not publicly listed.',
     },
     {
+        id: 'health',
+        label: 'Data health',
+        eyebrow: 'Maintenance',
+        title: 'Inventory counters',
+        description: 'Recompute the stored availability counters that drifted before availability was derived from assignment records.',
+    },
+    {
         id: 'images',
         label: 'Image processing',
         eyebrow: 'Automatic',
