@@ -5,15 +5,18 @@ import { isClerkUserIdAdmin } from '@/utils/auth/ClerkUtils';
 export default clerkMiddleware(async (auth, req) => {
     const { userId } = await auth();
 
-    // Apply admin checks only on protected routes
     if (req.nextUrl.pathname.startsWith('/admin')) {
+        // Being bounced to the homepage gave no indication of what happened or what to do
+        // next. Send people to sign in and return them to the page they asked for.
         if (!userId) {
-            return NextResponse.redirect(new URL('/', req.url));
+            const signIn = new URL('/signin', req.url);
+            signIn.searchParams.set('redirect_url', `${req.nextUrl.pathname}${req.nextUrl.search}`);
+            return NextResponse.redirect(signIn);
         }
 
         const hasAdminRole = await isClerkUserIdAdmin(userId);
         if (!hasAdminRole) {
-            return NextResponse.redirect(new URL('/', req.url));
+            return NextResponse.redirect(new URL('/not-authorized', req.url));
         }
     }
 
@@ -22,9 +25,13 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
     matcher: [
-        // Match all routes starting with /admin/
-        '/admin/:path*',
-        // Match the uploadthing API route
-        '/api/uploadthing',
+        /*
+         * Clerk has to run on every rendered route, not just the guarded ones: the sign-in,
+         * sign-up and not-authorized pages all read the session server-side, and `auth()`
+         * throws outright when the middleware did not run for that request. Static files and
+         * Next internals are excluded.
+         */
+        '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+        '/(api|trpc)(.*)',
     ],
 };

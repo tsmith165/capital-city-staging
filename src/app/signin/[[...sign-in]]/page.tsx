@@ -1,42 +1,62 @@
+import React from 'react';
 import type { Metadata } from 'next';
-export const metadata: Metadata = {
-    title: 'JWS Fine Art - Sign In',
-    description: 'Sign In to JWS Fine Art',
-    keywords:
-        'Jill Weeks Smith, JWS Fine Art, Jill Weeks Smith Art, JWS Art, Art, Artist, Oil Painting, Oil, Gallery, Jill, Weeks, Smith, Sign In',
-    applicationName: 'JWS Fine Art',
-    icons: {
-        icon: '/logo/JWS_ICON_260.png',
-        shortcut: '/logo/JWS_ICON_260.png',
-        apple: '/favicon/apple-icon.png',
-    },
-    openGraph: {
-        title: 'JWS Fine Art - Sign In',
-        description: 'Sign In for JWS Fine Art',
-        siteName: 'JWS Fine Art',
-        url: 'https://www.jwsfineart.com',
-        images: [
-            {
-                url: '/favicon/og-image.png',
-                width: 1200,
-                height: 630,
-                alt: 'JWS Fine Art',
-            },
-        ],
-        locale: 'en_US',
-        type: 'website',
-    },
-};
+import Link from 'next/link';
+import { SignIn } from '@clerk/nextjs';
+import { currentUser } from '@clerk/nextjs/server';
+import { isClerkUserIdAdmin } from '@/utils/auth/ClerkUtils';
 
-import PageLayout from '@/components/layout/PageLayout';
-import Sign_In from '@/app/signin/Sign_In';
+import AuthShell from '@/components/auth/AuthShell';
+import AccountSessionPanel from '@/components/auth/AccountSessionPanel';
+import { authAppearance } from '@/components/auth/authAppearance';
+import { authMetadata } from '@/components/auth/auth.metadata';
 
-export default async function Page() {
+export const metadata: Metadata = authMetadata('Sign in', 'Sign in to the Capital City Staging admin console.');
+
+export default async function SignInPage({ searchParams }: { searchParams: Promise<{ redirect_url?: string; account?: string }> }) {
+    const [user, params] = await Promise.all([currentUser(), searchParams]);
+
+    // Only ever return people to an internal admin path. An open redirect here would let a
+    // crafted link bounce a freshly authenticated session anywhere.
+    const requested = params.redirect_url;
+    const returnTo = requested && requested.startsWith('/admin') ? requested : '/admin';
+
+    const email = user?.primaryEmailAddress?.emailAddress ?? user?.emailAddresses[0]?.emailAddress ?? 'Signed-in account';
+    const isAdmin = user ? await isClerkUserIdAdmin(user.id) : false;
+
+    if (user) {
+        return (
+            <AuthShell
+                eyebrow="Admin access"
+                title="You are already signed in"
+                description="Continue to the console, or switch to a different account."
+            >
+                <AccountSessionPanel email={email} isAdmin={isAdmin} />
+            </AuthShell>
+        );
+    }
+
     return (
-        <PageLayout page="/signin">
-            <Sign_In />
-        </PageLayout>
+        <AuthShell
+            eyebrow="Admin access"
+            title="Sign in"
+            description="The admin console is where staging projects, inventory, the homepage and incoming enquiries are managed."
+            footer={
+                <p>
+                    Trying to book staging instead?{' '}
+                    <Link href="/contact" className="font-semibold text-gold-300 hover:text-gold-200">
+                        Get a quote
+                    </Link>
+                    .
+                </p>
+            }
+        >
+            <SignIn
+                path="/signin"
+                routing="path"
+                signUpUrl="/signup"
+                fallbackRedirectUrl={returnTo}
+                appearance={authAppearance}
+            />
+        </AuthShell>
     );
 }
-
-export const revalidate = 3600;

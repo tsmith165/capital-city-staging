@@ -1,42 +1,31 @@
+import React from 'react';
 import type { Metadata } from 'next';
-export const metadata: Metadata = {
-    title: 'JWS Fine Art - Sign Up',
-    description: 'Sign up to JWS Fine Art',
-    keywords:
-        'Jill Weeks Smith, JWS Fine Art, Jill Weeks Smith Art, JWS Art, Art, Artist, Oil Painting, Oil, Gallery, Jill, Weeks, Smith, Sign Up',
-    applicationName: 'JWS Fine Art',
-    icons: {
-        icon: '/logo/JWS_ICON_260.png',
-        shortcut: '/logo/JWS_ICON_260.png',
-        apple: '/favicon/apple-icon.png',
-    },
-    openGraph: {
-        title: 'JWS Fine Art - Sign Up',
-        description: 'Sign Up fsor JWS Fine Art',
-        siteName: 'JWS Fine Art',
-        url: 'https://www.jwsfineart.com',
-        images: [
-            {
-                url: '/favicon/og-image.png',
-                width: 1200,
-                height: 630,
-                alt: 'JWS Fine Art',
-            },
-        ],
-        locale: 'en_US',
-        type: 'website',
-    },
-};
+import Link from 'next/link';
+import { SignUp } from '@clerk/nextjs';
 
-import PageLayout from '@/components/layout/PageLayout';
-import Sign_Up from '@/app/signup/Sign_Up';
+import AuthShell from '@/components/auth/AuthShell';
+import { authAppearance } from '@/components/auth/authAppearance';
+import { authMetadata } from '@/components/auth/auth.metadata';
 
-export default async function Page() {
+export const metadata: Metadata = authMetadata('Create an account', 'Create a Capital City Staging account.');
+
+export default function SignUpPage() {
     return (
-        <PageLayout page="/signup">
-            <Sign_Up />
-        </PageLayout>
+        <AuthShell
+            eyebrow="New account"
+            title="Create an account"
+            description="Creating an account does not grant admin access on its own. Mia grants console access separately once an account exists."
+            footer={
+                <p>
+                    Trying to book staging instead?{' '}
+                    <Link href="/contact" className="font-semibold text-gold-300 hover:text-gold-200">
+                        Get a quote
+                    </Link>
+                    .
+                </p>
+            }
+        >
+            <SignUp path="/signup" routing="path" signInUrl="/signin" fallbackRedirectUrl="/signin" appearance={authAppearance} />
+        </AuthShell>
     );
 }
-
-export const revalidate = 3600;
