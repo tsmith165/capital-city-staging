@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from 'convex/react';
@@ -36,9 +36,8 @@ export default function Home({
     // Client-side query for real-time updates after hydration
     const homepageImagesData = useQuery(api.homepageImages.getHomepageImages);
 
-    const [isLogoVisible, setLogoVisible] = useState(true);
     const [isStagingImageVisible, setStagingImageVisible] = useState(true);
-    const currentImageIndexRef = useRef(0);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     // Priority: live Convex data > SSR-preloaded data > hardcoded fallback
     const images: HomepageImage[] = useMemo(() => {
@@ -75,21 +74,16 @@ export default function Home({
         const interval = setInterval(async () => {
             setStagingImageVisible(false);
             await delay(1500);
-            currentImageIndexRef.current = (currentImageIndexRef.current + 1) % images.length;
+            setCurrentImageIndex((index) => (index + 1) % images.length);
             setStagingImageVisible(true);
         }, 5500);
 
         return () => clearInterval(interval);
     }, [images.length]);
 
-    // Reset image index if images array shrinks below current index
-    useEffect(() => {
-        if (currentImageIndexRef.current >= images.length) {
-            currentImageIndexRef.current = 0;
-            setStagingImageVisible(false);
-            setTimeout(() => setStagingImageVisible(true), 100);
-        }
-    }, [images.length]);
+    // The image list can shrink underneath us when an admin removes a homepage image, so clamp
+    // during render rather than correcting it in an effect one paint later.
+    const activeImage = images[currentImageIndex] ?? images[0];
 
     const circularFadeVariants = {
         hidden: {
@@ -106,7 +100,7 @@ export default function Home({
             <AnimatePresence>
                 {isStagingImageVisible && (
                     <motion.div
-                        key={currentImageIndexRef.current}
+                        key={currentImageIndex}
                         initial={{ opacity: 0, scale: 1 }}
                         animate={{ opacity: 1, scale: 1.3 }}
                         exit={{ opacity: 0, scale: 1 }}
@@ -114,9 +108,9 @@ export default function Home({
                         className="absolute inset-0 h-full w-full"
                     >
                         <Image
-                            src={images[currentImageIndexRef.current].src}
-                            width={images[currentImageIndexRef.current].width}
-                            height={images[currentImageIndexRef.current].height}
+                            src={activeImage.src}
+                            width={activeImage.width}
+                            height={activeImage.height}
                             className="absolute inset-0 h-full w-full object-cover"
                             alt="One of our recently staged homes"
                             priority
@@ -132,18 +126,16 @@ export default function Home({
                 transition={{ duration: 2 }}
                 className="absolute inset-0 bg-stone-900"
             ></motion.div>
-            {isLogoVisible && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1 }}
-                    className="absolute inset-0 flex items-center justify-center"
-                >
-                    <div className="relative flex h-[350px] w-[350px] items-center justify-center rounded-full bg-stone-900 opacity-70">
-                        <Image src={'/logo/CCS_logo.png'} alt="Capital City Staging Logo" width={300} height={300} />
-                    </div>
-                </motion.div>
-            )}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1 }}
+                className="absolute inset-0 flex items-center justify-center"
+            >
+                <div className="relative flex h-[350px] w-[350px] items-center justify-center rounded-full bg-stone-900 opacity-70">
+                    <Image src={'/logo/CCS_logo.png'} alt="Capital City Staging Logo" width={300} height={300} />
+                </div>
+            </motion.div>
         </div>
     );
 }

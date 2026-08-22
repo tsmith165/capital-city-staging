@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 
 const COOKIE_KEY = 'distinct_id';
 
-export async function GET(request: Request) {
+export async function GET() {
     const cookieStore = await cookies();
     let distinctId = cookieStore.get(COOKIE_KEY)?.value;
 

@@ -20,7 +20,6 @@ interface AddInventoryOverlayProps {
 const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
     onClose,
     onSuccess,
-    defaultAction = 'stay'
 }) => {
     const [imageUrl, setImageUrl] = useState('Not yet uploaded');
     const [width, setWidth] = useState(0);
@@ -120,7 +119,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
         try {
             const nextOId = (mostRecentOId || 0) + 1;
 
-            const inventoryId = await createInventory({
+            await createInventory({
                 oId: nextOId,
                 pId: nextOId,
                 active: true,

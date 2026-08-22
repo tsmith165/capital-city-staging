@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Polygon } from 'react-leaflet';
-import { LatLngExpression, LatLngTuple } from 'leaflet';
+import { LatLngTuple } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import rawCityBoundaries from '../../lib/city_boundaries.json';
 
@@ -35,7 +35,6 @@ const Where: React.FC = () => {
     const [selectedCity, setSelectedCity] = useState<string | null>(null);
     const [hoveredMap, setHoveredMap] = useState<boolean>(false);
     const [currentCityIndex, setCurrentCityIndex] = useState<number>(0);
-    const [isVisible, setIsVisible] = useState<boolean>(false);
     const [zoomComplete, setZoomComplete] = useState<boolean>(false);
     const mapRef = useRef<L.Map | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -63,13 +62,9 @@ const Where: React.FC = () => {
             (entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        console.log('Map is intersecting');
-
                         timeoutId = setTimeout(() => {
-                            setIsVisible(true);
                             if (mapRef.current) {
                                 mapRef.current.on('zoomend', () => {
-                                    console.log('Zoom complete...');
                                     setTimeout(() => {
                                         setZoomComplete(true);
                                     }, 500);
@@ -81,11 +76,8 @@ const Where: React.FC = () => {
                                 });
                             }
                         }, 500);
-                    } else {
-                        setIsVisible(false);
-                        if (timeoutId) {
-                            clearTimeout(timeoutId);
-                        }
+                    } else if (timeoutId) {
+                        clearTimeout(timeoutId);
                     }
                 });
             },
@@ -122,16 +114,6 @@ const Where: React.FC = () => {
         setCurrentCityIndex(cityIndex);
     };
 
-    const handleMapReady = () => {
-        console.log('handleMapReady');
-        if (mapRef.current) {
-            mapRef.current.on('zoomend', () => {
-                console.log('Zoom complete...');
-                setZoomComplete(true);
-            });
-        }
-    };
-
     return (
         <div ref={containerRef} className="flex h-[calc(100dvh-50px)] w-full flex-col space-y-2 p-4">
             <div className="flex w-full items-center justify-center text-center">
@@ -158,7 +140,11 @@ const Where: React.FC = () => {
                     </React.Fragment>
                 ))}
             </div>
-            <div className="relative w-full flex-grow">
+            <div
+                className="relative w-full flex-grow"
+                onMouseEnter={() => setHoveredMap(true)}
+                onMouseLeave={() => setHoveredMap(false)}
+            >
                 <MapContainer
                     center={MAP_CENTER}
                     zoom={5}

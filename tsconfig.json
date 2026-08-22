@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es2017",
+        "target": "ES2022",
         "module": "esnext",
         "lib": ["dom", "dom.iterable", "esnext"],
         "allowJs": true,
@@ -9,10 +9,10 @@
         "forceConsistentCasingInFileNames": true,
         "noEmit": true,
         "esModuleInterop": true,
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "isolatedModules": true,
-        "jsx": "preserve",
+        "jsx": "react-jsx",
         "incremental": true,
         "plugins": [
             {
@@ -21,26 +21,10 @@
         ],
         "baseUrl": "./",
         "paths": {
-            "@/components/*": ["src/components/*"],
-            "@/styles/*": ["src/styles/*"],
-            "@/lib/*": ["src/lib/*"],
-            "@/app/*": ["src/app/*"],
-            "@/stores/*": ["src/stores/*"],
-            "@/utils/*": ["src/utils/*"],
-            "@/db/*": ["src/db/*"],
-            "@/server/*": ["src/server/*"],
-            "@/convex/*": ["convex/*"]
+            "@/convex/*": ["convex/*"],
+            "@/*": ["src/*"]
         }
     },
-    "include": [
-        "next-env.d.ts",
-        "**/*.ts",
-        "**/*.tsx",
-        "**/*.mts",
-        ".next/types/**/*.ts",
-        "tailwind.config.ts",
-        "middleware.js",
-        "src/scripts/scripts/border_coord_capture.js"
-    ],
-    "exclude": ["node_modules"]
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.mts", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
+    "exclude": ["node_modules", ".next", "coverage"]
 }

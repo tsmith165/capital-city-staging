@@ -162,7 +162,7 @@ const ContactForm = () => {
     });
     const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-    const [showQuote, setShowQuote] = useState(true);
+    const [showQuote] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {

@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import MenuOverlayButton from './MenuOverlayButton';
-import { menu_list, admin_menu_list, MenuItem } from '@/lib/menu_list';
+import { menu_list, admin_menu_list } from '@/lib/menu_list';
 
 import dynamic from 'next/dynamic';
 const DynamicMenuOverlaySignOutButton = dynamic(() => import('./MenuOverlaySignOutButton'), { ssr: false });

@@ -6,7 +6,7 @@ import { api } from '@/convex/_generated/api';
 import { useRouter } from 'next/navigation';
 import ProjectResizeUploader from '@/components/ProjectResizeUploader';
 import { Id } from '@/convex/_generated/dataModel';
-import { ChevronDown, ChevronRight, Plus, Bell, Loader2, Info, Trash2, ExternalLink } from 'lucide-react';
+import { Plus, Bell, Loader2, Info, Trash2, ExternalLink } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import Image from 'next/image';
 import { Tooltip } from 'react-tooltip';
@@ -37,7 +37,6 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
     const addProjectImage = useMutation(api.projects.addProjectImage);
     const removeProjectImage = useMutation(api.projects.removeProjectImage);
     const reorderProjectImages = useMutation(api.projects.reorderProjectImages);
-    const assignInventoryToProject = useMutation(api.projects.assignInventoryToProject);
     const returnInventoryFromProject = useMutation(api.projects.returnInventoryFromProject);
 
     const [formData, setFormData] = useState({
@@ -51,7 +50,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
         highlighted: false,
     });
 
-    const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+    const [, setUploadedImages] = useState<UploadedImage[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null);
     const [isUploadingImages, setIsUploadingImages] = useState(false);

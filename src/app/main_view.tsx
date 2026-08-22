@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useLayoutEffect, useEffect, useState } from 'react';
+import React, { useMemo, useLayoutEffect, useEffect, useState } from 'react';
 import { useStore } from '@/stores/store';
 
 import Home from '@/app/_main_components/home';
@@ -38,16 +38,18 @@ export default function MainView({
     const [layoutLoaded, setLayoutLoaded] = useState(false);
     const componentRefs = useStore((state) => state.componentRefs);
     const setComponentRefs = useStore((state) => state.setComponentRefs);
-    const refs = useRef(components.map(() => React.createRef<HTMLDivElement>()));
+    const refs = useMemo(() => components.map(() => React.createRef<HTMLDivElement>()), []);
 
     const selectedComponent = useStore((state) => state.selectedComponent);
 
     useLayoutEffect(() => {
-        setTimeout(() => {
-            setComponentRefs(refs.current);
+        const timer = setTimeout(() => {
+            setComponentRefs(refs);
             setLayoutLoaded(true);
         }, 500);
-    }, [setComponentRefs]);
+
+        return () => clearTimeout(timer);
+    }, [setComponentRefs, refs]);
 
     useEffect(() => {
         if (!layoutLoaded) return;
@@ -57,11 +59,9 @@ export default function MainView({
 
         // Check if the base component exists and scroll to it
         const index = componentRefs.findIndex((item) => item.current?.id === baseComponent);
-        console.log('Selected Component Index: ' + index);
         if (index !== -1) {
             const ref = componentRefs[index];
             if (ref && ref.current) {
-                console.log('Scrolling to ref: ', ref.current);
                 ref.current.scrollIntoView({
                     behavior: 'smooth',
                     block: 'start',
@@ -74,12 +74,8 @@ export default function MainView({
         <div className="flex h-full flex-col overflow-y-auto">
             <PostHogPageView />
             {components.map(({ id, component: Component }, index) => (
-                <div key={id} ref={refs.current[index]} id={id} className="h-auto w-full bg-stone-900">
-                    {id === 'home' ? (
-                        <Component initialHomepageImages={initialHomepageImages} />
-                    ) : (
-                        <Component />
-                    )}
+                <div key={id} ref={refs[index]} id={id} className="h-auto w-full bg-stone-900">
+                    {id === 'home' ? <Component initialHomepageImages={initialHomepageImages} /> : <Component />}
                 </div>
             ))}
         </div>

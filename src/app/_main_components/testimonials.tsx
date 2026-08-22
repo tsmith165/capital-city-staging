@@ -1,5 +1,4 @@
 import React from 'react';
-import Image from 'next/image';
 
 const testimonials = [
     {
@@ -26,8 +25,8 @@ export default function Testimonials() {
             </div>
 
             <div className="flex w-full flex-grow flex-col space-y-4 px-4 md:flex-row md:space-x-4 md:space-y-0">
-                {testimonials.map((testimonial, index) => (
-                    <div className="h-fit rounded-lg bg-secondary_dark p-4 text-white shadow-lg">
+                {testimonials.map((testimonial) => (
+                    <div key={testimonial.name} className="h-fit rounded-lg bg-secondary_dark p-4 text-white shadow-lg">
                         <p className="text-md md:text-lg">{`"${testimonial.text}"`}</p>
                         <p className="text-md mt-2 font-bold text-transparent gradient-gold-main-text">{testimonial.name}</p>
                     </div>

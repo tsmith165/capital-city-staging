@@ -9,8 +9,8 @@ interface InventoryItemProps {
 
 const InventoryItem = ({ item, handleItemClick }: InventoryItemProps) => {
     const image_path = item.small_image_path || item.image_path;
-    let image_width = item.small_width || item.width || 0;
-    let image_height = item.small_height || item.height || 0;
+    const image_width = item.small_width || item.width || 0;
+    const image_height = item.small_height || item.height || 0;
 
     return (
         <div

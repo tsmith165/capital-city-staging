@@ -341,7 +341,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
             {showAddInventoryOverlay && (
                 <AddInventoryOverlay
                     onClose={() => setShowAddInventoryOverlay(false)}
-                    onSuccess={(oId) => {
+                    onSuccess={() => {
                         // Refresh the current page to see the new inventory
                         router.refresh();
                     }}

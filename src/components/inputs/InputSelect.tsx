@@ -52,7 +52,7 @@ const InputSelect: React.FC<InputSelectProps> = ({ defaultValue, idName, name, s
                         DropdownIndicator,
                     }}
                     styles={{
-                        control: (baseStyles: any, state: any) => ({
+                        control: (baseStyles: any) => ({
                             ...baseStyles,
                             borderColor: '',
                             backgroundColor: 'var(--tw-bg-stone-400)',
@@ -73,15 +73,17 @@ const InputSelect: React.FC<InputSelectProps> = ({ defaultValue, idName, name, s
                         DropdownIndicator,
                     }}
                     styles={{
-                        control: (baseStyles: any, state: any) => ({
+                        control: (baseStyles: any) => ({
                             ...baseStyles,
                             borderColor: '',
                             backgroundColor: 'var(--tw-bg-stone-400)',
                         }),
                     }}
                     options={react_select_options}
-                    onChange={(selectedOption: { value: any }) =>
-                        onChange?.({ target: { value: selectedOption?.value, name: idName } } as React.ChangeEvent<HTMLSelectElement>)
+                    onChange={(selectedOption) =>
+                        onChange?.({
+                            target: { value: selectedOption?.value ?? '', name: idName },
+                        } as React.ChangeEvent<HTMLSelectElement>)
                     }
                 />
             )}

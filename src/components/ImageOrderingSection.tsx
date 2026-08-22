@@ -56,7 +56,7 @@ const ImageOrderingSection: React.FC<ImageOrderingSectionProps> = ({
         }
     };
 
-    const handleDelete = async (imageId: string | null, position: number) => {
+    const handleDelete = async (imageId: string | null, _position: number) => {
         if (!imageId) return; // Can't delete main image
         
         if (!confirm('Are you sure you want to delete this image? This action cannot be undone.')) {

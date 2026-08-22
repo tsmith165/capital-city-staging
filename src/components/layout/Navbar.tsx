@@ -16,11 +16,10 @@ export default function Navbar({ page }: { page: string }) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
-    const [isPending, startTransition] = useTransition();
+    const [, startTransition] = useTransition();
     const [showMenu, setShowMenu] = useState(false);
     const isAdmin = useIsAdmin();
 
-    const selectedComponent = useStore((state) => state.selectedComponent);
     const setSelectedComponent = useStore((state) => state.setSelectedComponent);
 
     const updateUrlWithoutNavigation = useCallback(

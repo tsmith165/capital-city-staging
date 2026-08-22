@@ -49,26 +49,22 @@ const InputMultiSelect: React.FC<InputMultiSelectProps> = ({ defaultValue, idNam
                     DropdownIndicator,
                 }}
                 styles={{
-                    control: (baseStyles: any, state: any) => ({
+                    control: (baseStyles: any) => ({
                         ...baseStyles,
                         borderColor: '',
                         backgroundColor: 'var(--color-secondary)',
                     }),
                     multiValue: (styles: any) => ({
                         ...styles,
-                        backgroundColor: 'var(--color-secondary-light)',
+                        backgroundColor: 'var(--color-secondary_light)',
                     }),
-                    option: (provided: any, state: any) => ({
+                    option: (provided: any) => ({
                         ...provided,
                         color: 'var(--color-secondary)',
                     }),
                 }}
                 options={react_select_options}
-                onChange={(selectedOptions: { value: string; label: string }[]) => {
-                    if (onChange) {
-                        onChange(selectedOptions as { value: string; label: string }[]);
-                    }
-                }}
+                onChange={(selectedOptions) => onChange?.([...selectedOptions])}
             />
         </div>
     );

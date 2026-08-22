@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -12,19 +12,12 @@ import AddInventoryOverlay from '@/components/AddInventoryOverlay';
 export default function InventoryConvexClient() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [selectedCategory, setSelectedCategory] = useState<string>('');
-    const [searchTerm, setSearchTerm] = useState<string>('');
-    const [selectedItem, setSelectedItem] = useState<string | null>(null);
+    // Seeded from the URL once. The filter handlers below write the URL, so re-syncing state
+    // from `searchParams` on every change would feed the component its own output.
+    const [selectedCategory, setSelectedCategory] = useState<string>(() => searchParams.get('category') || '');
+    const [searchTerm, setSearchTerm] = useState<string>(() => searchParams.get('search') || '');
     const [showAddInventoryOverlay, setShowAddInventoryOverlay] = useState(false);
     const [showItemInfo, setShowItemInfo] = useState<Record<string, boolean>>({});
-
-    // Initialize state from URL params
-    useEffect(() => {
-        const categoryParam = searchParams.get('category') || '';
-        const searchParam = searchParams.get('search') || '';
-        setSelectedCategory(categoryParam);
-        setSearchTerm(searchParam);
-    }, [searchParams]);
 
     // Function to update URL with new params
     const updateURLParams = (category: string, search: string) => {
@@ -56,16 +49,8 @@ export default function InventoryConvexClient() {
     
     const categories = useQuery(api.inventory.getInventoryCategories);
 
-    const handleItemClick = (oId: number) => {
-        router.push(`/admin/edit?id=${oId}`);
-    };
-
     const handleEditItem = (oId: number) => {
         router.push(`/admin/edit?id=${oId}`);
-    };
-
-    const handleEditImages = (inventoryOId: number) => {
-        router.push(`/admin/edit?id=${inventoryOId}`);
     };
 
     const toggleItemInfo = (itemId: string) => {
@@ -248,7 +233,7 @@ export default function InventoryConvexClient() {
             {showAddInventoryOverlay && (
                 <AddInventoryOverlay
                     onClose={() => setShowAddInventoryOverlay(false)}
-                    onSuccess={(oId) => {
+                    onSuccess={() => {
                         // Refresh the inventory list to show the new item
                         router.refresh();
                     }}

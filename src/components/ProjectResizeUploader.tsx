@@ -32,7 +32,7 @@ const ProjectResizeUploader: React.FC<ProjectResizeUploaderProps> = ({
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [loadingState, setLoadingState] = useState<string>('Resizing Images');
-    const [selectedFileCount, setSelectedFileCount] = useState<number>(0);
+    const [, setSelectedFileCount] = useState<number>(0);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const { startUpload } = useUploadThing('imageUploader', {

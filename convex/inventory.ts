@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query, internalMutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 
 // Get all inventory (admin only)
 export const getAllInventory = query({
@@ -538,7 +538,7 @@ export const initializeImageOrder = mutation({
     }, {} as Record<string, typeof extraImages>);
 
     // Update display order for each inventory's images
-    for (const [inventoryId, images] of Object.entries(imagesByInventory)) {
+    for (const images of Object.values(imagesByInventory)) {
       // Sort by creation time to maintain original order
       const sortedImages = images.sort((a, b) => a.createdAt - b.createdAt);
       

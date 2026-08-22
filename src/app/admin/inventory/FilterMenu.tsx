@@ -90,7 +90,7 @@ const FilterMenu: React.FC = () => {
                             </div>
                         );
                     })}
-                    {CATEGORY_FILTERS.map(([filter, filter_class, icon], i) => (
+                    {CATEGORY_FILTERS.map(([filter, filter_class], i) => (
                         <Tooltip key={i} anchorSelect={`.filter-icon-${filter_class}`} place="left">
                             {filter}
                         </Tooltip>

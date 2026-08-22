@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import DataBackup from './DataBackup';
 import GenerateSmallImages from './GenerateSmallImages';

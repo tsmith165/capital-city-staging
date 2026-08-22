@@ -7,16 +7,6 @@ import { api } from '@/convex/_generated/api';
 import ResizeUploader from '@/app/admin/edit/ResizeUploader';
 import InputTextbox from '@/components/inputs/InputTextbox';
 
-interface NewInventoryData {
-    name: string;
-    imagePath: string;
-    width: number;
-    height: number;
-    smallImagePath: string;
-    smallWidth: number;
-    smallHeight: number;
-}
-
 export default function CreateInventoryConvex() {
     const [imageUrl, setImageUrl] = useState('Not yet uploaded');
     const [width, setWidth] = useState(0);
@@ -78,7 +68,7 @@ export default function CreateInventoryConvex() {
 
             const nextOId = (mostRecentOId || 0) + 1;
 
-            const inventoryId = await createInventory({
+            await createInventory({
                 oId: nextOId,
                 pId: nextOId, // Use same value for pId
                 active: true,
