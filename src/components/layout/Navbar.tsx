@@ -1,20 +1,18 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { Menu } from 'lucide-react';
 
-import { navbar_menu_list } from '@/lib/menu_list';
+import { PRIMARY_CTA, PRIMARY_NAV } from '@/lib/menu_list';
 import { useStore } from '@/stores/store';
 import { useIsAdmin } from '@/utils/auth/useIsAdmin';
 
-import dynamic from 'next/dynamic';
-const DynamicMenuOverlay = dynamic(() => import('./menu/MenuOverlay'), { ssr: false });
-
-const NAV_LINK_CLASSES =
-    'rounded-sm text-sm font-bold uppercase tracking-wide text-gold-300 transition-colors hover:text-gold-200';
+import MobileNavPanel from './nav/MobileNavPanel';
+import NavDropdown from './nav/NavDropdown';
+import { CTA_CLASSES, NAV_LINK_ACTIVE, NAV_LINK_CLASSES, NAV_LINK_IDLE } from './nav/nav.constants';
 
 export default function Navbar({ page }: { page: string }) {
     const router = useRouter();
@@ -22,7 +20,6 @@ export default function Navbar({ page }: { page: string }) {
     const pathname = usePathname();
     const [showMenu, setShowMenu] = useState(false);
     const isAdmin = useIsAdmin();
-    const menuRef = useRef<HTMLDivElement>(null);
 
     const setSelectedComponent = useStore((state) => state.setSelectedComponent);
 
@@ -65,92 +62,86 @@ export default function Navbar({ page }: { page: string }) {
         }
     }, [page, searchParams, setSelectedComponent]);
 
-    // The menu previously opened on hover alone, which left it unreachable by keyboard and
-    // unreliable on touch. It is a real toggle now, so it also needs the usual dismissals.
-    useEffect(() => {
-        if (!showMenu) return;
-
-        const onKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') setShowMenu(false);
-        };
-        const onPointerDown = (event: PointerEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) setShowMenu(false);
-        };
-
-        document.addEventListener('keydown', onKeyDown);
-        document.addEventListener('pointerdown', onPointerDown);
-
-        return () => {
-            document.removeEventListener('keydown', onKeyDown);
-            document.removeEventListener('pointerdown', onPointerDown);
-        };
-    }, [showMenu]);
-
-    const navLinks = navbar_menu_list.map(([section, label]) =>
-        section === 'contact' ? (
-            <Link key={section} href="/contact" className={NAV_LINK_CLASSES}>
-                {label}
-            </Link>
-        ) : (
-            <Link
-                key={section}
-                href={`/?component=${section}`}
-                onClick={(event) => handleSectionClick(event, section)}
-                className={NAV_LINK_CLASSES}
-            >
-                {label}
-            </Link>
-        ),
-    );
-
-    const half = Math.ceil(navLinks.length / 2);
+    const activeSection = pathname === '/' ? searchParams.get('component') : null;
+    const activeId =
+        PRIMARY_NAV.find((item) =>
+            item.section
+                ? item.section === activeSection
+                : pathname === item.href || pathname.startsWith(`${item.href}/`),
+        )?.id ?? null;
 
     return (
-        <nav aria-label="Main" className="sticky top-0 z-40 h-[56px] w-full border-b border-line bg-ink/95 backdrop-blur">
-            <div className="relative flex h-full items-center justify-between gap-4 px-4">
-                <div className="hidden flex-1 items-center justify-end gap-6 md:flex">{navLinks.slice(0, half)}</div>
-
-                <Link href="/" aria-label="Capital City Staging home" className="flex shrink-0 items-center">
-                    <Image
-                        src="/logo/CCS_logo_text.png"
-                        alt="Capital City Staging"
-                        width={247}
-                        height={88}
-                        priority
-                        className="max-h-[44px] w-auto object-contain"
-                    />
-                </Link>
-
-                <div className="hidden flex-1 items-center justify-start gap-6 md:flex">{navLinks.slice(half)}</div>
-
-                <div className="flex min-w-0 flex-1 items-center justify-end md:hidden">
-                    <Link href="/contact" className={NAV_LINK_CLASSES}>
-                        Contact
+        <>
+            <nav aria-label="Main" className="sticky top-0 z-40 h-16 w-full border-b border-line bg-ink/95 backdrop-blur">
+                <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between gap-4 px-4 sm:px-6">
+                    <Link href="/" aria-label="Capital City Staging home" className="flex shrink-0 items-center">
+                        <Image
+                            src="/logo/CCS_logo_text.png"
+                            alt="Capital City Staging"
+                            width={247}
+                            height={88}
+                            priority
+                            className="h-[38px] w-auto object-contain"
+                        />
                     </Link>
-                </div>
 
-                <div ref={menuRef} className="relative shrink-0">
-                    <button
-                        type="button"
-                        onClick={() => setShowMenu((open) => !open)}
-                        aria-expanded={showMenu}
-                        aria-controls="site-menu"
-                        aria-label={showMenu ? 'Close menu' : 'Open menu'}
-                        className="grid h-10 w-10 place-items-center rounded-md text-gold-300 transition-colors hover:bg-surface-raised hover:text-gold-200"
-                    >
-                        {showMenu ? <X size={24} aria-hidden="true" /> : <Menu size={26} aria-hidden="true" />}
-                    </button>
+                    <div className="hidden items-center gap-7 tm:flex">
+                        {PRIMARY_NAV.map((item) => {
+                            const isActive = activeId === item.id;
 
-                    {showMenu && (
-                        <div
-                            id="site-menu"
-                            className="absolute right-0 top-[calc(100%+4px)] z-50 w-[220px] overflow-hidden rounded-md border border-line bg-surface-raised shadow-overlay"
+                            if (item.children) {
+                                return <NavDropdown key={item.id} item={item} isActive={isActive} />;
+                            }
+
+                            return (
+                                <Link
+                                    key={item.id}
+                                    href={item.href}
+                                    onClick={(event) => item.section && handleSectionClick(event, item.section)}
+                                    aria-current={isActive ? 'page' : undefined}
+                                    className={`${NAV_LINK_CLASSES} ${isActive ? NAV_LINK_ACTIVE : NAV_LINK_IDLE}`}
+                                >
+                                    {item.label}
+                                </Link>
+                            );
+                        })}
+
+                        {isAdmin ? (
+                            <Link href="/admin" className={`${NAV_LINK_CLASSES} text-forest-200 hover:text-gold-300`}>
+                                Admin
+                            </Link>
+                        ) : null}
+
+                        <Link href={PRIMARY_CTA.href} className={CTA_CLASSES}>
+                            {PRIMARY_CTA.label}
+                        </Link>
+                    </div>
+
+                    <div className="flex items-center gap-2 tm:hidden">
+                        <Link href={PRIMARY_CTA.href} className={`${CTA_CLASSES} hidden xs:inline-flex`}>
+                            {PRIMARY_CTA.label}
+                        </Link>
+                        <button
+                            type="button"
+                            onClick={() => setShowMenu(true)}
+                            aria-expanded={showMenu}
+                            aria-controls="site-menu"
+                            aria-label="Open menu"
+                            className="grid h-10 w-10 place-items-center rounded-md text-body-muted transition-colors hover:bg-surface-raised hover:text-gold-300"
                         >
-                            <DynamicMenuOverlay currentPage={page} isAdmin={isAdmin} onNavigate={() => setShowMenu(false)} />
-                        </div>
-                    )}
+                            <Menu size={24} aria-hidden="true" />
+                        </button>
+                    </div>
                 </div>
-            </div>
-        </nav>
+            </nav>
+
+            <MobileNavPanel
+                open={showMenu}
+                onClose={() => setShowMenu(false)}
+                isAdmin={isAdmin}
+                activeId={activeId}
+                onSectionClick={handleSectionClick}
+            />
+        </>
     );
 }

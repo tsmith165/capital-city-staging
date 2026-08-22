@@ -1,42 +1,39 @@
-export interface MenuItem {
+export interface NavItem {
     id: string;
     label: string;
-    url: string;
-    subMenu?: MenuItem[];
+    href: string;
+    /** Homepage sections scroll in place when you are already on the homepage. */
+    section?: string;
+    children?: NavItem[];
 }
 
 /**
- * Sections of the homepage. These scroll in place when you are already on the homepage and
- * navigate to it otherwise, so each one keeps a real href for crawlers and middle-click.
+ * One source for the header, the mobile panel and the footer. The site previously kept three
+ * overlapping lists: a tuple array for the navbar, a nested list for the dropdown menu, and a
+ * separate admin copy that had already drifted from the real admin routes.
  */
-export const navbar_menu_list: [string, string][] = [
-    ['portfolio', 'Portfolio'],
-    ['where', 'Where'],
-    ['services', 'Services'],
-    ['contact', 'Contact'],
-];
-
-export const menu_list: MenuItem[] = [
-    { id: 'portfolio', label: 'Portfolio', url: '/?component=portfolio' },
-    { id: 'where', label: 'Where We Work', url: '/?component=where' },
-    { id: 'services', label: 'Services', url: '/?component=services' },
-    { id: 'contact', label: 'Get a Quote', url: '/contact' },
+export const PRIMARY_NAV: NavItem[] = [
+    { id: 'portfolio', label: 'Portfolio', href: '/?component=portfolio', section: 'portfolio' },
+    { id: 'where', label: 'Where We Work', href: '/?component=where', section: 'where' },
+    { id: 'services', label: 'Services', href: '/?component=services', section: 'services' },
     {
         id: 'info',
         label: 'Articles',
-        url: '/info',
-        subMenu: [
-            { id: 'staging-tips', label: 'Staging Tips', url: '/info/home-staging-tips' },
-            { id: 'statistics', label: 'Statistics', url: '/info/home-staging-statistics' },
-            { id: 'buyer-psychology', label: 'Buyer Psychology', url: '/info/understanding-buyer-psychology' },
-            { id: 'cost-analysis', label: 'Cost Analysis', url: '/info/cost-vs-value-analysis' },
-            { id: 'staging-benefits', label: 'Staging Benefits', url: '/info/benefits-of-home-staging' },
+        href: '/info',
+        children: [
+            { id: 'staging-tips', label: 'Staging Tips', href: '/info/home-staging-tips' },
+            { id: 'statistics', label: 'Statistics', href: '/info/home-staging-statistics' },
+            { id: 'buyer-psychology', label: 'Buyer Psychology', href: '/info/understanding-buyer-psychology' },
+            { id: 'cost-analysis', label: 'Cost vs. Value', href: '/info/cost-vs-value-analysis' },
+            { id: 'staging-benefits', label: 'Staging Benefits', href: '/info/benefits-of-home-staging' },
         ],
     },
 ];
 
-/**
- * The admin console carries its own navigation, so the public menu only needs a way in.
- * This list previously restated every admin route and had already drifted from the real ones.
- */
-export const admin_menu_list: MenuItem[] = [...menu_list, { id: 'admin', label: 'Admin Console', url: '/admin' }];
+export const PRIMARY_CTA = { label: 'Get a Quote', href: '/contact' } as const;
+
+export const CONTACT_DETAILS = {
+    phone: '(209) 817-4240',
+    phoneHref: 'tel:+12098174240',
+    email: 'mdofflemyer.realestate@gmail.com',
+} as const;
