@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
-import type { PickerItem, StagingLine, StagingSummary } from './picker.types';
+import type { StagingItem, StagingLine, StagingSummary } from './staging.types';
 
 /**
  * The pending pull list.
@@ -15,10 +15,10 @@ import type { PickerItem, StagingLine, StagingSummary } from './picker.types';
  * Nothing is written until commit. Staging a house is one decision made while walking a warehouse,
  * and the old design turned it into twenty separate transactions with no way to review or undo.
  */
-export function useStagingList(items: PickerItem[] | undefined) {
+export function useStagingList<T extends StagingItem>(items: T[] | undefined) {
     const [draft, setDraft] = useState<Record<string, number>>({});
 
-    const toggle = (item: PickerItem) => {
+    const toggle = (item: T) => {
         setDraft((current) => {
             if (item._id in current) {
                 const { [item._id]: _removed, ...rest } = current;
@@ -30,7 +30,7 @@ export function useStagingList(items: PickerItem[] | undefined) {
         });
     };
 
-    const setQuantity = (item: PickerItem, quantity: number) => {
+    const setQuantity = (item: T, quantity: number) => {
         const capped = Math.max(0, Math.min(quantity, item.maxForThisProject));
         setDraft((current) => {
             /* Zero on an item that is not at this house yet just means "never mind". */
@@ -50,17 +50,17 @@ export function useStagingList(items: PickerItem[] | undefined) {
 
     const clear = () => setDraft({});
 
-    const summary = useMemo<StagingSummary>(() => {
+    const summary = useMemo<StagingSummary<T>>(() => {
         const source = items ?? [];
-        const adding: StagingLine[] = [];
-        const changing: StagingLine[] = [];
-        const removing: StagingLine[] = [];
+        const adding: StagingLine<T>[] = [];
+        const changing: StagingLine<T>[] = [];
+        const removing: StagingLine<T>[] = [];
 
         for (const item of source) {
             const desired = draft[item._id];
             if (desired === undefined) continue;
 
-            const line: StagingLine = { item, desired, delta: desired - item.assignedHere };
+            const line: StagingLine<T> = { item, desired, delta: desired - item.assignedHere };
 
             if (item.assignedHere === 0) adding.push(line);
             else if (desired === 0) removing.push(line);

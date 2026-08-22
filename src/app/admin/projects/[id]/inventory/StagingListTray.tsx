@@ -20,7 +20,7 @@ import type { LineProblem, PickerItem, StagingSummary } from './picker.types';
 
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 
-function commitLabel(summary: StagingSummary, projectName: string) {
+function commitLabel(summary: StagingSummary<PickerItem>, projectName: string) {
     const { unitsAdded, unitsRemoved } = summary;
 
     if (unitsAdded === 0 && unitsRemoved === 0) return `Add to ${projectName}`;
@@ -41,7 +41,7 @@ export default function StagingListTray({
     onClear,
     onCommit,
 }: {
-    summary: StagingSummary;
+    summary: StagingSummary<PickerItem>;
     projectName: string;
     expanded: boolean;
     problems: LineProblem[];

@@ -38,4 +38,9 @@ export const DIMENSION_REQUIRED_CATEGORIES: readonly string[] = [
 ];
 
 /** Grid used by every inventory photo grid, so the picker and the catalog stay visually the same. */
-export const INVENTORY_GRID_CLASSES = 'grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5';
+/*
+ * Column counts assume the surrounding three-column layout: the admin nav takes 260px from `lg`, and
+ * both grids gained a ~22rem right column at `xl`. The old 4-and-5 column steps were sized for a page
+ * that ran the full width, and would leave ~140px cards here — too small to recognise a sofa in.
+ */
+export const INVENTORY_GRID_CLASSES = 'grid grid-cols-2 gap-3 sm:grid-cols-3 2xl:grid-cols-4';

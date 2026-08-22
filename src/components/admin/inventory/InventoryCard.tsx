@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import type { ReactNode } from 'react';
-import { Check, ImageOff, ZoomIn } from 'lucide-react';
+import { Check, ImageOff, Info, ZoomIn } from 'lucide-react';
 
 import AvailabilityBadge from './AvailabilityBadge';
 import type { AvailabilitySummary } from './inventory.types';
@@ -33,6 +33,7 @@ export default function InventoryCard({
     actionLabel,
     onActivate,
     onZoom,
+    onInspect,
     badge,
     footer,
 }: {
@@ -47,6 +48,8 @@ export default function InventoryCard({
     actionLabel: string;
     onActivate?: () => void;
     onZoom?: () => void;
+    /** Opens the detail panel. Needed once the card's own tap is spent on selecting. */
+    onInspect?: () => void;
     /** Extra status pill, used for "At this house · 2". */
     badge?: ReactNode;
     /** Quantity stepper or per-card controls. Rendered outside the button so it stays clickable. */
@@ -92,15 +95,17 @@ export default function InventoryCard({
                 </span>
 
                 <span className="flex flex-col gap-2 p-3">
-                    <span className="flex items-start justify-between gap-2">
-                        <strong className="text-body line-clamp-2 min-h-[2.25rem] text-xs leading-snug font-bold">{name}</strong>
-                        <span className="text-gold-300 shrink-0 text-xs font-bold">{price ? money.format(price) : '—'}</span>
-                    </span>
+                    {/* The name owns its row. Sharing it with the price truncated long names to make
+                        room for four characters, and these names are how she tells two grey sofas apart. */}
+                    <strong className="text-body line-clamp-2 min-h-[2.25rem] text-xs leading-snug font-bold">{name}</strong>
 
-                    <span className="flex flex-wrap items-center gap-1.5">
-                        <AvailabilityBadge availability={availability} />
-                        {badge}
-                        {inactive && <span className="text-body-subtle text-[10px] font-bold uppercase">Inactive</span>}
+                    <span className="flex items-center justify-between gap-2">
+                        <span className="flex min-w-0 flex-wrap items-center gap-1.5">
+                            <AvailabilityBadge availability={availability} />
+                            {badge}
+                            {inactive && <span className="text-body-subtle text-[10px] font-bold uppercase">Inactive</span>}
+                        </span>
+                        <span className="text-gold-300 shrink-0 text-xs font-bold">{price ? money.format(price) : '—'}</span>
                     </span>
 
                     <small className="text-body-subtle truncate text-[11px]">{category || 'Uncategorised'}</small>
@@ -109,16 +114,31 @@ export default function InventoryCard({
 
             {footer && <div className="border-line border-t p-2">{footer}</div>}
 
-            {onZoom && thumbnail && (
-                <button
-                    type="button"
-                    onClick={onZoom}
-                    aria-label={`Enlarge photo of ${name}`}
-                    className="border-line-strong bg-ink/70 text-body hover:bg-ink focus-visible:outline-gold-300 absolute top-2 right-2 grid h-9 w-9 place-items-center rounded-md border backdrop-blur transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
-                >
-                    <ZoomIn size={15} aria-hidden="true" />
-                </button>
-            )}
+            {/* Siblings of the main button, not children: a button inside a button is invalid, and
+                once the card's own tap is spent on selecting, detail needs its own way in. */}
+            <div className="absolute top-2 right-2 flex flex-col gap-1.5">
+                {onInspect && (
+                    <button
+                        type="button"
+                        onClick={onInspect}
+                        aria-label={`Details for ${name}`}
+                        className="border-line-strong bg-ink/70 text-body hover:bg-ink focus-visible:outline-gold-300 grid h-9 w-9 place-items-center rounded-md border backdrop-blur transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+                    >
+                        <Info size={15} aria-hidden="true" />
+                    </button>
+                )}
+
+                {onZoom && thumbnail && (
+                    <button
+                        type="button"
+                        onClick={onZoom}
+                        aria-label={`Enlarge photo of ${name}`}
+                        className="border-line-strong bg-ink/70 text-body hover:bg-ink focus-visible:outline-gold-300 grid h-9 w-9 place-items-center rounded-md border backdrop-blur transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+                    >
+                        <ZoomIn size={15} aria-hidden="true" />
+                    </button>
+                )}
+            </div>
         </article>
     );
 }

@@ -17,7 +17,7 @@ import { INVENTORY_GRID_CLASSES } from '@/components/admin/inventory/inventory.c
 import { useInventoryFilters } from '@/components/admin/inventory/useInventoryFilters';
 
 import StagingListTray from './StagingListTray';
-import { useStagingList } from './useStagingList';
+import { useStagingList } from '@/components/admin/inventory/useStagingList';
 import type { LineProblem, PickerItem } from './picker.types';
 
 /**
