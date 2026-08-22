@@ -7,6 +7,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Menu } from 'lucide-react';
 
 import { PRIMARY_CTA, PRIMARY_NAV } from '@/lib/menu_list';
+import { track } from '@/lib/analytics';
 import { useStore } from '@/stores/store';
 import { useIsAdmin } from '@/utils/auth/useIsAdmin';
 
@@ -112,13 +113,21 @@ export default function Navbar({ page }: { page: string }) {
                             </Link>
                         ) : null}
 
-                        <Link href={PRIMARY_CTA.href} className={CTA_CLASSES}>
+                        <Link
+                            href={PRIMARY_CTA.href}
+                            className={CTA_CLASSES}
+                            onClick={() => track('cta_clicked', { cta: 'get_a_quote', placement: 'nav' })}
+                        >
                             {PRIMARY_CTA.label}
                         </Link>
                     </div>
 
                     <div className="flex items-center gap-2 tm:hidden">
-                        <Link href={PRIMARY_CTA.href} className={`${CTA_CLASSES} hidden xs:inline-flex`}>
+                        <Link
+                            href={PRIMARY_CTA.href}
+                            className={`${CTA_CLASSES} hidden xs:inline-flex`}
+                            onClick={() => track('cta_clicked', { cta: 'get_a_quote', placement: 'nav_mobile' })}
+                        >
                             {PRIMARY_CTA.label}
                         </Link>
                         <button

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ChevronDown, Mail, Phone, X } from 'lucide-react';
 
 import { CONTACT_DETAILS, PRIMARY_CTA, PRIMARY_NAV, type NavItem } from '@/lib/menu_list';
+import { track } from '@/lib/analytics';
 
 interface MobileNavPanelProps {
     open: boolean;
@@ -138,7 +139,10 @@ export default function MobileNavPanel({ open, onClose, isAdmin, activeId, onSec
                 <div className="shrink-0 border-t border-line p-4">
                     <Link
                         href={PRIMARY_CTA.href}
-                        onClick={onClose}
+                        onClick={() => {
+                            track('cta_clicked', { cta: 'get_a_quote', placement: 'nav_mobile' });
+                            onClose();
+                        }}
                         className="flex min-h-[48px] w-full items-center justify-center rounded-md bg-gold-400 text-sm font-bold uppercase tracking-[0.06em] text-body-inverse transition-colors hover:bg-gold-300"
                     >
                         {PRIMARY_CTA.label}
@@ -147,6 +151,7 @@ export default function MobileNavPanel({ open, onClose, isAdmin, activeId, onSec
                     <div className="mt-2 flex flex-col text-sm">
                         <a
                             href={CONTACT_DETAILS.phoneHref}
+                            onClick={() => track('contact_channel_clicked', { channel: 'phone', placement: 'nav_mobile' })}
                             className="flex min-h-[44px] items-center gap-2 text-body-muted transition-colors hover:text-gold-300"
                         >
                             <Phone size={15} aria-hidden="true" />
@@ -154,6 +159,7 @@ export default function MobileNavPanel({ open, onClose, isAdmin, activeId, onSec
                         </a>
                         <a
                             href={`mailto:${CONTACT_DETAILS.email}`}
+                            onClick={() => track('contact_channel_clicked', { channel: 'email', placement: 'nav_mobile' })}
                             className="flex min-h-[44px] items-center gap-2 break-all text-body-muted transition-colors hover:text-gold-300"
                         >
                             <Mail size={15} aria-hidden="true" />

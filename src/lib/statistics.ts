@@ -1,38 +1,33 @@
-export const statistics = [
+export interface StagingStatistic {
+    value: string;
+    claim: string;
+    source: string;
+}
+
+/**
+ * The homepage used to shuffle nine of these with `Math.random()` and rotate one into view every
+ * five seconds, on a band that was hidden below `md` entirely. Four are shown at once now, so
+ * the numbers can be read and compared instead of waiting for the carousel to come back around.
+ */
+export const statistics: StagingStatistic[] = [
     {
-        text: `Staged homes sell for 17% more on average.`,
-        attributor: `International Association of Home Staging Professionals`,
+        value: '73%',
+        claim: 'less time on the market for staged homes',
+        source: 'Real Estate Staging Association',
     },
     {
-        text: `95% of staged homes sell in 11 days or less.`,
-        attributor: `Home Staging Resource`,
+        value: '6-20%',
+        claim: 'higher sale price than comparable unstaged homes',
+        source: 'International Association of Home Staging Professionals',
     },
     {
-        text: `Staged homes can sell for up to 20% more.`,
-        attributor: `National Association of Realtors`,
+        value: '81%',
+        claim: 'of buyers find it easier to picture a staged home as their own',
+        source: 'National Association of Exclusive Buyer Agents',
     },
     {
-        text: `Staged homes spend 73% less time on the market.`,
-        attributor: `Real Estate Staging Association`,
-    },
-    {
-        text: `Staged homes sell for 6% above the asking price on average.`,
-        attributor: `Coldwell Banker Real Estate Corp.`,
-    },
-    {
-        text: `81% of buyers find it easier to visualize a staged property as their future home.`,
-        attributor: `National Association of Exclusive Buyer Agents`,
-    },
-    {
-        text: `Staged homes sold for $40,000 over list price on average.`,
-        attributor: `Profile of Home Staging`,
-    },
-    {
-        text: `48% of buyers are more likely to walk through a staged home they saw online.`,
-        attributor: `Zillow`,
-    },
-    {
-        text: `Staging can increase the sale price of a home by up to 5%.`,
-        attributor: `National Association of Realtors`,
+        value: '48%',
+        claim: 'of buyers are more likely to tour a staged home they found online',
+        source: 'Zillow',
     },
 ];

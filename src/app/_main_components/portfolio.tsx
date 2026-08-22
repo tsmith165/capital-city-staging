@@ -1,144 +1,129 @@
+'use client';
+
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
-import { IoIosArrowForward, IoIosArrowBack } from 'react-icons/io';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
+
+import SectionHeading from '@/components/content/SectionHeading';
+import { track } from '@/lib/analytics';
+import PortfolioLightbox from './PortfolioLightbox';
 
 export default function Portfolio() {
     const projects = useQuery(api.projects.getHighlightedProjects);
     const [selectedProjectIndex, setSelectedProjectIndex] = useState(0);
-    const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
-    const [fullScreenImage, setFullScreenImage] = useState(false);
+    const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
     const currentProject = projects?.[selectedProjectIndex];
-    const images = currentProject?.images || [];
+    const images = currentProject?.images ?? [];
 
-    if (!projects || projects.length === 0) {
+    if (!projects) {
         return (
-            <div className="min-section-viewport flex flex-col items-center justify-center space-y-4 p-4">
-                <h2 className="text-4xl font-bold gradient-secondary-main-text">Portfolio Coming Soon</h2>
-                <p className="text-body-muted">Check back soon to see our latest staging projects!</p>
-            </div>
+            <section className="w-full px-5 py-20 sm:px-8">
+                <div className="mx-auto max-w-[1200px]">
+                    <SectionHeading eyebrow="Recent work" title="Staged by Mia" />
+                    <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        {[0, 1, 2, 3, 4, 5].map((key) => (
+                            <div key={key} className="aspect-[4/3] animate-pulse rounded-lg border border-line bg-surface-raised" />
+                        ))}
+                    </div>
+                </div>
+            </section>
         );
     }
 
-    const handleImageClick = (index: number) => {
-        setSelectedImageIndex(index);
-        setFullScreenImage(true);
-    };
+    if (projects.length === 0) {
+        return (
+            <section className="w-full px-5 py-20 sm:px-8">
+                <div className="mx-auto max-w-[1200px]">
+                    <SectionHeading
+                        eyebrow="Recent work"
+                        title="Portfolio coming soon"
+                        lead="Recent projects are being photographed. Call or send a message in the meantime and we will walk you through comparable work."
+                    />
+                </div>
+            </section>
+        );
+    }
 
-    const handleNext = (event: React.MouseEvent<HTMLButtonElement>) => {
-        event.stopPropagation();
-        setSelectedImageIndex((prevIndex) => {
-            if (prevIndex === null) return 0;
-            return (prevIndex + 1) % images.length;
-        });
-    };
-
-    const handlePrev = (event: React.MouseEvent<HTMLButtonElement>) => {
-        event.stopPropagation();
-        setSelectedImageIndex((prevIndex) => {
-            if (prevIndex === null) return images.length - 1;
-            return (prevIndex - 1 + images.length) % images.length;
-        });
-    };
+    const step = (delta: number) =>
+        setLightboxIndex((current) => (current === null ? null : (current + delta + images.length) % images.length));
 
     return (
-        <div className="min-section-viewport p-4">
-            {/* Header Section */}
-            <div className="text-center mb-8">
-                <h2 className="text-4xl font-bold gradient-secondary-main-text mb-6">Staged by Mia</h2>
-                
-                {/* Project Pills */}
-                {projects.length > 0 && (
-                    <div className="flex flex-wrap justify-center gap-3 mb-6">
-                        {projects.map((project, index) => (
+        <section className="w-full px-5 py-20 sm:px-8">
+            <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center">
+                <SectionHeading
+                    eyebrow="Recent work"
+                    title="Staged by Mia"
+                    lead="Real Sacramento-area listings, photographed after install. Select a project to see the rooms."
+                />
+
+                {projects.length > 1 ? (
+                    <div role="tablist" aria-label="Projects" className="mt-8 flex flex-wrap justify-center gap-2.5">
+                        {projects.map((project, index) => {
+                            const isSelected = index === selectedProjectIndex;
+
+                            return (
+                                <button
+                                    key={project._id}
+                                    type="button"
+                                    role="tab"
+                                    aria-selected={isSelected}
+                                    onClick={() => {
+                                        setSelectedProjectIndex(index);
+                                        track('portfolio_project_selected', { project: project.name });
+                                    }}
+                                    className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+                                        isSelected
+                                            ? 'border-gold-400 bg-gold-400 text-body-inverse'
+                                            : 'border-line-strong text-body-muted hover:border-gold-400 hover:text-gold-300'
+                                    }`}
+                                >
+                                    {project.name}
+                                </button>
+                            );
+                        })}
+                    </div>
+                ) : null}
+
+                {images.length > 0 ? (
+                    <div className="mt-10 grid w-full gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                        {images.map((image, index) => (
                             <button
-                                key={project._id}
-                                onClick={() => setSelectedProjectIndex(index)}
-                                className={`rounded-full border-2 px-4 py-2 font-medium transition-all ${
-                                    index === selectedProjectIndex
-                                        ? 'border-secondary bg-secondary text-body-muted'
-                                        : 'border-primary bg-transparent text-primary hover:border-secondary hover:bg-secondary hover:text-body-muted'
-                                }`}
+                                key={image._id}
+                                type="button"
+                                onClick={() => {
+                                    setLightboxIndex(index);
+                                    track('portfolio_image_opened', { project: currentProject?.name ?? '', index });
+                                }}
+                                aria-label={`View ${currentProject?.name} image ${index + 1} full size`}
+                                className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-line bg-surface-raised shadow-card"
                             >
-                                {project.name}
+                                <Image
+                                    src={image.thumbnailPath || image.imagePath}
+                                    alt={`${currentProject?.name}, image ${index + 1}`}
+                                    fill
+                                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                                    className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                                    priority={index < 3}
+                                />
                             </button>
                         ))}
                     </div>
+                ) : (
+                    <p className="mt-10 text-body-subtle">Photography for this project is on its way.</p>
                 )}
-
             </div>
 
-            {/* Images Grid */}
-            {images.length > 0 ? (
-                <div className="max-w-7xl mx-auto">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {images.map((image, index) => (
-                            <div key={image._id} className="relative group">
-                                <Image
-                                    src={image.thumbnailPath || image.imagePath}
-                                    alt={`${currentProject?.name} - Image ${index + 1}`}
-                                    width={image.thumbnailWidth || image.width}
-                                    height={image.thumbnailHeight || image.height}
-                                    className="w-full h-auto cursor-pointer rounded-lg object-cover transition-transform duration-300 group-hover:scale-105 shadow-lg"
-                                    onClick={() => handleImageClick(index)}
-                                    priority={index < 4}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            ) : (
-                <div className="text-center py-12">
-                    <p className="text-body-subtle text-lg">No images available for this project yet.</p>
-                </div>
-            )}
-            <AnimatePresence>
-                {fullScreenImage && selectedImageIndex !== null && (
-                    <motion.div
-                        className="fixed inset-0 z-50 m-0 flex h-full w-full bg-black bg-opacity-85"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setFullScreenImage(false)}
-                    >
-                        <div className="relative flex h-full w-full items-center justify-center">
-                            <AnimatePresence mode="wait">
-                                <motion.img
-                                    key={selectedImageIndex}
-                                    src={images[selectedImageIndex].imagePath}
-                                    alt={`${currentProject?.name} - Full-screen image ${selectedImageIndex + 1}`}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.8 }}
-                                    className="max-h-[90vh] max-w-[90vw] object-contain"
-                                />
-                            </AnimatePresence>
-                            {images.length > 1 && (
-                                <>
-                                    <button
-                                        aria-label="Previous"
-                                        onClick={handlePrev}
-                                        className="absolute left-4 top-1/2 -translate-y-1/2 transform rounded-full bg-black bg-opacity-50 p-2"
-                                    >
-                                        <IoIosArrowBack className="text-4xl text-white" />
-                                    </button>
-                                    <button
-                                        aria-label="Next"
-                                        onClick={handleNext}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 transform rounded-full bg-black bg-opacity-50 p-2"
-                                    >
-                                        <IoIosArrowForward className="text-4xl text-white" />
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
+            {lightboxIndex !== null ? (
+                <PortfolioLightbox
+                    images={images}
+                    index={lightboxIndex}
+                    projectName={currentProject?.name ?? ''}
+                    onClose={() => setLightboxIndex(null)}
+                    onStep={step}
+                />
+            ) : null}
+        </section>
     );
 }

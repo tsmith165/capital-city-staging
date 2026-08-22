@@ -13,9 +13,9 @@ export interface NavItem {
  * separate admin copy that had already drifted from the real admin routes.
  */
 export const PRIMARY_NAV: NavItem[] = [
+    { id: 'services', label: 'Services', href: '/?component=services', section: 'services' },
     { id: 'portfolio', label: 'Portfolio', href: '/?component=portfolio', section: 'portfolio' },
     { id: 'where', label: 'Where We Work', href: '/?component=where', section: 'where' },
-    { id: 'services', label: 'Services', href: '/?component=services', section: 'services' },
     {
         id: 'info',
         label: 'Articles',

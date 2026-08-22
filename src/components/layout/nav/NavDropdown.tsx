@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
 
 import type { NavItem } from '@/lib/menu_list';
+import { track } from '@/lib/analytics';
 import { NAV_LINK_ACTIVE, NAV_LINK_CLASSES, NAV_LINK_IDLE } from './nav.constants';
 
 interface NavDropdownProps {
@@ -82,7 +83,10 @@ export default function NavDropdown({ item, isActive }: NavDropdownProps) {
                             <Link
                                 key={child.id}
                                 href={child.href}
-                                onClick={close}
+                                onClick={() => {
+                                    track('article_opened', { slug: child.id, placement: 'nav' });
+                                    close();
+                                }}
                                 className="block px-4 py-2 text-[13px] text-body-muted transition-colors hover:bg-surface-overlay hover:text-gold-300"
                             >
                                 {child.label}

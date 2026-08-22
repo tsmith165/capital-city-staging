@@ -1,28 +1,28 @@
 'use client';
 
-import React, { useMemo, useLayoutEffect, useEffect, useState } from 'react';
-import { useStore } from '@/stores/store';
-
-import Home from '@/app/_main_components/home';
-import About from '@/app/_main_components/about';
-import Portfolio from '@/app/_main_components/portfolio';
-import Services from '@/app/_main_components/services';
-
+import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
-const PostHogPageView = dynamic(() => import('@/app/PostHogPageView'), {
-    ssr: false,
-});
-const Where = dynamic(() => import('@/app/_main_components/where'), {
-    ssr: false,
-});
 
-const components = [
+import { useStore } from '@/stores/store';
+import Home from '@/app/_main_components/home';
+import Services from '@/app/_main_components/services';
+import Portfolio from '@/app/_main_components/portfolio';
+import About from '@/app/_main_components/about';
+
+const Where = dynamic(() => import('@/app/_main_components/where'), { ssr: false });
+
+/**
+ * Order follows what a visitor needs: what this is, what we sell, proof that it works, whether
+ * we cover them, and who they would be working with. Portfolio and the map used to come first,
+ * so the services were the fourth thing on the page.
+ */
+const SECTIONS = [
     { id: 'home', component: Home },
+    { id: 'services', component: Services },
     { id: 'portfolio', component: Portfolio },
     { id: 'where', component: Where },
-    { id: 'services', component: Services },
     { id: 'about', component: About },
-];
+] as const;
 
 interface InitialHomepageImage {
     imagePath: string;
@@ -30,52 +30,25 @@ interface InitialHomepageImage {
     height: number;
 }
 
-export default function MainView({
-    initialHomepageImages,
-}: {
-    initialHomepageImages?: InitialHomepageImage[] | null;
-}) {
-    const [layoutLoaded, setLayoutLoaded] = useState(false);
-    const componentRefs = useStore((state) => state.componentRefs);
-    const setComponentRefs = useStore((state) => state.setComponentRefs);
-    const refs = useMemo(() => components.map(() => React.createRef<HTMLDivElement>()), []);
-
+export default function MainView({ initialHomepageImages }: { initialHomepageImages?: InitialHomepageImage[] | null }) {
     const selectedComponent = useStore((state) => state.selectedComponent);
 
-    useLayoutEffect(() => {
-        const timer = setTimeout(() => {
-            setComponentRefs(refs);
-            setLayoutLoaded(true);
-        }, 500);
-
-        return () => clearTimeout(timer);
-    }, [setComponentRefs, refs]);
-
+    /*
+     * Scrolling used to depend on a store of refs registered from a 500ms timeout, so a nav click
+     * inside that window silently did nothing. The sections carry their ids in the DOM already.
+     */
     useEffect(() => {
-        if (!layoutLoaded) return;
+        const sectionId = selectedComponent.split('_')[0];
+        if (!sectionId || sectionId === 'home') return;
 
-        // Extract the base component name (remove the timestamp)
-        const baseComponent = selectedComponent.split('_')[0];
-
-        // Check if the base component exists and scroll to it
-        const index = componentRefs.findIndex((item) => item.current?.id === baseComponent);
-        if (index !== -1) {
-            const ref = componentRefs[index];
-            if (ref && ref.current) {
-                ref.current.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start',
-                });
-            }
-        }
-    }, [selectedComponent, componentRefs, layoutLoaded]);
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, [selectedComponent]);
 
     return (
         <div className="flex flex-col">
-            <PostHogPageView />
-            {components.map(({ id, component: Component }, index) => (
-                <div key={id} ref={refs[index]} id={id} className="w-full scroll-mt-[var(--nav-height)] bg-ink">
-                    {id === 'home' ? <Component initialHomepageImages={initialHomepageImages} /> : <Component />}
+            {SECTIONS.map(({ id, component: Component }) => (
+                <div key={id} id={id} className="w-full scroll-mt-[var(--nav-height)] bg-ink">
+                    {id === 'home' ? <Home initialHomepageImages={initialHomepageImages} /> : <Component />}
                 </div>
             ))}
         </div>

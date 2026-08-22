@@ -9,6 +9,7 @@ import { api } from '@/convex/_generated/api';
 import { sendContactFormEmail } from './actions';
 import { buildSubmissionRecord } from './contact_form.utils';
 import { calculateStagingQuote, formatPrice } from '@/utils/calculateQuote';
+import { track, trackOnce } from '@/lib/analytics';
 import { Calculator, Send, CheckCircle, AlertCircle, Info, Ruler, Bed, MapPin, Trees, Building, Home, Users, Bath, Sofa, Briefcase, UtensilsCrossed, Phone } from 'lucide-react';
 
 const schema = z.object({
@@ -57,17 +58,17 @@ const Toggle = ({
             aria-labelledby={`toggle-label-${fieldId(label)}`}
             onClick={() => onChange(!enabled)}
             className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
-                enabled ? 'bg-secondary' : 'bg-surface-hover'
+                enabled ? 'bg-forest-400' : 'bg-surface-hover'
             }`}
         >
             <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                className={`inline-block h-4 w-4 transform rounded-full bg-body transition-transform ${
                     enabled ? 'translate-x-6' : 'translate-x-1'
                 }`}
             />
         </button>
         <div className="flex items-center gap-3">
-            <div className="text-primary" aria-hidden="true">
+            <div className="text-forest-200" aria-hidden="true">
                 {icon}
             </div>
             <span id={`toggle-label-${fieldId(label)}`} className="font-medium text-body-muted">
@@ -164,6 +165,7 @@ const ContactForm = () => {
     }, []);
 
     const handleChange = (field: keyof FormData, value: any) => {
+        trackOnce('quote_started', { placement: 'contact_page' });
         setFormData((prev) => ({
             ...prev,
             [field]: value,
@@ -219,9 +221,20 @@ const ContactForm = () => {
                 throw new Error('Failed to submit form');
             }
 
+            track('quote_submitted', {
+                estimate: quote.totalEstimate,
+                staging_type: formData.stagingType,
+                square_footage: formData.squareFootage,
+                bedrooms: formData.bedrooms,
+                bathrooms: formData.bathrooms,
+                distance_miles: formData.distanceFromDowntown,
+                outdoor_staging: formData.outdoorStaging,
+                multi_floor: formData.multiFloor,
+            });
+
             setSubmitMessage({
                 type: 'success',
-                message: 'Your quote request has been sent! Mia will contact you within 24 hours.',
+                message: 'Your quote request has been sent. Mia will get back to you within one business day.',
             });
 
             // Reset form
@@ -253,11 +266,13 @@ const ContactForm = () => {
                     }
                 });
                 setErrors(newErrors);
+                track('quote_failed', { reason: 'validation', fields: Object.keys(newErrors) });
             } else {
                 console.error('Error submitting form:', error);
+                track('quote_failed', { reason: 'delivery' });
                 setSubmitMessage({
                     type: 'error',
-                    message: 'An error occurred. Please try again or call us directly.',
+                    message: 'Something went wrong sending that. Try again, or call (209) 817-4240 and we will take the details over the phone.',
                 });
             }
         } finally {
@@ -273,11 +288,14 @@ const ContactForm = () => {
         <div className="w-full space-y-8">
             {/* Header */}
             <div className="text-center">
-                <div className="mb-4 flex items-center justify-center gap-3">
-                    <Calculator className="text-primary" size={32} />
-                    <h2 className="text-3xl font-bold gradient-gold-main-text">Instant Quote Calculator</h2>
+                <div className="mb-3 flex items-center justify-center gap-3">
+                    <Calculator className="text-forest-200" size={28} aria-hidden="true" />
+                    <h2 className="font-display text-3xl font-bold gradient-gold-main-text">Estimate your staging</h2>
                 </div>
-                <p className="text-body-subtle">Get an instant estimate and submit for your personalized consultation</p>
+                <p className="mx-auto max-w-xl text-pretty text-body-muted">
+                    Answer a few questions about the property and you will see a price range before you send anything. The final
+                    number is confirmed at the walkthrough.
+                </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
@@ -305,7 +323,7 @@ const ContactForm = () => {
                                     aria-describedby={errors.name ? 'contact-name-error' : undefined}
                                     value={formData.name}
                                     onChange={(e) => handleChange('name', e.target.value)}
-                                    className="w-full rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-white placeholder-body-subtle transition-colors focus:border-primary focus:outline-none"
+                                    className="w-full rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-body placeholder-body-subtle transition-colors focus:border-gold-400"
                                     placeholder="John Doe"
                                 />
                                 {errors.name && (
@@ -329,7 +347,7 @@ const ContactForm = () => {
                                     aria-describedby={errors.phone ? 'contact-phone-error' : undefined}
                                     value={formData.phone}
                                     onChange={(e) => handleChange('phone', e.target.value)}
-                                    className="w-full rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-white placeholder-body-subtle transition-colors focus:border-primary focus:outline-none"
+                                    className="w-full rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-body placeholder-body-subtle transition-colors focus:border-gold-400"
                                     placeholder="(555) 123-4567"
                                 />
                                 {errors.phone && (
@@ -355,7 +373,7 @@ const ContactForm = () => {
                                 aria-describedby={errors.email ? 'contact-email-error' : undefined}
                                 value={formData.email}
                                 onChange={(e) => handleChange('email', e.target.value)}
-                                className="w-full rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-white placeholder-body-subtle transition-colors focus:border-primary focus:outline-none"
+                                className="w-full rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-body placeholder-body-subtle transition-colors focus:border-gold-400"
                                 placeholder="john@example.com"
                             />
                             {errors.email && (
@@ -381,7 +399,7 @@ const ContactForm = () => {
                         value={formData.message}
                         onChange={(e) => handleChange('message', e.target.value)}
                         rows={3}
-                        className="w-full resize-none rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-white placeholder-body-subtle transition-colors focus:border-primary focus:outline-none"
+                        className="w-full resize-none rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-body placeholder-body-subtle transition-colors focus:border-gold-400"
                         placeholder="Tell us about your timeline, specific needs, or any questions you have..."
                     />
                     {errors.message && (
@@ -583,12 +601,12 @@ const ContactForm = () => {
                                                     className={`flex transform items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-all hover:scale-[1.02] hover:rotate-1 ${
                                                         isSubmitting
                                                             ? 'cursor-not-allowed bg-surface-hover text-body-subtle'
-                                                            : 'bg-gradient-to-r from-primary via-primary_dark to-primary text-white shadow-2xl hover:shadow-primary/40 hover:shadow-2xl border-2 border-primary_dark/50'
+                                                            : 'bg-gold-400 text-body-inverse shadow-card hover:bg-gold-300'
                                                     }`}
                                                 >
                                                     {isSubmitting ? (
                                                         <>
-                                                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-stone-400 border-t-transparent" />
+                                                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-body-inverse/40 border-t-transparent" />
                                                             <span>Sending Your Request...</span>
                                                         </>
                                                     ) : (
@@ -821,12 +839,12 @@ const ContactForm = () => {
                                                     className={`flex transform items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-all hover:scale-[1.02] hover:rotate-1 ${
                                                         isSubmitting
                                                             ? 'cursor-not-allowed bg-surface-hover text-body-subtle'
-                                                            : 'bg-gradient-to-r from-primary via-primary_dark to-primary text-white shadow-2xl hover:shadow-primary/40 hover:shadow-2xl border-2 border-primary_dark/50'
+                                                            : 'bg-gold-400 text-body-inverse shadow-card hover:bg-gold-300'
                                                     }`}
                                                 >
                                                     {isSubmitting ? (
                                                         <>
-                                                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-stone-400 border-t-transparent" />
+                                                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-body-inverse/40 border-t-transparent" />
                                                             <span>Sending Your Quote...</span>
                                                         </>
                                                     ) : (

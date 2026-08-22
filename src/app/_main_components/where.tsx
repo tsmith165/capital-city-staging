@@ -1,221 +1,144 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Polygon } from 'react-leaflet';
+import React, { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { MapContainer, Polygon, TileLayer } from 'react-leaflet';
 import { LatLngTuple } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import rawCityBoundaries from '../../lib/city_boundaries.json';
 
-const cityOrder = [
-    'Sacramento',
-    'West Sacramento',
-    'Rancho Cordova',
-    'Carmichael',
-    'Rio Linda',
-    'North Highlands',
-    'Antelope',
-    'Citrus Heights',
-    'Gold River',
-    'Fair Oaks',
-    'Orangevale',
-    'Folsom',
-    'Granite Bay',
-    'Roseville',
-    'Rocklin',
-    'Loomis',
-];
+import SectionHeading from '@/components/content/SectionHeading';
+import { SERVICE_AREAS } from '@/components/layout/Footer.constants';
+import { track } from '@/lib/analytics';
+import rawCityBoundaries from '@/lib/city_boundaries.json';
 
-const cityBoundaries = cityOrder
-    .map((cityName) => rawCityBoundaries.find((city) => city.name === cityName))
-    .filter((city): city is NonNullable<typeof city> => city !== undefined);
+const MAP_CENTER: LatLngTuple = [38.6171, -121.3283];
 
-const Where: React.FC = () => {
-    const MAP_CENTER: LatLngTuple = [38.6171, -121.3283];
+/** Ordered by the service-area constant so the map, the footer and the sitemap cannot drift. */
+const cityBoundaries = SERVICE_AREAS.map((area) => {
+    const boundary = rawCityBoundaries.find((city) => city.name === area.name);
+    return boundary ? { ...area, coordinates: boundary.coordinates } : null;
+}).filter((city): city is NonNullable<typeof city> => city !== null);
 
-    const [selectedCity, setSelectedCity] = useState<string | null>(null);
-    const [hoveredMap, setHoveredMap] = useState<boolean>(false);
-    const [currentCityIndex, setCurrentCityIndex] = useState<number>(0);
-    const [zoomComplete, setZoomComplete] = useState<boolean>(false);
+export default function Where() {
+    const [activeCity, setActiveCity] = useState<string | null>(null);
+    const [mapReady, setMapReady] = useState(false);
     const mapRef = useRef<L.Map | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
+    /*
+     * The map used to cycle a highlighted polygon on a one-second interval for as long as the
+     * page was open, repainting the whole canvas each tick whether or not it was on screen.
+     * Highlighting now follows the pointer or keyboard focus and is idle otherwise.
+     */
     useEffect(() => {
-        let interval: ReturnType<typeof setInterval> | null = null;
+        const node = containerRef.current;
+        if (!node) return;
 
-        if (!hoveredMap && !selectedCity && zoomComplete) {
-            interval = setInterval(() => {
-                setCurrentCityIndex((prevIndex) => (prevIndex === cityBoundaries.length - 1 ? 0 : prevIndex + 1));
-            }, 1000);
-        }
-
-        return () => {
-            if (interval !== null) {
-                clearInterval(interval);
-            }
-        };
-    }, [selectedCity, hoveredMap, zoomComplete]);
-
-    useEffect(() => {
-        let timeoutId: NodeJS.Timeout | null = null;
+        let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
         const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        timeoutId = setTimeout(() => {
-                            if (mapRef.current) {
-                                mapRef.current.on('zoomend', () => {
-                                    setTimeout(() => {
-                                        setZoomComplete(true);
-                                    }, 500);
-                                });
+            ([entry]) => {
+                if (!entry.isIntersecting) return;
 
-                                mapRef.current.flyTo(MAP_CENTER, 9.5, {
-                                    duration: 2,
-                                    easeLinearity: 0.25,
-                                });
-                            }
-                        }, 500);
-                    } else if (timeoutId) {
-                        clearTimeout(timeoutId);
-                    }
-                });
+                timeoutId = setTimeout(() => {
+                    mapRef.current?.flyTo(MAP_CENTER, 9.5, { duration: 1.5, easeLinearity: 0.25 });
+                    setMapReady(true);
+                }, 300);
+
+                observer.disconnect();
             },
             { threshold: 0.2 },
         );
 
-        if (containerRef.current) {
-            observer.observe(containerRef.current);
-        }
+        observer.observe(node);
 
         return () => {
-            if (containerRef.current) {
-                observer.unobserve(containerRef.current);
-            }
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
+            observer.disconnect();
+            if (timeoutId) clearTimeout(timeoutId);
         };
     }, []);
 
-    const handleMouseOver = (cityName: string) => {
-        setSelectedCity(cityName);
-        const cityIndex = cityBoundaries.findIndex((city) => city.name === cityName);
-        setCurrentCityIndex(cityIndex);
-    };
-
-    const handleMouseOut = () => {
-        setSelectedCity(null);
-    };
-
-    const handleCityClick = (cityName: string) => {
-        setSelectedCity(cityName);
-        const cityIndex = cityBoundaries.findIndex((city) => city.name === cityName);
-        setCurrentCityIndex(cityIndex);
+    const selectCity = (name: string) => {
+        setActiveCity(name);
+        track('service_area_selected', { city: name });
     };
 
     return (
-        <div ref={containerRef} className="section-viewport flex w-full flex-col space-y-2 p-4">
-            <div className="flex w-full items-center justify-center text-center">
-                <h2 className="w-fit text-4xl font-bold gradient-secondary-main-text">Where We Work</h2>
-            </div>
-            <div className="flex flex-wrap justify-center space-x-2 px-2 pb-2">
-                {cityBoundaries.map((city, index) => (
-                    <React.Fragment key={index}>
-                        <div
-                            onMouseOver={() => handleMouseOver(city.name)}
-                            onMouseOut={handleMouseOut}
-                            onClick={() => handleCityClick(city.name)}
-                            className={`cursor-pointer bg-clip-text font-bold text-transparent ${
-                                selectedCity === city.name || (!selectedCity && index === currentCityIndex)
-                                    ? 'bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400'
-                                    : 'bg-gradient-to-r from-secondary from-10% via-secondary_light via-70% to-secondary to-90% hover:from-yellow-400 hover:via-amber-500 hover:to-yellow-400'
-                            }`}
-                        >
-                            {city.name}
-                        </div>
-                        {index < cityBoundaries.length - 1 && (
-                            <div className="bg-clip-text font-bold text-transparent gradient-gold-main">-</div>
-                        )}
-                    </React.Fragment>
-                ))}
-            </div>
-            <div
-                className="relative w-full flex-grow"
-                onMouseEnter={() => setHoveredMap(true)}
-                onMouseLeave={() => setHoveredMap(false)}
-            >
-                <MapContainer
-                    center={MAP_CENTER}
-                    zoom={5}
-                    className="h-full w-full rounded-lg"
-                    ref={mapRef}
-                    dragging={false}
-                    zoomControl={false}
-                    scrollWheelZoom={false}
-                    doubleClickZoom={false}
-                    touchZoom={false}
-                    keyboard={false}
-                >
-                    <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" subdomains="abcd" maxZoom={11} />
-                    {zoomComplete && (
-                        <>
-                            {cityBoundaries.map((city, index) => (
-                                <Polygon
-                                    key={index}
-                                    positions={city.coordinates[0].map(([lng, lat]) => [lat, lng])}
-                                    pathOptions={{
-                                        color: '#355e3b',
-                                        fillColor: '#498352',
-                                        fillOpacity: 0.2,
-                                    }}
-                                    eventHandlers={{
-                                        mouseover: () => handleMouseOver(city.name),
-                                        mouseout: handleMouseOut,
-                                        click: () => handleCityClick(city.name),
-                                    }}
-                                />
-                            ))}
-                            {!selectedCity && cityBoundaries[currentCityIndex] && (
-                                <Polygon
-                                    positions={cityBoundaries[currentCityIndex].coordinates[0].map(([lng, lat]) => [lat, lng])}
-                                    pathOptions={{
-                                        color: '#b99727',
-                                        fillColor: '#d4af37',
-                                        fillOpacity: 0.5,
-                                    }}
-                                    eventHandlers={{
-                                        mouseover: () => handleMouseOver(cityBoundaries[currentCityIndex].name),
-                                        mouseout: handleMouseOut,
-                                        click: () => handleCityClick(cityBoundaries[currentCityIndex].name),
-                                    }}
-                                />
-                            )}
-                            {selectedCity && (
-                                <Polygon
-                                    positions={
-                                        cityBoundaries
-                                            .find((city) => city.name === selectedCity)
-                                            ?.coordinates[0].map(([lng, lat]) => [lat, lng]) || []
-                                    }
-                                    pathOptions={{
-                                        color: '#b99727',
-                                        fillColor: '#d4af37',
-                                        fillOpacity: 0.5,
-                                    }}
-                                    eventHandlers={{
-                                        mouseover: () => handleMouseOver(selectedCity),
-                                        mouseout: handleMouseOut,
-                                        click: () => handleCityClick(selectedCity),
-                                    }}
-                                />
-                            )}
-                        </>
-                    )}
-                </MapContainer>
-            </div>
-        </div>
-    );
-};
+        <section ref={containerRef} className="w-full px-5 py-20 sm:px-8">
+            <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center">
+                <SectionHeading
+                    eyebrow="Service area"
+                    title="Where we work"
+                    lead="Sacramento and the surrounding cities across Sacramento, Placer and Yolo counties. Travel beyond the map is quoted per job."
+                />
 
-export default Where;
+                {/* Cities are links, not decorated divs: each one has a page and each is reachable by keyboard. */}
+                <ul className="mt-8 flex flex-wrap justify-center gap-x-2 gap-y-2.5">
+                    {cityBoundaries.map((city) => (
+                        <li key={city.slug}>
+                            <Link
+                                href={`/locations/${city.slug}`}
+                                onMouseEnter={() => setActiveCity(city.name)}
+                                onMouseLeave={() => setActiveCity(null)}
+                                onFocus={() => setActiveCity(city.name)}
+                                onBlur={() => setActiveCity(null)}
+                                onClick={() => selectCity(city.name)}
+                                className={`inline-flex rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${
+                                    activeCity === city.name
+                                        ? 'border-gold-400 bg-gold-400 text-body-inverse'
+                                        : 'border-line-strong text-body-muted hover:border-gold-400 hover:text-gold-300'
+                                }`}
+                            >
+                                {city.name}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+
+                <div className="mt-10 h-[clamp(320px,50vh,520px)] w-full overflow-hidden rounded-xl border border-line shadow-card">
+                    <MapContainer
+                        center={MAP_CENTER}
+                        zoom={7}
+                        className="h-full w-full"
+                        ref={mapRef}
+                        dragging={false}
+                        zoomControl={false}
+                        scrollWheelZoom={false}
+                        doubleClickZoom={false}
+                        touchZoom={false}
+                        keyboard={false}
+                        attributionControl={false}
+                    >
+                        <TileLayer
+                            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                            subdomains="abcd"
+                            maxZoom={11}
+                        />
+                        {mapReady
+                            ? cityBoundaries.map((city) => {
+                                  const isActive = activeCity === city.name;
+
+                                  return (
+                                      <Polygon
+                                          key={city.slug}
+                                          positions={city.coordinates[0].map(([lng, lat]) => [lat, lng])}
+                                          pathOptions={{
+                                              color: isActive ? '#b99727' : '#355e3b',
+                                              fillColor: isActive ? '#d4af37' : '#498352',
+                                              fillOpacity: isActive ? 0.5 : 0.2,
+                                          }}
+                                          eventHandlers={{
+                                              mouseover: () => setActiveCity(city.name),
+                                              mouseout: () => setActiveCity(null),
+                                              click: () => selectCity(city.name),
+                                          }}
+                                      />
+                                  );
+                              })
+                            : null}
+                    </MapContainer>
+                </div>
+            </div>
+        </section>
+    );
+}

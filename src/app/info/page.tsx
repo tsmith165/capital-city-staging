@@ -40,9 +40,12 @@ export default function InfoPage() {
                     <header className="mx-auto max-w-2xl text-center">
                         <p className="text-xs font-semibold tracking-[0.2em] text-forest-200 uppercase">Resources</p>
                         <h1 className="mt-3 bg-clip-text font-display text-3xl leading-tight font-bold text-transparent gradient-gold-main sm:text-4xl">
-                            {TITLE}
+                            What staging actually does
                         </h1>
-                        <p className="mt-5 text-lg text-body-muted">{DESCRIPTION}</p>
+                        <p className="mt-5 text-lg text-pretty text-body-muted">
+                            The numbers behind staging, what it costs, and how buyers read a room. Written for sellers deciding
+                            whether it is worth it.
+                        </p>
                     </header>
 
                     <ul className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
