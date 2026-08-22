@@ -27,11 +27,7 @@ const InputMultiSelect: React.FC<InputMultiSelectProps> = ({ defaultValue, idNam
 
     return (
         <div className="m-0 flex w-full p-0">
-            <div
-                className={FIELD_LABEL_CLASSES}
-                data-tooltip-id={`tooltip-${idName}`}
-                data-tooltip-content={formattedName}
-            >
+            <div className={FIELD_LABEL_CLASSES} data-tooltip-id={`tooltip-${idName}`} data-tooltip-content={formattedName}>
                 {formattedName}
             </div>
             <Tooltip id={`tooltip-${idName}`} place="top" />

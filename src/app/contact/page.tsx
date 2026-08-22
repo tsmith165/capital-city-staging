@@ -8,7 +8,7 @@ import { localBusinessSchema, SITE_URL } from '@/lib/structuredData';
 export const metadata: Metadata = {
     title: 'Contact Us',
     description:
-        "Get in touch with Capital City Staging for your free consultation. Professional home staging services in Sacramento to help you sell faster and for more money.",
+        'Get in touch with Capital City Staging for your free consultation. Professional home staging services in Sacramento to help you sell faster and for more money.',
     keywords:
         'Contact Capital City Staging, Home Staging Sacramento, home staging consultation, staging quote, Mia Dofflemyer, Sacramento staging services, real estate staging contact',
     applicationName: 'Capital City Staging',
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     openGraph: {
         title: 'Contact Capital City Staging | Free Home Staging Consultation',
         description:
-            "Get in touch with Capital City Staging for your free consultation. Professional home staging services in Sacramento to help you sell faster and for more money.",
+            'Get in touch with Capital City Staging for your free consultation. Professional home staging services in Sacramento to help you sell faster and for more money.',
         siteName: 'Capital City Staging',
         url: 'https://www.capitalcitystaging.com/contact',
         locale: 'en_US',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
         card: 'summary_large_image',
         title: 'Contact Capital City Staging | Free Home Staging Consultation',
         description:
-            "Get in touch with Capital City Staging for your free consultation. Professional home staging services in Sacramento to help you sell faster and for more money.",
+            'Get in touch with Capital City Staging for your free consultation. Professional home staging services in Sacramento to help you sell faster and for more money.',
         site: '@capitalcitystaging',
         creator: '@capitalcitystaging',
     },

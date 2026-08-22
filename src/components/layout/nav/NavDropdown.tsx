@@ -48,12 +48,7 @@ export default function NavDropdown({ item, isActive }: NavDropdownProps) {
     }, [open, close]);
 
     return (
-        <div
-            ref={containerRef}
-            className="relative"
-            onMouseEnter={() => setHovering(true)}
-            onMouseLeave={() => setHovering(false)}
-        >
+        <div ref={containerRef} className="relative" onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)}>
             <button
                 type="button"
                 onClick={() => setPinned(true)}
@@ -66,19 +61,16 @@ export default function NavDropdown({ item, isActive }: NavDropdownProps) {
             </button>
 
             {open ? (
-                <div
-                    id={panelId}
-                    className="absolute left-1/2 top-full z-50 w-60 -translate-x-1/2 pt-3"
-                >
-                    <div className="overflow-hidden rounded-lg border border-line bg-surface-raised py-1.5 shadow-overlay">
+                <div id={panelId} className="absolute top-full left-1/2 z-50 w-60 -translate-x-1/2 pt-3">
+                    <div className="border-line bg-surface-raised shadow-overlay overflow-hidden rounded-lg border py-1.5">
                         <Link
                             href={item.href}
                             onClick={close}
-                            className="block px-4 py-2 text-[13px] font-bold text-gold-300 transition-colors hover:bg-surface-overlay"
+                            className="text-gold-300 hover:bg-surface-overlay block px-4 py-2 text-[13px] font-bold transition-colors"
                         >
                             All articles
                         </Link>
-                        <div className="my-1.5 border-t border-line" />
+                        <div className="border-line my-1.5 border-t" />
                         {item.children?.map((child) => (
                             <Link
                                 key={child.id}
@@ -87,7 +79,7 @@ export default function NavDropdown({ item, isActive }: NavDropdownProps) {
                                     track('article_opened', { slug: child.id, placement: 'nav' });
                                     close();
                                 }}
-                                className="block px-4 py-2 text-[13px] text-body-muted transition-colors hover:bg-surface-overlay hover:text-gold-300"
+                                className="text-body-muted hover:bg-surface-overlay hover:text-gold-300 block px-4 py-2 text-[13px] transition-colors"
                             >
                                 {child.label}
                             </Link>

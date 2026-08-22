@@ -176,11 +176,13 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ handleUploadComplete, h
                 >
                     {isUploading && (
                         <div
-                            className="absolute left-0 top-0 z-0 h-full bg-primary"
+                            className="bg-primary absolute top-0 left-0 z-0 h-full"
                             style={{ width: `${uploadProgress}%`, transition: 'width 0.3s ease-in-out' }}
                         />
                     )}
-                    <span className={`relative z-10 flex items-center space-x-2 text-body-muted ${isUploading ? '' : 'group-hover:text-primary'}`}>
+                    <span
+                        className={`text-body-muted relative z-10 flex items-center space-x-2 ${isUploading ? '' : 'group-hover:text-primary'}`}
+                    >
                         <FileIcon size={16} />
                         <span>{isUploading ? loadingState : 'Select Image'}</span>
                     </span>

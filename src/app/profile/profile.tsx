@@ -4,7 +4,7 @@ import { UserProfile } from '@clerk/nextjs';
 
 const Profile = () => {
     return (
-        <div className="h-full w-full overflow-y-scroll bg-secondary_light p-1">
+        <div className="bg-secondary_light h-full w-full overflow-y-scroll p-1">
             <UserProfile path="/profile" routing="path" />
         </div>
     );

@@ -25,7 +25,7 @@ export default async function SignOutPage() {
     const isAdmin = await isClerkUserIdAdmin(user.id);
 
     return (
-        <AuthShell eyebrow="Session" title="Sign out" description="Confirm below, or head back to the console." >
+        <AuthShell eyebrow="Session" title="Sign out" description="Confirm below, or head back to the console.">
             <AccountSessionPanel email={email} isAdmin={isAdmin} />
         </AuthShell>
     );

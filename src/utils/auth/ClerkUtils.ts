@@ -27,9 +27,9 @@ export async function isClerkUserIdAdmin(userId: string) {
     if (userId) {
         const user_organization_memberships = await captureClerkUserOrganizationMemberships(userId);
         isAdmin = user_organization_memberships.data.some(
-            (membership: any) => 
-                membership.organization.name === 'ADMIN' && 
-                (membership.role === 'org:admin' || membership.permissions.includes('org:sys_domains:manage'))
+            (membership: any) =>
+                membership.organization.name === 'ADMIN' &&
+                (membership.role === 'org:admin' || membership.permissions.includes('org:sys_domains:manage')),
         );
     }
     // console.log('Is user admin:', isAdmin);

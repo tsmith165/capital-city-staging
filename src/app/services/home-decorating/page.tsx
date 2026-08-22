@@ -69,22 +69,20 @@ export default function OccupiedStagingServices() {
             >
                 <h2>Who this is for</h2>
                 <p>
-                    Sellers living in the home while it&rsquo;s listed. You keep using the house, so the plan has to survive
-                    daily life &mdash; and it has to work around what you already own.
+                    Sellers living in the home while it&rsquo;s listed. You keep using the house, so the plan has to survive daily life
+                    &mdash; and it has to work around what you already own.
                 </p>
 
                 <h2>How it works</h2>
                 <ol>
                     <li>
-                        <strong>Walkthrough.</strong> Mia goes room by room and writes down what stays, what moves, and what is
-                        missing.
+                        <strong>Walkthrough.</strong> Mia goes room by room and writes down what stays, what moves, and what is missing.
                     </li>
                     <li>
                         <strong>Plan and price.</strong> You get that plan priced to your budget before anything moves.
                     </li>
                     <li>
-                        <strong>Restyle.</strong> Rearranging and restyling what you own, with rental pieces only where they are
-                        needed.
+                        <strong>Restyle.</strong> Rearranging and restyling what you own, with rental pieces only where they are needed.
                     </li>
                     <li>
                         <strong>Photo day.</strong> A final pass so the rooms are right before the camera arrives.
@@ -100,8 +98,8 @@ export default function OccupiedStagingServices() {
 
                 <h2>Who you&rsquo;ll be working with</h2>
                 <p>
-                    Mia Dofflemyer, directly. She is a RESA-certified stager and has been a licensed California real estate
-                    agent since 2020. There is no account manager and no handoff.
+                    Mia Dofflemyer, directly. She is a RESA-certified stager and has been a licensed California real estate agent since
+                    2020. There is no account manager and no handoff.
                 </p>
             </ArticleShell>
         </PageLayout>

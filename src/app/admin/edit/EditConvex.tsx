@@ -23,15 +23,10 @@ interface EditConvexProps {
     prevOId: number | null;
 }
 
-const EditConvex: React.FC<EditConvexProps> = ({ 
-    inventoryData, 
-    currentOId, 
-    nextOId, 
-    prevOId 
-}) => {
+const EditConvex: React.FC<EditConvexProps> = ({ inventoryData, currentOId, nextOId, prevOId }) => {
     const router = useRouter();
     const updateInventory = useMutation(api.inventory.updateInventory);
-    
+
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
     const [titleInput, setTitleInput] = useState(inventoryData?.name || '');
     const [isFullScreenImage, setIsFullScreenImage] = useState(false);
@@ -61,7 +56,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
     // Helper function to get all images with IDs for ordering
     const getAllImages = () => {
         if (!inventoryData) return [];
-        
+
         const images: Array<{
             src: string;
             label: string;
@@ -72,21 +67,21 @@ const EditConvex: React.FC<EditConvexProps> = ({
                 src: inventoryData.imagePath,
                 label: 'Main Image',
                 isMain: true,
-                _id: null
-            }
+                _id: null,
+            },
         ];
-        
+
         if (inventoryData.extraImages) {
             inventoryData.extraImages.forEach((img: any) => {
                 images.push({
                     src: img.imagePath,
                     label: img.imagePath.split('/').pop() || 'Extra Image',
                     isMain: false,
-                    _id: img._id
+                    _id: img._id,
                 });
             });
         }
-        
+
         return images;
     };
 
@@ -96,13 +91,13 @@ const EditConvex: React.FC<EditConvexProps> = ({
 
     const handleTitleUpdate = async () => {
         if (!titleInput || titleInput === inventoryData.name) return;
-        
+
         try {
             await updateInventory({
                 id: inventoryData._id,
-                updates: { name: titleInput }
+                updates: { name: titleInput },
             });
-            
+
             setSubmitMessage({ type: 'success', text: 'Title updated successfully!' });
             setTimeout(() => setSubmitMessage(null), 3000);
         } catch (error) {
@@ -119,11 +114,11 @@ const EditConvex: React.FC<EditConvexProps> = ({
     };
 
     const handlePrevImage = () => {
-        setCurrentImageIndex(prev => prev > 0 ? prev - 1 : allImages.length - 1);
+        setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : allImages.length - 1));
     };
 
     const handleNextImage = () => {
-        setCurrentImageIndex(prev => prev < allImages.length - 1 ? prev + 1 : 0);
+        setCurrentImageIndex((prev) => (prev < allImages.length - 1 ? prev + 1 : 0));
     };
 
     const handleDotClick = (index: number) => {
@@ -150,37 +145,35 @@ const EditConvex: React.FC<EditConvexProps> = ({
 
     return (
         <>
-            <div className="flex h-full w-full bg-surface">
-                <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row h-full">
+            <div className="bg-surface flex h-full w-full">
+                <div className="mx-auto flex h-full w-full max-w-7xl flex-col md:flex-row">
                     {/* Images Section - Top on mobile, Left on desktop */}
-                    <div className="w-full md:w-2/5 p-4 flex flex-col">
+                    <div className="flex w-full flex-col p-4 md:w-2/5">
                         {/* Current Image Display */}
                         {allImages.length > 0 && (
-                            <div className="flex-grow flex flex-col items-center justify-center">
-                                <div className="relative w-full max-w-md aspect-square bg-surface-raised rounded-lg overflow-hidden mb-4">
-                                    <Image 
-                                        src={currentImage?.src || inventoryData.imagePath} 
+                            <div className="flex flex-grow flex-col items-center justify-center">
+                                <div className="bg-surface-raised relative mb-4 aspect-square w-full max-w-md overflow-hidden rounded-lg">
+                                    <Image
+                                        src={currentImage?.src || inventoryData.imagePath}
                                         alt={currentImage?.label || inventoryData.name}
                                         fill
-                                        className="object-cover cursor-pointer"
+                                        className="cursor-pointer object-cover"
                                         onClick={() => setIsFullScreenImage(true)}
                                     />
                                 </div>
 
                                 {/* Image Label */}
-                                <div className="text-center mb-4">
-                                    <span className="text-lg font-medium text-body">
-                                        {currentImage?.label}
-                                    </span>
+                                <div className="mb-4 text-center">
+                                    <span className="text-body text-lg font-medium">{currentImage?.label}</span>
                                 </div>
 
                                 {/* Pagination Controls */}
                                 {allImages.length > 1 && (
-                                    <div className="flex items-center space-x-3 mb-6">
+                                    <div className="mb-6 flex items-center space-x-3">
                                         {/* Left Arrow */}
                                         <button
                                             onClick={handlePrevImage}
-                                            className="w-8 h-8 bg-surface-overlay hover:bg-surface-hover rounded-full flex items-center justify-center text-body-muted hover:text-body transition-colors"
+                                            className="bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body flex h-8 w-8 items-center justify-center rounded-full transition-colors"
                                             data-tooltip-id="prev-image"
                                             data-tooltip-content="Previous Image"
                                         >
@@ -193,9 +186,9 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                                 <button
                                                     key={index}
                                                     onClick={() => handleDotClick(index)}
-                                                    className={`w-3 h-3 rounded-full transition-colors ${
-                                                        index === currentImageIndex 
-                                                            ? 'bg-secondary' 
+                                                    className={`h-3 w-3 rounded-full transition-colors ${
+                                                        index === currentImageIndex
+                                                            ? 'bg-secondary'
                                                             : 'bg-surface-overlay hover:bg-surface-hover'
                                                     }`}
                                                     data-tooltip-id={`dot-${index}`}
@@ -207,7 +200,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                         {/* Right Arrow */}
                                         <button
                                             onClick={handleNextImage}
-                                            className="w-8 h-8 bg-surface-overlay hover:bg-surface-hover rounded-full flex items-center justify-center text-body-muted hover:text-body transition-colors"
+                                            className="bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body flex h-8 w-8 items-center justify-center rounded-full transition-colors"
                                             data-tooltip-id="next-image"
                                             data-tooltip-content="Next Image"
                                         >
@@ -221,7 +214,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                     <div className="flex space-x-3">
                                         <button
                                             onClick={handleChangeMainImage}
-                                            className="flex items-center space-x-2 px-4 py-2 bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body rounded-lg transition-colors"
+                                            className="bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body flex items-center space-x-2 rounded-lg px-4 py-2 transition-colors"
                                             data-tooltip-id="change-main"
                                             data-tooltip-content="Change the main image"
                                         >
@@ -230,7 +223,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                         </button>
                                         <button
                                             onClick={handleAddExtraImage}
-                                            className="flex items-center space-x-2 px-4 py-2 bg-secondary hover:bg-secondary_light text-body hover:text-white rounded-lg transition-colors"
+                                            className="bg-secondary hover:bg-secondary_light text-body flex items-center space-x-2 rounded-lg px-4 py-2 transition-colors hover:text-white"
                                             data-tooltip-id="add-extra"
                                             data-tooltip-content="Add an extra image"
                                         >
@@ -240,7 +233,7 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                     </div>
                                     <button
                                         onClick={() => setShowAddInventoryOverlay(true)}
-                                        className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary hover:bg-primary_dark text-body-inverse hover:text-body-inverse rounded-lg transition-colors font-medium"
+                                        className="bg-primary hover:bg-primary_dark text-body-inverse hover:text-body-inverse flex items-center justify-center space-x-2 rounded-lg px-4 py-2 font-medium transition-colors"
                                         data-tooltip-id="add-inventory"
                                         data-tooltip-content="Create new inventory item"
                                     >
@@ -253,17 +246,17 @@ const EditConvex: React.FC<EditConvexProps> = ({
                     </div>
 
                     {/* Form Section - Bottom on mobile, Right on desktop */}
-                    <div className="w-full md:w-3/5 p-4 overflow-y-auto">
+                    <div className="w-full overflow-y-auto p-4 md:w-3/5">
                         {/* Navigation and Title */}
-                        <div className="flex items-center space-x-2 mb-4">
+                        <div className="mb-4 flex items-center space-x-2">
                             <div className="flex flex-col space-y-1">
                                 <button
                                     onClick={() => handleNavigation(nextOId)}
                                     disabled={!nextOId}
-                                    className={`h-[22px] w-8 cursor-pointer rounded-lg flex items-center justify-center ${
-                                        nextOId 
-                                            ? 'bg-secondary text-body-subtle hover:bg-primary hover:text-secondary_dark' 
-                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    className={`flex h-[22px] w-8 cursor-pointer items-center justify-center rounded-lg ${
+                                        nextOId
+                                            ? 'bg-secondary text-body-subtle hover:bg-primary hover:text-secondary_dark'
+                                            : 'cursor-not-allowed bg-gray-300 text-gray-500'
                                     }`}
                                     data-tooltip-id="next-item"
                                     data-tooltip-content="Next Item"
@@ -273,10 +266,10 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                 <button
                                     onClick={() => handleNavigation(prevOId)}
                                     disabled={!prevOId}
-                                    className={`h-[22px] w-8 cursor-pointer rounded-lg flex items-center justify-center ${
-                                        prevOId 
-                                            ? 'bg-secondary text-body-subtle hover:bg-primary hover:text-secondary_dark' 
-                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    className={`flex h-[22px] w-8 cursor-pointer items-center justify-center rounded-lg ${
+                                        prevOId
+                                            ? 'bg-secondary text-body-subtle hover:bg-primary hover:text-secondary_dark'
+                                            : 'cursor-not-allowed bg-gray-300 text-gray-500'
                                     }`}
                                     data-tooltip-id="prev-item"
                                     data-tooltip-content="Previous Item"
@@ -285,23 +278,29 @@ const EditConvex: React.FC<EditConvexProps> = ({
                                 </button>
                             </div>
                             <Link href={`/admin/inventory/?item=${currentOId}`}>
-                                <MdPageview 
-                                    className="h-[48px] w-[48px] cursor-pointer rounded-lg bg-secondary text-body-subtle p-1 hover:bg-primary hover:text-secondary_dark" 
+                                <MdPageview
+                                    className="bg-secondary text-body-subtle hover:bg-primary hover:text-secondary_dark h-[48px] w-[48px] cursor-pointer rounded-lg p-1"
                                     data-tooltip-id="view-item"
                                     data-tooltip-content="View in inventory"
                                 />
                             </Link>
-                            <form onSubmit={(e) => { e.preventDefault(); handleTitleUpdate(); }} className="flex flex-grow rounded-lg bg-secondary_dark">
+                            <form
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    handleTitleUpdate();
+                                }}
+                                className="bg-secondary_dark flex flex-grow rounded-lg"
+                            >
                                 <input
                                     type="text"
                                     name="newTitle"
                                     value={titleInput}
                                     onChange={(e) => setTitleInput(e.target.value)}
-                                    className="flex-grow rounded-lg border-none bg-secondary_dark px-3 py-1 text-2xl font-bold text-body-subtle outline-none"
+                                    className="bg-secondary_dark text-body-subtle flex-grow rounded-lg border-none px-3 py-1 text-2xl font-bold outline-none"
                                 />
                                 <button
                                     type="submit"
-                                    className="ml-2 rounded-md bg-secondary px-3 py-1 font-bold text-body-subtle hover:bg-primary_dark hover:text-secondary_dark"
+                                    className="bg-secondary text-body-subtle hover:bg-primary_dark hover:text-secondary_dark ml-2 rounded-md px-3 py-1 font-bold"
                                 >
                                     Save
                                 </button>
@@ -309,13 +308,15 @@ const EditConvex: React.FC<EditConvexProps> = ({
                         </div>
 
                         {submitMessage && (
-                            <div className={`mb-4 rounded-md p-2 ${submitMessage.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`}>
+                            <div
+                                className={`mb-4 rounded-md p-2 ${submitMessage.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`}
+                            >
                                 {submitMessage.text}
                             </div>
                         )}
 
                         <EditFormConvex inventoryData={inventoryData} onUpdate={() => router.refresh()} />
-                        
+
                         {/* Image Ordering Section */}
                         <ImageOrderingSection
                             inventoryId={inventoryData._id}

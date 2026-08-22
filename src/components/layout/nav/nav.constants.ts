@@ -1,5 +1,4 @@
-export const NAV_LINK_CLASSES =
-    'rounded-sm text-[13px] font-semibold uppercase tracking-[0.08em] transition-colors whitespace-nowrap';
+export const NAV_LINK_CLASSES = 'rounded-sm text-[13px] font-semibold uppercase tracking-[0.08em] transition-colors whitespace-nowrap';
 
 export const NAV_LINK_IDLE = 'text-body-muted hover:text-gold-300';
 export const NAV_LINK_ACTIVE = 'text-gold-300';

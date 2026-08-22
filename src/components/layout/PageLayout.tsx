@@ -14,7 +14,7 @@ type PageLayoutProps = {
  */
 export default function PageLayout({ children, page }: PageLayoutProps) {
     return (
-        <div className="flex min-h-[100dvh] flex-col bg-ink">
+        <div className="bg-ink flex min-h-[100dvh] flex-col">
             <Suspense>
                 <PostHogPageView />
                 <Navbar page={page} />

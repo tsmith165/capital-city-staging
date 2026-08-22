@@ -8,14 +8,12 @@ import { useEffect } from 'react';
 export default function ProjectEditDefaultClient() {
     const router = useRouter();
     const projects = useQuery(api.projects.getProjects, {});
-    
+
     useEffect(() => {
         if (projects && projects.length > 0) {
             // Get the newest project (highest ID)
-            const newestProject = projects.reduce((latest, current) => 
-                current._creationTime > latest._creationTime ? current : latest
-            );
-            
+            const newestProject = projects.reduce((latest, current) => (current._creationTime > latest._creationTime ? current : latest));
+
             // Redirect to the specific project edit page
             router.replace(`/admin/projects/${newestProject._id}/edit`);
         } else if (projects && projects.length === 0) {
@@ -26,7 +24,7 @@ export default function ProjectEditDefaultClient() {
 
     if (projects === undefined) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
+            <div className="flex min-h-screen items-center justify-center">
                 <div className="text-body-muted">Loading projects...</div>
             </div>
         );
@@ -34,14 +32,14 @@ export default function ProjectEditDefaultClient() {
 
     if (projects.length === 0) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
+            <div className="flex min-h-screen items-center justify-center">
                 <div className="text-body-muted">No projects found. Redirecting to create new project...</div>
             </div>
         );
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen">
+        <div className="flex min-h-screen items-center justify-center">
             <div className="text-body-muted">Redirecting to newest project...</div>
         </div>
     );

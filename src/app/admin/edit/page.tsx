@@ -35,7 +35,7 @@ function EditPageContent() {
     if (!oId && !mostRecentOId) {
         return (
             <AdminShell title="Edit inventory">
-                <p className="p-8 text-center text-sm text-body-subtle">No inventory items found.</p>
+                <p className="text-body-subtle p-8 text-center text-sm">No inventory items found.</p>
             </AdminShell>
         );
     }

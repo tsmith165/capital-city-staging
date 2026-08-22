@@ -48,7 +48,9 @@ export default function CostVsValueAnalysis() {
                 </p>
 
                 <h2>Breakdown of staging costs</h2>
-                <p>Cost varies with the size of your home, the amount of work needed, and how long the home will be listed. Typical items:</p>
+                <p>
+                    Cost varies with the size of your home, the amount of work needed, and how long the home will be listed. Typical items:
+                </p>
                 <ul>
                     <li>Initial consultation fee</li>
                     <li>Design and planning</li>

@@ -36,7 +36,7 @@ interface SubmitFormData {
 
 const EditFormConvex: React.FC<EditFormConvexProps> = ({ inventoryData, onUpdate }) => {
     const updateInventory = useMutation(api.inventory.updateInventory);
-    
+
     const [initialFormData, setInitialFormData] = useState<SubmitFormData>({
         inventory_id: inventoryData._id,
         inventory_name: inventoryData.name,
@@ -113,7 +113,7 @@ const EditFormConvex: React.FC<EditFormConvexProps> = ({ inventoryData, onUpdate
         setSubmitMessage(null);
         console.log('Form Data (Next Line):');
         console.log(formData);
-        
+
         try {
             await updateInventory({
                 id: inventoryData._id,
@@ -132,9 +132,9 @@ const EditFormConvex: React.FC<EditFormConvexProps> = ({ inventoryData, onUpdate
                     width: parseInt(formData.width) || 0,
                     height: parseInt(formData.height) || 0,
                     imagePath: formData.image_path,
-                }
+                },
             });
-            
+
             setSubmitMessage({ type: 'success', text: 'Changes submitted successfully!' });
             setSubmittedChanges(changes);
             setInitialFormData(formData); // Update initial data after successful submission
@@ -189,7 +189,7 @@ const EditFormConvex: React.FC<EditFormConvexProps> = ({ inventoryData, onUpdate
                 </div>
 
                 {/* Row 4.) Price / Cost Text Box */}
-                <div className="flex h-fit w-full flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+                <div className="flex h-fit w-full flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
                     <div className="w-full md:w-1/2">
                         <InputTextbox idName="price" name="Price" value={formData.price} onChange={handleChange} />
                     </div>
@@ -199,7 +199,7 @@ const EditFormConvex: React.FC<EditFormConvexProps> = ({ inventoryData, onUpdate
                 </div>
 
                 {/* Row 8.) Width / Height Text Box */}
-                <div className="flex h-fit w-full flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+                <div className="flex h-fit w-full flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
                     <div className="w-full md:w-1/2">
                         <InputTextbox idName="width" name="Width (px)" value={formData.width} onChange={handleChange} />
                     </div>
@@ -209,7 +209,7 @@ const EditFormConvex: React.FC<EditFormConvexProps> = ({ inventoryData, onUpdate
                 </div>
 
                 {/* Row 5.) Real Width / Height / Depth Text Boxes */}
-                <div className="flex h-fit w-full flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+                <div className="flex h-fit w-full flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
                     <div className="w-full md:w-1/3">
                         <InputTextbox idName="real_width" name="Width (in)" value={formData.real_width} onChange={handleChange} />
                     </div>
@@ -240,7 +240,7 @@ const EditFormConvex: React.FC<EditFormConvexProps> = ({ inventoryData, onUpdate
                     <button
                         type="submit"
                         className={
-                            'rounded-md bg-secondary px-3 py-1 text-center font-bold text-body-subtle ' +
+                            'bg-secondary text-body-subtle rounded-md px-3 py-1 text-center font-bold ' +
                             'hover:bg-primary hover:text-secondary_dark'
                         }
                     >
@@ -249,7 +249,7 @@ const EditFormConvex: React.FC<EditFormConvexProps> = ({ inventoryData, onUpdate
                     <Link
                         href="/admin/edit/new"
                         className={
-                            'rounded-md bg-secondary px-3 py-1 text-center font-bold text-body-subtle ' +
+                            'bg-secondary text-body-subtle rounded-md px-3 py-1 text-center font-bold ' +
                             ' hover:bg-primary hover:text-secondary_dark'
                         }
                     >

@@ -6,15 +6,17 @@ import { reportUploadError } from '@/utils/uploads/uploadErrors';
 const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
 interface ProjectResizeUploaderProps {
-    onUploadComplete: (images: Array<{
-        fileName: string;
-        originalImageUrl: string;
-        smallImageUrl: string;
-        originalWidth: number;
-        originalHeight: number;
-        smallWidth: number;
-        smallHeight: number;
-    }>) => void;
+    onUploadComplete: (
+        images: Array<{
+            fileName: string;
+            originalImageUrl: string;
+            smallImageUrl: string;
+            originalWidth: number;
+            originalHeight: number;
+            smallWidth: number;
+            smallHeight: number;
+        }>,
+    ) => void;
     onResetInputs: () => void;
     disabled?: boolean;
 }
@@ -24,11 +26,7 @@ interface UploadResponse {
     url: string;
 }
 
-const ProjectResizeUploader: React.FC<ProjectResizeUploaderProps> = ({ 
-    onUploadComplete, 
-    onResetInputs, 
-    disabled = false 
-}) => {
+const ProjectResizeUploader: React.FC<ProjectResizeUploaderProps> = ({ onUploadComplete, onResetInputs, disabled = false }) => {
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [loadingState, setLoadingState] = useState<string>('Resizing Images');
@@ -39,21 +37,20 @@ const ProjectResizeUploader: React.FC<ProjectResizeUploaderProps> = ({
         onClientUploadComplete: async (res) => {
             console.log('Upload complete:', res);
             setLoadingState('Processing Images');
-            
+
             if (res && res.length > 0) {
                 try {
                     const processedImages = [];
-                    
+
                     // Group files by pairs (small- prefix and regular)
                     const files = res as UploadResponse[];
-                    const regularFiles = files.filter(file => !file.name.startsWith('small-'));
-                    
+                    const regularFiles = files.filter((file) => !file.name.startsWith('small-'));
+
                     for (const regularFile of regularFiles) {
-                        const smallFile = files.find(file => 
-                            file.name.startsWith('small-') && 
-                            file.name.substring(6) === regularFile.name
+                        const smallFile = files.find(
+                            (file) => file.name.startsWith('small-') && file.name.substring(6) === regularFile.name,
                         );
-                        
+
                         if (smallFile) {
                             const [imgDimensions, smallImgDimensions] = await Promise.all([
                                 getImageDimensions(regularFile.url),
@@ -71,13 +68,13 @@ const ProjectResizeUploader: React.FC<ProjectResizeUploaderProps> = ({
                             });
                         }
                     }
-                    
+
                     onUploadComplete(processedImages);
                 } catch (error) {
                     console.error('Error processing images:', error);
                 }
             }
-            
+
             setIsUploading(false);
             setUploadProgress(0);
             setLoadingState('Resizing Images');
@@ -155,22 +152,20 @@ const ProjectResizeUploader: React.FC<ProjectResizeUploaderProps> = ({
 
                 for (let i = 0; i < selectedFiles.length; i++) {
                     const originalFile = selectedFiles[i];
-                    
+
                     const originalResizedFile = await resizeImage(originalFile, 1920, 1920);
                     const smallResizedFile = await resizeImage(originalFile, 450, 450);
-                    
-                    const smallFileWithPrefix = new File(
-                        [smallResizedFile], 
-                        `small-${smallResizedFile.name}`, 
-                        { type: smallResizedFile.type }
-                    );
-                    
+
+                    const smallFileWithPrefix = new File([smallResizedFile], `small-${smallResizedFile.name}`, {
+                        type: smallResizedFile.type,
+                    });
+
                     filesToUpload.push(smallFileWithPrefix, originalResizedFile);
                 }
 
                 console.log('Resize complete...');
                 setLoadingState(`Uploading ${selectedFiles.length} Images`);
-                
+
                 // Upload all files at once - UploadThing handles the batching internally
                 console.log(`Uploading ${filesToUpload.length} files (${selectedFiles.length} images)`);
                 await startUpload(filesToUpload);
@@ -187,11 +182,11 @@ const ProjectResizeUploader: React.FC<ProjectResizeUploaderProps> = ({
 
     return (
         <>
-            <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileChange} 
-                className="hidden" 
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
                 disabled={isUploading || disabled}
                 multiple
                 accept="image/*"
@@ -201,27 +196,21 @@ const ProjectResizeUploader: React.FC<ProjectResizeUploaderProps> = ({
                     onClick={handleSelectFilesClick}
                     disabled={isUploading || disabled}
                     className={
-                        isUploading || disabled 
-                            ? 'group relative overflow-hidden rounded-md px-6 py-3 text-lg font-bold transition-colors border-2 bg-surface-hover border-line-strong text-body-subtle cursor-not-allowed' 
-                            : 'group relative overflow-hidden rounded-md px-6 py-3 text-lg font-bold transition-colors border-2 bg-transparent border-primary text-primary hover:bg-secondary hover:border-secondary hover:text-body-muted'
+                        isUploading || disabled
+                            ? 'group bg-surface-hover border-line-strong text-body-subtle relative cursor-not-allowed overflow-hidden rounded-md border-2 px-6 py-3 text-lg font-bold transition-colors'
+                            : 'group border-primary text-primary hover:bg-secondary hover:border-secondary hover:text-body-muted relative overflow-hidden rounded-md border-2 bg-transparent px-6 py-3 text-lg font-bold transition-colors'
                     }
                 >
                     {isUploading && (
                         <div
-                            className="absolute left-0 top-0 z-0 h-full bg-primary/20"
+                            className="bg-primary/20 absolute top-0 left-0 z-0 h-full"
                             style={{ width: `${uploadProgress}%`, transition: 'width 0.3s ease-in-out' }}
                         />
                     )}
-                    <span className="relative z-10">
-                        {isUploading ? loadingState : 'Select Project Images (Multiple)'}
-                    </span>
+                    <span className="relative z-10">{isUploading ? loadingState : 'Select Project Images (Multiple)'}</span>
                 </button>
-                
-                {isUploading && (
-                    <div className="text-sm text-body-subtle">
-                        {uploadProgress}% complete
-                    </div>
-                )}
+
+                {isUploading && <div className="text-body-subtle text-sm">{uploadProgress}% complete</div>}
             </div>
         </>
     );

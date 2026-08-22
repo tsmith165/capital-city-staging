@@ -26,14 +26,13 @@ export const SERVICES: ServiceSpec[] = [
         id: 'occupied',
         title: 'Occupied staging',
         href: '/services/home-decorating',
-        summary:
-            "You’re still living there. We work with what you own, clear what’s in the way, and add only what’s missing.",
-        bestFor: "Sellers living in the home while it’s listed.",
+        summary: 'You’re still living there. We work with what you own, clear what’s in the way, and add only what’s missing.',
+        bestFor: 'Sellers living in the home while it’s listed.',
         includedItems: [
             'Walkthrough and a written room-by-room plan',
             'A priced plan before anything moves',
             'Rearranging and restyling what you already own',
-            "Rental pieces only where they’re needed",
+            'Rental pieces only where they’re needed',
         ],
     },
 ];

@@ -66,14 +66,12 @@ export default function Navbar({ page }: { page: string }) {
     const activeSection = pathname === '/' ? searchParams.get('component') : null;
     const activeId =
         PRIMARY_NAV.find((item) =>
-            item.section
-                ? item.section === activeSection
-                : pathname === item.href || pathname.startsWith(`${item.href}/`),
+            item.section ? item.section === activeSection : pathname === item.href || pathname.startsWith(`${item.href}/`),
         )?.id ?? null;
 
     return (
         <>
-            <nav aria-label="Main" className="sticky top-0 z-40 h-16 w-full border-b border-line bg-ink/95 backdrop-blur">
+            <nav aria-label="Main" className="border-line bg-ink/95 sticky top-0 z-40 h-16 w-full border-b backdrop-blur">
                 <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between gap-4 px-4 sm:px-6">
                     <Link href="/" aria-label="Capital City Staging home" className="flex shrink-0 items-center">
                         <Image
@@ -86,7 +84,7 @@ export default function Navbar({ page }: { page: string }) {
                         />
                     </Link>
 
-                    <div className="hidden items-center gap-7 tm:flex">
+                    <div className="tm:flex hidden items-center gap-7">
                         {PRIMARY_NAV.map((item) => {
                             const isActive = activeId === item.id;
 
@@ -122,10 +120,10 @@ export default function Navbar({ page }: { page: string }) {
                         </Link>
                     </div>
 
-                    <div className="flex items-center gap-2 tm:hidden">
+                    <div className="tm:hidden flex items-center gap-2">
                         <Link
                             href={PRIMARY_CTA.href}
-                            className={`${CTA_CLASSES} hidden xs:inline-flex`}
+                            className={`${CTA_CLASSES} xs:inline-flex hidden`}
                             onClick={() => track('cta_clicked', { cta: 'get_a_quote', placement: 'nav_mobile' })}
                         >
                             {PRIMARY_CTA.label}
@@ -136,7 +134,7 @@ export default function Navbar({ page }: { page: string }) {
                             aria-expanded={showMenu}
                             aria-controls="site-menu"
                             aria-label="Open menu"
-                            className="grid h-10 w-10 place-items-center rounded-md text-body-muted transition-colors hover:bg-surface-raised hover:text-gold-300"
+                            className="text-body-muted hover:bg-surface-raised hover:text-gold-300 grid h-10 w-10 place-items-center rounded-md transition-colors"
                         >
                             <Menu size={24} aria-hidden="true" />
                         </button>

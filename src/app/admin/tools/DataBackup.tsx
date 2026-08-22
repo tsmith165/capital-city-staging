@@ -49,20 +49,20 @@ export default function DataBackup() {
         <div className="flex flex-col gap-4 p-5">
             <dl className="flex flex-wrap gap-x-8 gap-y-3">
                 <div className="flex flex-col gap-1">
-                    <dt className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-body-subtle">Records</dt>
-                    <dd className="font-display text-2xl font-normal leading-none text-body">
+                    <dt className="text-body-subtle text-[10px] font-extrabold tracking-[0.14em] uppercase">Records</dt>
+                    <dd className="font-display text-body text-2xl leading-none font-normal">
                         {inventory ? number.format(inventory.length) : <SkeletonBlock className="h-6 w-14" />}
                     </dd>
                 </div>
                 <div className="flex flex-col gap-1">
-                    <dt className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-body-subtle">Format</dt>
-                    <dd className="font-display text-2xl font-normal leading-none text-body">XLSX</dd>
+                    <dt className="text-body-subtle text-[10px] font-extrabold tracking-[0.14em] uppercase">Format</dt>
+                    <dd className="font-display text-body text-2xl leading-none font-normal">XLSX</dd>
                 </div>
             </dl>
 
-            <p className="max-w-prose text-sm text-body-muted">
-                One row per inventory item with every stored field, including items hidden from the public catalog. The file is
-                built in your browser and never leaves this machine.
+            <p className="text-body-muted max-w-prose text-sm">
+                One row per inventory item with every stored field, including items hidden from the public catalog. The file is built in
+                your browser and never leaves this machine.
             </p>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -70,7 +70,7 @@ export default function DataBackup() {
                     type="button"
                     onClick={exportInventory}
                     disabled={isWorking || !inventory?.length}
-                    className="inline-flex items-center gap-2 rounded-md bg-gold-400 px-4 py-2.5 text-sm font-bold text-body-inverse transition-colors hover:bg-gold-300 disabled:cursor-not-allowed disabled:bg-surface-hover disabled:text-body-subtle"
+                    className="bg-gold-400 text-body-inverse hover:bg-gold-300 disabled:bg-surface-hover disabled:text-body-subtle inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-bold transition-colors disabled:cursor-not-allowed"
                 >
                     {isWorking ? (
                         <Loader2 size={16} aria-hidden="true" className="animate-spin" />
@@ -80,13 +80,11 @@ export default function DataBackup() {
                     {isWorking ? 'Building the file…' : 'Export inventory'}
                 </button>
 
-                {inventory?.length === 0 && <span className="text-sm text-body-subtle">There is nothing in the catalog yet.</span>}
+                {inventory?.length === 0 && <span className="text-body-subtle text-sm">There is nothing in the catalog yet.</span>}
             </div>
 
             <p aria-live="polite" className="min-h-5 text-sm">
-                {state.status === 'done' && (
-                    <span className="text-success">Exported {number.format(state.rows)} records.</span>
-                )}
+                {state.status === 'done' && <span className="text-success">Exported {number.format(state.rows)} records.</span>}
                 {state.status === 'error' && <span className="text-danger">{state.message}</span>}
             </p>
         </div>

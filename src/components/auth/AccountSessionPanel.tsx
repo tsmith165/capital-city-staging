@@ -16,10 +16,10 @@ const SECONDARY_BUTTON =
 export default function AccountSessionPanel({ email, isAdmin }: AccountSessionPanelProps) {
     return (
         <div className="space-y-5">
-            <div className="rounded-lg border border-line bg-surface-overlay p-4">
-                <p className="text-xs font-semibold tracking-[0.14em] text-body-subtle uppercase">Signed in as</p>
-                <p className="mt-1.5 text-sm font-semibold break-all text-body">{email}</p>
-                <p className="mt-2 text-sm text-body-muted">
+            <div className="border-line bg-surface-overlay rounded-lg border p-4">
+                <p className="text-body-subtle text-xs font-semibold tracking-[0.14em] uppercase">Signed in as</p>
+                <p className="text-body mt-1.5 text-sm font-semibold break-all">{email}</p>
+                <p className="text-body-muted mt-2 text-sm">
                     {isAdmin
                         ? 'This account has admin console access.'
                         : 'This account does not have admin access. Ask Mia to grant it, or sign in with a different account.'}
@@ -30,7 +30,7 @@ export default function AccountSessionPanel({ email, isAdmin }: AccountSessionPa
                 {isAdmin ? (
                     <a
                         href="/admin"
-                        className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-forest-400 px-4 py-2.5 text-sm font-semibold text-body transition-colors hover:bg-forest-300"
+                        className="bg-forest-400 text-body hover:bg-forest-300 inline-flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-colors"
                     >
                         <LayoutDashboard size={16} aria-hidden="true" />
                         Open admin console

@@ -21,13 +21,11 @@ export default function SectionHeading({ eyebrow, title, lead, align = 'left', i
 
     return (
         <div className={`flex w-full flex-col gap-3 ${alignment}`}>
-            {eyebrow ? (
-                <p className="text-xs font-bold tracking-[0.2em] text-forest-200 uppercase">{eyebrow}</p>
-            ) : null}
-            <h2 id={id} className="font-display text-3xl font-bold text-balance gradient-gold-main-text sm:text-4xl">
+            {eyebrow ? <p className="text-forest-200 text-xs font-bold tracking-[0.2em] uppercase">{eyebrow}</p> : null}
+            <h2 id={id} className="font-display gradient-gold-main-text text-3xl font-bold text-balance sm:text-4xl">
                 {title}
             </h2>
-            {lead ? <p className="max-w-xl text-base text-pretty text-body-muted sm:text-lg">{lead}</p> : null}
+            {lead ? <p className="text-body-muted max-w-xl text-base text-pretty sm:text-lg">{lead}</p> : null}
         </div>
     );
 }

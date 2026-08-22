@@ -13,7 +13,11 @@ const article = getArticle('home-staging-statistics');
 const HEADLINE_STATS = [
     { value: '73%', label: 'less time on the market for professionally staged homes', source: 'Real Estate Staging Association' },
     { value: '6-20%', label: 'increase in the dollar value buyers offer', source: 'National Association of Realtors' },
-    { value: '81%', label: 'of buyers find it easier to visualize a staged property as their home', source: 'National Association of Realtors' },
+    {
+        value: '81%',
+        label: 'of buyers find it easier to visualize a staged property as their home',
+        source: 'National Association of Realtors',
+    },
     { value: '586%', label: 'peak return on investment reported for staging', source: 'HomeGain Selling Survey' },
 ];
 
@@ -50,10 +54,10 @@ export default function HomeStagingStatistics() {
 
                 <div className="not-prose my-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {HEADLINE_STATS.map((stat) => (
-                        <div key={stat.value} className="rounded-xl border border-line bg-surface-raised p-5 shadow-raised">
-                            <p className="font-display text-3xl font-bold text-gold-300">{stat.value}</p>
-                            <p className="mt-2 text-sm text-body">{stat.label}</p>
-                            <p className="mt-3 text-xs text-body-subtle">{stat.source}</p>
+                        <div key={stat.value} className="border-line bg-surface-raised shadow-raised rounded-xl border p-5">
+                            <p className="font-display text-gold-300 text-3xl font-bold">{stat.value}</p>
+                            <p className="text-body mt-2 text-sm">{stat.label}</p>
+                            <p className="text-body-subtle mt-3 text-xs">{stat.source}</p>
                         </div>
                     ))}
                 </div>

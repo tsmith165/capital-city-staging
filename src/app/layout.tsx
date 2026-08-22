@@ -30,8 +30,7 @@ export const metadata: Metadata = {
         default: 'Capital City Staging | Home Staging in Sacramento',
         template: '%s | Capital City Staging',
     },
-    description:
-        'Professional home staging and decorating in Sacramento. Capital City Staging helps homes sell faster and for more money.',
+    description: 'Professional home staging and decorating in Sacramento. Capital City Staging helps homes sell faster and for more money.',
     alternates: {
         canonical: '/',
     },

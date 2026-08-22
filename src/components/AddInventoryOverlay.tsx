@@ -17,10 +17,7 @@ interface AddInventoryOverlayProps {
     defaultAction?: 'edit' | 'view' | 'stay';
 }
 
-const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
-    onClose,
-    onSuccess,
-}) => {
+const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({ onClose, onSuccess }) => {
     const [imageUrl, setImageUrl] = useState('Not yet uploaded');
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
@@ -32,7 +29,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
     const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
-    
+
     // Additional form fields
     const [category, setCategory] = useState('');
     const [vendor, setVendor] = useState('');
@@ -85,7 +82,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
         if (previewUrl) {
             URL.revokeObjectURL(previewUrl);
         }
-        
+
         setImageUrl('Not yet uploaded');
         setWidth(0);
         setHeight(0);
@@ -150,7 +147,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
             // Close overlay after short delay for success message
             setTimeout(() => {
                 onClose();
-                
+
                 // Navigate if requested
                 switch (action) {
                     case 'edit':
@@ -165,12 +162,11 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                         break;
                 }
             }, 1500);
-
         } catch (error) {
             console.error('Error creating inventory:', error);
-            setStatusMessage({ 
-                type: 'error', 
-                message: error instanceof Error ? error.message : 'Failed to create inventory' 
+            setStatusMessage({
+                type: 'error',
+                message: error instanceof Error ? error.message : 'Failed to create inventory',
             });
         } finally {
             setIsSubmitting(false);
@@ -182,16 +178,14 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
     return (
         <>
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
-                <div className="relative w-full max-w-3xl mx-4 max-h-[90vh] bg-surface rounded-lg shadow-2xl overflow-hidden">
+                <div className="bg-surface relative mx-4 max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-lg shadow-2xl">
                     {/* Header */}
-                    <div className="flex items-center justify-between p-6 bg-surface-raised border-b border-line">
-                        <h2 className="text-2xl font-bold gradient-secondary-main-text">
-                            Create New Inventory
-                        </h2>
+                    <div className="bg-surface-raised border-line flex items-center justify-between border-b p-6">
+                        <h2 className="gradient-secondary-main-text text-2xl font-bold">Create New Inventory</h2>
                         <button
                             onClick={onClose}
                             disabled={isSubmitting}
-                            className="p-2 rounded-full bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body transition-colors disabled:opacity-50"
+                            className="bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body rounded-full p-2 transition-colors disabled:opacity-50"
                             data-tooltip-id="close-btn"
                             data-tooltip-content="Close"
                         >
@@ -201,50 +195,52 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
 
                     {/* Content */}
                     <div className="flex h-[calc(90vh-200px)]">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+                        <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
                             {/* Preview Section - Left Side */}
-                            <div className="p-6 space-y-4">
-                                <div className="aspect-square bg-surface-raised rounded-lg overflow-hidden flex items-center justify-center">
+                            <div className="space-y-4 p-6">
+                                <div className="bg-surface-raised flex aspect-square items-center justify-center overflow-hidden rounded-lg">
                                     {previewUrl ? (
-                                        <img
-                                            src={previewUrl}
-                                            alt="Preview"
-                                            className="w-full h-full object-cover"
-                                        />
+                                        <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
                                     ) : imageUrl && imageUrl !== 'Not yet uploaded' ? (
                                         <Image
                                             src={imageUrl}
                                             alt="Preview"
                                             width={width}
                                             height={height}
-                                            className="w-full h-full object-cover"
+                                            className="h-full w-full object-cover"
                                         />
                                     ) : (
-                                        <div className="text-center text-body-subtle">
+                                        <div className="text-body-subtle text-center">
                                             <Upload size={48} className="mx-auto mb-2 opacity-50" />
                                             <p>Image preview will appear here</p>
                                         </div>
                                     )}
                                 </div>
-                                
+
                                 {imageUrl && imageUrl !== 'Not yet uploaded' && (
                                     <>
-                                        <div className="grid grid-cols-2 gap-4 text-sm text-body-subtle bg-surface-raised p-4 rounded-lg">
+                                        <div className="text-body-subtle bg-surface-raised grid grid-cols-2 gap-4 rounded-lg p-4 text-sm">
                                             <div>
-                                                <span className="block font-medium text-body-muted">Dimensions:</span>
-                                                <span>{width} × {height}px</span>
+                                                <span className="text-body-muted block font-medium">Dimensions:</span>
+                                                <span>
+                                                    {width} × {height}px
+                                                </span>
                                             </div>
                                             <div>
-                                                <span className="block font-medium text-body-muted">Small:</span>
-                                                <span>{smallWidth} × {smallHeight}px</span>
+                                                <span className="text-body-muted block font-medium">Small:</span>
+                                                <span>
+                                                    {smallWidth} × {smallHeight}px
+                                                </span>
                                             </div>
                                         </div>
 
-                                        {width < 800 || height < 800 && (
-                                            <div className="text-red-400 text-sm bg-red-900/20 p-3 rounded">
-                                                ⚠️ Warning: Image dimensions are less than 800px. Consider uploading a larger image for better quality.
-                                            </div>
-                                        )}
+                                        {width < 800 ||
+                                            (height < 800 && (
+                                                <div className="rounded bg-red-900/20 p-3 text-sm text-red-400">
+                                                    ⚠️ Warning: Image dimensions are less than 800px. Consider uploading a larger image for
+                                                    better quality.
+                                                </div>
+                                            ))}
                                     </>
                                 )}
                             </div>
@@ -266,19 +262,19 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                                         <>
                                             {/* Upload Status */}
                                             {isUploading && (
-                                                <div className="flex items-center space-x-2 p-3 bg-surface-raised rounded-lg border border-line-strong">
-                                                    <Loader2 size={20} className="animate-spin text-secondary" />
+                                                <div className="bg-surface-raised border-line-strong flex items-center space-x-2 rounded-lg border p-3">
+                                                    <Loader2 size={20} className="text-secondary animate-spin" />
                                                     <span className="text-body-muted">Processing image...</span>
                                                 </div>
                                             )}
-                                            
-                                            <InputTextbox 
-                                                idName="title" 
-                                                name="Item Title" 
-                                                value={title} 
-                                                onChange={(e) => setTitle(e.target.value)} 
+
+                                            <InputTextbox
+                                                idName="title"
+                                                name="Item Title"
+                                                value={title}
+                                                onChange={(e) => setTitle(e.target.value)}
                                             />
-                                            
+
                                             <InputSelect
                                                 idName="category"
                                                 name="Category"
@@ -306,61 +302,61 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                                                     ['Other', 'Other'],
                                                 ]}
                                             />
-                                            
-                                            <InputTextbox 
-                                                idName="vendor" 
-                                                name="Vendor" 
-                                                value={vendor} 
-                                                onChange={(e) => setVendor(e.target.value)} 
+
+                                            <InputTextbox
+                                                idName="vendor"
+                                                name="Vendor"
+                                                value={vendor}
+                                                onChange={(e) => setVendor(e.target.value)}
                                             />
-                                            
-                                            <InputTextbox 
-                                                idName="location" 
-                                                name="Location" 
-                                                value={location} 
-                                                onChange={(e) => setLocation(e.target.value)} 
+
+                                            <InputTextbox
+                                                idName="location"
+                                                name="Location"
+                                                value={location}
+                                                onChange={(e) => setLocation(e.target.value)}
                                             />
-                                            
-                                            <InputTextbox 
-                                                idName="price" 
-                                                name="Price ($)" 
-                                                value={price.toString()} 
-                                                onChange={(e) => setPrice(Number(e.target.value) || 0)} 
+
+                                            <InputTextbox
+                                                idName="price"
+                                                name="Price ($)"
+                                                value={price.toString()}
+                                                onChange={(e) => setPrice(Number(e.target.value) || 0)}
                                             />
-                                            
-                                            <InputTextbox 
-                                                idName="cost" 
-                                                name="Cost ($)" 
-                                                value={cost.toString()} 
-                                                onChange={(e) => setCost(Number(e.target.value) || 0)} 
+
+                                            <InputTextbox
+                                                idName="cost"
+                                                name="Cost ($)"
+                                                value={cost.toString()}
+                                                onChange={(e) => setCost(Number(e.target.value) || 0)}
                                             />
-                                            
-                                            <InputTextbox 
-                                                idName="count" 
-                                                name="Count" 
-                                                value={count.toString()} 
-                                                onChange={(e) => setCount(Number(e.target.value) || 1)} 
+
+                                            <InputTextbox
+                                                idName="count"
+                                                name="Count"
+                                                value={count.toString()}
+                                                onChange={(e) => setCount(Number(e.target.value) || 1)}
                                             />
-                                            
-                                            <InputTextbox 
-                                                idName="realWidth" 
-                                                name="Width (in)" 
-                                                value={realWidth.toString()} 
-                                                onChange={(e) => setRealWidth(Number(e.target.value) || 0)} 
+
+                                            <InputTextbox
+                                                idName="realWidth"
+                                                name="Width (in)"
+                                                value={realWidth.toString()}
+                                                onChange={(e) => setRealWidth(Number(e.target.value) || 0)}
                                             />
-                                            
-                                            <InputTextbox 
-                                                idName="realHeight" 
-                                                name="Height (in)" 
-                                                value={realHeight.toString()} 
-                                                onChange={(e) => setRealHeight(Number(e.target.value) || 0)} 
+
+                                            <InputTextbox
+                                                idName="realHeight"
+                                                name="Height (in)"
+                                                value={realHeight.toString()}
+                                                onChange={(e) => setRealHeight(Number(e.target.value) || 0)}
                                             />
-                                            
-                                            <InputTextbox 
-                                                idName="realDepth" 
-                                                name="Depth (in)" 
-                                                value={realDepth.toString()} 
-                                                onChange={(e) => setRealDepth(Number(e.target.value) || 0)} 
+
+                                            <InputTextbox
+                                                idName="realDepth"
+                                                name="Depth (in)"
+                                                value={realDepth.toString()}
+                                                onChange={(e) => setRealDepth(Number(e.target.value) || 0)}
                                             />
                                         </>
                                     )}
@@ -371,23 +367,23 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
 
                     {/* Status Message */}
                     {statusMessage && (
-                        <div className={`mx-6 mb-4 rounded-lg p-3 ${
-                            statusMessage.type === 'success' 
-                                ? 'bg-green-900 text-green-300' 
-                                : 'bg-red-900 text-red-300'
-                        }`}>
+                        <div
+                            className={`mx-6 mb-4 rounded-lg p-3 ${
+                                statusMessage.type === 'success' ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'
+                            }`}
+                        >
                             {statusMessage.message}
                         </div>
                     )}
 
                     {/* Footer */}
-                    <div className="flex justify-between items-center p-6 bg-surface-raised border-t border-line">
+                    <div className="bg-surface-raised border-line flex items-center justify-between border-t p-6">
                         <div>
                             {imageUrl !== 'Not yet uploaded' && (
                                 <button
                                     onClick={handleResetInputs}
                                     disabled={isSubmitting}
-                                    className="flex items-center space-x-2 px-4 py-2 bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body rounded-lg transition-colors disabled:opacity-50"
+                                    className="bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body flex items-center space-x-2 rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
                                     data-tooltip-id="change-image-btn"
                                     data-tooltip-content="Change the selected image"
                                 >
@@ -396,12 +392,12 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                                 </button>
                             )}
                         </div>
-                        
+
                         <div className="flex space-x-3">
                             <button
                                 onClick={onClose}
                                 disabled={isSubmitting}
-                                className="px-4 py-2 bg-surface-hover hover:bg-stone-500 text-body-muted hover:text-body rounded-lg transition-colors disabled:opacity-50"
+                                className="bg-surface-hover text-body-muted hover:text-body rounded-lg px-4 py-2 transition-colors hover:bg-stone-500 disabled:opacity-50"
                                 data-tooltip-id="cancel-btn"
                                 data-tooltip-content="Cancel creation"
                             >
@@ -413,7 +409,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                                     <button
                                         onClick={() => handleCreateInventory('stay')}
                                         disabled={!isFormValid}
-                                        className="flex items-center space-x-2 px-4 py-2 bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body flex items-center space-x-2 rounded-lg px-4 py-2 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                                         data-tooltip-id="create-stay-btn"
                                         data-tooltip-content="Create and stay on current page"
                                     >
@@ -433,7 +429,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                                     <button
                                         onClick={() => handleCreateInventory('edit')}
                                         disabled={!isFormValid}
-                                        className="flex items-center space-x-2 px-4 py-2 bg-secondary hover:bg-secondary_light text-body hover:text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="bg-secondary hover:bg-secondary_light text-body flex items-center space-x-2 rounded-lg px-4 py-2 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
                                         data-tooltip-id="create-edit-btn"
                                         data-tooltip-content="Create and go to edit page"
                                     >
@@ -453,7 +449,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                                     <button
                                         onClick={() => handleCreateInventory('view')}
                                         disabled={!isFormValid}
-                                        className="flex items-center space-x-2 px-4 py-2 bg-primary hover:bg-primary_dark text-body-inverse hover:text-body-inverse rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="bg-primary hover:bg-primary_dark text-body-inverse hover:text-body-inverse flex items-center space-x-2 rounded-lg px-4 py-2 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                                         data-tooltip-id="create-view-btn"
                                         data-tooltip-content="Create and view in inventory"
                                     >
@@ -475,7 +471,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({
                     </div>
                 </div>
             </div>
-            
+
             {/* Tooltips */}
             <Tooltip id="close-btn" />
             <Tooltip id="cancel-btn" />

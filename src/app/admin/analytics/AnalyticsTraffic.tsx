@@ -20,15 +20,15 @@ export default async function AnalyticsTraffic({ range }: { range: PostHogRange 
 
     if (analytics.status !== 'ready') {
         return (
-            <div className="flex items-start gap-3 rounded-lg border border-line bg-surface-raised p-5">
-                <AlertTriangle size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-warning" />
+            <div className="border-line bg-surface-raised flex items-start gap-3 rounded-lg border p-5">
+                <AlertTriangle size={18} aria-hidden="true" className="text-warning mt-0.5 shrink-0" />
                 <div className="flex flex-col gap-1">
-                    <strong className="text-sm font-bold text-body">
+                    <strong className="text-body text-sm font-bold">
                         {analytics.status === 'unconfigured'
                             ? 'Traffic analytics are not connected yet'
                             : 'Traffic analytics could not be loaded'}
                     </strong>
-                    <p className="text-sm text-body-muted">{analytics.message}</p>
+                    <p className="text-body-muted text-sm">{analytics.message}</p>
                 </div>
             </div>
         );
@@ -47,11 +47,7 @@ export default async function AnalyticsTraffic({ range }: { range: PostHogRange 
                     value={number.format(conversions.quotesSubmitted)}
                     hint={`${conversions.conversionRate.toFixed(1)}% of visitors`}
                 />
-                <AdminMetric
-                    label="Estimated value"
-                    value={currency.format(conversions.quoteValue)}
-                    hint="Sum of the quoted estimates"
-                />
+                <AdminMetric label="Estimated value" value={currency.format(conversions.quoteValue)} hint="Sum of the quoted estimates" />
                 <AdminMetric label="Quotes started" value={number.format(conversions.quotesStarted)} hint={sendRate} />
                 <AdminMetric
                     label="Calls and emails"
@@ -100,7 +96,7 @@ export default async function AnalyticsTraffic({ range }: { range: PostHogRange 
 
             {analytics.trend.length > 0 && (
                 <AdminPanel eyebrow="Trend" title="Views over time">
-                    <div className="flex items-center gap-2 px-5 py-3 text-xs text-body-subtle">
+                    <div className="text-body-subtle flex items-center gap-2 px-5 py-3 text-xs">
                         <TrendingUp size={14} aria-hidden="true" />
                         {analytics.trend.length} {analytics.trend.length === 1 ? 'day' : 'days'} with recorded traffic
                     </div>

@@ -10,7 +10,7 @@ const CONTACT_PHONE_HREF = 'tel:+12098174240';
 
 export default function Footer() {
     return (
-        <footer className="border-t border-line bg-surface text-body-muted">
+        <footer className="border-line bg-surface text-body-muted border-t">
             <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 py-12 sm:px-8 md:grid-cols-[1.2fr_1fr_1.4fr]">
                 <div className="flex flex-col gap-4">
                     <Image
@@ -21,15 +21,17 @@ export default function Footer() {
                         className="h-11 w-auto object-contain"
                     />
                     <p className="max-w-xs text-sm leading-relaxed">
-                        Professional home staging and decorating across the greater Sacramento area, helping homes sell faster and for
-                        more.
+                        Professional home staging and decorating across the greater Sacramento area, helping homes sell faster and for more.
                     </p>
                     <div className="flex flex-col gap-2 text-sm">
-                        <a href={`mailto:${CONTACT_EMAIL}`} className="inline-flex items-center gap-2 transition-colors hover:text-gold-300">
+                        <a
+                            href={`mailto:${CONTACT_EMAIL}`}
+                            className="hover:text-gold-300 inline-flex items-center gap-2 transition-colors"
+                        >
                             <Mail size={15} aria-hidden="true" />
                             <span className="break-all">{CONTACT_EMAIL}</span>
                         </a>
-                        <a href={CONTACT_PHONE_HREF} className="inline-flex items-center gap-2 transition-colors hover:text-gold-300">
+                        <a href={CONTACT_PHONE_HREF} className="hover:text-gold-300 inline-flex items-center gap-2 transition-colors">
                             <Phone size={15} aria-hidden="true" />
                             {CONTACT_PHONE}
                         </a>
@@ -37,30 +39,30 @@ export default function Footer() {
                 </div>
 
                 <nav aria-label="Footer" className="flex flex-col gap-3">
-                    <h2 className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-gold-300">Explore</h2>
-                    <Link href="/?component=portfolio" className="text-sm transition-colors hover:text-gold-300">
+                    <h2 className="text-gold-300 text-[10px] font-extrabold tracking-[0.14em] uppercase">Explore</h2>
+                    <Link href="/?component=portfolio" className="hover:text-gold-300 text-sm transition-colors">
                         Portfolio
                     </Link>
-                    <Link href="/services/home-staging" className="text-sm transition-colors hover:text-gold-300">
+                    <Link href="/services/home-staging" className="hover:text-gold-300 text-sm transition-colors">
                         Home staging
                     </Link>
-                    <Link href="/services/home-decorating" className="text-sm transition-colors hover:text-gold-300">
+                    <Link href="/services/home-decorating" className="hover:text-gold-300 text-sm transition-colors">
                         Home decorating
                     </Link>
-                    <Link href="/info" className="text-sm transition-colors hover:text-gold-300">
+                    <Link href="/info" className="hover:text-gold-300 text-sm transition-colors">
                         Articles
                     </Link>
-                    <Link href="/contact" className="text-sm transition-colors hover:text-gold-300">
+                    <Link href="/contact" className="hover:text-gold-300 text-sm transition-colors">
                         Get a quote
                     </Link>
                 </nav>
 
                 <div className="flex flex-col gap-3">
-                    <h2 className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-gold-300">Areas we serve</h2>
+                    <h2 className="text-gold-300 text-[10px] font-extrabold tracking-[0.14em] uppercase">Areas we serve</h2>
                     <ul className="flex flex-wrap gap-x-4 gap-y-2">
                         {SERVICE_AREAS.map(({ slug, name }) => (
                             <li key={slug}>
-                                <Link href={`/locations/${slug}`} className="text-sm transition-colors hover:text-gold-300">
+                                <Link href={`/locations/${slug}`} className="hover:text-gold-300 text-sm transition-colors">
                                     {name}
                                 </Link>
                             </li>
@@ -69,7 +71,7 @@ export default function Footer() {
                 </div>
             </div>
 
-            <div className="border-t border-line px-5 py-5 text-center text-xs text-body-subtle sm:px-8">
+            <div className="border-line text-body-subtle border-t px-5 py-5 text-center text-xs sm:px-8">
                 &copy; {new Date().getFullYear()} Capital City Staging. All rights reserved.
             </div>
         </footer>

@@ -52,8 +52,8 @@ const FilterMenu: React.FC = () => {
         <div onMouseEnter={() => setFilterMenuOpen(true)}>
             <div
                 className={
-                    `group absolute bottom-0 right-0 z-10 flex flex-row p-[5px] ` +
-                    `${filterMenuOpen ? 'bg-secondary' : 'rounded-tl-lg bg-secondary_light'}`
+                    `group absolute right-0 bottom-0 z-10 flex flex-row p-[5px] ` +
+                    `${filterMenuOpen ? 'bg-secondary' : 'bg-secondary_light rounded-tl-lg'}`
                 }
                 onClick={(e) => {
                     e.preventDefault();
@@ -63,7 +63,7 @@ const FilterMenu: React.FC = () => {
                 <FaSlidersH className={`${filterMenuOpen ? 'fill-stone-300' : 'fill-stone-950'} h-[30px] w-[30px] p-0.5`} />
             </div>
             {filterMenuOpen === true && (
-                <div className="absolute bottom-[40px] right-0 flex h-[calc(100dvh-40px-50px)] flex-row-reverse gap-0">
+                <div className="absolute right-0 bottom-[40px] flex h-[calc(100dvh-40px-50px)] flex-row-reverse gap-0">
                     {columns.map((columnFilters, colIndex) => {
                         console.log(`colIndex: ${colIndex}`);
                         console.log(`columnFilters: `, columnFilters);

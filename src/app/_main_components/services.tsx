@@ -28,31 +28,31 @@ export default function Services() {
                         return (
                             <article
                                 key={service.id}
-                                className="flex flex-col rounded-xl border border-line bg-surface-raised p-7 shadow-card transition-colors hover:border-line-strong"
+                                className="border-line bg-surface-raised shadow-card hover:border-line-strong flex flex-col rounded-xl border p-7 transition-colors"
                             >
                                 <div className="flex items-center gap-3">
-                                    <span className="grid h-10 w-10 place-items-center rounded-md bg-forest-600/60 text-forest-100">
+                                    <span className="bg-forest-600/60 text-forest-100 grid h-10 w-10 place-items-center rounded-md">
                                         <Icon size={20} aria-hidden="true" />
                                     </span>
-                                    <h3 className="font-display text-2xl font-bold text-gold-300">{service.title}</h3>
+                                    <h3 className="font-display text-gold-300 text-2xl font-bold">{service.title}</h3>
                                 </div>
 
-                                <p className="mt-4 text-body-muted">{service.summary}</p>
+                                <p className="text-body-muted mt-4">{service.summary}</p>
 
-                                <p className="mt-4 rounded-md border border-line bg-surface-overlay px-3.5 py-2.5 text-sm text-body-subtle">
-                                    <span className="font-semibold text-body-muted">Best for:</span> {service.bestFor}
+                                <p className="border-line bg-surface-overlay text-body-subtle mt-4 rounded-md border px-3.5 py-2.5 text-sm">
+                                    <span className="text-body-muted font-semibold">Best for:</span> {service.bestFor}
                                 </p>
 
                                 <ul className="mt-6 flex flex-1 flex-col gap-3">
                                     {service.includedItems.map((item) => (
-                                        <li key={item} className="flex items-start gap-2.5 text-sm text-body-muted">
-                                            <Check size={16} className="mt-0.5 shrink-0 text-forest-200" aria-hidden="true" />
+                                        <li key={item} className="text-body-muted flex items-start gap-2.5 text-sm">
+                                            <Check size={16} className="text-forest-200 mt-0.5 shrink-0" aria-hidden="true" />
                                             {item}
                                         </li>
                                     ))}
                                 </ul>
 
-                                <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-line pt-5">
+                                <div className="border-line mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 border-t pt-5">
                                     <Link
                                         href="/contact"
                                         className={PRIMARY_ACTION}

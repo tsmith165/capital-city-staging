@@ -77,10 +77,7 @@ export default function Where() {
     return (
         <section ref={containerRef} className="w-full px-5 py-20 sm:px-8">
             <div className="mx-auto flex w-full max-w-[1200px] flex-col">
-                <SectionHeading
-                    title="Where we work"
-                    lead="Sacramento, Placer and Yolo counties. Anything further is quoted per job."
-                />
+                <SectionHeading title="Where we work" lead="Sacramento, Placer and Yolo counties. Anything further is quoted per job." />
 
                 {/* Cities are links, not decorated divs: each one has a page and each is reachable by keyboard. */}
                 <ul className="mt-8 flex flex-wrap gap-x-2 gap-y-2.5">
@@ -105,7 +102,7 @@ export default function Where() {
                     ))}
                 </ul>
 
-                <div className="mt-10 h-[clamp(320px,50vh,520px)] w-full overflow-hidden rounded-xl border border-line shadow-card">
+                <div className="border-line shadow-card mt-10 h-[clamp(320px,50vh,520px)] w-full overflow-hidden rounded-xl border">
                     <MapContainer
                         center={MAP_CENTER}
                         zoom={7}
@@ -119,11 +116,7 @@ export default function Where() {
                         keyboard={false}
                         attributionControl={false}
                     >
-                        <TileLayer
-                            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                            subdomains="abcd"
-                            maxZoom={11}
-                        />
+                        <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" subdomains="abcd" maxZoom={11} />
                         {mapReady
                             ? cityBoundaries.map((city) => {
                                   const isActive = activeCity === city.name;

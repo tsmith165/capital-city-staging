@@ -143,11 +143,16 @@ function getVacantTierInfo(sqft: number): TierInfo | null {
 // Get base price for vacant tier
 function getVacantBasePrice(tier: number): number {
     switch (tier) {
-        case 1: return 1700;
-        case 2: return 2200;
-        case 3: return 2600;
-        case 4: return 3000;
-        default: return 0;
+        case 1:
+            return 1700;
+        case 2:
+            return 2200;
+        case 3:
+            return 2600;
+        case 4:
+            return 3000;
+        default:
+            return 0;
     }
 }
 
@@ -175,9 +180,9 @@ function calculateVacantQuote(details: QuoteDetails): QuoteBreakdown {
     // Check if requires custom quote
     if (!tierInfo || travelFee === null) {
         const reason = !tierInfo
-            ? (details.squareFootage < 800
+            ? details.squareFootage < 800
                 ? 'Property under 800 sq ft requires custom quote'
-                : 'Property over 4,000 sq ft requires custom quote')
+                : 'Property over 4,000 sq ft requires custom quote'
             : 'Property over 40 miles from Sacramento requires custom quote';
 
         return {
@@ -250,9 +255,16 @@ function calculateVacantQuote(details: QuoteDetails): QuoteBreakdown {
     const largeSquareFootageAdjustment = 0;
 
     // Calculate total
-    const totalEstimate = basePrice + livingAreaTotal + diningSpaceTotal +
-        bedroomTotal + bathroomTotal + officeTotal +
-        distanceAdjustment + multiFloorAdjustment + outdoorAdjustment;
+    const totalEstimate =
+        basePrice +
+        livingAreaTotal +
+        diningSpaceTotal +
+        bedroomTotal +
+        bathroomTotal +
+        officeTotal +
+        distanceAdjustment +
+        multiFloorAdjustment +
+        outdoorAdjustment;
 
     // Price range: ±$200 from exact price
     const priceRange = {
@@ -318,10 +330,17 @@ function calculateOccupiedQuote(details: QuoteDetails): QuoteBreakdown {
     const outdoorAdjustment = details.outdoorStaging ? 250 : 0;
 
     // Calculate total
-    const totalEstimate = basePrice + bedroomTotal + bathroomTotal +
-        livingAreaTotal + officeTotal + diningSpaceTotal +
-        distanceAdjustment + multiFloorAdjustment +
-        largeSquareFootageAdjustment + outdoorAdjustment;
+    const totalEstimate =
+        basePrice +
+        bedroomTotal +
+        bathroomTotal +
+        livingAreaTotal +
+        officeTotal +
+        diningSpaceTotal +
+        distanceAdjustment +
+        multiFloorAdjustment +
+        largeSquareFootageAdjustment +
+        outdoorAdjustment;
 
     // Price range: ±15% (original logic for occupied)
     const variance = 0.15;

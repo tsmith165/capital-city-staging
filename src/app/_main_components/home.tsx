@@ -46,7 +46,7 @@ export default function Home({ initialHomepageImages }: { initialHomepageImages?
     const activeIndex = currentImageIndex % images.length;
 
     return (
-        <section className="relative w-full overflow-hidden min-section-viewport">
+        <section className="min-section-viewport relative w-full overflow-hidden">
             {/*
              * The background used to animate a 1.3x scale across three seconds on every rotation.
              * A full-bleed image being transformed forever is the most expensive thing a page can
@@ -71,22 +71,20 @@ export default function Home({ initialHomepageImages }: { initialHomepageImages?
             </div>
 
             {/* A readable ground for the copy rather than a radial vignette over the whole frame. */}
-            <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/80 to-transparent" aria-hidden="true" />
-            <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-ink/40" aria-hidden="true" />
+            <div className="from-ink via-ink/80 absolute inset-0 bg-gradient-to-r to-transparent" aria-hidden="true" />
+            <div className="from-ink/80 to-ink/40 absolute inset-0 bg-gradient-to-t via-transparent" aria-hidden="true" />
 
             <div className="relative mx-auto flex min-h-[inherit] w-full max-w-[1400px] flex-col justify-center px-5 py-16 sm:px-8 lg:py-24">
                 <div className="max-w-2xl">
-                    <p className="text-xs font-bold tracking-[0.2em] text-forest-200 uppercase">
-                        Home staging in Sacramento
-                    </p>
+                    <p className="text-forest-200 text-xs font-bold tracking-[0.2em] uppercase">Home staging in Sacramento</p>
 
-                    <h1 className="mt-4 text-4xl leading-[1.1] font-bold text-balance text-body sm:text-5xl lg:text-[3.5rem]">
+                    <h1 className="text-body mt-4 text-4xl leading-[1.1] font-bold text-balance sm:text-5xl lg:text-[3.5rem]">
                         Your home, staged to <span className="gradient-gold-main-text">sell faster</span> and for more.
                     </h1>
 
-                    <p className="mt-5 max-w-xl text-lg text-pretty text-body-muted">
-                        Mia Dofflemyer is a RESA-certified stager and licensed agent serving Sacramento, Placer and Yolo
-                        counties. Vacant or occupied, we stage for the buyers your home is competing for.
+                    <p className="text-body-muted mt-5 max-w-xl text-lg text-pretty">
+                        Mia Dofflemyer is a RESA-certified stager and licensed agent serving Sacramento, Placer and Yolo counties. Vacant or
+                        occupied, we stage for the buyers your home is competing for.
                     </p>
 
                     <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -108,11 +106,11 @@ export default function Home({ initialHomepageImages }: { initialHomepageImages?
                         </Link>
                     </div>
 
-                    <dl className="mt-12 flex flex-wrap gap-x-10 gap-y-5 border-t border-line/70 pt-6">
+                    <dl className="border-line/70 mt-12 flex flex-wrap gap-x-10 gap-y-5 border-t pt-6">
                         {HERO_PROOF.map(({ value, label }) => (
                             <div key={label}>
-                                <dt className="font-display text-2xl font-bold text-gold-300">{value}</dt>
-                                <dd className="mt-0.5 text-xs tracking-wide text-body-subtle uppercase">{label}</dd>
+                                <dt className="font-display text-gold-300 text-2xl font-bold">{value}</dt>
+                                <dd className="text-body-subtle mt-0.5 text-xs tracking-wide uppercase">{label}</dd>
                             </div>
                         ))}
                     </dl>

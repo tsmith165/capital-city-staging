@@ -18,7 +18,7 @@ interface AuthShellProps {
  */
 export default function AuthShell({ eyebrow, title, description, children, footer }: AuthShellProps) {
     return (
-        <div className="flex min-h-[100dvh] w-full flex-col items-center justify-center bg-ink px-5 py-12">
+        <div className="bg-ink flex min-h-[100dvh] w-full flex-col items-center justify-center px-5 py-12">
             <div className="w-full max-w-md">
                 <Link href="/" className="mx-auto flex w-fit items-center justify-center" aria-label="Capital City Staging home">
                     <Image
@@ -31,19 +31,19 @@ export default function AuthShell({ eyebrow, title, description, children, foote
                     />
                 </Link>
 
-                <div className="mt-8 rounded-xl border border-line bg-surface-raised p-6 shadow-card sm:p-8">
-                    <p className="text-xs font-semibold tracking-[0.2em] text-forest-200 uppercase">{eyebrow}</p>
-                    <h1 className="mt-2 font-display text-2xl font-bold text-gold-300">{title}</h1>
-                    <p className="mt-2 text-sm leading-relaxed text-body-muted">{description}</p>
+                <div className="border-line bg-surface-raised shadow-card mt-8 rounded-xl border p-6 sm:p-8">
+                    <p className="text-forest-200 text-xs font-semibold tracking-[0.2em] uppercase">{eyebrow}</p>
+                    <h1 className="font-display text-gold-300 mt-2 text-2xl font-bold">{title}</h1>
+                    <p className="text-body-muted mt-2 text-sm leading-relaxed">{description}</p>
 
                     <div className="mt-7">{children}</div>
 
-                    {footer ? <div className="mt-7 border-t border-line pt-5 text-sm text-body-muted">{footer}</div> : null}
+                    {footer ? <div className="border-line text-body-muted mt-7 border-t pt-5 text-sm">{footer}</div> : null}
                 </div>
 
                 <Link
                     href="/"
-                    className="mx-auto mt-6 flex w-fit items-center gap-2 text-sm text-body-subtle transition-colors hover:text-gold-300"
+                    className="text-body-subtle hover:text-gold-300 mx-auto mt-6 flex w-fit items-center gap-2 text-sm transition-colors"
                 >
                     <ArrowLeft size={15} aria-hidden="true" />
                     Back to capitalcitystaging.com
