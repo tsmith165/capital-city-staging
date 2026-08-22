@@ -96,12 +96,17 @@ export default function Portfolio() {
                                     setLightboxIndex(index);
                                     track('portfolio_image_opened', { project: currentProject?.name ?? '', index });
                                 }}
-                                aria-label={`View ${currentProject?.name} image ${index + 1} full size`}
+                                aria-label={
+                                    image.title
+                                        ? `View ${image.title} full size`
+                                        : `View ${currentProject?.name} image ${index + 1} full size`
+                                }
                                 className="group border-line bg-surface-raised shadow-card relative aspect-[4/3] overflow-hidden rounded-lg border"
                             >
                                 <Image
                                     src={image.thumbnailPath || image.imagePath}
-                                    alt={`${currentProject?.name}, image ${index + 1}`}
+                                    /* Captions written on the project become the alt text, since they describe the room. */
+                                    alt={image.title ?? `${currentProject?.name}, image ${index + 1}`}
                                     fill
                                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                                     className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"

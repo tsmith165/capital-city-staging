@@ -1,33 +1,47 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
-import { useRouter } from 'next/navigation';
-import ProjectResizeUploader from '@/components/ProjectResizeUploader';
-import { Id } from '@/convex/_generated/dataModel';
-import { Plus, Bell, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { useMutation, useQuery } from 'convex/react';
 import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
+import { ArrowLeft, Images, ListChecks, MapPin, SlidersHorizontal } from 'lucide-react';
 
+import { api } from '@/convex/_generated/api';
+import type { Id } from '@/convex/_generated/dataModel';
 import CheckInDialog from './CheckInDialog';
+import ProjectDetailsForm from './ProjectDetailsForm';
+import ProjectImagesSection from './ProjectImagesSection';
 import ProjectInventoryTab from './ProjectInventoryTab';
-import { CLOSING_STATUSES, type ProjectAssignmentLine, type ProjectStatus } from './project.types';
+import type { CommittedImage } from './images.types';
+import { CLOSING_STATUSES, type ProjectAssignmentLine, type ProjectFormState, type ProjectStatus } from './project.types';
 
-interface UploadedImage {
-    fileName: string;
-    originalImageUrl: string;
-    smallImageUrl: string;
-    originalWidth: number;
-    originalHeight: number;
-    smallWidth: number;
-    smallHeight: number;
-}
+/**
+ * Editing one project.
+ *
+ * This was three tabs, which meant the photos and the furniture on the job were each one click away
+ * from being forgotten, and saving from the Details tab navigated the whole page away. Everything is
+ * on one column now; the header carries the save and a jump link per section, and saving stays put so
+ * a save in the middle of arranging photos does not throw the arrangement away.
+ */
+
+const DETAILS_FORM_ID = 'project-details-form';
+
+const SECTIONS = [
+    { id: 'details', label: 'Details', icon: SlidersHorizontal },
+    { id: 'photos', label: 'Photos', icon: Images },
+    { id: 'inventory', label: 'Inventory', icon: ListChecks },
+] as const;
+
+const STATUS_TONES: Record<ProjectStatus, string> = {
+    draft: 'border-line text-body-muted',
+    active: 'border-success/40 bg-success-soft text-success',
+    completed: 'border-line-strong text-body-subtle',
+    cancelled: 'border-danger/40 bg-danger-soft text-danger',
+};
 
 export default function EditProjectClient({ projectId }: { projectId: string }) {
-    const router = useRouter();
     const { user, isLoaded } = useUser();
 
-    // All hooks must be called at the top level before any conditional returns
     const project = useQuery(api.projects.getProjectById, isLoaded && user ? { projectId: projectId as Id<'projects'> } : 'skip');
     const assignments = useQuery(
         api.assignments.getProjectAssignments,
@@ -35,13 +49,10 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
     );
 
     const updateProject = useMutation(api.projects.updateProject);
-    const addProjectImage = useMutation(api.projects.addProjectImage);
-    const removeProjectImage = useMutation(api.projects.removeProjectImage);
-    const reorderProjectImages = useMutation(api.projects.reorderProjectImages);
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<ProjectFormState>({
         name: '',
-        status: 'draft' as ProjectStatus,
+        status: 'draft',
         address: '',
         startDate: '',
         endDate: '',
@@ -50,98 +61,39 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
         highlighted: false,
     });
 
-    const [, setUploadedImages] = useState<UploadedImage[]>([]);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null);
-    const [isUploadingImages, setIsUploadingImages] = useState(false);
-
-    // Tab state
-    const [activeTab, setActiveTab] = useState<'details' | 'images' | 'inventory'>('details');
+    const [saving, setSaving] = useState(false);
+    const [saved, setSaved] = useState(false);
     const [saveError, setSaveError] = useState<string | null>(null);
     /* Held while the check-in dialog is open, so submitting again can carry the confirmed ids. */
     const [pendingCheckIn, setPendingCheckIn] = useState<'completed' | 'cancelled' | null>(null);
 
-    useEffect(() => {
-        if (project) {
-            setFormData({
-                name: project.name || '',
-                /*
-                 * This used to force every non-draft project back to 'draft' when the form loaded, so
-                 * opening a completed job and saving it silently reopened it.
-                 */
-                status: project.status ?? 'draft',
-                address: project.address || '',
-                startDate: project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
-                endDate: project.endDate ? new Date(project.endDate).toISOString().split('T')[0] : '',
-                revenue: project.revenue ? project.revenue.toString() : '',
-                notes: project.notes || '',
-                highlighted: project.highlighted || false,
-            });
-        }
-    }, [project]);
-
-    const handleUploadComplete = async (images: UploadedImage[]) => {
-        setIsUploadingImages(true);
-        setUploadedImages((prev) => [...prev, ...images]);
-
-        try {
-            // Add images to project
-            for (let i = 0; i < images.length; i++) {
-                const image = images[i];
-                const currentImageCount = (project?.images?.length || 0) + i;
-                await addProjectImage({
-                    projectId: projectId as Id<'projects'>,
-                    imagePath: image.originalImageUrl,
-                    width: image.originalWidth,
-                    height: image.originalHeight,
-                    thumbnailPath: image.smallImageUrl,
-                    thumbnailWidth: image.smallWidth,
-                    thumbnailHeight: image.smallHeight,
-                    displayOrder: currentImageCount,
-                });
-            }
-        } finally {
-            setIsUploadingImages(false);
-        }
-    };
-
-    const handleResetImages = () => {
-        setUploadedImages([]);
-    };
-
-    const handleRemoveImage = async (imageId: string) => {
-        await removeProjectImage({ imageId: imageId as Id<'projectImages'> });
-    };
-
-    const handleDragStart = (index: number) => {
-        setDraggedImageIndex(index);
-    };
-
-    const handleDragOver = (e: React.DragEvent) => {
-        e.preventDefault();
-    };
-
-    const handleDrop = async (e: React.DragEvent, dropIndex: number) => {
-        e.preventDefault();
-        if (draggedImageIndex === null || draggedImageIndex === dropIndex || !project?.images) return;
-
-        const newOrder = [...project.images];
-        const draggedImage = newOrder[draggedImageIndex];
-        newOrder.splice(draggedImageIndex, 1);
-        newOrder.splice(dropIndex, 0, draggedImage);
-
-        // Update display order in database
-        const imageIds = newOrder.map((img) => img._id);
-        await reorderProjectImages({
-            projectId: projectId as Id<'projects'>,
-            imageIds: imageIds as Id<'projectImages'>[],
+    /*
+     * Seeded from the query the first time a project arrives, adjusted during render rather than in an
+     * effect. Keying on the id matters: this is a live subscription, so it re-emits after every save and
+     * after every photo edit, and the effect this replaced re-seeded the form each time — typing into a
+     * field while an upload landed lost the edit.
+     */
+    const [seededFor, setSeededFor] = useState<string | null>(null);
+    if (project && seededFor !== project._id) {
+        setSeededFor(project._id);
+        setFormData({
+            name: project.name || '',
+            /*
+             * This used to force every non-draft project back to 'draft' when the form loaded, so
+             * opening a completed job and saving it silently reopened it.
+             */
+            status: (project.status as ProjectStatus) ?? 'draft',
+            address: project.address || '',
+            startDate: project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
+            endDate: project.endDate ? new Date(project.endDate).toISOString().split('T')[0] : '',
+            revenue: project.revenue ? project.revenue.toString() : '',
+            notes: project.notes || '',
+            highlighted: project.highlighted || false,
         });
-
-        setDraggedImageIndex(null);
-    };
+    }
 
     const save = async (checkInAssignmentIds?: string[]) => {
-        setIsSubmitting(true);
+        setSaving(true);
         setSaveError(null);
 
         try {
@@ -158,12 +110,13 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                 checkInAssignmentIds: checkInAssignmentIds?.length ? (checkInAssignmentIds as Id<'projectInventory'>[]) : undefined,
             });
 
-            router.push('/admin/projects');
+            setPendingCheckIn(null);
+            setSaved(true);
         } catch (error) {
             setSaveError(error instanceof Error ? error.message : 'Could not save this project. Try again.');
             setPendingCheckIn(null);
         } finally {
-            setIsSubmitting(false);
+            setSaving(false);
         }
     };
 
@@ -173,8 +126,8 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
      * it — the dialog offers a way through either way — but it stops the job from quietly closing
      * while the catalog still believes the furniture is unavailable.
      */
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
 
         const closing = CLOSING_STATUSES.includes(formData.status);
         const stillOut = assignments?.open ?? [];
@@ -187,301 +140,122 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
         void save();
     };
 
-    // Show loading while user auth is loading
-    if (!isLoaded) {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="text-body-muted">Loading...</div>
-            </div>
-        );
+    if (!isLoaded || project === undefined) {
+        return <p className="text-body-muted p-6 text-sm">Loading project…</p>;
     }
 
-    // Redirect to login if not authenticated
     if (!user) {
-        router.push('/sign-in');
         return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="text-body-muted">Redirecting to login...</div>
-            </div>
+            <p className="text-body-muted p-6 text-sm">
+                <Link href="/sign-in" className="text-gold-300 hover:text-gold-200 font-bold">
+                    Sign in
+                </Link>{' '}
+                to edit this project.
+            </p>
         );
     }
 
-    // Show loading while project data is loading
-    if (project === undefined) {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="text-body-muted">Loading project...</div>
-            </div>
-        );
-    }
-
-    // Show not found if project doesn't exist
     if (project === null) {
         return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="text-body-muted">Project not found</div>
+            <div className="flex flex-col gap-3 p-6">
+                <p className="text-body text-sm font-bold">That project no longer exists.</p>
+                <Link href="/admin/projects" className="text-gold-300 hover:text-gold-200 text-sm font-bold">
+                    Back to projects
+                </Link>
             </div>
         );
     }
 
+    const images = (project.images ?? []) as CommittedImage[];
+    const openCount = assignments?.open.length ?? 0;
+    const counts: Record<(typeof SECTIONS)[number]['id'], number | null> = {
+        details: null,
+        photos: images.length,
+        inventory: openCount,
+    };
+
     return (
-        <div className="container mx-auto max-w-5xl p-4">
-            {/* Tab Navigation */}
-            <div className="bg-surface-raised mb-6 flex space-x-1 rounded-lg p-1">
-                <button
-                    type="button"
-                    onClick={() => setActiveTab('details')}
-                    className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                        activeTab === 'details' ? 'bg-primary text-white' : 'text-body-subtle hover:text-body'
-                    }`}
-                >
-                    Details
-                </button>
-                <button
-                    type="button"
-                    onClick={() => setActiveTab('images')}
-                    className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                        activeTab === 'images' ? 'bg-primary text-white' : 'text-body-subtle hover:text-body'
-                    }`}
-                >
-                    Images {project.images && project.images.length > 0 && <span className="ml-1 text-xs">({project.images.length})</span>}
-                </button>
-                <button
-                    type="button"
-                    onClick={() => setActiveTab('inventory')}
-                    className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                        activeTab === 'inventory' ? 'bg-primary text-white' : 'text-body-subtle hover:text-body'
-                    }`}
-                >
-                    Inventory{' '}
-                    {assignments && assignments.open.length > 0 && <span className="ml-1 text-xs">({assignments.open.length})</span>}
-                </button>
-            </div>
+        <div className="mx-auto flex max-w-5xl flex-col gap-5 p-4">
+            <header className="bg-ink/95 border-line sticky top-0 z-20 -mx-4 flex flex-col gap-3 border-b px-4 py-3 backdrop-blur">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                    <Link
+                        href="/admin/projects"
+                        className="text-body-subtle hover:text-body inline-flex items-center gap-1.5 text-xs font-bold transition-colors"
+                    >
+                        <ArrowLeft size={13} aria-hidden="true" /> Projects
+                    </Link>
 
-            {/* Tab Content */}
-            <div className="bg-surface-raised rounded-lg">
-                {activeTab === 'details' && (
-                    <form onSubmit={handleSubmit} className="p-6">
-                        <h2 className="text-body mb-6 text-2xl font-bold">Project Details</h2>
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <div>
-                                <label className="text-body mb-1 block text-sm font-medium">Project Name *</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
-                                    placeholder="Enter project name"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="text-body mb-1 block text-sm font-medium">Status *</label>
-                                <select
-                                    value={formData.status}
-                                    onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                                    className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
-                                >
-                                    <option value="draft">Draft</option>
-                                    <option value="active">Active</option>
-                                    <option value="completed">Completed</option>
-                                    <option value="cancelled">Cancelled</option>
-                                </select>
-                            </div>
-
-                            <div className="md:col-span-2">
-                                <label className="text-body mb-1 block text-sm font-medium">Address</label>
-                                <input
-                                    type="text"
-                                    value={formData.address}
-                                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                    className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
-                                    placeholder="Project address"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="text-body mb-1 block text-sm font-medium">Start Date</label>
-                                <input
-                                    type="date"
-                                    value={formData.startDate}
-                                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                                    className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="text-body mb-1 block text-sm font-medium">End Date</label>
-                                <input
-                                    type="date"
-                                    value={formData.endDate}
-                                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                                    className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
-                                />
-                            </div>
-
-                            <div className="md:col-span-2">
-                                <label className="text-body mb-1 block text-sm font-medium">Revenue ($)</label>
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    value={formData.revenue}
-                                    onChange={(e) => setFormData({ ...formData, revenue: e.target.value })}
-                                    className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
-                                    placeholder="Project revenue"
-                                />
-                            </div>
-
-                            <div className="md:col-span-2">
-                                <label className="text-body mb-1 block text-sm font-medium">Notes</label>
-                                <textarea
-                                    value={formData.notes}
-                                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                                    rows={3}
-                                    className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
-                                    placeholder="Project notes..."
-                                />
-                            </div>
-
-                            {saveError && (
-                                <p
-                                    role="alert"
-                                    className="border-danger/40 bg-danger-soft text-danger rounded-md border px-4 py-2.5 text-sm md:col-span-2"
-                                >
-                                    {saveError}
-                                </p>
-                            )}
-
-                            <div className="md:col-span-2">
-                                <div className="flex items-center justify-between">
-                                    <button
-                                        type="submit"
-                                        disabled={isSubmitting}
-                                        className={`rounded px-4 py-2 font-medium transition-colors ${
-                                            isSubmitting
-                                                ? 'bg-surface-hover text-body-subtle cursor-not-allowed'
-                                                : 'bg-primary hover:bg-primary_dark text-white'
-                                        }`}
-                                    >
-                                        {isSubmitting ? 'Saving...' : 'Save Project'}
-                                    </button>
-                                    <div className="flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            id="highlighted"
-                                            checked={formData.highlighted}
-                                            onChange={(e) => setFormData({ ...formData, highlighted: e.target.checked })}
-                                            className="border-line-strong bg-surface-overlay text-primary focus:ring-primary mr-2 h-4 w-4 rounded focus:ring-2"
-                                        />
-                                        <label htmlFor="highlighted" className="text-body text-sm font-medium">
-                                            Show in portfolio (highlighted)
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                )}
-
-                {activeTab === 'images' && (
-                    <div className="p-6">
-                        <div className="mb-6 flex items-center justify-between">
-                            <h2 className="text-body text-2xl font-bold">Project Images</h2>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    const uploadInput = document.querySelector('#project-uploader input') as HTMLInputElement;
-                                    if (uploadInput) uploadInput.click();
-                                }}
-                                disabled={isUploadingImages}
-                                className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-colors ${
-                                    isUploadingImages
-                                        ? 'border-line-strong bg-surface-hover text-body-subtle cursor-not-allowed'
-                                        : 'border-primary text-primary hover:border-secondary hover:bg-secondary hover:text-body-muted bg-transparent'
-                                }`}
-                                title={isUploadingImages ? 'Processing images...' : 'Add images'}
-                            >
-                                {isUploadingImages ? <Loader2 className="animate-spin" size={16} /> : <Plus size={16} />}
-                            </button>
-                        </div>
-
-                        <div className="space-y-4">
-                            {/* Hidden ProjectResizeUploader */}
-                            <div id="project-uploader" className="hidden">
-                                <ProjectResizeUploader
-                                    onUploadComplete={handleUploadComplete}
-                                    onResetInputs={handleResetImages}
-                                    disabled={isSubmitting}
-                                />
-                            </div>
-
-                            {/* Upload Loading Spinner */}
-                            {isUploadingImages && (
-                                <div className="flex items-center justify-center py-8">
-                                    <div className="bg-surface-overlay flex items-center gap-3 rounded-lg px-4 py-3">
-                                        <Loader2 className="text-primary h-5 w-5 animate-spin" />
-                                        <span className="text-body text-sm">Processing uploaded images...</span>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Existing Images */}
-                            {project.images && project.images.length > 0 && (
-                                <div>
-                                    <div className="text-body-inverse mb-3 flex items-center gap-2 rounded-lg bg-green-300/70 p-2">
-                                        <Bell size={16} />
-                                        <span className="text-sm">Drag and drop to reorder</span>
-                                    </div>
-                                    <div className="max-h-120 overflow-y-auto">
-                                        <div className="grid grid-cols-2 gap-4 pr-2 md:grid-cols-3 lg:grid-cols-4">
-                                            {project.images.map((image, index) => (
-                                                <div
-                                                    key={image._id}
-                                                    className="group relative cursor-move"
-                                                    draggable
-                                                    onDragStart={() => handleDragStart(index)}
-                                                    onDragOver={handleDragOver}
-                                                    onDrop={(e) => handleDrop(e, index)}
-                                                >
-                                                    <img
-                                                        src={image.thumbnailPath || image.imagePath}
-                                                        alt={`Project image ${index + 1}`}
-                                                        className="aspect-square w-full rounded-lg object-cover"
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleRemoveImage(image._id)}
-                                                        className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white opacity-0 transition-opacity group-hover:opacity-100"
-                                                    >
-                                                        ×
-                                                    </button>
-                                                    <div className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs text-white">
-                                                        {index + 1}
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                    <div className="flex min-w-0 flex-col">
+                        <h1 className="font-display text-body truncate text-xl leading-tight font-normal">
+                            {formData.name || project.name || 'Untitled project'}
+                        </h1>
+                        {formData.address && (
+                            <span className="text-body-subtle inline-flex items-center gap-1 truncate text-xs">
+                                <MapPin size={11} aria-hidden="true" /> {formData.address}
+                            </span>
+                        )}
                     </div>
-                )}
 
-                {activeTab === 'inventory' && (
-                    <div className="p-6">
-                        <ProjectInventoryTab projectId={projectId} />
-                    </div>
-                )}
-            </div>
+                    <span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold capitalize ${STATUS_TONES[formData.status]}`}>
+                        {formData.status}
+                    </span>
+
+                    <button
+                        type="submit"
+                        form={DETAILS_FORM_ID}
+                        disabled={saving}
+                        className="bg-gold-400 text-body-inverse hover:bg-gold-300 ml-auto rounded-md px-4 py-2 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                        {saving ? 'Saving…' : 'Save'}
+                    </button>
+                </div>
+
+                <nav aria-label="Sections" className="flex flex-wrap gap-1.5">
+                    {SECTIONS.map((section) => (
+                        <a
+                            key={section.id}
+                            href={`#${section.id}`}
+                            className="border-line text-body-muted hover:bg-surface-hover hover:text-body inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-colors"
+                        >
+                            <section.icon size={12} aria-hidden="true" />
+                            {section.label}
+                            {counts[section.id] !== null && counts[section.id]! > 0 && (
+                                <span className="text-body-subtle">{counts[section.id]}</span>
+                            )}
+                        </a>
+                    ))}
+                </nav>
+            </header>
+
+            <section id="details" className="scroll-mt-32">
+                <ProjectDetailsForm
+                    formId={DETAILS_FORM_ID}
+                    formData={formData}
+                    onChange={(patch) => {
+                        setSaved(false);
+                        setFormData((current) => ({ ...current, ...patch }));
+                    }}
+                    onSubmit={handleSubmit}
+                    saving={saving}
+                    error={saveError}
+                    saved={saved}
+                />
+            </section>
+
+            <section id="photos" className="scroll-mt-32">
+                <ProjectImagesSection projectId={projectId} images={images} />
+            </section>
+
+            <section id="inventory" className="scroll-mt-32">
+                <ProjectInventoryTab projectId={projectId} />
+            </section>
 
             {pendingCheckIn && (
                 <CheckInDialog
                     projectName={project.name}
                     status={pendingCheckIn}
                     lines={(assignments?.open ?? []) as ProjectAssignmentLine[]}
-                    saving={isSubmitting}
+                    saving={saving}
                     onCancel={() => setPendingCheckIn(null)}
                     onConfirm={(checkInIds) => void save(checkInIds)}
                 />
