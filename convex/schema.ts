@@ -65,8 +65,17 @@ export default defineSchema({
     endDate: v.optional(v.number()),
     revenue: v.optional(v.number()),
     address: v.optional(v.string()),
+    /*
+     * Payment. `paymentReceivedAt` predates the rest and holds the date the money arrived; the three
+     * fields below record how much, how, and what is still outstanding. Rows written before this
+     * existed carry no status, so read payment through `paymentState` rather than these directly.
+     */
     paymentReceivedAt: v.optional(v.number()),
     paymentProcessedAt: v.optional(v.number()),
+    paymentStatus: v.optional(v.union(v.literal("unpaid"), v.literal("partial"), v.literal("paid"))),
+    amountPaid: v.optional(v.number()),
+    paymentMethod: v.optional(v.string()),
+    paymentNotes: v.optional(v.string()),
     mlsLink: v.optional(v.string()),
     invoiceLink: v.optional(v.string()),
     highlighted: v.boolean(),

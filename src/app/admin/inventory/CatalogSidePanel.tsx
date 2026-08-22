@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
-import { House, PackageSearch, X } from 'lucide-react';
+import { useCallback } from 'react';
+import { House, PackageSearch } from 'lucide-react';
+
+import AdminSidePanel from '@/components/admin/AdminSidePanel';
 
 import type { LineProblem, StagingSummary } from '@/components/admin/inventory/staging.types';
 
@@ -9,14 +11,7 @@ import ItemDetailPanel from './ItemDetailPanel';
 import ProjectWorkspacePanel from './ProjectWorkspacePanel';
 import type { CatalogItem, ProjectOption } from './catalog.types';
 
-/**
- * The catalog's third column.
- *
- * From `xl` up it sits in the layout, so the grid keeps scrolling behind whatever is open and there
- * is no scrim to dismiss. Below that width there is not enough room for three columns, so the same
- * panel becomes a slide-over — one component, two wrappers, rather than two implementations that
- * drift apart.
- */
+/** The catalog's third column: what it shows, over the shared responsive panel that positions it. */
 export default function CatalogSidePanel({
     open,
     onOpenChange,
@@ -47,17 +42,11 @@ export default function CatalogSidePanel({
     onClear: () => void;
     onCommit: () => void;
 }) {
-    /* Escape closes the overlay at narrow widths. At `xl` the panel is furniture, not a dialog. */
-    useEffect(() => {
-        if (!open) return;
-        const onKeyDown = (event: KeyboardEvent) => {
-            if (event.key !== 'Escape') return;
-            if (detailItemId) onCloseDetail();
-            else onOpenChange(false);
-        };
-        document.addEventListener('keydown', onKeyDown);
-        return () => document.removeEventListener('keydown', onKeyDown);
-    }, [open, detailItemId, onCloseDetail, onOpenChange]);
+    /* Escape steps back out of an item before it closes the panel itself. */
+    const handleEscape = useCallback(() => {
+        if (detailItemId) onCloseDetail();
+        else onOpenChange(false);
+    }, [detailItemId, onCloseDetail, onOpenChange]);
 
     const body = detailItemId ? (
         <ItemDetailPanel itemId={detailItemId} onClose={onCloseDetail} projects={projects} activeProjectId={project?._id ?? null} />
@@ -85,42 +74,13 @@ export default function CatalogSidePanel({
     );
 
     return (
-        <>
-            {/* Overlay wrapper, below xl only. */}
-            {open && (
-                <div className="fixed inset-0 z-50 flex justify-end xl:hidden">
-                    <button
-                        type="button"
-                        aria-label="Close panel"
-                        onClick={() => onOpenChange(false)}
-                        className="bg-ink/70 absolute inset-0"
-                    />
-                    <aside
-                        role="dialog"
-                        aria-modal="true"
-                        aria-label={detailItemId ? 'Item details' : 'Staging list'}
-                        className="border-line bg-surface-raised shadow-overlay relative flex h-full w-full max-w-md flex-col border-l"
-                    >
-                        <button
-                            type="button"
-                            onClick={() => onOpenChange(false)}
-                            aria-label="Close panel"
-                            className="border-line bg-surface-raised text-body-muted hover:text-body absolute top-3 -left-11 grid h-9 w-9 place-items-center rounded-md border transition-colors"
-                        >
-                            <X size={16} aria-hidden="true" />
-                        </button>
-                        {body}
-                    </aside>
-                </div>
-            )}
-
-            {/* In-flow column, xl and up. */}
-            <aside
-                aria-label={detailItemId ? 'Item details' : 'Staging list'}
-                className="border-line bg-surface-raised sticky top-0 hidden max-h-[calc(100dvh-64px)] w-[22rem] shrink-0 flex-col self-start border-l xl:flex 2xl:w-[24rem]"
-            >
-                {body}
-            </aside>
-        </>
+        <AdminSidePanel
+            open={open}
+            onOpenChange={onOpenChange}
+            label={detailItemId ? 'Item details' : 'Staging list'}
+            onEscape={handleEscape}
+        >
+            {body}
+        </AdminSidePanel>
     );
 }

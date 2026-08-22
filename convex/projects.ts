@@ -3,6 +3,7 @@ import { mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { isAdmin, requireAdmin } from "./authz";
 import { openAssignments, syncItemCounter, syncProjectFlag } from "./availability";
+import { paymentState } from "./payments";
 
 // Get highlighted projects for portfolio
 export const getHighlightedProjects = query({
@@ -68,19 +69,120 @@ export const getProjectOptions = query({
 
 export const getAllProjects = query({
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return [];
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .first();
-
-    if (!user || user.role !== "admin") {
-      throw new Error("Not authorized");
-    }
+    if (!(await isAdmin(ctx))) return [];
 
     return await ctx.db.query("projects").withIndex("by_order").collect();
+  },
+});
+
+/**
+ * The projects list, with everything the list and its detail column need in one subscription.
+ *
+ * The list used to render raw project rows, so the only way to learn that a job still had furniture
+ * out or money outstanding was to open it. Those are the two facts worth chasing, so they belong on
+ * the row.
+ */
+export const getProjectsOverview = query({
+  handler: async (ctx) => {
+    if (!(await isAdmin(ctx))) return [];
+
+    const projects = await ctx.db.query("projects").withIndex("by_order").collect();
+
+    return await Promise.all(
+      projects.map(async (project) => {
+        const [open, images] = await Promise.all([
+          ctx.db
+            .query("projectInventory")
+            .withIndex("by_active", (q) => q.eq("projectId", project._id).eq("returnedAt", undefined))
+            .collect(),
+          ctx.db
+            .query("projectImages")
+            .withIndex("by_project", (q) => q.eq("projectId", project._id))
+            .collect(),
+        ]);
+
+        return {
+          _id: project._id,
+          name: project.name,
+          status: project.status,
+          address: project.address,
+          startDate: project.startDate,
+          endDate: project.endDate,
+          revenue: project.revenue,
+          notes: project.notes,
+          highlighted: project.highlighted,
+          displayOrder: project.displayOrder,
+          createdAt: project.createdAt,
+          imageCount: images.length,
+          openUnits: open.reduce((total, row) => total + row.quantity, 0),
+          openValue: open.reduce((total, row) => total + row.quantity * row.pricePerItem, 0),
+          payment: paymentState(project),
+        };
+      }),
+    );
+  },
+});
+
+/**
+ * Records money against a project.
+ *
+ * Marking a job paid is the moment to capture the rest of it, so this takes the date and the amount
+ * together rather than flipping a flag and leaving the amount to be reconstructed later. Passing an
+ * amount that covers the invoice settles the job outright even when "partial" was chosen, because
+ * the number is the fact and the radio button is a guess.
+ */
+export const recordProjectPayment = mutation({
+  args: {
+    projectId: v.id("projects"),
+    paidOn: v.number(),
+    amountPaid: v.number(),
+    /* What she selected. Reconciled against the invoice below. */
+    intent: v.union(v.literal("partial"), v.literal("paid")),
+    method: v.optional(v.string()),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const project = await ctx.db.get(args.projectId);
+    if (!project) throw new Error("Project not found");
+    if (args.amountPaid < 0) throw new Error("A payment cannot be negative");
+
+    const invoiced = project.revenue ?? 0;
+    const settled = invoiced > 0 ? args.amountPaid >= invoiced : args.intent === "paid";
+
+    await ctx.db.patch(args.projectId, {
+      paymentStatus: settled ? "paid" : "partial",
+      paymentReceivedAt: args.paidOn,
+      amountPaid: args.amountPaid,
+      paymentMethod: args.method?.trim() || undefined,
+      paymentNotes: args.notes?.trim() || undefined,
+      updatedAt: Date.now(),
+    });
+
+    return { status: settled ? "paid" : "partial", outstanding: Math.max(0, invoiced - args.amountPaid) };
+  },
+});
+
+/** Undoes a payment record — the way back from a wrong date or a mistaken toggle. */
+export const clearProjectPayment = mutation({
+  args: { projectId: v.id("projects") },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const project = await ctx.db.get(args.projectId);
+    if (!project) throw new Error("Project not found");
+
+    await ctx.db.patch(args.projectId, {
+      paymentStatus: "unpaid",
+      paymentReceivedAt: undefined,
+      amountPaid: undefined,
+      paymentMethod: undefined,
+      paymentNotes: undefined,
+      updatedAt: Date.now(),
+    });
+
+    return { success: true };
   },
 });
 
@@ -360,34 +462,23 @@ export const deleteProjectImage = mutation({
 export const getProjectById = query({
   args: { projectId: v.id("projects") },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-
-    // Check if user is admin
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .first();
-
-    if (!user || user.role !== "admin") {
-      throw new Error("Not authorized");
-    }
+    await requireAdmin(ctx);
 
     const project = await ctx.db.get(args.projectId);
     if (!project) return null;
 
-    // Get project images ordered by displayOrder
     const images = await ctx.db
       .query("projectImages")
       .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
       .collect();
 
-    // Sort images by displayOrder
     images.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
 
     return {
       ...project,
       images,
+      /* Derived rather than raw: the stored columns predate partial payments. */
+      payment: paymentState(project),
     };
   },
 });
