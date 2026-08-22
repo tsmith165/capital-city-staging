@@ -1,21 +1,14 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { useQuery } from 'convex/react';
-import { AlertTriangle, TrendingUp } from 'lucide-react';
 
 import { api } from '@/convex/_generated/api';
 import AdminShell from '@/components/admin/AdminShell';
-import { AdminEmpty, AdminHeading, AdminMetric, AdminPanel } from '@/components/admin/AdminPrimitives';
-import { POSTHOG_RANGES, type PostHogAnalytics, type PostHogRange } from '@/data/posthogAnalytics.types';
-
-import BarList from './BarList';
-
-const currency = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-});
+import { AdminHeading, AdminMetric } from '@/components/admin/AdminPrimitives';
+import { SkeletonMetricGrid } from '@/components/admin/AdminSkeleton';
+import { POSTHOG_RANGES, type PostHogRange } from '@/data/posthogAnalytics.types';
 
 const number = new Intl.NumberFormat('en-US');
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
@@ -27,7 +20,12 @@ const RANGE_LABELS: Record<PostHogRange, string> = {
     '365d': '12 months',
 };
 
-export default function AnalyticsClient({ analytics, range }: { analytics: PostHogAnalytics; range: PostHogRange }) {
+/**
+ * The page shell. It renders immediately: the business figures come from Convex over a websocket,
+ * and the traffic section arrives as an already-suspended server component from the route. Nothing
+ * on this page blocks the navigation to it.
+ */
+export default function AnalyticsClient({ range, traffic }: { range: PostHogRange; traffic: ReactNode }) {
     const summary = useQuery(api.dashboard.getDashboardSummary);
 
     const utilisation =
@@ -44,153 +42,60 @@ export default function AnalyticsClient({ analytics, range }: { analytics: PostH
 
                 <section className="flex flex-col gap-4">
                     <h2 className="font-display text-xl font-normal text-body">Business</h2>
-                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                        <AdminMetric
-                            label="Revenue this year"
-                            value={summary ? money.format(summary.projects.revenueThisYear) : '—'}
-                            hint="Completed projects only"
-                        />
-                        <AdminMetric
-                            label="Completed projects"
-                            value={summary ? number.format(summary.projects.completed) : '—'}
-                            hint={summary ? `${number.format(summary.projects.active)} active now` : undefined}
-                        />
-                        <AdminMetric
-                            label="Inventory utilisation"
-                            value={summary ? `${utilisation}%` : '—'}
-                            hint={
-                                summary
-                                    ? `${number.format(summary.inventory.inUse)} of ${number.format(summary.inventory.units)} units staged`
-                                    : undefined
-                            }
-                        />
-                        <AdminMetric
-                            label="Quote requests"
-                            value={summary ? number.format(summary.inbox.total) : '—'}
-                            hint={summary ? `${number.format(summary.inbox.unanswered)} awaiting a reply` : undefined}
-                        />
-                    </div>
+                    {summary ? (
+                        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                            <AdminMetric
+                                label="Revenue this year"
+                                value={money.format(summary.projects.revenueThisYear)}
+                                hint="Completed projects only"
+                            />
+                            <AdminMetric
+                                label="Completed projects"
+                                value={number.format(summary.projects.completed)}
+                                hint={`${number.format(summary.projects.active)} active now`}
+                            />
+                            <AdminMetric
+                                label="Inventory utilisation"
+                                value={`${utilisation}%`}
+                                hint={`${number.format(summary.inventory.inUse)} of ${number.format(
+                                    summary.inventory.units,
+                                )} units staged`}
+                            />
+                            <AdminMetric
+                                label="Quote requests"
+                                value={number.format(summary.inbox.total)}
+                                hint={`${number.format(summary.inbox.unanswered)} awaiting a reply`}
+                            />
+                        </div>
+                    ) : (
+                        <SkeletonMetricGrid count={4} columns={4} label="Loading business figures" />
+                    )}
                 </section>
 
                 <section className="flex flex-col gap-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                         <h2 className="font-display text-xl font-normal text-body">Website traffic</h2>
-                        {analytics.status === 'ready' && (
-                            <div className="flex flex-wrap gap-2" role="group" aria-label="Select date range">
-                                {POSTHOG_RANGES.map((value) => (
-                                    <Link
-                                        key={value}
-                                        href={`/admin/analytics?range=${value}`}
-                                        aria-current={value === range ? 'true' : undefined}
-                                        className={`rounded-md border px-3 py-1.5 text-xs font-bold transition-colors ${
-                                            value === range
-                                                ? 'border-gold-400 bg-gold-400/10 text-gold-300'
-                                                : 'border-line text-body-muted hover:bg-surface-raised hover:text-body'
-                                        }`}
-                                    >
-                                        {RANGE_LABELS[value]}
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
+
+                        {/* Plain links, so the range is switchable before the figures have loaded. */}
+                        <div className="flex flex-wrap gap-2" role="group" aria-label="Select date range">
+                            {POSTHOG_RANGES.map((value) => (
+                                <Link
+                                    key={value}
+                                    href={`/admin/analytics?range=${value}`}
+                                    aria-current={value === range ? 'true' : undefined}
+                                    className={`rounded-md border px-3 py-1.5 text-xs font-bold transition-colors ${
+                                        value === range
+                                            ? 'border-gold-400 bg-gold-400/10 text-gold-300'
+                                            : 'border-line text-body-muted hover:bg-surface-raised hover:text-body'
+                                    }`}
+                                >
+                                    {RANGE_LABELS[value]}
+                                </Link>
+                            ))}
+                        </div>
                     </div>
 
-                    {analytics.status !== 'ready' ? (
-                        <div className="flex items-start gap-3 rounded-lg border border-line bg-surface-raised p-5">
-                            <AlertTriangle size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-warning" />
-                            <div className="flex flex-col gap-1">
-                                <strong className="text-sm font-bold text-body">
-                                    {analytics.status === 'unconfigured'
-                                        ? 'Traffic analytics are not connected yet'
-                                        : 'Traffic analytics could not be loaded'}
-                                </strong>
-                                <p className="text-sm text-body-muted">{analytics.message}</p>
-                            </div>
-                        </div>
-                    ) : (
-                        <>
-                            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                                <AdminMetric
-                                    label="Quotes submitted"
-                                    value={number.format(analytics.conversions.quotesSubmitted)}
-                                    hint={`${analytics.conversions.conversionRate.toFixed(1)}% of visitors`}
-                                />
-                                <AdminMetric
-                                    label="Estimated value"
-                                    value={currency.format(analytics.conversions.quoteValue)}
-                                    hint="Sum of the quoted estimates"
-                                />
-                                <AdminMetric
-                                    label="Quotes started"
-                                    value={number.format(analytics.conversions.quotesStarted)}
-                                    hint={
-                                        analytics.conversions.quotesStarted
-                                            ? `${Math.round(
-                                                  (analytics.conversions.quotesSubmitted / analytics.conversions.quotesStarted) * 100,
-                                              )}% went on to send`
-                                            : 'Nobody opened the calculator yet'
-                                    }
-                                />
-                                <AdminMetric
-                                    label="Calls and emails"
-                                    value={number.format(analytics.conversions.phoneClicks + analytics.conversions.emailClicks)}
-                                    hint={`${number.format(analytics.conversions.phoneClicks)} phone, ${number.format(
-                                        analytics.conversions.emailClicks,
-                                    )} email`}
-                                />
-                            </div>
-
-                            <div className="grid gap-3 sm:grid-cols-3">
-                                <AdminMetric label="Page views" value={number.format(analytics.pageViews)} hint={analytics.rangeLabel} />
-                                <AdminMetric label="Visitors" value={number.format(analytics.visitors)} hint={analytics.rangeLabel} />
-                                <AdminMetric
-                                    label="Quote page views"
-                                    value={number.format(analytics.quotePageViews)}
-                                    hint={
-                                        analytics.pageViews
-                                            ? `${Math.round((analytics.quotePageViews / analytics.pageViews) * 100)}% of all views`
-                                            : undefined
-                                    }
-                                />
-                            </div>
-
-                            <div className="grid gap-5 xl:grid-cols-2">
-                                <AdminPanel eyebrow="Content" title="Most viewed pages">
-                                    {analytics.topPages.length ? (
-                                        <BarList entries={analytics.topPages} />
-                                    ) : (
-                                        <AdminEmpty>No page views recorded in this range.</AdminEmpty>
-                                    )}
-                                </AdminPanel>
-                                <AdminPanel eyebrow="Acquisition" title="Where visitors come from">
-                                    {analytics.topSources.length ? (
-                                        <BarList entries={analytics.topSources} />
-                                    ) : (
-                                        <AdminEmpty>No referrers recorded in this range.</AdminEmpty>
-                                    )}
-                                </AdminPanel>
-                                <AdminPanel eyebrow="Conversion" title="Which buttons get pressed">
-                                    {analytics.conversions.topCtas.length ? (
-                                        <BarList entries={analytics.conversions.topCtas} />
-                                    ) : (
-                                        <AdminEmpty>No call-to-action clicks recorded in this range.</AdminEmpty>
-                                    )}
-                                </AdminPanel>
-                            </div>
-
-                            {analytics.trend.length > 0 && (
-                                <AdminPanel eyebrow="Trend" title="Views over time">
-                                    <div className="flex items-center gap-2 px-5 py-3 text-xs text-body-subtle">
-                                        <TrendingUp size={14} aria-hidden="true" />
-                                        {analytics.trend.length} {analytics.trend.length === 1 ? 'day' : 'days'} with recorded traffic
-                                    </div>
-                                    <BarList
-                                        entries={analytics.trend.slice(-14).map((point) => ({ label: point.date, value: point.views }))}
-                                    />
-                                </AdminPanel>
-                            )}
-                        </>
-                    )}
+                    {traffic}
                 </section>
             </div>
         </AdminShell>
