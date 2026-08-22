@@ -96,7 +96,7 @@ export default function Navbar({ page }: { page: string }) {
                 key={section}
                 href={`/?component=${section}`}
                 onClick={(event) => handleSectionClick(event, section)}
-                className={`${NAV_LINK_CLASSES} ${section === 'portfolio' ? 'hidden xs:inline' : ''}`}
+                className={NAV_LINK_CLASSES}
             >
                 {label}
             </Link>
@@ -123,7 +123,11 @@ export default function Navbar({ page }: { page: string }) {
 
                 <div className="hidden flex-1 items-center justify-start gap-6 md:flex">{navLinks.slice(half)}</div>
 
-                <div className="flex flex-1 items-center justify-end gap-5 md:hidden">{navLinks}</div>
+                <div className="flex min-w-0 flex-1 items-center justify-end md:hidden">
+                    <Link href="/contact" className={NAV_LINK_CLASSES}>
+                        Contact
+                    </Link>
+                </div>
 
                 <div ref={menuRef} className="relative shrink-0">
                     <button

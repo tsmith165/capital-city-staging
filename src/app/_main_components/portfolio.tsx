@@ -17,7 +17,7 @@ export default function Portfolio() {
     if (!projects || projects.length === 0) {
         return (
             <div className="min-section-viewport flex flex-col items-center justify-center space-y-4 p-4">
-                <h1 className="text-4xl font-bold gradient-secondary-main-text">Portfolio Coming Soon</h1>
+                <h2 className="text-4xl font-bold gradient-secondary-main-text">Portfolio Coming Soon</h2>
                 <p className="text-body-muted">Check back soon to see our latest staging projects!</p>
             </div>
         );
@@ -48,7 +48,7 @@ export default function Portfolio() {
         <div className="min-section-viewport p-4">
             {/* Header Section */}
             <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold gradient-secondary-main-text mb-6">Staged by Mia</h1>
+                <h2 className="text-4xl font-bold gradient-secondary-main-text mb-6">Staged by Mia</h2>
                 
                 {/* Project Pills */}
                 {projects.length > 0 && (

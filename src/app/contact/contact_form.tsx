@@ -34,6 +34,9 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+/** The quote fields carried no `id`, `name` or label association, so nothing announced them. */
+const fieldId = (label: string) => label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
 // Custom Toggle Component
 const Toggle = ({
     enabled,
@@ -49,8 +52,11 @@ const Toggle = ({
     <div className="flex items-center gap-4 rounded-lg border border-line-strong bg-surface-overlay/50 p-4">
         <button
             type="button"
+            role="switch"
+            aria-checked={enabled}
+            aria-labelledby={`toggle-label-${fieldId(label)}`}
             onClick={() => onChange(!enabled)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+            className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
                 enabled ? 'bg-secondary' : 'bg-surface-hover'
             }`}
         >
@@ -61,8 +67,12 @@ const Toggle = ({
             />
         </button>
         <div className="flex items-center gap-3">
-            <div className="text-primary">{icon}</div>
-            <span className="font-medium text-body-muted">{label}</span>
+            <div className="text-primary" aria-hidden="true">
+                {icon}
+            </div>
+            <span id={`toggle-label-${fieldId(label)}`} className="font-medium text-body-muted">
+                {label}
+            </span>
         </div>
     </div>
 );
@@ -86,22 +96,30 @@ const Slider = ({
     label: string;
     icon: React.ReactNode;
     formatValue?: (value: number) => string;
-}) => (
+}) => {
+    const id = `slider-${fieldId(label)}`;
+
+    return (
     <div className="space-y-3">
         <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-                <div className="text-primary">{icon}</div>
+            <label htmlFor={id} className="flex items-center gap-2">
+                <span className="text-primary" aria-hidden="true">
+                    {icon}
+                </span>
                 <span className="font-medium text-body-muted">{label}</span>
-            </div>
+            </label>
             <span className="font-bold text-primary">{formatValue ? formatValue(value) : value}</span>
         </div>
         <div className="relative">
             <input
+                id={id}
+                name={id}
                 type="range"
                 min={min}
                 max={max}
                 step={step}
                 value={value}
+                aria-valuetext={formatValue ? formatValue(value) : String(value)}
                 onChange={(e) => onChange(Number(e.target.value))}
                 className="custom-slider h-2 w-full cursor-pointer appearance-none rounded-lg bg-surface-hover"
                 style={{
@@ -114,7 +132,8 @@ const Slider = ({
             </div>
         </div>
     </div>
-);
+    );
+};
 
 const ContactForm = () => {
     const createSubmission = useMutation(api.contactSubmissions.createSubmission);
@@ -273,56 +292,103 @@ const ContactForm = () => {
                         {/* Name and Phone Row */}
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             <div>
-                                <label className="mb-2 block text-sm font-medium text-body-muted">Full Name *</label>
+                                <label htmlFor="contact-name" className="mb-2 block text-sm font-medium text-body-muted">
+                                    Full Name *
+                                </label>
                                 <input
+                                    id="contact-name"
+                                    name="name"
                                     type="text"
+                                    autoComplete="name"
+                                    required
+                                    aria-invalid={errors.name ? true : undefined}
+                                    aria-describedby={errors.name ? 'contact-name-error' : undefined}
                                     value={formData.name}
                                     onChange={(e) => handleChange('name', e.target.value)}
                                     className="w-full rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-white placeholder-body-subtle transition-colors focus:border-primary focus:outline-none"
                                     placeholder="John Doe"
                                 />
-                                {errors.name && <p className="mt-1 text-xs text-red-400">{errors.name}</p>}
+                                {errors.name && (
+                                    <p id="contact-name-error" className="mt-1 text-xs text-danger">
+                                        {errors.name}
+                                    </p>
+                                )}
                             </div>
 
                             <div>
-                                <label className="mb-2 block text-sm font-medium text-body-muted">Phone Number *</label>
+                                <label htmlFor="contact-phone" className="mb-2 block text-sm font-medium text-body-muted">
+                                    Phone Number *
+                                </label>
                                 <input
+                                    id="contact-phone"
+                                    name="phone"
                                     type="tel"
+                                    autoComplete="tel"
+                                    required
+                                    aria-invalid={errors.phone ? true : undefined}
+                                    aria-describedby={errors.phone ? 'contact-phone-error' : undefined}
                                     value={formData.phone}
                                     onChange={(e) => handleChange('phone', e.target.value)}
                                     className="w-full rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-white placeholder-body-subtle transition-colors focus:border-primary focus:outline-none"
                                     placeholder="(555) 123-4567"
                                 />
-                                {errors.phone && <p className="mt-1 text-xs text-red-400">{errors.phone}</p>}
+                                {errors.phone && (
+                                    <p id="contact-phone-error" className="mt-1 text-xs text-danger">
+                                        {errors.phone}
+                                    </p>
+                                )}
                             </div>
                         </div>
 
                         {/* Email Row */}
                         <div>
-                            <label className="mb-2 block text-sm font-medium text-body-muted">Email Address *</label>
+                            <label htmlFor="contact-email" className="mb-2 block text-sm font-medium text-body-muted">
+                                Email Address *
+                            </label>
                             <input
+                                id="contact-email"
+                                name="email"
                                 type="email"
+                                autoComplete="email"
+                                required
+                                aria-invalid={errors.email ? true : undefined}
+                                aria-describedby={errors.email ? 'contact-email-error' : undefined}
                                 value={formData.email}
                                 onChange={(e) => handleChange('email', e.target.value)}
                                 className="w-full rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-white placeholder-body-subtle transition-colors focus:border-primary focus:outline-none"
                                 placeholder="john@example.com"
                             />
-                            {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
+                            {errors.email && (
+                                <p id="contact-email-error" className="mt-1 text-xs text-danger">
+                                    {errors.email}
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>
 
                 {/* Message */}
                 <div className="space-y-4 rounded-xl border border-line bg-surface-raised/30 p-6">
-                    <h3 className="text-xl font-semibold text-primary">Tell us about your project</h3>
+                    <h3 className="text-xl font-semibold text-primary">
+                        <label htmlFor="contact-message">Tell us about your project</label>
+                    </h3>
                     <textarea
+                        id="contact-message"
+                        name="message"
+                        required
+                        aria-invalid={errors.message ? true : undefined}
+                        aria-describedby={errors.message ? 'contact-message-error' : undefined}
                         value={formData.message}
                         onChange={(e) => handleChange('message', e.target.value)}
                         rows={3}
                         className="w-full resize-none rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-white placeholder-body-subtle transition-colors focus:border-primary focus:outline-none"
                         placeholder="Tell us about your timeline, specific needs, or any questions you have..."
                     />
-                    {errors.message && <p className="text-xs text-red-400">{errors.message}</p>}
+                    {errors.message && (
+                        <p id="contact-message-error" className="text-xs text-danger">
+                            {errors.message}
+                        </p>
+                    )}
                 </div>
 
                 {/* Property Details */}

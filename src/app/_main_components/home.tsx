@@ -97,6 +97,8 @@ export default function Home({
 
     return (
         <div className="section-viewport relative w-full overflow-hidden">
+            {/* The hero is a full-bleed image and a logo mark, so the page had no h1 at all. */}
+            <h1 className="sr-only">Capital City Staging, professional home staging in Sacramento, California</h1>
             <AnimatePresence>
                 {isStagingImageVisible && (
                     <motion.div

@@ -117,7 +117,7 @@ const Where: React.FC = () => {
     return (
         <div ref={containerRef} className="section-viewport flex w-full flex-col space-y-2 p-4">
             <div className="flex w-full items-center justify-center text-center">
-                <h1 className="w-fit text-4xl font-bold gradient-secondary-main-text">Where We Work</h1>
+                <h2 className="w-fit text-4xl font-bold gradient-secondary-main-text">Where We Work</h2>
             </div>
             <div className="flex flex-wrap justify-center space-x-2 px-2 pb-2">
                 {cityBoundaries.map((city, index) => (

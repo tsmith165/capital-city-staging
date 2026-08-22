@@ -59,14 +59,14 @@ export default function Services() {
                 >
                     <div className="mb-2 flex items-center justify-center gap-2">
                         <Sparkles className="text-primary" size={28} />
-                        <h1 className="text-4xl font-bold lg:text-5xl">
+                        <h2 className="text-4xl font-bold lg:text-5xl">
                             <span className="text-white">Focus on your </span>
                             <span className="gradient-primary-main-text">next moves</span>
-                        </h1>
+                        </h2>
                     </div>
-                    <h2 className="text-3xl font-bold gradient-secondary-main-text lg:text-4xl">
+                    <p className="text-3xl font-bold gradient-secondary-main-text lg:text-4xl">
                         We'll handle the rest.
-                    </h2>
+                    </p>
                     <p className="mt-4 text-lg text-body-muted max-w-2xl mx-auto">
                         With professional staging expertise, we transform spaces into buyer-ready homes that sell faster and for top dollar.
                     </p>

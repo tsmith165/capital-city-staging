@@ -21,7 +21,7 @@ export default function Testimonials() {
     return (
         <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
             <div className="flex h-auto w-full items-center justify-center">
-                <h1 className="text-center text-4xl font-bold gradient-secondary-main-text">Testimonials</h1>
+                <h2 className="text-center text-4xl font-bold gradient-secondary-main-text">Testimonials</h2>
             </div>
 
             <div className="flex w-full flex-grow flex-col space-y-4 px-4 md:flex-row md:space-x-4 md:space-y-0">

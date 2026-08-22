@@ -20,7 +20,7 @@ export default function About() {
             <div className="flex h-full w-full flex-col justify-center space-y-6 rounded-lg p-6 text-body-muted md:w-2/3 lg:p-8">
                 {/* Name and RESA Badge */}
                 <div className="flex items-center gap-3">
-                    <h1 className="text-4xl font-bold gradient-gold-main-text lg:text-5xl">Mia Dofflemyer</h1>
+                    <h2 className="text-4xl font-bold gradient-gold-main-text lg:text-5xl">Mia Dofflemyer</h2>
                     <Link 
                         href="https://www.realestatestagingassociation.com/" 
                         className="flex"
