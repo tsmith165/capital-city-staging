@@ -8,6 +8,7 @@ import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import AdminShell from '@/components/admin/AdminShell';
 import { AdminEmpty, AdminHeading, AdminStatus } from '@/components/admin/AdminPrimitives';
+import { SkeletonTiles } from '@/components/admin/AdminSkeleton';
 
 import { INBOX_FILTERS } from './AdminInbox.constants';
 import type { InboxFilter } from './AdminInbox.types';
@@ -63,7 +64,7 @@ export default function AdminInboxClient() {
                 </div>
 
                 {submissions === undefined ? (
-                    <AdminEmpty>Loading messages…</AdminEmpty>
+                    <SkeletonTiles count={4} label="Loading messages" className="flex flex-col gap-3" />
                 ) : submissions.length === 0 ? (
                     <div className="rounded-lg border border-line bg-surface-raised">
                         <AdminEmpty>

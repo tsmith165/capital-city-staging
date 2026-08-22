@@ -4,6 +4,10 @@ import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useState } from 'react';
 
+import { SkeletonBlock, SkeletonTable } from '@/components/admin/AdminSkeleton';
+
+const USER_COLUMNS = ['Name', 'Email', 'Role', 'Clerk ID', 'Created', 'Actions'] as const;
+
 export default function AdminUsersClient() {
   const users = useQuery(api.users.getAllUsers);
   const updateUserRole = useMutation(api.users.updateUserRole);
@@ -23,8 +27,12 @@ export default function AdminUsersClient() {
 
   if (users === undefined) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-body-muted">Loading users...</div>
+      <div className="container mx-auto p-4">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-body">Manage Users</h1>
+          <SkeletonBlock className="h-3.5 w-28" />
+        </div>
+        <SkeletonTable headers={USER_COLUMNS} rows={6} label="Loading users" />
       </div>
     );
   }

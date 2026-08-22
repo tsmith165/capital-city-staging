@@ -1,70 +1,61 @@
-'use client';
-
+import type { ComponentType } from 'react';
 import Link from 'next/link';
+
+import { AdminHeading, AdminPanel } from '@/components/admin/AdminPrimitives';
+
 import DataBackup from './DataBackup';
-import GenerateSmallImages from './GenerateSmallImages';
-import VerifyImageDimensions from './VerifyImageDimensions';
+import ImageProcessing from './ImageProcessing';
+import { TOOL_TABS } from './tools.constants';
 
-interface ToolsProps {
-    activeTab: string;
-}
+const PANELS: Record<string, ComponentType> = {
+    backup: DataBackup,
+    images: ImageProcessing,
+};
 
-const Tools: React.FC<ToolsProps> = ({ activeTab }) => {
+/**
+ * The page used to be a fixed 80%-width box painted in the pre-overhaul palette, with the tab
+ * strip nested two divs deep inside its own coloured header. It is an ordinary admin page now:
+ * the standard heading, a tab row, and the selected tool in a panel.
+ */
+export default function Tools({ activeTab }: { activeTab: string }) {
+    const tab = TOOL_TABS.find((candidate) => candidate.id === activeTab) ?? TOOL_TABS[0];
+    const Panel = PANELS[tab.id];
+
     return (
-        <div className="flex w-4/5 flex-col space-y-4">
-            <div className="w-full rounded-lg bg-primary_dark text-lg font-bold text-secondary_dark">
-                <div className="w-full rounded-t-md bg-primary_dark text-lg font-bold text-secondary_dark">
-                    <div className="flex pt-1">
-                        <Link
-                            href="/admin/tools?tab=backup"
-                            className={`rounded-t-md px-2 py-1 ${
-                                activeTab === 'backup'
-                                    ? 'bg-secondary_dark text-primary'
-                                    : 'bg-primary text-secondary_dark hover:bg-secondary_dark hover:text-primary'
-                            }`}
-                        >
-                            Data Backup
-                        </Link>
-                        <Link
-                            href="/admin/tools?tab=email"
-                            className={`rounded-t-md px-2 py-1 ${
-                                activeTab === 'email'
-                                    ? 'bg-secondary_dark text-primary'
-                                    : 'bg-primary text-secondary_dark hover:bg-secondary_dark hover:text-primary'
-                            }`}
-                        >
-                            Test Email
-                        </Link>
-                        <Link
-                            href="/admin/tools?tab=small-images"
-                            className={`rounded-t-md px-2 py-1 ${
-                                activeTab === 'small-images'
-                                    ? 'bg-secondary_dark text-primary'
-                                    : 'bg-primary text-secondary_dark hover:bg-secondary_dark hover:text-primary'
-                            }`}
-                        >
-                            Small Images
-                        </Link>
-                        <Link
-                            href="/admin/tools?tab=verify-dimensions"
-                            className={`rounded-t-md px-2 py-1 ${
-                                activeTab === 'verify-dimensions'
-                                    ? 'bg-secondary_dark text-primary'
-                                    : 'bg-primary text-secondary_dark hover:bg-secondary_dark hover:text-primary'
-                            }`}
-                        >
-                            Verify Dimensions
-                        </Link>
-                    </div>
-                </div>
-                <div className="rounded-b-lg bg-secondary p-4">
-                    {activeTab === 'backup' && <DataBackup />}
-                    {activeTab === 'small-images' && <GenerateSmallImages />}
-                    {activeTab === 'verify-dimensions' && <VerifyImageDimensions />}
-                </div>
+        <div className="flex flex-col gap-8">
+            <AdminHeading
+                eyebrow="Maintenance"
+                title="Tools"
+                description="Exports and data-health utilities. Anything that runs automatically is listed here too, so you are not left wondering where it went."
+            />
+
+            <div className="flex flex-col gap-4">
+                <nav className="flex flex-wrap gap-2" aria-label="Tools">
+                    {TOOL_TABS.map((candidate) => {
+                        const isActive = candidate.id === tab.id;
+
+                        return (
+                            <Link
+                                key={candidate.id}
+                                href={`/admin/tools?tab=${candidate.id}`}
+                                aria-current={isActive ? 'page' : undefined}
+                                className={`rounded-md border px-3.5 py-2 text-xs font-bold transition-colors ${
+                                    isActive
+                                        ? 'border-gold-400 bg-gold-400/10 text-gold-300'
+                                        : 'border-line text-body-muted hover:bg-surface-raised hover:text-body'
+                                }`}
+                            >
+                                {candidate.label}
+                            </Link>
+                        );
+                    })}
+                </nav>
+
+                <AdminPanel eyebrow={tab.eyebrow} title={tab.title}>
+                    <p className="border-b border-line px-5 py-3.5 text-sm text-body-muted">{tab.description}</p>
+                    <Panel />
+                </AdminPanel>
             </div>
         </div>
     );
-};
-
-export default Tools;
+}
