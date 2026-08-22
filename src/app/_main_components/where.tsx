@@ -1,17 +1,15 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { MapContainer, Polygon, TileLayer } from 'react-leaflet';
-import { LatLngTuple } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 import SectionHeading from '@/components/content/SectionHeading';
 import { SERVICE_AREAS } from '@/components/layout/Footer.constants';
 import { track } from '@/lib/analytics';
 import rawCityBoundaries from '@/lib/city_boundaries.json';
-
-const MAP_CENTER: LatLngTuple = [38.6171, -121.3283];
+import { CITY_CYCLE_MS, MAP_CENTER, MAP_ZOOM } from './where.constants';
 
 /** Ordered by the service-area constant so the map, the footer and the sitemap cannot drift. */
 const cityBoundaries = SERVICE_AREAS.map((area) => {
@@ -20,70 +18,82 @@ const cityBoundaries = SERVICE_AREAS.map((area) => {
 }).filter((city): city is NonNullable<typeof city> => city !== null);
 
 export default function Where() {
-    const [activeCity, setActiveCity] = useState<string | null>(null);
+    const [hoveredCity, setHoveredCity] = useState<string | null>(null);
+    const [cycleIndex, setCycleIndex] = useState(0);
+    const [visible, setVisible] = useState(false);
     const [mapReady, setMapReady] = useState(false);
     const mapRef = useRef<L.Map | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const hasFlown = useRef(false);
 
     /*
-     * The map used to cycle a highlighted polygon on a one-second interval for as long as the
-     * page was open, repainting the whole canvas each tick whether or not it was on screen.
-     * Highlighting now follows the pointer or keyboard focus and is idle otherwise.
+     * The highlight cycle used to run on a one-second interval for as long as the page was open,
+     * repainting the canvas whether or not the map was on screen. It now only ticks while the
+     * section is actually visible, stops while a pointer or keyboard is driving the highlight,
+     * and never starts for a reader who has asked for reduced motion.
      */
     useEffect(() => {
         const node = containerRef.current;
         if (!node) return;
 
-        let timeoutId: ReturnType<typeof setTimeout> | null = null;
-
         const observer = new IntersectionObserver(
             ([entry]) => {
-                if (!entry.isIntersecting) return;
+                setVisible(entry.isIntersecting);
 
-                timeoutId = setTimeout(() => {
-                    mapRef.current?.flyTo(MAP_CENTER, 9.5, { duration: 1.5, easeLinearity: 0.25 });
+                if (entry.isIntersecting && !hasFlown.current) {
+                    hasFlown.current = true;
+                    mapRef.current?.flyTo(MAP_CENTER, MAP_ZOOM, { duration: 1.5, easeLinearity: 0.25 });
                     setMapReady(true);
-                }, 300);
-
-                observer.disconnect();
+                }
             },
             { threshold: 0.2 },
         );
 
         observer.observe(node);
-
-        return () => {
-            observer.disconnect();
-            if (timeoutId) clearTimeout(timeoutId);
-        };
+        return () => observer.disconnect();
     }, []);
 
+    const reducedMotion = useReducedMotion();
+    const cycling = visible && !hoveredCity && !reducedMotion && cityBoundaries.length > 1;
+
+    useEffect(() => {
+        if (!cycling) return;
+
+        const interval = setInterval(() => {
+            setCycleIndex((index) => (index + 1) % cityBoundaries.length);
+        }, CITY_CYCLE_MS);
+
+        return () => clearInterval(interval);
+    }, [cycling]);
+
+    // A pointer or a focus ring always wins over the ambient cycle.
+    const activeCity = hoveredCity ?? (cycling ? cityBoundaries[cycleIndex].name : null);
+
     const selectCity = (name: string) => {
-        setActiveCity(name);
+        setHoveredCity(name);
         track('service_area_selected', { city: name });
     };
 
     return (
         <section ref={containerRef} className="w-full px-5 py-20 sm:px-8">
-            <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center">
+            <div className="mx-auto flex w-full max-w-[1200px] flex-col">
                 <SectionHeading
-                    eyebrow="Service area"
                     title="Where we work"
-                    lead="Sacramento and the surrounding cities across Sacramento, Placer and Yolo counties. Travel beyond the map is quoted per job."
+                    lead="Sacramento, Placer and Yolo counties. Anything further is quoted per job."
                 />
 
                 {/* Cities are links, not decorated divs: each one has a page and each is reachable by keyboard. */}
-                <ul className="mt-8 flex flex-wrap justify-center gap-x-2 gap-y-2.5">
+                <ul className="mt-8 flex flex-wrap gap-x-2 gap-y-2.5">
                     {cityBoundaries.map((city) => (
                         <li key={city.slug}>
                             <Link
                                 href={`/locations/${city.slug}`}
-                                onMouseEnter={() => setActiveCity(city.name)}
-                                onMouseLeave={() => setActiveCity(null)}
-                                onFocus={() => setActiveCity(city.name)}
-                                onBlur={() => setActiveCity(null)}
+                                onMouseEnter={() => setHoveredCity(city.name)}
+                                onMouseLeave={() => setHoveredCity(null)}
+                                onFocus={() => setHoveredCity(city.name)}
+                                onBlur={() => setHoveredCity(null)}
                                 onClick={() => selectCity(city.name)}
-                                className={`inline-flex rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${
+                                className={`inline-flex rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors duration-500 ${
                                     activeCity === city.name
                                         ? 'border-gold-400 bg-gold-400 text-body-inverse'
                                         : 'border-line-strong text-body-muted hover:border-gold-400 hover:text-gold-300'
@@ -128,8 +138,8 @@ export default function Where() {
                                               fillOpacity: isActive ? 0.5 : 0.2,
                                           }}
                                           eventHandlers={{
-                                              mouseover: () => setActiveCity(city.name),
-                                              mouseout: () => setActiveCity(null),
+                                              mouseover: () => setHoveredCity(city.name),
+                                              mouseout: () => setHoveredCity(null),
                                               click: () => selectCity(city.name),
                                           }}
                                       />
@@ -140,5 +150,25 @@ export default function Where() {
                 </div>
             </div>
         </section>
+    );
+}
+
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+
+/*
+ * `useSyncExternalStore` rather than state-in-an-effect: the media query is external state, and
+ * reading it during render means the cycle never starts for one frame before being torn down.
+ */
+function subscribeToReducedMotion(onChange: () => void) {
+    const query = window.matchMedia(REDUCED_MOTION_QUERY);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+}
+
+function useReducedMotion() {
+    return useSyncExternalStore(
+        subscribeToReducedMotion,
+        () => window.matchMedia(REDUCED_MOTION_QUERY).matches,
+        () => false,
     );
 }
