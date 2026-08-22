@@ -1,8 +1,8 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
-import { requireAdmin } from "./authz";
-import { syncItemCounter, syncProjectFlag } from "./availability";
+import { isAdmin, requireAdmin } from "./authz";
+import { openAssignments, syncItemCounter, syncProjectFlag } from "./availability";
 
 // Get highlighted projects for portfolio
 export const getHighlightedProjects = query({
@@ -34,6 +34,38 @@ export const getHighlightedProjects = query({
 });
 
 // Get all projects (admin only)
+/**
+ * The project list behind the catalog's "staging for" picker.
+ *
+ * Returns [] rather than throwing while Clerk is still handing over the token, so the picker renders
+ * its empty state instead of taking the page down. Live jobs sort first because those are the ones
+ * being staged; finished ones stay reachable for correcting a manifest after the fact.
+ */
+export const getProjectOptions = query({
+  handler: async (ctx) => {
+    if (!(await isAdmin(ctx))) return [];
+
+    const [projects, openRows] = await Promise.all([ctx.db.query("projects").collect(), openAssignments(ctx)]);
+
+    const unitsByProject = new Map<Id<"projects">, number>();
+    for (const row of openRows) {
+      unitsByProject.set(row.projectId, (unitsByProject.get(row.projectId) ?? 0) + row.quantity);
+    }
+
+    const rank = (status: string) => (status === "active" ? 0 : status === "draft" ? 1 : 2);
+
+    return projects
+      .map((project) => ({
+        _id: project._id,
+        name: project.name,
+        address: project.address ?? "",
+        status: project.status ?? "draft",
+        openUnits: unitsByProject.get(project._id) ?? 0,
+      }))
+      .sort((a, b) => rank(a.status) - rank(b.status) || a.name.localeCompare(b.name));
+  },
+});
+
 export const getAllProjects = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();

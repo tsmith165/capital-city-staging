@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { requireAdmin, isAdmin } from "./authz";
-import { availabilityByItem, availabilityForItem, openAssignmentsForItem } from "./availability";
+import { availabilityByItem, availabilityForItem, openAssignmentsForItem, openAssignmentsForProject } from "./availability";
 import { attentionReasons, highestTier } from "./inventoryRules";
 
 // Get all inventory (admin only)
@@ -559,15 +559,23 @@ export const initializeImageOrder = mutation({
  * in sync without a round trip per keystroke.
  */
 export const getCatalog = query({
-  args: { includeInactive: v.optional(v.boolean()) },
+  /**
+   * `projectId` puts the catalog into staging mode: every row gains what that project already holds
+   * and the real cap for it, so the grid can be picked from directly instead of sending her to a
+   * separate picker screen and back.
+   */
+  args: { includeInactive: v.optional(v.boolean()), projectId: v.optional(v.id("projects")) },
   handler: async (ctx, args) => {
     if (!(await isAdmin(ctx))) return null;
 
-    const [items, availability, allAssignments] = await Promise.all([
+    const [items, availability, allAssignments, assignedRows] = await Promise.all([
       ctx.db.query("inventory").collect(),
       availabilityByItem(ctx),
       ctx.db.query("projectInventory").collect(),
+      args.projectId ? openAssignmentsForProject(ctx, args.projectId) : Promise.resolve([]),
     ]);
+
+    const assignedByItem = new Map(assignedRows.map((row) => [row.inventoryId, row] as const));
 
     /* Lifetime staging count, including returned rows — this is what "never staged" is read off. */
     const stagedCount = new Map<string, number>();
@@ -582,6 +590,8 @@ export const getCatalog = query({
         const derived = availability.get(item._id);
         const reasons = attentionReasons(item, derived);
         const primaryHolder = derived?.holders[0];
+        /* Units this project already holds are spendable by it, so fold them back into its cap. */
+        const assignedHere = assignedByItem.get(item._id)?.quantity ?? 0;
 
         return {
           _id: item._id,
@@ -603,6 +613,8 @@ export const getCatalog = query({
           holderCount: derived?.holders.length ?? 0,
           attentionTier: highestTier(reasons),
           timesStaged: stagedCount.get(item._id) ?? 0,
+          assignedHere,
+          maxForThisProject: (derived?.free ?? 0) + assignedHere,
         };
       })
       .sort((a, b) => b.oId - a.oId);

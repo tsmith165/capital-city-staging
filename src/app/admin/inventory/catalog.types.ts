@@ -1,14 +1,11 @@
+import type { StagingItem } from '@/components/admin/inventory/staging.types';
+
 /** One catalog row as `inventory.getCatalog` returns it, with availability already derived. */
-export interface CatalogItem {
-    _id: string;
+export interface CatalogItem extends StagingItem {
     oId: number;
-    name: string;
-    category: string;
     location: string;
-    price: number;
     active: boolean;
     imagePath: string;
-    smallImagePath: string;
     owned: number;
     out: number;
     awaitingCheckIn: number;
@@ -20,4 +17,13 @@ export interface CatalogItem {
     attentionTier: 'fix-now' | 'later' | null;
     /** Lifetime count of assignment rows, including returned ones. Powers the "times staged" sort. */
     timesStaged: number;
+}
+
+/** One house in the "staging for" picker. */
+export interface ProjectOption {
+    _id: string;
+    name: string;
+    address: string;
+    status: string;
+    openUnits: number;
 }
