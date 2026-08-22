@@ -27,7 +27,7 @@ export default function ProjectEditDefaultClient() {
     if (projects === undefined) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <div className="text-stone-300">Loading projects...</div>
+                <div className="text-body-muted">Loading projects...</div>
             </div>
         );
     }
@@ -35,14 +35,14 @@ export default function ProjectEditDefaultClient() {
     if (projects.length === 0) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <div className="text-stone-300">No projects found. Redirecting to create new project...</div>
+                <div className="text-body-muted">No projects found. Redirecting to create new project...</div>
             </div>
         );
     }
 
     return (
         <div className="flex items-center justify-center min-h-screen">
-            <div className="text-stone-300">Redirecting to newest project...</div>
+            <div className="text-body-muted">Redirecting to newest project...</div>
         </div>
     );
 }

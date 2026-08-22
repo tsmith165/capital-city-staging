@@ -240,7 +240,7 @@ const EditFormConvex: React.FC<EditFormConvexProps> = ({ inventoryData, onUpdate
                     <button
                         type="submit"
                         className={
-                            'rounded-md bg-secondary px-3 py-1 text-center font-bold text-stone-400 ' +
+                            'rounded-md bg-secondary px-3 py-1 text-center font-bold text-body-subtle ' +
                             'hover:bg-primary hover:text-secondary_dark'
                         }
                     >
@@ -249,7 +249,7 @@ const EditFormConvex: React.FC<EditFormConvexProps> = ({ inventoryData, onUpdate
                     <Link
                         href="/admin/edit/new"
                         className={
-                            'rounded-md bg-secondary px-3 py-1 text-center font-bold text-stone-400 ' +
+                            'rounded-md bg-secondary px-3 py-1 text-center font-bold text-body-subtle ' +
                             ' hover:bg-primary hover:text-secondary_dark'
                         }
                     >

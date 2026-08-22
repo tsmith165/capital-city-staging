@@ -202,8 +202,8 @@ const ProjectResizeUploader: React.FC<ProjectResizeUploaderProps> = ({
                     disabled={isUploading || disabled}
                     className={
                         isUploading || disabled 
-                            ? 'group relative overflow-hidden rounded-md px-6 py-3 text-lg font-bold transition-colors border-2 bg-stone-600 border-stone-600 text-stone-400 cursor-not-allowed' 
-                            : 'group relative overflow-hidden rounded-md px-6 py-3 text-lg font-bold transition-colors border-2 bg-transparent border-primary text-primary hover:bg-secondary hover:border-secondary hover:text-stone-300'
+                            ? 'group relative overflow-hidden rounded-md px-6 py-3 text-lg font-bold transition-colors border-2 bg-surface-hover border-line-strong text-body-subtle cursor-not-allowed' 
+                            : 'group relative overflow-hidden rounded-md px-6 py-3 text-lg font-bold transition-colors border-2 bg-transparent border-primary text-primary hover:bg-secondary hover:border-secondary hover:text-body-muted'
                     }
                 >
                     {isUploading && (
@@ -218,7 +218,7 @@ const ProjectResizeUploader: React.FC<ProjectResizeUploaderProps> = ({
                 </button>
                 
                 {isUploading && (
-                    <div className="text-sm text-stone-400">
+                    <div className="text-sm text-body-subtle">
                         {uploadProgress}% complete
                     </div>
                 )}

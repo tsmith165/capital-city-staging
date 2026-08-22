@@ -175,7 +175,7 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ handleUploadComplete, h
                             style={{ width: `${uploadProgress}%`, transition: 'width 0.3s ease-in-out' }}
                         />
                     )}
-                    <span className={`relative z-10 text-stone-300 ${isUploading ? '' : 'group-hover:text-primary'}`}>
+                    <span className={`relative z-10 text-body-muted ${isUploading ? '' : 'group-hover:text-primary'}`}>
                         {isUploading ? loadingState : 'Select and Upload File'}
                     </span>
                 </button>

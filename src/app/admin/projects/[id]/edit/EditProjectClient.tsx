@@ -168,7 +168,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
     if (!isLoaded) {
         return (
             <div className="flex min-h-screen items-center justify-center">
-                <div className="text-stone-300">Loading...</div>
+                <div className="text-body-muted">Loading...</div>
             </div>
         );
     }
@@ -178,7 +178,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
         router.push('/sign-in');
         return (
             <div className="flex min-h-screen items-center justify-center">
-                <div className="text-stone-300">Redirecting to login...</div>
+                <div className="text-body-muted">Redirecting to login...</div>
             </div>
         );
     }
@@ -187,7 +187,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
     if (project === undefined) {
         return (
             <div className="flex min-h-screen items-center justify-center">
-                <div className="text-stone-300">Loading project...</div>
+                <div className="text-body-muted">Loading project...</div>
             </div>
         );
     }
@@ -196,7 +196,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
     if (project === null) {
         return (
             <div className="flex min-h-screen items-center justify-center">
-                <div className="text-stone-300">Project not found</div>
+                <div className="text-body-muted">Project not found</div>
             </div>
         );
     }
@@ -222,12 +222,12 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
     return (
         <div className="container mx-auto max-w-5xl p-4">
             {/* Tab Navigation */}
-            <div className="mb-6 flex space-x-1 rounded-lg bg-stone-800 p-1">
+            <div className="mb-6 flex space-x-1 rounded-lg bg-surface-raised p-1">
                 <button
                     type="button"
                     onClick={() => setActiveTab('details')}
                     className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                        activeTab === 'details' ? 'bg-primary text-white' : 'text-stone-400 hover:text-stone-200'
+                        activeTab === 'details' ? 'bg-primary text-white' : 'text-body-subtle hover:text-body'
                     }`}
                 >
                     Details
@@ -236,7 +236,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                     type="button"
                     onClick={() => setActiveTab('images')}
                     className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                        activeTab === 'images' ? 'bg-primary text-white' : 'text-stone-400 hover:text-stone-200'
+                        activeTab === 'images' ? 'bg-primary text-white' : 'text-body-subtle hover:text-body'
                     }`}
                 >
                     Images {project.images && project.images.length > 0 && <span className="ml-1 text-xs">({project.images.length})</span>}
@@ -245,7 +245,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                     type="button"
                     onClick={() => setActiveTab('inventory')}
                     className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                        activeTab === 'inventory' ? 'bg-primary text-white' : 'text-stone-400 hover:text-stone-200'
+                        activeTab === 'inventory' ? 'bg-primary text-white' : 'text-body-subtle hover:text-body'
                     }`}
                 >
                     Inventory{' '}
@@ -256,29 +256,29 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
             </div>
 
             {/* Tab Content */}
-            <div className="rounded-lg bg-stone-800">
+            <div className="rounded-lg bg-surface-raised">
                 {activeTab === 'details' && (
                     <form onSubmit={handleSubmit} className="p-6">
-                        <h2 className="mb-6 text-2xl font-bold text-stone-100">Project Details</h2>
+                        <h2 className="mb-6 text-2xl font-bold text-body">Project Details</h2>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-stone-200">Project Name *</label>
+                                <label className="mb-1 block text-sm font-medium text-body">Project Name *</label>
                                 <input
                                     type="text"
                                     required
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full rounded border border-stone-600 bg-stone-700 px-3 py-2 text-stone-100 focus:border-primary focus:outline-none"
+                                    className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
                                     placeholder="Enter project name"
                                 />
                             </div>
 
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-stone-200">Status *</label>
+                                <label className="mb-1 block text-sm font-medium text-body">Status *</label>
                                 <select
                                     value={formData.status}
                                     onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                                    className="w-full rounded border border-stone-600 bg-stone-700 px-3 py-2 text-stone-100 focus:border-primary focus:outline-none"
+                                    className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
                                 >
                                     <option value="draft">Draft</option>
                                     <option value="active">Active</option>
@@ -288,55 +288,55 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                             </div>
 
                             <div className="md:col-span-2">
-                                <label className="mb-1 block text-sm font-medium text-stone-200">Address</label>
+                                <label className="mb-1 block text-sm font-medium text-body">Address</label>
                                 <input
                                     type="text"
                                     value={formData.address}
                                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                    className="w-full rounded border border-stone-600 bg-stone-700 px-3 py-2 text-stone-100 focus:border-primary focus:outline-none"
+                                    className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
                                     placeholder="Project address"
                                 />
                             </div>
 
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-stone-200">Start Date</label>
+                                <label className="mb-1 block text-sm font-medium text-body">Start Date</label>
                                 <input
                                     type="date"
                                     value={formData.startDate}
                                     onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                                    className="w-full rounded border border-stone-600 bg-stone-700 px-3 py-2 text-stone-100 focus:border-primary focus:outline-none"
+                                    className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
                                 />
                             </div>
 
                             <div>
-                                <label className="mb-1 block text-sm font-medium text-stone-200">End Date</label>
+                                <label className="mb-1 block text-sm font-medium text-body">End Date</label>
                                 <input
                                     type="date"
                                     value={formData.endDate}
                                     onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                                    className="w-full rounded border border-stone-600 bg-stone-700 px-3 py-2 text-stone-100 focus:border-primary focus:outline-none"
+                                    className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
                                 />
                             </div>
 
                             <div className="md:col-span-2">
-                                <label className="mb-1 block text-sm font-medium text-stone-200">Revenue ($)</label>
+                                <label className="mb-1 block text-sm font-medium text-body">Revenue ($)</label>
                                 <input
                                     type="number"
                                     step="0.01"
                                     value={formData.revenue}
                                     onChange={(e) => setFormData({ ...formData, revenue: e.target.value })}
-                                    className="w-full rounded border border-stone-600 bg-stone-700 px-3 py-2 text-stone-100 focus:border-primary focus:outline-none"
+                                    className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
                                     placeholder="Project revenue"
                                 />
                             </div>
 
                             <div className="md:col-span-2">
-                                <label className="mb-1 block text-sm font-medium text-stone-200">Notes</label>
+                                <label className="mb-1 block text-sm font-medium text-body">Notes</label>
                                 <textarea
                                     value={formData.notes}
                                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                                     rows={3}
-                                    className="w-full rounded border border-stone-600 bg-stone-700 px-3 py-2 text-stone-100 focus:border-primary focus:outline-none"
+                                    className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
                                     placeholder="Project notes..."
                                 />
                             </div>
@@ -348,7 +348,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                         disabled={isSubmitting}
                                         className={`rounded px-4 py-2 font-medium transition-colors ${
                                             isSubmitting
-                                                ? 'cursor-not-allowed bg-stone-600 text-stone-400'
+                                                ? 'cursor-not-allowed bg-surface-hover text-body-subtle'
                                                 : 'bg-primary text-white hover:bg-primary_dark'
                                         }`}
                                     >
@@ -360,9 +360,9 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                             id="highlighted"
                                             checked={formData.highlighted}
                                             onChange={(e) => setFormData({ ...formData, highlighted: e.target.checked })}
-                                            className="mr-2 h-4 w-4 rounded border-stone-600 bg-stone-700 text-primary focus:ring-2 focus:ring-primary"
+                                            className="mr-2 h-4 w-4 rounded border-line-strong bg-surface-overlay text-primary focus:ring-2 focus:ring-primary"
                                         />
-                                        <label htmlFor="highlighted" className="text-sm font-medium text-stone-200">
+                                        <label htmlFor="highlighted" className="text-sm font-medium text-body">
                                             Show in portfolio (highlighted)
                                         </label>
                                     </div>
@@ -375,7 +375,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                 {activeTab === 'images' && (
                     <div className="p-6">
                         <div className="mb-6 flex items-center justify-between">
-                            <h2 className="text-2xl font-bold text-stone-100">Project Images</h2>
+                            <h2 className="text-2xl font-bold text-body">Project Images</h2>
                             <button
                                 type="button"
                                 onClick={() => {
@@ -385,8 +385,8 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                 disabled={isUploadingImages}
                                 className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-colors ${
                                     isUploadingImages
-                                        ? 'cursor-not-allowed border-stone-600 bg-stone-600 text-stone-400'
-                                        : 'border-primary bg-transparent text-primary hover:border-secondary hover:bg-secondary hover:text-stone-300'
+                                        ? 'cursor-not-allowed border-line-strong bg-surface-hover text-body-subtle'
+                                        : 'border-primary bg-transparent text-primary hover:border-secondary hover:bg-secondary hover:text-body-muted'
                                 }`}
                                 title={isUploadingImages ? 'Processing images...' : 'Add images'}
                             >
@@ -407,9 +407,9 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                             {/* Upload Loading Spinner */}
                             {isUploadingImages && (
                                 <div className="flex items-center justify-center py-8">
-                                    <div className="flex items-center gap-3 rounded-lg bg-stone-700 px-4 py-3">
+                                    <div className="flex items-center gap-3 rounded-lg bg-surface-overlay px-4 py-3">
                                         <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                                        <span className="text-sm text-stone-200">Processing uploaded images...</span>
+                                        <span className="text-sm text-body">Processing uploaded images...</span>
                                     </div>
                                 </div>
                             )}
@@ -417,11 +417,11 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                             {/* Existing Images */}
                             {project.images && project.images.length > 0 && (
                                 <div>
-                                    <div className="mb-3 flex items-center gap-2 rounded-lg bg-green-300/70 p-2 text-stone-950">
+                                    <div className="mb-3 flex items-center gap-2 rounded-lg bg-green-300/70 p-2 text-body-inverse">
                                         <Bell size={16} />
                                         <span className="text-sm">Drag and drop to reorder</span>
                                     </div>
-                                    <div className="scrollbar-thin scrollbar-thumb-stone-600 scrollbar-track-stone-800 max-h-120 overflow-y-auto">
+                                    <div className="max-h-120 overflow-y-auto">
                                         <div className="grid grid-cols-2 gap-4 pr-2 md:grid-cols-3 lg:grid-cols-4">
                                             {project.images.map((image, index) => (
                                                 <div
@@ -460,14 +460,14 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                 {activeTab === 'inventory' && (
                     <div className="p-6">
                         <div className="mb-6 flex items-center justify-between">
-                            <h2 className="text-2xl font-bold text-stone-100">Project Inventory</h2>
+                            <h2 className="text-2xl font-bold text-body">Project Inventory</h2>
                             <div className="flex items-center gap-2">
                                 {/* Category Filter */}
                                 {projectInventory && projectInventory.filter((item) => !item.returnedAt).length > 0 && (
                                     <select
                                         value={inventoryFilter}
                                         onChange={(e) => setInventoryFilter(e.target.value)}
-                                        className="rounded border border-stone-600 bg-stone-700 px-2 py-1 text-xs text-stone-100 focus:border-primary focus:outline-none"
+                                        className="rounded border border-line-strong bg-surface-overlay px-2 py-1 text-xs text-body focus:border-primary focus:outline-none"
                                     >
                                         <option value="">All Categories</option>
                                         {[
@@ -489,7 +489,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                 <button
                                     type="button"
                                     onClick={() => router.push(`/admin/projects/${projectId}/inventory`)}
-                                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary bg-transparent text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-stone-300"
+                                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary bg-transparent text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-body-muted"
                                     title="Assign inventory"
                                 >
                                     <Plus size={16} />
@@ -500,7 +500,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                             <div className="space-y-4">
                                 {/* Assigned Inventory */}
                                 {projectInventory && projectInventory.filter((item) => !item.returnedAt).length > 0 ? (
-                                    <div className="scrollbar-thin scrollbar-thumb-stone-600 scrollbar-track-stone-800 max-h-120 overflow-y-auto">
+                                    <div className="max-h-120 overflow-y-auto">
                                         <div className="grid grid-cols-1 gap-4 pr-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                                             {projectInventory
                                                 .filter((item) => !item.returnedAt)
@@ -508,13 +508,13 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                                 .map((assignment) => (
                                                     <div
                                                         key={assignment._id}
-                                                        className="group relative overflow-hidden rounded-lg bg-stone-700 transition-all hover:bg-stone-600"
+                                                        className="group relative overflow-hidden rounded-lg bg-surface-overlay transition-all hover:bg-surface-hover"
                                                     >
                                                         {/* Image or Info Display */}
                                                         <div className="relative aspect-square overflow-hidden">
                                                             {showItemInfo[assignment._id] ? (
                                                                 // Show item info
-                                                                <div className="flex h-full flex-col justify-start bg-gradient-to-br from-stone-800 to-stone-900 p-4 text-stone-100">
+                                                                <div className="flex h-full flex-col justify-start bg-gradient-to-br from-stone-800 to-stone-900 p-4 text-body">
                                                                     <div className="space-y-2">
                                                                         <div className="flex items-center justify-between">
                                                                             <div className="text-sm font-bold text-primary">
@@ -535,25 +535,25 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                                                                 <span className="text-[10px]">Edit</span>
                                                                             </button>
                                                                         </div>
-                                                                        <div className="text-xs text-stone-300">
+                                                                        <div className="text-xs text-body-muted">
                                                                             <span className="font-medium">Size:</span>{' '}
                                                                             {assignment.inventory?.realWidth}" ×{' '}
                                                                             {assignment.inventory?.realHeight}" ×{' '}
                                                                             {assignment.inventory?.realDepth}"
                                                                         </div>
-                                                                        <div className="text-xs text-stone-300">
+                                                                        <div className="text-xs text-body-muted">
                                                                             <span className="font-medium">Available:</span>{' '}
                                                                             {(assignment.inventory?.count || 0) -
                                                                                 (assignment.inventory?.inUse || 0)}{' '}
                                                                             of {assignment.inventory?.count}
                                                                         </div>
                                                                         {assignment.inventory?.location && (
-                                                                            <div className="text-xs text-stone-400">
+                                                                            <div className="text-xs text-body-subtle">
                                                                                 📍 {assignment.inventory.location}
                                                                             </div>
                                                                         )}
                                                                         {assignment.inventory?.description && (
-                                                                            <div className="text-xs text-stone-400 border-t border-stone-700 pt-2">
+                                                                            <div className="text-xs text-body-subtle border-t border-line pt-2">
                                                                                 {assignment.inventory.description}
                                                                             </div>
                                                                         )}
@@ -581,13 +581,13 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
 
                                                         {/* Info overlay */}
                                                         <div className="p-3">
-                                                            <h3 className="mb-2 truncate font-medium text-stone-100">
+                                                            <h3 className="mb-2 truncate font-medium text-body">
                                                                 {assignment.inventory?.name}
                                                             </h3>
 
                                                             {/* Quantity info and buttons on same row */}
                                                             <div className="flex items-center justify-between">
-                                                                <p className="text-sm text-stone-400">
+                                                                <p className="text-sm text-body-subtle">
                                                                     Qty: {assignment.quantity} • ${assignment.pricePerItem} each
                                                                 </p>
 
@@ -619,7 +619,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="py-8 text-center text-stone-400">
+                                    <div className="py-8 text-center text-body-subtle">
                                         <p>No inventory assigned to this project</p>
                                         <p className="mt-1 text-sm">Click the + button to assign inventory</p>
                                     </div>
