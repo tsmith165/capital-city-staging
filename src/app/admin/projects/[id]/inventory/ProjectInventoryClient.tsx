@@ -1,641 +1,325 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { useQuery, useMutation } from 'convex/react';
+import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { useMutation, useQuery } from 'convex/react';
+import { ChevronLeft, PackageOpen } from 'lucide-react';
+
 import { api } from '@/convex/_generated/api';
-import { useRouter } from 'next/navigation';
-import { Id } from '@/convex/_generated/dataModel';
-import { useUser } from '@clerk/nextjs';
-import Image from 'next/image';
-import { Search, Package, ShoppingCart, X, ZoomIn, Trash2, ChevronLeft, Info } from 'lucide-react';
-import { Tooltip } from 'react-tooltip';
+import type { Id } from '@/convex/_generated/dataModel';
+import { AdminHeading, AdminStatus } from '@/components/admin/AdminPrimitives';
+import { SkeletonBlock, SkeletonTiles } from '@/components/admin/AdminSkeleton';
+import InventoryCard from '@/components/admin/inventory/InventoryCard';
+import InventoryFilterBar from '@/components/admin/inventory/InventoryFilterBar';
+import PhotoLightbox from '@/components/admin/inventory/PhotoLightbox';
+import QuantityStepper from '@/components/admin/inventory/QuantityStepper';
+import { INVENTORY_GRID_CLASSES } from '@/components/admin/inventory/inventory.constants';
+import { useInventoryFilters } from '@/components/admin/inventory/useInventoryFilters';
+
+import StagingListTray from './StagingListTray';
+import { useStagingList } from './useStagingList';
+import type { LineProblem, PickerItem } from './picker.types';
+
+/**
+ * Pick furniture for one house.
+ *
+ * The screen is a selection layer over a photo grid, committed as a single transaction. Previously
+ * every card carried its own quantity field and its own "Add to Project" button, so a twenty-item
+ * house meant twenty round trips with no review step and no way to back out — and because each add
+ * was independent, a mistake halfway through left the job half-staged.
+ *
+ * Items already at this house stay in the grid with an "At this house" badge instead of being
+ * filtered out, which is what the old `count - inUse > 0` filter did: it hid the item she had just
+ * assigned, so the chair appeared to vanish from the catalog.
+ */
 
 export default function ProjectInventoryClient({ projectId }: { projectId: string }) {
-    const router = useRouter();
-    const { user, isLoaded } = useUser();
+    const data = useQuery(api.assignments.getPickerData, { projectId: projectId as Id<'projects'> });
+    const assignItems = useMutation(api.assignments.assignItemsToProject);
 
-    // Only call queries when user is loaded and authenticated
-    const project = useQuery(api.projects.getProjectById, isLoaded && user ? { projectId: projectId as Id<'projects'> } : 'skip');
-    const inventory = useQuery(api.inventory.getInventory, isLoaded && user ? { active: true } : 'skip');
-    const projectInventory = useQuery(
-        api.projects.getProjectInventory,
-        isLoaded && user ? { projectId: projectId as Id<'projects'> } : 'skip',
-    );
-    const assignInventory = useMutation(api.projects.assignInventoryToProject);
-    const returnInventory = useMutation(api.projects.returnInventoryFromProject);
+    const items = data?.items as PickerItem[] | undefined;
+    const { filters, update, visible, categories, locations, counts } = useInventoryFilters(items);
+    const { toggle, setQuantity, remove, clear, summary } = useStagingList(items);
 
-    const [quantities, setQuantities] = useState<Record<string, number>>({});
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [isCartOpen, setIsCartOpen] = useState(false);
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const [cartCategoryFilter, setCartCategoryFilter] = useState('');
-    const [quantityOverlay, setQuantityOverlay] = useState<string | null>(null);
-    const [overlayQuantity, setOverlayQuantity] = useState<number>(1);
-    const [showItemInfo, setShowItemInfo] = useState<Record<string, boolean>>({});
-    const overlayRef = useRef<HTMLDivElement>(null);
+    const [expanded, setExpanded] = useState(false);
+    const [problems, setProblems] = useState<LineProblem[]>([]);
+    const [committing, setCommitting] = useState(false);
+    const [flash, setFlash] = useState<string | null>(null);
+    const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
 
-    // Close overlay when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (overlayRef.current && !overlayRef.current.contains(event.target as Node)) {
-                setQuantityOverlay(null);
-            }
-        };
+    const searchRef = useRef<HTMLInputElement>(null);
+    const gridRef = useRef<HTMLDivElement>(null);
+    const cardRefs = useRef<(HTMLElement | null)[]>([]);
 
-        if (quantityOverlay) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
+    const handleCommit = async () => {
+        if (summary.lines.length === 0) return;
 
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [quantityOverlay]);
-
-    const handleAssignInventory = async (inventoryId: string) => {
-        const quantity = quantities[inventoryId] || 1;
+        setCommitting(true);
+        setFlash(null);
         try {
-            await assignInventory({
+            const result = await assignItems({
                 projectId: projectId as Id<'projects'>,
-                inventoryId: inventoryId as Id<'inventory'>,
-                quantity,
+                lines: summary.lines.map((line) => ({
+                    inventoryId: line.inventoryId as Id<'inventory'>,
+                    quantity: line.quantity,
+                })),
             });
-            setQuantities({ ...quantities, [inventoryId]: 1 });
-        } catch (error) {
-            console.error('Error assigning inventory:', error);
-            alert('Error assigning inventory. Please try again.');
-        }
-    };
 
-    const handleReturnInventory = async (assignmentId: string) => {
-        try {
-            await returnInventory({
-                projectInventoryId: assignmentId as Id<'projectInventory'>,
-            });
-            setQuantityOverlay(null); // Close overlay after deletion
-        } catch (error) {
-            console.error('Error returning inventory:', error);
-            alert('Error returning inventory. Please try again.');
-        }
-    };
-
-    const toggleItemInfo = (itemId: string) => {
-        setShowItemInfo(prev => ({
-            ...prev,
-            [itemId]: !prev[itemId]
-        }));
-    };
-
-    const handleUpdateQuantity = async (assignmentId: string, newQuantity: number) => {
-        try {
-            // Remove the old assignment
-            await returnInventory({
-                projectInventoryId: assignmentId as Id<'projectInventory'>,
-            });
-            
-            // Find the inventory item to re-assign with new quantity
-            const assignment = cartItems.find(item => item._id === assignmentId);
-            if (assignment && assignment.inventoryId) {
-                await assignInventory({
-                    projectId: projectId as Id<'projects'>,
-                    inventoryId: assignment.inventoryId as Id<'inventory'>,
-                    quantity: newQuantity,
-                });
+            if (result.ok) {
+                setProblems([]);
+                clear();
+                setExpanded(false);
+                const parts = [
+                    result.added && `${result.added} added`,
+                    result.updated && `${result.updated} changed`,
+                    result.removed && `${result.removed} taken off`,
+                ].filter(Boolean);
+                setFlash(parts.length ? `Saved — ${parts.join(', ')}.` : 'Nothing needed changing.');
+            } else {
+                /* Nothing was written, so keep the list intact and mark only the lines that blocked it. */
+                setProblems(result.problems);
+                setExpanded(true);
             }
-            setQuantityOverlay(null);
         } catch (error) {
-            console.error('Error updating quantity:', error);
-            alert('Error updating quantity. Please try again.');
+            setProblems([]);
+            setFlash(error instanceof Error ? error.message : 'Could not save this list. Try again.');
+        } finally {
+            setCommitting(false);
         }
     };
 
-    // Helper function to check if item is already in cart
-    const getItemCartAssignment = (inventoryId: string) => {
-        return projectInventory?.find((assignment) => assignment.inventoryId === inventoryId && !assignment.returnedAt);
+    const currentQuantity = (item: PickerItem) => {
+        const line = [...summary.adding, ...summary.changing, ...summary.removing].find((candidate) => candidate.item._id === item._id);
+        return line ? line.desired : item.assignedHere;
     };
 
-    // Show loading while user auth is loading
-    if (!isLoaded) {
+    /**
+     * Arrow keys walk the grid; Space toggles selection natively because every card is a button.
+     * The column count is measured rather than assumed, because the grid is responsive.
+     */
+    const handleGridKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+        const focusedIndex = cardRefs.current.findIndex((node) => node?.contains(document.activeElement));
+        if (focusedIndex === -1) return;
+
+        const columns = gridRef.current
+            ? window.getComputedStyle(gridRef.current).gridTemplateColumns.split(' ').filter(Boolean).length
+            : 1;
+
+        const focusCard = (target: number) => {
+            const node = cardRefs.current[Math.max(0, Math.min(target, visible.length - 1))];
+            const button = node?.querySelector('button');
+            if (button instanceof HTMLElement) {
+                event.preventDefault();
+                button.focus();
+            }
+        };
+
+        const item = visible[focusedIndex];
+
+        switch (event.key) {
+            case 'ArrowRight':
+                return focusCard(focusedIndex + 1);
+            case 'ArrowLeft':
+                return focusCard(focusedIndex - 1);
+            case 'ArrowDown':
+                return focusCard(focusedIndex + columns);
+            case 'ArrowUp':
+                return focusCard(focusedIndex - columns);
+            case '+':
+            case '=':
+                event.preventDefault();
+                return setQuantity(item, currentQuantity(item) + 1);
+            case '-':
+                event.preventDefault();
+                return setQuantity(item, currentQuantity(item) - 1);
+            case 'Escape':
+                event.preventDefault();
+                return searchRef.current?.focus();
+            default:
+                return;
+        }
+    };
+
+    /**
+     * Whole-screen shortcuts. `/` jumps to search and Cmd+Enter commits, so a house can be picked
+     * without leaving the keyboard: search, space, search, space, commit.
+     */
+    useEffect(() => {
+        const onKeyDown = (event: KeyboardEvent) => {
+            const target = event.target as HTMLElement | null;
+            const typing = target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA' || target?.tagName === 'SELECT';
+
+            if (event.key === '/' && !typing) {
+                event.preventDefault();
+                searchRef.current?.focus();
+                return;
+            }
+
+            if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+                event.preventDefault();
+                void handleCommit();
+            }
+        };
+
+        document.addEventListener('keydown', onKeyDown);
+        return () => document.removeEventListener('keydown', onKeyDown);
+        /* Rebound whenever the pending list changes, so Cmd+Enter always commits the current list. */
+    }, [handleCommit]);
+
+    if (data === undefined) {
         return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="text-body-muted">Loading...</div>
+            <div className="flex flex-col gap-6 p-5 sm:p-8">
+                <SkeletonBlock className="h-8 w-64" />
+                <SkeletonBlock className="h-10 w-full max-w-2xl" />
+                <SkeletonTiles count={10} label="Loading the catalog" />
             </div>
         );
     }
 
-    // Redirect to login if not authenticated
-    if (!user) {
-        router.push('/sign-in');
+    if (data === null) {
         return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="text-body-muted">Redirecting to login...</div>
+            <div className="p-5 sm:p-8">
+                <p className="border-line bg-surface-raised text-body-muted rounded-lg border px-5 py-8 text-center text-sm">
+                    That project could not be found.
+                </p>
             </div>
         );
     }
 
-    // Show loading while data is loading
-    if (project === undefined || inventory === undefined || projectInventory === undefined) {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="text-body-muted">Loading project data...</div>
-            </div>
-        );
-    }
-
-    if (project === null) {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="text-body-muted">Project not found</div>
-            </div>
-        );
-    }
-
-    // Filter available inventory (only show items that are available)
-    const availableInventory = inventory.filter((item) => item.count - item.inUse > 0);
-
-    const filteredInventory = availableInventory.filter((item) => {
-        const matchesSearch =
-            item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.description?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = !selectedCategory || item.category === selectedCategory;
-        return matchesSearch && matchesCategory;
-    });
-
-    // Get unique categories from available inventory
-    const categories = [...new Set(availableInventory.map((item) => item.category))].sort();
-    
-    // Get cart items and their categories
-    const cartItems = projectInventory?.filter(assignment => !assignment.returnedAt) || [];
-    const cartCategories = [...new Set(cartItems.map(assignment => assignment.inventory?.category).filter(Boolean))].sort();
-    
-    // Filter cart items by category
-    const filteredCartItems = cartItems.filter(assignment => 
-        !cartCategoryFilter || assignment.inventory?.category === cartCategoryFilter
-    );
+    const { project } = data;
 
     return (
-        <div className="flex h-[calc(100vh-50px)] flex-col">
-            {/* Fixed Header */}
-            <div className="flex-shrink-0 border-b border-line bg-surface-raised">
-                <div className="container mx-auto max-w-7xl p-4">
-                    <div className="mb-4 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <button
-                                onClick={() => router.push(`/admin/projects/${projectId}/edit`)}
-                                className="text-primary hover:text-secondary transition-colors"
-                                data-tooltip-id="back-tooltip"
-                                data-tooltip-content="Back to Project"
-                            >
-                                <ChevronLeft size={24} />
-                            </button>
-                            <h2 className="text-2xl font-bold text-body">Select Inventory</h2>
-                            <span className="text-sm text-body-subtle">(showing {filteredInventory.length} items)</span>
-                        </div>
-
-                        {/* Cart Button */}
-                        <button
-                            onClick={() => setIsCartOpen(!isCartOpen)}
-                            className="relative flex items-center gap-2 rounded-lg border-2 border-primary bg-transparent px-4 py-2 font-medium text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-body-muted"
+        <div className="flex min-h-full flex-col xl:flex-row xl:items-start">
+            <div className="flex min-w-0 flex-1 flex-col gap-5 p-5 sm:p-8">
+                <AdminHeading
+                    eyebrow={project.name}
+                    title="Choose furniture"
+                    description="Tap items to build a list, adjust how many of each, then add the whole list to this house in one go."
+                    action={
+                        <Link
+                            href={`/admin/projects/${projectId}/edit`}
+                            className="border-line text-body-muted hover:bg-surface-raised hover:text-body inline-flex shrink-0 items-center gap-2 rounded-md border px-4 py-2.5 text-sm font-bold transition-colors"
                         >
-                            <ShoppingCart size={20} />
-                            <span className="hidden sm:inline">Project Cart</span>
-                            {projectInventory.filter((a) => !a.returnedAt).length > 0 && (
-                                <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-secondary_dark">
-                                    {projectInventory.filter((a) => !a.returnedAt).length}
-                                </span>
-                            )}
-                        </button>
-                    </div>
+                            <ChevronLeft size={16} aria-hidden="true" /> Back to project
+                        </Link>
+                    }
+                />
 
-                    {/* Search and Filter */}
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 transform text-body-subtle" size={16} />
-                            <input
-                                type="text"
-                                placeholder="Search inventory..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 pl-10 text-body focus:border-primary focus:outline-none"
-                            />
-                        </div>
-                        <select
-                            value={selectedCategory}
-                            onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
-                        >
-                            <option value="">All Categories</option>
-                            {categories.map((category) => (
-                                <option key={category} value={category}>
-                                    {category}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                <div className="border-line bg-ink/95 sticky top-0 z-20 -mx-5 border-b px-5 py-3 backdrop-blur sm:-mx-8 sm:px-8">
+                    <InventoryFilterBar
+                        ref={searchRef}
+                        filters={filters}
+                        onChange={update}
+                        categories={categories}
+                        locations={locations}
+                        counts={counts}
+                        availabilityOptions={['all', 'free', 'out']}
+                        showSort={false}
+                        summary={`${visible.length} of ${items?.length ?? 0} items`}
+                    />
                 </div>
-            </div>
 
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto bg-surface">
-                <div className="container mx-auto max-w-7xl">
-                    {/* Inventory Grid */}
-                    <div className="p-6">
-                        {filteredInventory.length === 0 ? (
-                            <div className="py-12 text-center text-body-subtle">
-                                <Package size={48} className="mx-auto mb-4 opacity-50" />
-                                <p>No available inventory found</p>
-                                {searchTerm && (
-                                    <button onClick={() => setSearchTerm('')} className="mt-2 text-primary hover:underline">
-                                        Clear search
-                                    </button>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                                {filteredInventory.map((item) => {
-                                    const available = item.count - item.inUse;
-                                    const quantity = quantities[item._id] || 1;
+                <p aria-live="polite" className="sr-only">
+                    {flash ?? ''}
+                </p>
+                {flash && <p className="border-success/40 bg-success-soft text-success rounded-md border px-4 py-2.5 text-sm">{flash}</p>}
 
-                                    return (
-                                        <div
-                                            key={item._id}
-                                            className="overflow-hidden rounded-lg bg-surface-overlay transition-colors hover:bg-surface-hover"
-                                        >
-                                            {/* Item Image or Info Display */}
-                                            <div className="relative aspect-square">
-                                                {showItemInfo[item._id] ? (
-                                                    // Show item info
-                                                    <div className="h-full p-4 bg-surface-raised text-body text-xs overflow-auto">
-                                                        <div className="space-y-2">
-                                                            <div><span className="font-semibold">Price:</span> ${item.price}</div>
-                                                            <div><span className="font-semibold">Cost:</span> ${item.cost || 'N/A'}</div>
-                                                            <div><span className="font-semibold">Dimensions:</span> {item.realWidth}"W × {item.realHeight}"H × {item.realDepth}"D</div>
-                                                            <div><span className="font-semibold">Category:</span> {item.category}</div>
-                                                            <div><span className="font-semibold">Vendor:</span> {item.vendor || 'N/A'}</div>
-                                                            <div><span className="font-semibold">Location:</span> {item.location || 'N/A'}</div>
-                                                            <div><span className="font-semibold">Count:</span> {item.count}</div>
-                                                            <div><span className="font-semibold">In Use:</span> {item.inUse}</div>
-                                                            {item.description && <div><span className="font-semibold">Description:</span> {item.description}</div>}
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    // Show item image
-                                                    <>
-                                                        <Image
-                                                            src={item.smallImagePath}
-                                                            alt={item.name}
-                                                            fill
-                                                            className="object-cover"
-                                                            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
-                                                        />
-                                                        {/* Category tag */}
-                                                        <div className="absolute right-2 top-2 rounded bg-secondary px-2 py-1 text-xs font-medium text-white">
-                                                            {item.category}
-                                                        </div>
-                                                        {/* Quantity available tag */}
-                                                        <div className="absolute left-2 top-2 rounded bg-black/70 px-2 py-1 text-xs font-medium text-white">
-                                                            {available}
-                                                        </div>
-                                                        {/* Enlarge button */}
-                                                        <button
-                                                            onClick={() => setSelectedImage(item.imagePath)}
-                                                            className="absolute bottom-2 right-2 rounded bg-black/70 p-1 text-white transition-colors hover:bg-black/90"
-                                                        >
-                                                            <ZoomIn size={14} />
-                                                        </button>
-                                                    </>
-                                                )}
-                                            </div>
-
-                                            <div className="p-4">
-                                                <h3 className="mb-3 line-clamp-2 min-h-[2.5rem] font-medium text-body">{item.name}</h3>
-
-                                                {(() => {
-                                                    const cartAssignment = getItemCartAssignment(item._id);
-
-                                                    if (cartAssignment) {
-                                                        // Item is already in cart - show info and trash buttons
-                                                        return (
-                                                            <div className="flex gap-2">
-                                                                <button
-                                                                    onClick={() => toggleItemInfo(item._id)}
-                                                                    className="flex-1 rounded border-2 border-blue-500 bg-transparent px-3 py-2 text-sm font-medium text-blue-400 transition-colors hover:border-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center"
-                                                                    data-tooltip-id="info-tooltip"
-                                                                    data-tooltip-content="Show item info"
-                                                                >
-                                                                    <Info size={16} />
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => handleReturnInventory(cartAssignment._id)}
-                                                                    className="flex-1 rounded border-2 border-red-500 bg-transparent px-3 py-2 text-sm font-medium text-red-400 transition-colors hover:border-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center"
-                                                                    data-tooltip-id="remove-tooltip"
-                                                                    data-tooltip-content="Remove from project"
-                                                                >
-                                                                    <Trash2 size={16} />
-                                                                </button>
-                                                            </div>
-                                                        );
-                                                    }
-
-                                                    // Item not in cart - show add button(s)
-                                                    if (available === 1) {
-                                                        return (
-                                                            <button
-                                                                onClick={() => handleAssignInventory(item._id)}
-                                                                className="w-full rounded border-2 border-primary bg-transparent px-3 py-2 text-sm font-medium text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-body-muted"
-                                                            >
-                                                                Add to Project
-                                                            </button>
-                                                        );
-                                                    } else {
-                                                        return (
-                                                            <div className="flex items-center gap-2">
-                                                                <input
-                                                                    type="number"
-                                                                    min="1"
-                                                                    max={available}
-                                                                    value={quantity}
-                                                                    onChange={(e) =>
-                                                                        setQuantities({
-                                                                            ...quantities,
-                                                                            [item._id]: parseInt(e.target.value) || 1,
-                                                                        })
-                                                                    }
-                                                                    className="w-16 rounded border border-line-strong bg-surface-hover px-2 py-1 text-center text-body focus:border-primary focus:outline-none"
-                                                                />
-                                                                <button
-                                                                    onClick={() => handleAssignInventory(item._id)}
-                                                                    disabled={quantity > available}
-                                                                    className="flex-1 rounded border-2 border-primary bg-transparent px-3 py-1 text-sm font-medium text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-body-muted disabled:cursor-not-allowed disabled:opacity-50"
-                                                                >
-                                                                    Add to Project
-                                                                </button>
-                                                            </div>
-                                                        );
-                                                    }
-                                                })()}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
+                {visible.length === 0 ? (
+                    <div className="border-line bg-surface-raised flex flex-col items-center gap-3 rounded-lg border px-5 py-14 text-center">
+                        <PackageOpen size={26} aria-hidden="true" className="text-body-subtle" />
+                        <strong className="font-display text-body text-lg font-normal">Nothing matches those filters</strong>
+                        <p className="text-body-muted max-w-sm text-sm">
+                            {filters.availability === 'free'
+                                ? 'Every item matching the rest of your filters is already out on a job.'
+                                : 'Try a different category or clear the search.'}
+                        </p>
                     </div>
-                </div>
-            </div>
+                ) : (
+                    <div ref={gridRef} onKeyDown={handleGridKeyDown} className={INVENTORY_GRID_CLASSES}>
+                        {visible.map((item, index) => {
+                            const selected = summary.selectedIds.has(item._id);
+                            const quantity = currentQuantity(item);
+                            const problem = problems.find((candidate) => candidate.inventoryId === item._id);
 
-            <div>
-                {/* Cart Sidebar Overlay */}
-                {isCartOpen && (
-                    <>
-                        {/* Backdrop */}
-                        <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setIsCartOpen(false)} />
-
-                        {/* Sidebar */}
-                        <div className="fixed right-0 top-0 z-50 flex h-full w-full transform flex-col overflow-hidden bg-surface-raised shadow-2xl transition-transform duration-300 ease-in-out sm:w-3/5 lg:w-2/5 xl:w-1/3">
-                            {/* Cart Header */}
-                            <div className="border-b border-line p-6">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center gap-3">
-                                        <ShoppingCart className="text-primary" size={24} />
-                                        <h2 className="text-2xl font-bold text-body">Project Cart</h2>
-                                        <span className="text-sm text-body-subtle">
-                                            ({cartItems.length} items)
-                                        </span>
-                                    </div>
-                                    <button
-                                        onClick={() => setIsCartOpen(false)}
-                                        className="rounded-lg p-2 text-body-subtle transition-colors hover:bg-surface-overlay hover:text-body"
-                                    >
-                                        <X size={20} />
-                                    </button>
-                                </div>
-                                
-                                {/* Cart Category Filter */}
-                                {cartCategories.length > 0 && (
-                                    <select
-                                        value={cartCategoryFilter}
-                                        onChange={(e) => setCartCategoryFilter(e.target.value)}
-                                        className="w-full rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
-                                    >
-                                        <option value="">All Categories ({cartItems.length} items)</option>
-                                        {cartCategories.map((category) => (
-                                            <option key={category} value={category}>
-                                                {category} ({cartItems.filter(item => item.inventory?.category === category).length} items)
-                                            </option>
-                                        ))}
-                                    </select>
-                                )}
-                            </div>
-
-                            {/* Cart Content */}
-                            <div className="flex-1 overflow-y-auto">
-                                <div className="p-6">
-                                    {filteredCartItems.length === 0 ? (
-                                        <div className="py-12 text-center text-body-subtle">
-                                            <ShoppingCart size={48} className="mx-auto mb-4 opacity-50" />
-                                            {cartCategoryFilter ? (
-                                                <>
-                                                    <p>No items in "{cartCategoryFilter}" category.</p>
-                                                    <button 
-                                                        onClick={() => setCartCategoryFilter('')}
-                                                        className="mt-2 text-primary hover:underline"
-                                                    >
-                                                        Show all categories
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <p>No inventory assigned to this project yet.</p>
-                                                    <p className="mt-1 text-sm">Add items from the inventory grid.</p>
-                                                </>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-3 overflow-visible">
-                                            {filteredCartItems.map((assignment) => (
-                                                <div
-                                                    key={assignment._id}
-                                                    className="relative rounded-lg bg-surface-overlay transition-colors hover:bg-surface-hover"
-                                                >
-                                                    <div className="flex h-20">
-                                                        {/* Item Image - Full Height */}
-                                                        <div className="relative w-20 h-20 flex-shrink-0 cursor-pointer group" onClick={() => setSelectedImage(assignment.inventory?.imagePath || '')}>
-                                                            <Image
-                                                                src={assignment.inventory?.smallImagePath || ''}
-                                                                alt={assignment.inventory?.name || ''}
-                                                                fill
-                                                                className="object-cover transition-transform group-hover:scale-105"
-                                                                sizes="80px"
-                                                            />
-                                                            {/* Zoom overlay on hover */}
-                                                            <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/30 flex items-center justify-center">
-                                                                <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity" size={16} />
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Item Details */}
-                                                        <div className="flex-1 p-3 flex flex-col justify-between">
-                                                            <div>
-                                                                <h3 className="font-medium text-body leading-tight line-clamp-2">
-                                                                    {assignment.inventory?.name}
-                                                                </h3>
-                                                            </div>
-                                                            <div className="flex items-center justify-between">
-                                                                <div className="flex items-center gap-2 text-sm text-body-muted">
-                                                                    <span className="bg-secondary text-white px-2 py-1 rounded text-xs font-medium">
-                                                                        {assignment.inventory?.category}
-                                                                    </span>
-                                                                    <button
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            console.log('Quantity button clicked, current overlay:', quantityOverlay, 'assignment ID:', assignment._id);
-                                                                            setOverlayQuantity(assignment.quantity);
-                                                                            setQuantityOverlay(quantityOverlay === assignment._id ? null : assignment._id);
-                                                                        }}
-                                                                        className="cursor-pointer rounded bg-forest-400 px-2 py-1 text-xs font-medium text-body transition-colors hover:bg-forest-300"
-                                                                    >
-                                                                        Quantity: {assignment.quantity}
-                                                                    </button>
-                                                                    <span className="text-primary font-medium">
-                                                                        ${(assignment.quantity * assignment.pricePerItem).toFixed(2)}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            {/* Quantity Adjustment Overlay */}
-                                                            {quantityOverlay === assignment._id && (() => {
-                                                                console.log('Rendering overlay for assignment:', assignment._id);
-                                                                const inventoryItem = inventory?.find(item => item._id === assignment.inventoryId);
-                                                                const maxAvailable = inventoryItem ? inventoryItem.count : 10; // Use total inventory count since we don't track inUse anymore
-                                                                const currentQuantity = assignment.quantity;
-                                                                const hasChanged = overlayQuantity !== currentQuantity;
-                                                                
-                                                                return (
-                                                                    <div ref={overlayRef} className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-surface-raised border border-line-strong rounded-md p-2 shadow-lg z-[100] w-48">
-                                                                        <div className="mb-2">
-                                                                            <div className="text-xs text-body font-medium mb-1 text-center">
-                                                                                Update quantity (max {maxAvailable})
-                                                                            </div>
-                                                                            <div className="flex justify-between items-center mb-1">
-                                                                                <span className="text-xs text-body-subtle">1</span>
-                                                                                <span className="text-xs text-body-subtle">{maxAvailable}</span>
-                                                                            </div>
-                                                                            <input
-                                                                                type="range"
-                                                                                min="1"
-                                                                                max={maxAvailable}
-                                                                                value={overlayQuantity}
-                                                                                onChange={(e) => {
-                                                                                    setOverlayQuantity(parseInt(e.target.value));
-                                                                                }}
-                                                                                className="w-full h-1.5 bg-surface-overlay rounded appearance-none cursor-pointer"
-                                                                                style={{
-                                                                                    background: `linear-gradient(to right, #10b981 0%, #10b981 ${((overlayQuantity - 1) / (maxAvailable - 1)) * 100}%, #374151 ${((overlayQuantity - 1) / (maxAvailable - 1)) * 100}%, #374151 100%)`
-                                                                                }}
-                                                                            />
-                                                                        </div>
-                                                                        <div className="flex gap-1">
-                                                                            <button
-                                                                                onClick={() => {
-                                                                                    if (hasChanged) {
-                                                                                        handleUpdateQuantity(assignment._id, overlayQuantity);
-                                                                                    } else {
-                                                                                        setQuantityOverlay(null);
-                                                                                    }
-                                                                                }}
-                                                                                className={`flex-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
-                                                                                    hasChanged 
-                                                                                        ? 'bg-primary text-white hover:bg-primary_dark' 
-                                                                                        : 'bg-surface-hover text-body-subtle hover:bg-stone-500'
-                                                                                }`}
-                                                                                data-tooltip-id="update-tooltip"
-                                                                                data-tooltip-content={hasChanged ? `Update quantity to ${overlayQuantity}` : 'Close overlay'}
-                                                                            >
-                                                                                {hasChanged ? `Update (${overlayQuantity})` : `Current (${currentQuantity})`}
-                                                                            </button>
-                                                                            <button
-                                                                                onClick={() => handleReturnInventory(assignment._id)}
-                                                                                className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 transition-colors"
-                                                                                data-tooltip-id="remove-tooltip"
-                                                                                data-tooltip-content="Remove item from project"
-                                                                            >
-                                                                                <Trash2 size={12} />
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
-                                                                );
-                                                            })()}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Cart Footer - Total */}
-                            {cartItems.length > 0 && (
-                                <div className="bg-surface-raised border-t border-line p-6">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-lg font-medium text-body">
-                                            {cartCategoryFilter ? `${cartCategoryFilter} Total:` : 'Total Project Cost:'}
-                                        </span>
-                                        <span className="text-xl font-bold text-primary">
-                                            $
-                                            {filteredCartItems
-                                                .reduce((sum, a) => sum + a.quantity * a.pricePerItem, 0)
-                                                .toFixed(2)}
-                                        </span>
-                                    </div>
-                                    {cartCategoryFilter && (
-                                        <div className="text-center mt-2">
-                                            <button
-                                                onClick={() => setCartCategoryFilter('')}
-                                                className="text-sm text-body-subtle hover:text-primary transition-colors"
-                                            >
-                                                View all items (${cartItems.reduce((sum, a) => sum + a.quantity * a.pricePerItem, 0).toFixed(2)} total)
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    </>
-                )}
-
-                {/* Image Modal */}
-                {selectedImage && (
-                    <>
-                        <div
-                            className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4"
-                            onClick={() => setSelectedImage(null)}
-                        >
-                            <div className="relative max-h-full max-w-4xl">
-                                <Image
-                                    src={selectedImage}
-                                    alt="Enlarged view"
-                                    width={800}
-                                    height={600}
-                                    className="max-h-[90vh] rounded-lg object-contain"
-                                />
-                                <button
-                                    onClick={() => setSelectedImage(null)}
-                                    className="absolute right-4 top-4 rounded-full bg-black/50 p-2 text-white transition-colors hover:bg-black/75"
+                            return (
+                                <div
+                                    key={item._id}
+                                    ref={(node) => {
+                                        cardRefs.current[index] = node;
+                                    }}
                                 >
-                                    <X size={20} />
-                                </button>
-                            </div>
-                        </div>
-                    </>
+                                    <InventoryCard
+                                        name={item.name}
+                                        category={item.category}
+                                        price={item.price}
+                                        thumbnail={item.smallImagePath}
+                                        availability={{
+                                            owned: item.owned,
+                                            out: item.out,
+                                            awaitingCheckIn: item.awaitingCheckIn,
+                                            free: item.free,
+                                            holderName: item.holders[0]?.projectName ?? null,
+                                            holderCount: item.holders.length,
+                                        }}
+                                        selected={selected}
+                                        actionLabel={`${selected ? 'Remove' : 'Add'} ${item.name}${
+                                            item.assignedHere ? `, ${item.assignedHere} already at this house` : ''
+                                        }`}
+                                        onActivate={item.maxForThisProject > 0 ? () => toggle(item) : undefined}
+                                        onZoom={item.imagePath ? () => setLightbox({ src: item.imagePath, alt: item.name }) : undefined}
+                                        badge={
+                                            item.assignedHere > 0 ? (
+                                                <AdminStatus tone="info">At this house · {item.assignedHere}</AdminStatus>
+                                            ) : undefined
+                                        }
+                                        footer={
+                                            selected ? (
+                                                <div className="flex flex-col gap-1.5">
+                                                    <QuantityStepper
+                                                        value={quantity}
+                                                        max={item.maxForThisProject}
+                                                        label={item.name}
+                                                        onChange={(next) => setQuantity(item, next)}
+                                                    />
+                                                    {problem && (
+                                                        <small className="text-danger text-[11px] font-bold">{problem.message}</small>
+                                                    )}
+                                                </div>
+                                            ) : item.maxForThisProject === 0 ? (
+                                                <small className="text-body-subtle block px-1 text-[11px]">
+                                                    {item.awaitingCheckIn > 0
+                                                        ? 'Still checked out to a finished job'
+                                                        : 'All units are out on another house'}
+                                                </small>
+                                            ) : undefined
+                                        }
+                                    />
+                                </div>
+                            );
+                        })}
+                    </div>
                 )}
             </div>
 
-            <Tooltip id="update-tooltip" place="top" />
-            <Tooltip id="remove-tooltip" place="top" />
-            <Tooltip id="back-tooltip" place="top" />
-            <Tooltip id="info-tooltip" place="top" />
+            {/* Hides itself below `xl` while the list is empty; the desktop rail is always there. */}
+            <StagingListTray
+                summary={summary}
+                projectName={project.name}
+                expanded={expanded}
+                problems={problems}
+                committing={committing}
+                onToggleExpanded={() => setExpanded((open) => !open)}
+                onQuantityChange={setQuantity}
+                onRemove={remove}
+                onClear={() => {
+                    clear();
+                    setProblems([]);
+                    setExpanded(false);
+                }}
+                onCommit={handleCommit}
+            />
+
+            {lightbox && <PhotoLightbox src={lightbox.src} alt={lightbox.alt} onClose={() => setLightbox(null)} />}
         </div>
     );
 }

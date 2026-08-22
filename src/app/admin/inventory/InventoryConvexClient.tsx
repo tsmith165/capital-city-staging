@@ -1,258 +1,231 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Image from 'next/image';
-import { Plus, Edit, Info, ExternalLink } from 'lucide-react';
-import { Tooltip } from 'react-tooltip';
+import { useQuery } from 'convex/react';
+import { PackageOpen, Plus, Undo2, Wrench } from 'lucide-react';
+
+import { api } from '@/convex/_generated/api';
+import { AdminHeading, AdminMetric } from '@/components/admin/AdminPrimitives';
+import { SkeletonBlock, SkeletonMetricGrid, SkeletonTiles } from '@/components/admin/AdminSkeleton';
 import AddInventoryOverlay from '@/components/AddInventoryOverlay';
-import { SkeletonBlock, SkeletonTiles } from '@/components/admin/AdminSkeleton';
+import InventoryCard from '@/components/admin/inventory/InventoryCard';
+import InventoryFilterBar from '@/components/admin/inventory/InventoryFilterBar';
+import PhotoLightbox from '@/components/admin/inventory/PhotoLightbox';
+import { INVENTORY_GRID_CLASSES } from '@/components/admin/inventory/inventory.constants';
+import { useInventoryFilters } from '@/components/admin/inventory/useInventoryFilters';
+import type { AvailabilityFilter, InventoryFilterState } from '@/components/admin/inventory/inventory.types';
+
+import ItemDetailSheet from './ItemDetailSheet';
+import type { CatalogItem } from './catalog.types';
+
+/**
+ * The catalog.
+ *
+ * 413 items is a small dataset that used to feel enormous because the page offered no way to slice it
+ * and the cards answered none of the questions being asked of them. Filters are the navigation, not
+ * pagination — pagination breaks browsing by eye, which is the whole point of a photo grid — and at
+ * this size `next/image` lazy loading covers the render cost without a virtualization dependency.
+ *
+ * The card now leads with availability, which was previously `count - inUse` and therefore always
+ * reported the full stock as free.
+ */
+
+const number = new Intl.NumberFormat('en-US');
 
 export default function InventoryConvexClient() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    // Seeded from the URL once. The filter handlers below write the URL, so re-syncing state
-    // from `searchParams` on every change would feed the component its own output.
-    const [selectedCategory, setSelectedCategory] = useState<string>(() => searchParams.get('category') || '');
-    const [searchTerm, setSearchTerm] = useState<string>(() => searchParams.get('search') || '');
-    const [showAddInventoryOverlay, setShowAddInventoryOverlay] = useState(false);
-    const [showItemInfo, setShowItemInfo] = useState<Record<string, boolean>>({});
 
-    // Function to update URL with new params
-    const updateURLParams = (category: string, search: string) => {
-        const params = new URLSearchParams();
-        if (category) params.set('category', category);
-        if (search) params.set('search', search);
-        
-        const newUrl = params.toString() ? `/admin/inventory?${params.toString()}` : '/admin/inventory';
-        router.replace(newUrl);
-    };
+    const items = useQuery(api.inventory.getCatalog, {}) as CatalogItem[] | null | undefined;
 
-    // Handle category change
-    const handleCategoryChange = (newCategory: string) => {
-        setSelectedCategory(newCategory);
-        updateURLParams(newCategory, searchTerm);
-    };
-
-    // Handle search change
-    const handleSearchChange = (newSearch: string) => {
-        setSearchTerm(newSearch);
-        updateURLParams(selectedCategory, newSearch);
-    };
-
-    const inventory = useQuery(api.inventory.getInventory, {
-        category: selectedCategory || undefined,
-        search: searchTerm || undefined,
-        active: true,
+    /*
+     * Seeded from the URL once so the dashboard can deep-link into a slice of the catalog. The
+     * handlers below write the URL, so re-reading `searchParams` on every render would feed the
+     * component its own output.
+     */
+    const { filters, update, visible, categories, locations, counts } = useInventoryFilters(items ?? undefined, {
+        search: searchParams.get('search') ?? '',
+        category: searchParams.get('category') ?? '',
+        availability: (searchParams.get('availability') as AvailabilityFilter | null) ?? 'all',
     });
-    
-    const categories = useQuery(api.inventory.getInventoryCategories);
 
-    const handleEditItem = (oId: number) => {
-        router.push(`/admin/edit?id=${oId}`);
+    const [showAddOverlay, setShowAddOverlay] = useState(false);
+    const [detailId, setDetailId] = useState<string | null>(null);
+    const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
+
+    /** Filter changes are pushed to the URL from the handler, so no effect watches the state. */
+    const handleFilterChange = <K extends keyof InventoryFilterState>(key: K, value: InventoryFilterState[K]) => {
+        update(key, value);
+
+        const next = { ...filters, [key]: value };
+        const params = new URLSearchParams();
+        if (next.search) params.set('search', next.search);
+        if (next.category) params.set('category', next.category);
+        if (next.availability !== 'all') params.set('availability', next.availability);
+
+        const query = params.toString();
+        router.replace(query ? `/admin/inventory?${query}` : '/admin/inventory', { scroll: false });
     };
 
-    const toggleItemInfo = (itemId: string) => {
-        setShowItemInfo(prev => ({
-            ...prev,
-            [itemId]: !prev[itemId]
-        }));
-    };
+    const awaitingCheckIn = (items ?? []).reduce((total, item) => total + item.awaitingCheckIn, 0);
+    const totals = (items ?? []).reduce(
+        (accumulator, item) => ({
+            owned: accumulator.owned + item.owned,
+            free: accumulator.free + item.free,
+            out: accumulator.out + item.out,
+        }),
+        { owned: 0, free: 0, out: 0 },
+    );
 
-    if (inventory === undefined || categories === undefined) {
+    if (items === undefined) {
         return (
-            <div className="container mx-auto max-w-7xl p-4">
-                <div className="mb-6 flex items-center justify-between">
-                    <h1 className="text-3xl font-bold text-body">Inventory Management</h1>
-                    <SkeletonBlock className="h-10 w-44 rounded-lg" />
-                </div>
-                <div className="mb-6 flex flex-wrap gap-4">
-                    <SkeletonBlock className="h-10 min-w-[200px] flex-1 rounded" />
-                    <SkeletonBlock className="h-10 w-40 rounded" />
-                </div>
-                <SkeletonTiles count={9} label="Loading inventory" />
+            <div className="flex flex-col gap-6 p-5 sm:p-8">
+                <SkeletonBlock className="h-8 w-56" />
+                <SkeletonMetricGrid count={3} columns={3} label="Loading catalog totals" />
+                <SkeletonBlock className="h-10 w-full max-w-2xl" />
+                <SkeletonTiles count={10} label="Loading inventory" />
             </div>
         );
     }
 
-    const filteredInventory = inventory || [];
+    /* The query returns null rather than throwing while Clerk is still handing over the token. */
+    if (items === null) {
+        return (
+            <div className="p-5 sm:p-8">
+                <p className="border-line bg-surface-raised text-body-muted rounded-lg border px-5 py-8 text-center text-sm">
+                    You do not have access to the catalog.
+                </p>
+            </div>
+        );
+    }
 
     return (
-        <div className="container mx-auto max-w-7xl p-4">
-            <div className="mb-6">
-                <div className="flex items-center justify-between mb-4">
-                    <h1 className="text-3xl font-bold text-body">Inventory Management</h1>
-                    <button
-                        onClick={() => setShowAddInventoryOverlay(true)}
-                        className="flex items-center space-x-2 px-4 py-2 bg-primary hover:bg-primary_dark text-body-inverse hover:text-body-inverse rounded-lg transition-colors font-medium"
-                        title="Create new inventory item"
-                    >
-                        <Plus size={20} />
-                        <span>Add New Inventory</span>
-                    </button>
-                </div>
-                
-                {/* Search and Filter Controls */}
-                <div className="flex flex-wrap gap-4 mb-6">
-                    <input
-                        type="text"
-                        placeholder="Search inventory..."
-                        value={searchTerm}
-                        onChange={(e) => handleSearchChange(e.target.value)}
-                        className="flex-1 min-w-[200px] rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
-                    />
-                    
-                    <select
-                        value={selectedCategory}
-                        onChange={(e) => handleCategoryChange(e.target.value)}
-                        className="rounded border border-line-strong bg-surface-overlay px-3 py-2 text-body focus:border-primary focus:outline-none"
-                    >
-                        <option value="">All Categories</option>
-                        {categories.map(category => (
-                            <option key={category} value={category}>
-                                {category}
-                            </option>
-                        ))}
-                    </select>
-                    
-                </div>
-
-                {/* Inventory Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredInventory.map((item) => (
-                        <div
-                            key={item._id}
-                            className="bg-surface-raised rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
+        <div className="flex flex-col gap-6 p-5 sm:p-8">
+            <AdminHeading
+                eyebrow="Inventory"
+                title="Catalog"
+                description="Everything you own, what is free to stage, and which house is holding the rest."
+                action={
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                        <Link
+                            href="/admin/inventory/attention"
+                            className="border-line text-body-muted hover:bg-surface-raised hover:text-body inline-flex items-center gap-2 rounded-md border px-4 py-2.5 text-sm font-bold transition-colors"
                         >
-                            {/* Image or Info Display */}
-                            <div className="relative h-48">
-                                {showItemInfo[item._id] ? (
-                                    // Show item info
-                                    <div className="flex h-full flex-col justify-start bg-gradient-to-br from-stone-800 to-stone-900 p-4 text-body">
-                                        <div className="space-y-2">
-                                            <div className="flex items-center justify-between">
-                                                <div className="text-sm font-bold text-primary">${item.price}</div>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        router.push(`/admin/edit?id=${item.oId}`);
-                                                    }}
-                                                    className="flex items-center gap-1 px-2 py-1 text-xs text-primary hover:text-secondary transition-colors"
-                                                >
-                                                    <ExternalLink size={8} />
-                                                    <span className="text-[10px]">Edit</span>
-                                                </button>
-                                            </div>
-                                            <div className="text-xs text-body-muted">
-                                                <span className="font-medium">Size:</span> {item.realWidth}" × {item.realHeight}" × {item.realDepth}"
-                                            </div>
-                                            <div className="text-xs text-body-muted">
-                                                <span className="font-medium">Available:</span> {item.count - item.inUse} of {item.count}
-                                            </div>
-                                            {item.location && (
-                                                <div className="text-xs text-body-subtle">
-                                                    📍 {item.location}
-                                                </div>
-                                            )}
-                                            {item.description && (
-                                                <div className="text-xs text-body-subtle border-t border-line pt-2">
-                                                    {item.description}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    // Show item image
-                                    <>
-                                        <Image
-                                            src={item.smallImagePath}
-                                            alt={item.name}
-                                            fill
-                                            className="object-cover"
-                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                        />
-                                        <div className="absolute top-2 right-2 bg-secondary text-white px-2 py-1 rounded text-sm">
-                                            ${item.price}
-                                        </div>
-                                        {!item.active && (
-                                            <div className="absolute top-2 left-2 bg-red-600 text-white px-2 py-1 rounded text-sm">
-                                                Inactive
-                                            </div>
-                                        )}
-                                    </>
-                                )}
-                            </div>
-                            
-                            <div className="p-4">
-                                <h3 className="font-semibold text-body mb-3 truncate">{item.name}</h3>
-                                
-                                {/* Availability and buttons on same row */}
-                                <div className="flex items-center justify-between">
-                                    <div className="text-xs text-body-subtle">
-                                        <span>Available: {item.count - item.inUse} / {item.count}</span>
-                                    </div>
-                                    
-                                    {/* Edit and Info buttons */}
-                                    <div className="flex gap-1">
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                toggleItemInfo(item._id);
-                                            }}
-                                            className="w-6 h-6 rounded border border-blue-500 bg-transparent text-blue-400 transition-colors hover:border-blue-600 hover:bg-blue-600 hover:text-white flex items-center justify-center"
-                                            data-tooltip-id="info-tooltip"
-                                            data-tooltip-content="Show item info"
-                                        >
-                                            <Info size={10} />
-                                        </button>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleEditItem(item.oId);
-                                            }}
-                                            className="w-6 h-6 rounded border border-primary bg-transparent text-primary transition-colors hover:border-secondary hover:bg-secondary hover:text-body-muted flex items-center justify-center"
-                                            data-tooltip-id="edit-tooltip"
-                                            data-tooltip-content="Edit item"
-                                        >
-                                            <Edit size={10} />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {filteredInventory.length === 0 && (
-                    <div className="text-center py-12">
-                        <p className="text-body-subtle text-lg">No inventory items found</p>
+                            <Wrench size={15} aria-hidden="true" /> Fix queue
+                            {counts.attention > 0 && (
+                                <span className="bg-warning-soft text-warning rounded-full px-1.5 text-[11px]">{counts.attention}</span>
+                            )}
+                        </Link>
                         <button
-                            onClick={() => setShowAddInventoryOverlay(true)}
-                            className="mt-4 rounded border-2 bg-transparent border-primary text-primary px-6 py-2 font-medium transition-colors hover:bg-secondary hover:border-secondary hover:text-body-muted"
+                            type="button"
+                            onClick={() => setShowAddOverlay(true)}
+                            className="bg-gold-400 text-body-inverse hover:bg-gold-300 inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-bold transition-colors"
                         >
-                            Add First Item
+                            <Plus size={16} aria-hidden="true" /> Add item
                         </button>
                     </div>
-                )}
+                }
+            />
+
+            {awaitingCheckIn > 0 && (
+                <Link
+                    href="/admin/inventory/check-in"
+                    className="border-warning/40 bg-warning-soft hover:border-warning/70 flex items-center gap-3 rounded-lg border px-4 py-3.5 transition-colors"
+                >
+                    <Undo2 size={18} aria-hidden="true" className="text-warning shrink-0" />
+                    <span className="flex min-w-0 flex-col">
+                        <strong className="text-warning text-sm font-bold">
+                            {number.format(awaitingCheckIn)} {awaitingCheckIn === 1 ? 'unit is' : 'units are'} still checked out to finished
+                            jobs
+                        </strong>
+                        <small className="text-body-muted text-xs">
+                            Until they are checked in, everything below understates what you have free.
+                        </small>
+                    </span>
+                    <span className="text-warning ml-auto shrink-0 text-xs font-bold">Check them in</span>
+                </Link>
+            )}
+
+            <div className="grid gap-3 sm:grid-cols-3" aria-label="Catalog totals">
+                <AdminMetric
+                    label="Free to stage"
+                    value={`${number.format(totals.free)} units`}
+                    hint={`of ${number.format(totals.owned)} owned`}
+                />
+                <AdminMetric label="Out staging" value={`${number.format(totals.out)} units`} hint="At a house being staged now" />
+                <AdminMetric
+                    label="Items in the catalog"
+                    value={number.format(items.length)}
+                    hint={`${number.format(categories.length)} categories`}
+                />
             </div>
-            
-            {/* Add Inventory Overlay */}
-            {showAddInventoryOverlay && (
+
+            <InventoryFilterBar
+                filters={filters}
+                onChange={handleFilterChange}
+                categories={categories}
+                locations={locations}
+                counts={counts}
+                summary={`${visible.length} of ${items.length} items`}
+            />
+
+            {visible.length === 0 ? (
+                <div className="border-line bg-surface-raised flex flex-col items-center gap-3 rounded-lg border px-5 py-14 text-center">
+                    <PackageOpen size={26} aria-hidden="true" className="text-body-subtle" />
+                    <strong className="font-display text-body text-lg font-normal">Nothing matches those filters</strong>
+                    <p className="text-body-muted max-w-sm text-sm">
+                        {items.length === 0
+                            ? 'The catalog is empty. Add your first piece of furniture to get started.'
+                            : 'Try a different category, or clear the filters to see everything.'}
+                    </p>
+                    {items.length === 0 && (
+                        <button
+                            type="button"
+                            onClick={() => setShowAddOverlay(true)}
+                            className="bg-gold-400 text-body-inverse hover:bg-gold-300 mt-1 inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-bold transition-colors"
+                        >
+                            <Plus size={16} aria-hidden="true" /> Add the first item
+                        </button>
+                    )}
+                </div>
+            ) : (
+                <div className={INVENTORY_GRID_CLASSES}>
+                    {visible.map((item) => (
+                        <InventoryCard
+                            key={item._id}
+                            name={item.name}
+                            category={item.category}
+                            price={item.price}
+                            thumbnail={item.smallImagePath}
+                            inactive={!item.active}
+                            availability={{
+                                owned: item.owned,
+                                out: item.out,
+                                awaitingCheckIn: item.awaitingCheckIn,
+                                free: item.free,
+                                holderName: item.holderName,
+                                holderCount: item.holderCount,
+                            }}
+                            actionLabel={`Open details for ${item.name}`}
+                            onActivate={() => setDetailId(item._id)}
+                            onZoom={item.imagePath ? () => setLightbox({ src: item.imagePath, alt: item.name }) : undefined}
+                        />
+                    ))}
+                </div>
+            )}
+
+            {detailId && <ItemDetailSheet itemId={detailId} onClose={() => setDetailId(null)} />}
+            {lightbox && <PhotoLightbox src={lightbox.src} alt={lightbox.alt} onClose={() => setLightbox(null)} />}
+
+            {showAddOverlay && (
                 <AddInventoryOverlay
-                    onClose={() => setShowAddInventoryOverlay(false)}
-                    onSuccess={() => {
-                        // Refresh the inventory list to show the new item
-                        router.refresh();
-                    }}
+                    onClose={() => setShowAddOverlay(false)}
+                    onSuccess={() => setShowAddOverlay(false)}
                     defaultAction="stay"
                 />
             )}
-            
-            {/* Tooltips */}
-            <Tooltip id="info-tooltip" place="top" />
-            <Tooltip id="edit-tooltip" place="top" />
         </div>
     );
 }

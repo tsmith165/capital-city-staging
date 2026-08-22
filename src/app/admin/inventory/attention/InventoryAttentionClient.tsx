@@ -1,90 +1,111 @@
 'use client';
 
-import Image from 'next/image';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useQuery } from 'convex/react';
-import { ArrowLeft, CheckCircle2, ImageOff, Pencil } from 'lucide-react';
+import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 import { api } from '@/convex/_generated/api';
 import AdminShell from '@/components/admin/AdminShell';
-import { AdminHeading, AdminStatus } from '@/components/admin/AdminPrimitives';
-import { SkeletonTiles } from '@/components/admin/AdminSkeleton';
+import { AdminHeading, AdminPanel } from '@/components/admin/AdminPrimitives';
+import { SkeletonListRows } from '@/components/admin/AdminSkeleton';
 
+import AttentionFixRow from './AttentionFixRow';
+import type { AttentionItem } from './attention.types';
+
+/**
+ * The catalog fix queue.
+ *
+ * The old version flagged 386 of 413 active items, which is not a queue — it is wallpaper, and a
+ * badge that high trains you to ignore it. The rules behind it now separate problems that cost money
+ * today from housekeeping (see `convex/inventoryRules.ts`), and the two tiers are shown as separate
+ * panels so the top one stays short enough to finish.
+ *
+ * Progress is counted for the visit rather than read from a stored total: a queue you can watch
+ * empty is a queue that gets emptied.
+ */
 export default function InventoryAttentionClient() {
-    const items = useQuery(api.dashboard.getInventoryNeedingAttention);
+    const items = useQuery(api.dashboard.getInventoryNeedingAttention) as AttentionItem[] | undefined;
+    const [fixedThisVisit, setFixedThisVisit] = useState(0);
+
+    const fixNow = items?.filter((item) => item.tier === 'fix-now') ?? [];
+    const later = items?.filter((item) => item.tier === 'later') ?? [];
 
     return (
         <AdminShell title="Needs attention">
             <div className="flex flex-col gap-6 p-5 sm:p-8">
                 <AdminHeading
                     eyebrow="Inventory"
-                    title="Needs attention"
-                    description="Active inventory that is missing something a customer or a project would need. Fixing these keeps the public catalog accurate."
+                    title="Fix queue"
+                    description="Problems that cost money on a live job come first. Prices and measurements can be filled in right here without opening the editor."
                     action={
                         <Link
                             href="/admin/inventory"
-                            className="inline-flex shrink-0 items-center gap-2 rounded-md border border-line px-4 py-2.5 text-sm font-bold text-body-muted transition-colors hover:bg-surface-raised hover:text-body"
+                            className="border-line text-body-muted hover:bg-surface-raised hover:text-body inline-flex shrink-0 items-center gap-2 rounded-md border px-4 py-2.5 text-sm font-bold transition-colors"
                         >
-                            <ArrowLeft size={16} aria-hidden="true" /> All inventory
+                            <ArrowLeft size={16} aria-hidden="true" /> Back to catalog
                         </Link>
                     }
                 />
 
+                {fixedThisVisit > 0 && (
+                    <p aria-live="polite" className="border-success/40 bg-success-soft text-success rounded-md border px-4 py-2.5 text-sm">
+                        {fixedThisVisit} {fixedThisVisit === 1 ? 'item' : 'items'} fixed in this visit · {fixNow.length + later.length}{' '}
+                        left.
+                    </p>
+                )}
+
                 {items === undefined ? (
-                    <SkeletonTiles count={6} label="Checking the catalog" />
+                    <AdminPanel eyebrow="Catalog" title="Fix now">
+                        <SkeletonListRows rows={5} label="Checking the catalog" />
+                    </AdminPanel>
                 ) : items.length === 0 ? (
-                    <div className="flex flex-col items-center gap-3 rounded-lg border border-line bg-surface-raised px-5 py-12 text-center">
+                    <div className="border-line bg-surface-raised flex flex-col items-center gap-3 rounded-lg border px-5 py-14 text-center">
                         <CheckCircle2 size={28} aria-hidden="true" className="text-success" />
-                        <strong className="font-display text-xl font-normal text-body">The catalog is complete</strong>
-                        <p className="max-w-md text-sm text-body-muted">
-                            Every active item has a photo, a thumbnail, real dimensions, and a price, and none are assigned out more
-                            times than you own.
+                        <strong className="font-display text-body text-xl font-normal">Nothing needs fixing</strong>
+                        <p className="text-body-muted max-w-md text-sm">
+                            Every active item has a photo and a price, no item is assigned out more times than you own, and the furniture
+                            that needs measurements has them.
                         </p>
                     </div>
                 ) : (
-                    <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                        {items.map((item) => (
-                            <li
-                                key={item._id}
-                                className="flex flex-col gap-3 rounded-lg border border-line bg-surface-raised p-4 shadow-card"
-                            >
-                                <div className="flex items-start gap-3">
-                                    <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-md border border-line bg-surface">
-                                        {item.smallImagePath || item.imagePath ? (
-                                            <Image
-                                                src={item.smallImagePath || item.imagePath}
-                                                alt=""
-                                                width={64}
-                                                height={64}
-                                                className="h-full w-full object-cover"
-                                            />
-                                        ) : (
-                                            <ImageOff size={20} aria-hidden="true" className="text-body-subtle" />
-                                        )}
-                                    </div>
-                                    <div className="flex min-w-0 flex-col gap-0.5">
-                                        <strong className="truncate text-sm font-bold text-body">{item.name}</strong>
-                                        <small className="truncate text-xs text-body-subtle">{item.category}</small>
-                                    </div>
-                                </div>
-
-                                <ul className="flex flex-wrap gap-1.5">
-                                    {item.reasons.map((reason) => (
-                                        <li key={reason}>
-                                            <AdminStatus tone="warning">{reason}</AdminStatus>
-                                        </li>
+                    <>
+                        <AdminPanel
+                            eyebrow="Costing you money"
+                            title={fixNow.length === 0 ? 'Nothing urgent' : `Fix now · ${fixNow.length}`}
+                        >
+                            {fixNow.length === 0 ? (
+                                <p className="text-success flex items-center justify-center gap-2 px-5 py-8 text-center text-sm">
+                                    <CheckCircle2 size={16} aria-hidden="true" /> No unpriced items are out on a job, and nothing is
+                                    over-assigned.
+                                </p>
+                            ) : (
+                                <ul className="divide-line divide-y">
+                                    {fixNow.map((item) => (
+                                        <AttentionFixRow
+                                            key={item._id}
+                                            item={item}
+                                            onFixed={() => setFixedThisVisit((count) => count + 1)}
+                                        />
                                     ))}
                                 </ul>
+                            )}
+                        </AdminPanel>
 
-                                <Link
-                                    href={`/admin/edit?id=${item.oId}`}
-                                    className="mt-auto inline-flex w-fit items-center gap-1.5 text-xs font-bold text-gold-300 transition-colors hover:text-gold-200"
-                                >
-                                    <Pencil size={13} aria-hidden="true" /> Fix this item
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
+                        {later.length > 0 && (
+                            <AdminPanel eyebrow="Housekeeping" title={`When you have time · ${later.length}`}>
+                                <ul className="divide-line divide-y">
+                                    {later.map((item) => (
+                                        <AttentionFixRow
+                                            key={item._id}
+                                            item={item}
+                                            onFixed={() => setFixedThisVisit((count) => count + 1)}
+                                        />
+                                    ))}
+                                </ul>
+                            </AdminPanel>
+                        )}
+                    </>
                 )}
             </div>
         </AdminShell>
