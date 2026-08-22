@@ -37,8 +37,8 @@ export default function UnderstandingBuyerPsychology() {
                 }
             >
                 <p>
-                    Selling a home isn’t just about showcasing square footage; it’s about connecting with buyers emotionally.
-                    Understanding buyer psychology is what makes a staging strategy resonate and motivates an offer.
+                    Selling a home isn’t just about showcasing square footage; it’s about connecting with buyers emotionally. Understanding
+                    buyer psychology is what makes a staging strategy resonate and motivates an offer.
                 </p>
 
                 <h2>The role of emotions in buying decisions</h2>

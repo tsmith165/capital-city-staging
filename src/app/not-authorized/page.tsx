@@ -31,7 +31,7 @@ export default async function NotAuthorizedPage() {
             footer={
                 <p>
                     Looking to book staging?{' '}
-                    <Link href="/contact" className="font-semibold text-gold-300 hover:text-gold-200">
+                    <Link href="/contact" className="text-gold-300 hover:text-gold-200 font-semibold">
                         Get a quote
                     </Link>
                     .
@@ -39,9 +39,9 @@ export default async function NotAuthorizedPage() {
             }
         >
             <div className="space-y-5">
-                <div className="flex items-start gap-3 rounded-lg border border-warning/40 bg-warning-soft p-4">
-                    <ShieldAlert size={18} className="mt-0.5 shrink-0 text-warning" aria-hidden="true" />
-                    <p className="text-sm text-body-muted">
+                <div className="border-warning/40 bg-warning-soft flex items-start gap-3 rounded-lg border p-4">
+                    <ShieldAlert size={18} className="text-warning mt-0.5 shrink-0" aria-hidden="true" />
+                    <p className="text-body-muted text-sm">
                         Ask Mia to grant admin access to this address, then reload. If you have a second account with access, switch to it
                         below.
                     </p>

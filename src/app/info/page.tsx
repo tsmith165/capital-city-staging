@@ -35,16 +35,16 @@ export const metadata: Metadata = {
 export default function InfoPage() {
     return (
         <PageLayout page="info">
-            <div className="w-full bg-ink px-6 py-14 sm:px-8 sm:py-20">
+            <div className="bg-ink w-full px-6 py-14 sm:px-8 sm:py-20">
                 <div className="mx-auto w-full max-w-6xl">
                     <header className="mx-auto max-w-2xl text-center">
-                        <p className="text-xs font-semibold tracking-[0.2em] text-forest-200 uppercase">Resources</p>
-                        <h1 className="mt-3 bg-clip-text font-display text-3xl leading-tight font-bold text-transparent gradient-gold-main sm:text-4xl">
+                        <p className="text-forest-200 text-xs font-semibold tracking-[0.2em] uppercase">Resources</p>
+                        <h1 className="font-display gradient-gold-main mt-3 bg-clip-text text-3xl leading-tight font-bold text-transparent sm:text-4xl">
                             What staging actually does
                         </h1>
-                        <p className="mt-5 text-lg text-pretty text-body-muted">
-                            The numbers behind staging, what it costs, and how buyers read a room. Written for sellers deciding
-                            whether it’s worth it.
+                        <p className="text-body-muted mt-5 text-lg text-pretty">
+                            The numbers behind staging, what it costs, and how buyers read a room. Written for sellers deciding whether it’s
+                            worth it.
                         </p>
                     </header>
 
@@ -53,21 +53,21 @@ export default function InfoPage() {
                             <li key={article.id} className="h-full">
                                 <Link
                                     href={article.url}
-                                    className="group flex h-full flex-col overflow-hidden rounded-xl border border-line bg-surface-raised shadow-card transition-colors hover:border-gold-500"
+                                    className="group border-line bg-surface-raised shadow-card hover:border-gold-500 flex h-full flex-col overflow-hidden rounded-xl border transition-colors"
                                 >
-                                    <div className="relative aspect-16/9 w-full overflow-hidden bg-surface">
+                                    <div className="bg-surface relative aspect-16/9 w-full overflow-hidden">
                                         <Image
                                             src={article.imageSrc}
                                             alt=""
                                             fill
-                                            className="object-cover transition-transform duration-500 ease-out-soft group-hover:scale-[1.04]"
+                                            className="ease-out-soft object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                                             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                         />
                                     </div>
                                     <div className="flex flex-1 flex-col p-6">
-                                        <h2 className="font-display text-xl font-semibold text-gold-300">{article.title}</h2>
-                                        <p className="mt-3 flex-1 text-sm leading-relaxed text-body-muted">{article.description}</p>
-                                        <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-forest-200 transition-colors group-hover:text-gold-300">
+                                        <h2 className="font-display text-gold-300 text-xl font-semibold">{article.title}</h2>
+                                        <p className="text-body-muted mt-3 flex-1 text-sm leading-relaxed">{article.description}</p>
+                                        <span className="text-forest-200 group-hover:text-gold-300 mt-5 inline-flex items-center gap-1.5 text-sm font-semibold transition-colors">
                                             Read the article
                                             <ArrowRight
                                                 size={15}

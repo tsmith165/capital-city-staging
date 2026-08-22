@@ -15,7 +15,7 @@ const InventoryItem = ({ item, handleItemClick }: InventoryItemProps) => {
     return (
         <div
             key={`item-${item.id}`}
-            className="group relative cursor-pointer overflow-hidden rounded-md bg-surface-hover shadow-md transition duration-300 ease-in-out hover:shadow-lg"
+            className="group bg-surface-hover relative cursor-pointer overflow-hidden rounded-md shadow-md transition duration-300 ease-in-out hover:shadow-lg"
             onClick={() => handleItemClick(item.id, item.index)}
         >
             <Image
@@ -23,13 +23,13 @@ const InventoryItem = ({ item, handleItemClick }: InventoryItemProps) => {
                 alt={item.name}
                 width={image_width}
                 height={image_height}
-                className="h-auto w-full rounded-md bg-surface-hover object-cover p-1"
+                className="bg-surface-hover h-auto w-full rounded-md object-cover p-1"
                 priority
             />
             <div className="absolute inset-0 flex items-center justify-center bg-black/50 p-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <p className="text-center text-xl font-bold text-white">{item.name}</p>
             </div>
-            {item.count === 0 && <div className="absolute bottom-6 right-6 h-2 w-2 rounded-full bg-red-600 shadow-md" />}
+            {item.count === 0 && <div className="absolute right-6 bottom-6 h-2 w-2 rounded-full bg-red-600 shadow-md" />}
         </div>
     );
 };

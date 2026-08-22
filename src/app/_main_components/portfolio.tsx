@@ -24,7 +24,7 @@ export default function Portfolio() {
                     <SectionHeading eyebrow="Recent work" title="Staged by Mia" />
                     <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {[0, 1, 2, 3, 4, 5].map((key) => (
-                            <div key={key} className="aspect-[4/3] animate-pulse rounded-lg border border-line bg-surface-raised" />
+                            <div key={key} className="border-line bg-surface-raised aspect-[4/3] animate-pulse rounded-lg border" />
                         ))}
                     </div>
                 </div>
@@ -97,7 +97,7 @@ export default function Portfolio() {
                                     track('portfolio_image_opened', { project: currentProject?.name ?? '', index });
                                 }}
                                 aria-label={`View ${currentProject?.name} image ${index + 1} full size`}
-                                className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-line bg-surface-raised shadow-card"
+                                className="group border-line bg-surface-raised shadow-card relative aspect-[4/3] overflow-hidden rounded-lg border"
                             >
                                 <Image
                                     src={image.thumbnailPath || image.imagePath}
@@ -111,7 +111,7 @@ export default function Portfolio() {
                         ))}
                     </div>
                 ) : (
-                    <p className="mt-10 text-body-subtle">Photography for this project is on its way.</p>
+                    <p className="text-body-subtle mt-10">Photography for this project is on its way.</p>
                 )}
             </div>
 

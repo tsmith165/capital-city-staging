@@ -25,20 +25,18 @@ interface ArticleShellProps {
  */
 export default function ArticleShell({ eyebrow, title, lead, image, children, aside }: ArticleShellProps) {
     return (
-        <article className="w-full bg-ink">
+        <article className="bg-ink w-full">
             <header className="mx-auto w-full max-w-3xl px-6 pt-14 pb-10 text-center sm:px-8 sm:pt-20">
-                {eyebrow ? (
-                    <p className="text-xs font-semibold tracking-[0.2em] text-forest-200 uppercase">{eyebrow}</p>
-                ) : null}
-                <h1 className="mt-3 bg-clip-text font-display text-3xl leading-tight font-bold text-transparent gradient-gold-main sm:text-4xl">
+                {eyebrow ? <p className="text-forest-200 text-xs font-semibold tracking-[0.2em] uppercase">{eyebrow}</p> : null}
+                <h1 className="font-display gradient-gold-main mt-3 bg-clip-text text-3xl leading-tight font-bold text-transparent sm:text-4xl">
                     {title}
                 </h1>
-                {lead ? <p className="mx-auto mt-5 max-w-2xl text-lg text-body-muted">{lead}</p> : null}
+                {lead ? <p className="text-body-muted mx-auto mt-5 max-w-2xl text-lg">{lead}</p> : null}
             </header>
 
             {image ? (
                 <div className="mx-auto w-full max-w-4xl px-6 sm:px-8">
-                    <div className="overflow-hidden rounded-xl border border-line shadow-card">
+                    <div className="border-line shadow-card overflow-hidden rounded-xl border">
                         <Image
                             src={image.src}
                             alt={image.alt}

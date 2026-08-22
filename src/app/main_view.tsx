@@ -51,7 +51,7 @@ export default function MainView({ initialHomepageImages }: { initialHomepageIma
     return (
         <div className="flex flex-col">
             {SECTIONS.map(({ id, component: Component }) => (
-                <div key={id} id={id} className="w-full scroll-mt-[var(--nav-height)] bg-ink">
+                <div key={id} id={id} className="bg-ink w-full scroll-mt-[var(--nav-height)]">
                     {id === 'home' ? <Home initialHomepageImages={initialHomepageImages} /> : <Component />}
                 </div>
             ))}

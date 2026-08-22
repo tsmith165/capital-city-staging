@@ -10,7 +10,25 @@ import { sendContactFormEmail } from './actions';
 import { buildSubmissionRecord } from './contact_form.utils';
 import { calculateStagingQuote, formatPrice } from '@/utils/calculateQuote';
 import { track, trackOnce } from '@/lib/analytics';
-import { Calculator, Send, CheckCircle, AlertCircle, Info, Ruler, Bed, MapPin, Trees, Building, Home, Users, Bath, Sofa, Briefcase, UtensilsCrossed, Phone } from 'lucide-react';
+import {
+    Calculator,
+    Send,
+    CheckCircle,
+    AlertCircle,
+    Info,
+    Ruler,
+    Bed,
+    MapPin,
+    Trees,
+    Building,
+    Home,
+    Users,
+    Bath,
+    Sofa,
+    Briefcase,
+    UtensilsCrossed,
+    Phone,
+} from 'lucide-react';
 
 const schema = z.object({
     name: z.string().nonempty('Name is required'),
@@ -36,7 +54,11 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 /** The quote fields carried no `id`, `name` or label association, so nothing announced them. */
-const fieldId = (label: string) => label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const fieldId = (label: string) =>
+    label
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
 
 // Custom Toggle Component
 const Toggle = ({
@@ -50,7 +72,7 @@ const Toggle = ({
     label: string;
     icon: React.ReactNode;
 }) => (
-    <div className="flex items-center gap-4 rounded-lg border border-line-strong bg-surface-overlay/50 p-4">
+    <div className="border-line-strong bg-surface-overlay/50 flex items-center gap-4 rounded-lg border p-4">
         <button
             type="button"
             role="switch"
@@ -62,7 +84,7 @@ const Toggle = ({
             }`}
         >
             <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-body transition-transform ${
+                className={`bg-body inline-block h-4 w-4 transform rounded-full transition-transform ${
                     enabled ? 'translate-x-6' : 'translate-x-1'
                 }`}
             />
@@ -71,7 +93,7 @@ const Toggle = ({
             <div className="text-forest-200" aria-hidden="true">
                 {icon}
             </div>
-            <span id={`toggle-label-${fieldId(label)}`} className="font-medium text-body-muted">
+            <span id={`toggle-label-${fieldId(label)}`} className="text-body-muted font-medium">
                 {label}
             </span>
         </div>
@@ -101,38 +123,38 @@ const Slider = ({
     const id = `slider-${fieldId(label)}`;
 
     return (
-    <div className="space-y-3">
-        <div className="flex items-center justify-between">
-            <label htmlFor={id} className="flex items-center gap-2">
-                <span className="text-primary" aria-hidden="true">
-                    {icon}
-                </span>
-                <span className="font-medium text-body-muted">{label}</span>
-            </label>
-            <span className="font-bold text-primary">{formatValue ? formatValue(value) : value}</span>
-        </div>
-        <div className="relative">
-            <input
-                id={id}
-                name={id}
-                type="range"
-                min={min}
-                max={max}
-                step={step}
-                value={value}
-                aria-valuetext={formatValue ? formatValue(value) : String(value)}
-                onChange={(e) => onChange(Number(e.target.value))}
-                className="custom-slider h-2 w-full cursor-pointer appearance-none rounded-lg bg-surface-hover"
-                style={{
-                    background: `linear-gradient(to right, #b99727 0%, #b99727 ${((value - min) / (max - min)) * 100}%, #57534e ${((value - min) / (max - min)) * 100}%, #57534e 100%)`,
-                }}
-            />
-            <div className="mt-1 flex justify-between text-xs text-body-subtle">
-                <span>{formatValue ? formatValue(min) : min}</span>
-                <span>{formatValue ? formatValue(max) : max}</span>
+        <div className="space-y-3">
+            <div className="flex items-center justify-between">
+                <label htmlFor={id} className="flex items-center gap-2">
+                    <span className="text-primary" aria-hidden="true">
+                        {icon}
+                    </span>
+                    <span className="text-body-muted font-medium">{label}</span>
+                </label>
+                <span className="text-primary font-bold">{formatValue ? formatValue(value) : value}</span>
+            </div>
+            <div className="relative">
+                <input
+                    id={id}
+                    name={id}
+                    type="range"
+                    min={min}
+                    max={max}
+                    step={step}
+                    value={value}
+                    aria-valuetext={formatValue ? formatValue(value) : String(value)}
+                    onChange={(e) => onChange(Number(e.target.value))}
+                    className="custom-slider bg-surface-hover h-2 w-full cursor-pointer appearance-none rounded-lg"
+                    style={{
+                        background: `linear-gradient(to right, #b99727 0%, #b99727 ${((value - min) / (max - min)) * 100}%, #57534e ${((value - min) / (max - min)) * 100}%, #57534e 100%)`,
+                    }}
+                />
+                <div className="text-body-subtle mt-1 flex justify-between text-xs">
+                    <span>{formatValue ? formatValue(min) : min}</span>
+                    <span>{formatValue ? formatValue(max) : max}</span>
+                </div>
             </div>
         </div>
-    </div>
     );
 };
 
@@ -186,10 +208,11 @@ const ContactForm = () => {
     });
 
     // Check if there are any additional items to show separator after room counts
-    const hasAdditionalItems = quote.outdoorAdjustment > 0 || 
-                              quote.multiFloorAdjustment > 0 || 
-                              quote.largeSquareFootageAdjustment > 0 || 
-                              quote.distanceAdjustment > 0;
+    const hasAdditionalItems =
+        quote.outdoorAdjustment > 0 ||
+        quote.multiFloorAdjustment > 0 ||
+        quote.largeSquareFootageAdjustment > 0 ||
+        quote.distanceAdjustment > 0;
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -272,7 +295,8 @@ const ContactForm = () => {
                 track('quote_failed', { reason: 'delivery' });
                 setSubmitMessage({
                     type: 'error',
-                    message: "Something went wrong sending that. Try again, or call (209) 817-4240 and we’ll take the details over the phone.",
+                    message:
+                        'Something went wrong sending that. Try again, or call (209) 817-4240 and we’ll take the details over the phone.',
                 });
             }
         } finally {
@@ -290,18 +314,18 @@ const ContactForm = () => {
             <div className="text-center">
                 <div className="mb-3 flex items-center justify-center gap-3">
                     <Calculator className="text-forest-200" size={28} aria-hidden="true" />
-                    <h2 className="font-display text-3xl font-bold gradient-gold-main-text">Estimate your staging</h2>
+                    <h2 className="font-display gradient-gold-main-text text-3xl font-bold">Estimate your staging</h2>
                 </div>
-                <p className="mx-auto max-w-xl text-pretty text-body-muted">
-                    Answer a few questions and you&rsquo;ll see a price range before you send anything. The final number is
-                    confirmed at the walkthrough.
+                <p className="text-body-muted mx-auto max-w-xl text-pretty">
+                    Answer a few questions and you&rsquo;ll see a price range before you send anything. The final number is confirmed at the
+                    walkthrough.
                 </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Contact Information */}
-                <div className="space-y-6 rounded-xl border border-line bg-surface-raised/30 p-6">
-                    <h3 className="flex items-center gap-2 text-xl font-semibold text-primary">
+                <div className="border-line bg-surface-raised/30 space-y-6 rounded-xl border p-6">
+                    <h3 className="text-primary flex items-center gap-2 text-xl font-semibold">
                         <Info size={24} />
                         Contact Information
                     </h3>
@@ -310,7 +334,7 @@ const ContactForm = () => {
                         {/* Name and Phone Row */}
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             <div>
-                                <label htmlFor="contact-name" className="mb-2 block text-sm font-medium text-body-muted">
+                                <label htmlFor="contact-name" className="text-body-muted mb-2 block text-sm font-medium">
                                     Full Name *
                                 </label>
                                 <input
@@ -323,18 +347,18 @@ const ContactForm = () => {
                                     aria-describedby={errors.name ? 'contact-name-error' : undefined}
                                     value={formData.name}
                                     onChange={(e) => handleChange('name', e.target.value)}
-                                    className="w-full rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-body placeholder-body-subtle transition-colors focus:border-gold-400"
+                                    className="border-line-strong bg-surface-overlay text-body placeholder-body-subtle focus:border-gold-400 w-full rounded-lg border px-4 py-3 transition-colors"
                                     placeholder="John Doe"
                                 />
                                 {errors.name && (
-                                    <p id="contact-name-error" className="mt-1 text-xs text-danger">
+                                    <p id="contact-name-error" className="text-danger mt-1 text-xs">
                                         {errors.name}
                                     </p>
                                 )}
                             </div>
 
                             <div>
-                                <label htmlFor="contact-phone" className="mb-2 block text-sm font-medium text-body-muted">
+                                <label htmlFor="contact-phone" className="text-body-muted mb-2 block text-sm font-medium">
                                     Phone Number *
                                 </label>
                                 <input
@@ -347,11 +371,11 @@ const ContactForm = () => {
                                     aria-describedby={errors.phone ? 'contact-phone-error' : undefined}
                                     value={formData.phone}
                                     onChange={(e) => handleChange('phone', e.target.value)}
-                                    className="w-full rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-body placeholder-body-subtle transition-colors focus:border-gold-400"
+                                    className="border-line-strong bg-surface-overlay text-body placeholder-body-subtle focus:border-gold-400 w-full rounded-lg border px-4 py-3 transition-colors"
                                     placeholder="(555) 123-4567"
                                 />
                                 {errors.phone && (
-                                    <p id="contact-phone-error" className="mt-1 text-xs text-danger">
+                                    <p id="contact-phone-error" className="text-danger mt-1 text-xs">
                                         {errors.phone}
                                     </p>
                                 )}
@@ -360,7 +384,7 @@ const ContactForm = () => {
 
                         {/* Email Row */}
                         <div>
-                            <label htmlFor="contact-email" className="mb-2 block text-sm font-medium text-body-muted">
+                            <label htmlFor="contact-email" className="text-body-muted mb-2 block text-sm font-medium">
                                 Email Address *
                             </label>
                             <input
@@ -373,11 +397,11 @@ const ContactForm = () => {
                                 aria-describedby={errors.email ? 'contact-email-error' : undefined}
                                 value={formData.email}
                                 onChange={(e) => handleChange('email', e.target.value)}
-                                className="w-full rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-body placeholder-body-subtle transition-colors focus:border-gold-400"
+                                className="border-line-strong bg-surface-overlay text-body placeholder-body-subtle focus:border-gold-400 w-full rounded-lg border px-4 py-3 transition-colors"
                                 placeholder="john@example.com"
                             />
                             {errors.email && (
-                                <p id="contact-email-error" className="mt-1 text-xs text-danger">
+                                <p id="contact-email-error" className="text-danger mt-1 text-xs">
                                     {errors.email}
                                 </p>
                             )}
@@ -386,8 +410,8 @@ const ContactForm = () => {
                 </div>
 
                 {/* Message */}
-                <div className="space-y-4 rounded-xl border border-line bg-surface-raised/30 p-6">
-                    <h3 className="text-xl font-semibold text-primary">
+                <div className="border-line bg-surface-raised/30 space-y-4 rounded-xl border p-6">
+                    <h3 className="text-primary text-xl font-semibold">
                         <label htmlFor="contact-message">Tell us about your project</label>
                     </h3>
                     <textarea
@@ -399,467 +423,481 @@ const ContactForm = () => {
                         value={formData.message}
                         onChange={(e) => handleChange('message', e.target.value)}
                         rows={3}
-                        className="w-full resize-none rounded-lg border border-line-strong bg-surface-overlay px-4 py-3 text-body placeholder-body-subtle transition-colors focus:border-gold-400"
+                        className="border-line-strong bg-surface-overlay text-body placeholder-body-subtle focus:border-gold-400 w-full resize-none rounded-lg border px-4 py-3 transition-colors"
                         placeholder="Tell us about your timeline, specific needs, or any questions you have..."
                     />
                     {errors.message && (
-                        <p id="contact-message-error" className="text-xs text-danger">
+                        <p id="contact-message-error" className="text-danger text-xs">
                             {errors.message}
                         </p>
                     )}
                 </div>
 
                 {/* Property Details */}
-                <div className="space-y-6 rounded-xl border border-line bg-surface-raised/30 p-6">
-                        <h3 className="flex items-center gap-2 text-xl font-semibold text-primary">
-                            <Home size={24} />
-                            Property Details
-                        </h3>
+                <div className="border-line bg-surface-raised/30 space-y-6 rounded-xl border p-6">
+                    <h3 className="text-primary flex items-center gap-2 text-xl font-semibold">
+                        <Home size={24} />
+                        Property Details
+                    </h3>
 
-                        <div className="space-y-6">
-                            {/* First Row: Square Footage and Distance */}
-                            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                                <Slider
-                                    value={formData.squareFootage}
-                                    onChange={(value) => handleChange('squareFootage', value)}
-                                    min={500}
-                                    max={8000}
-                                    step={100}
-                                    label="Square Footage"
-                                    icon={<Ruler size={20} />}
-                                    formatValue={(value) => `${value.toLocaleString()} sq ft`}
-                                />
+                    <div className="space-y-6">
+                        {/* First Row: Square Footage and Distance */}
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                            <Slider
+                                value={formData.squareFootage}
+                                onChange={(value) => handleChange('squareFootage', value)}
+                                min={500}
+                                max={8000}
+                                step={100}
+                                label="Square Footage"
+                                icon={<Ruler size={20} />}
+                                formatValue={(value) => `${value.toLocaleString()} sq ft`}
+                            />
 
-                                <Slider
-                                    value={formData.distanceFromDowntown}
-                                    onChange={(value) => handleChange('distanceFromDowntown', value)}
-                                    min={0}
-                                    max={50}
-                                    step={1}
-                                    label="Miles from Downtown Sacramento"
-                                    icon={<MapPin size={20} />}
-                                    formatValue={(value) => `${value} miles`}
-                                />
-                            </div>
+                            <Slider
+                                value={formData.distanceFromDowntown}
+                                onChange={(value) => handleChange('distanceFromDowntown', value)}
+                                min={0}
+                                max={50}
+                                step={1}
+                                label="Miles from Downtown Sacramento"
+                                icon={<MapPin size={20} />}
+                                formatValue={(value) => `${value} miles`}
+                            />
+                        </div>
 
-                            {/* Second Row: Bedrooms and Bathrooms */}
-                            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                                <Slider
-                                    value={formData.bedrooms}
-                                    onChange={(value) => handleChange('bedrooms', value)}
-                                    min={0}
-                                    max={6}
-                                    step={1}
-                                    label="Bedrooms to be staged"
-                                    icon={<Bed size={20} />}
-                                    formatValue={(value) => `${value} ${value === 1 ? 'Bedroom' : 'Bedrooms'}`}
-                                />
+                        {/* Second Row: Bedrooms and Bathrooms */}
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                            <Slider
+                                value={formData.bedrooms}
+                                onChange={(value) => handleChange('bedrooms', value)}
+                                min={0}
+                                max={6}
+                                step={1}
+                                label="Bedrooms to be staged"
+                                icon={<Bed size={20} />}
+                                formatValue={(value) => `${value} ${value === 1 ? 'Bedroom' : 'Bedrooms'}`}
+                            />
 
-                                <Slider
-                                    value={formData.bathrooms}
-                                    onChange={(value) => handleChange('bathrooms', value)}
-                                    min={0}
-                                    max={5}
-                                    step={1}
-                                    label="Bathrooms to be staged"
-                                    icon={<Bath size={20} />}
-                                    formatValue={(value) => `${value} ${value === 1 ? 'Bathroom' : 'Bathrooms'}`}
-                                />
-                            </div>
+                            <Slider
+                                value={formData.bathrooms}
+                                onChange={(value) => handleChange('bathrooms', value)}
+                                min={0}
+                                max={5}
+                                step={1}
+                                label="Bathrooms to be staged"
+                                icon={<Bath size={20} />}
+                                formatValue={(value) => `${value} ${value === 1 ? 'Bathroom' : 'Bathrooms'}`}
+                            />
+                        </div>
 
-                            {/* Third Row: Living Areas and Offices */}
-                            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                                <Slider
-                                    value={formData.livingAreas}
-                                    onChange={(value) => handleChange('livingAreas', value)}
-                                    min={0}
-                                    max={4}
-                                    step={1}
-                                    label="Living Areas"
-                                    icon={<Sofa size={20} />}
-                                    formatValue={(value) => `${value} ${value === 1 ? 'Area' : 'Areas'}`}
-                                />
+                        {/* Third Row: Living Areas and Offices */}
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                            <Slider
+                                value={formData.livingAreas}
+                                onChange={(value) => handleChange('livingAreas', value)}
+                                min={0}
+                                max={4}
+                                step={1}
+                                label="Living Areas"
+                                icon={<Sofa size={20} />}
+                                formatValue={(value) => `${value} ${value === 1 ? 'Area' : 'Areas'}`}
+                            />
 
-                                <Slider
-                                    value={formData.offices}
-                                    onChange={(value) => handleChange('offices', value)}
-                                    min={0}
-                                    max={3}
-                                    step={1}
-                                    label="Home Offices"
-                                    icon={<Briefcase size={20} />}
-                                    formatValue={(value) => `${value} ${value === 1 ? 'Office' : 'Offices'}`}
-                                />
-                            </div>
+                            <Slider
+                                value={formData.offices}
+                                onChange={(value) => handleChange('offices', value)}
+                                min={0}
+                                max={3}
+                                step={1}
+                                label="Home Offices"
+                                icon={<Briefcase size={20} />}
+                                formatValue={(value) => `${value} ${value === 1 ? 'Office' : 'Offices'}`}
+                            />
+                        </div>
 
-                            {/* Fourth Row: Dining Spaces and Staging Type */}
-                            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                                <Slider
-                                    value={formData.diningSpaces}
-                                    onChange={(value) => handleChange('diningSpaces', value)}
-                                    min={0}
-                                    max={3}
-                                    step={1}
-                                    label="Dining Spaces"
-                                    icon={<UtensilsCrossed size={20} />}
-                                    formatValue={(value) => `${value} ${value === 1 ? 'Space' : 'Spaces'}`}
-                                />
-                                
-                                {/* Staging Type Toggle Buttons */}
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-2">
-                                        <Home className="text-primary" size={20} />
-                                        <span className="font-medium text-body-muted">Staging Type</span>
-                                    </div>
-                                    <div className="flex gap-4">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleChange('stagingType', 'vacant')}
-                                            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 font-medium transition-all ${
-                                                formData.stagingType === 'vacant'
-                                                    ? 'border-primary bg-primary text-body-muted'
-                                                    : 'border-primary bg-transparent text-primary hover:bg-primary/70 hover:text-body-muted'
-                                            } border`}
-                                        >
-                                            <Building size={18} />
-                                            Vacant Home
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleChange('stagingType', 'occupied')}
-                                            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 font-medium transition-all ${
-                                                formData.stagingType === 'occupied'
-                                                    ? 'border-primary bg-primary text-body-muted'
-                                                    : 'border-primary bg-transparent text-primary hover:bg-primary/70 hover:text-body-muted'
-                                            } border`}
-                                        >
-                                            <Users size={18} />
-                                            Occupied Home
-                                        </button>
-                                    </div>
+                        {/* Fourth Row: Dining Spaces and Staging Type */}
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                            <Slider
+                                value={formData.diningSpaces}
+                                onChange={(value) => handleChange('diningSpaces', value)}
+                                min={0}
+                                max={3}
+                                step={1}
+                                label="Dining Spaces"
+                                icon={<UtensilsCrossed size={20} />}
+                                formatValue={(value) => `${value} ${value === 1 ? 'Space' : 'Spaces'}`}
+                            />
+
+                            {/* Staging Type Toggle Buttons */}
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <Home className="text-primary" size={20} />
+                                    <span className="text-body-muted font-medium">Staging Type</span>
+                                </div>
+                                <div className="flex gap-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleChange('stagingType', 'vacant')}
+                                        className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 font-medium transition-all ${
+                                            formData.stagingType === 'vacant'
+                                                ? 'border-primary bg-primary text-body-muted'
+                                                : 'border-primary text-primary hover:bg-primary/70 hover:text-body-muted bg-transparent'
+                                        } border`}
+                                    >
+                                        <Building size={18} />
+                                        Vacant Home
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleChange('stagingType', 'occupied')}
+                                        className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 font-medium transition-all ${
+                                            formData.stagingType === 'occupied'
+                                                ? 'border-primary bg-primary text-body-muted'
+                                                : 'border-primary text-primary hover:bg-primary/70 hover:text-body-muted bg-transparent'
+                                        } border`}
+                                    >
+                                        <Users size={18} />
+                                        Occupied Home
+                                    </button>
                                 </div>
                             </div>
-
-                            {/* Toggle Options */}
-                            <div className="space-y-4">
-                                <Toggle
-                                    enabled={formData.outdoorStaging}
-                                    onChange={(enabled) => handleChange('outdoorStaging', enabled)}
-                                    label="Outdoor staging required (patio, deck, yard)"
-                                    icon={<Trees size={20} />}
-                                />
-
-                                <Toggle
-                                    enabled={formData.multiFloor}
-                                    onChange={(enabled) => handleChange('multiFloor', enabled)}
-                                    label="Multi-floor home (2+ stories)"
-                                    icon={<Building size={20} />}
-                                />
-                            </div>
                         </div>
+
+                        {/* Toggle Options */}
+                        <div className="space-y-4">
+                            <Toggle
+                                enabled={formData.outdoorStaging}
+                                onChange={(enabled) => handleChange('outdoorStaging', enabled)}
+                                label="Outdoor staging required (patio, deck, yard)"
+                                icon={<Trees size={20} />}
+                            />
+
+                            <Toggle
+                                enabled={formData.multiFloor}
+                                onChange={(enabled) => handleChange('multiFloor', enabled)}
+                                label="Multi-floor home (2+ stories)"
+                                icon={<Building size={20} />}
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 {/* Instant Quote Display */}
                 <div>
-                        <AnimatePresence>
-                            {showQuote && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    className="h-fit rounded-xl border-2 border-primary bg-gradient-to-br from-primary/5 via-primary_dark/10 to-primary/5 p-6 shadow-xl"
-                                >
-                                    {/* Header */}
-                                    <div className="mb-6 text-center">
-                                        <div className="mb-1 flex items-center justify-center gap-2">
-                                            <Calculator className="text-primary" size={24} />
-                                            <h3 className="text-2xl font-bold text-primary">Your Estimated Quote</h3>
-                                        </div>
+                    <AnimatePresence>
+                        {showQuote && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                className="border-primary from-primary/5 via-primary_dark/10 to-primary/5 h-fit rounded-xl border-2 bg-gradient-to-br p-6 shadow-xl"
+                            >
+                                {/* Header */}
+                                <div className="mb-6 text-center">
+                                    <div className="mb-1 flex items-center justify-center gap-2">
+                                        <Calculator className="text-primary" size={24} />
+                                        <h3 className="text-primary text-2xl font-bold">Your Estimated Quote</h3>
                                     </div>
+                                </div>
 
-                                    {/* Custom Quote Required Message */}
-                                    {quote.requiresCustomQuote ? (
-                                        <>
-                                            <div className="mb-6 rounded-xl bg-gradient-to-br from-amber-500/10 via-amber-600/15 to-amber-500/10 border border-amber-500/30 p-6 text-center">
-                                                <div className="mb-4">
-                                                    <Phone className="mx-auto text-amber-400 mb-3" size={40} />
-                                                    <div className="text-xl font-bold text-amber-200 mb-2">Custom Quote Required</div>
-                                                    <div className="text-sm text-amber-200/80">
-                                                        {quote.customQuoteReason}
+                                {/* Custom Quote Required Message */}
+                                {quote.requiresCustomQuote ? (
+                                    <>
+                                        <div className="mb-6 rounded-xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-amber-600/15 to-amber-500/10 p-6 text-center">
+                                            <div className="mb-4">
+                                                <Phone className="mx-auto mb-3 text-amber-400" size={40} />
+                                                <div className="mb-2 text-xl font-bold text-amber-200">Custom Quote Required</div>
+                                                <div className="text-sm text-amber-200/80">{quote.customQuoteReason}</div>
+                                            </div>
+                                            <div className="text-body-muted text-sm">
+                                                Please submit your information below and Mia will provide a personalized quote for your
+                                                property.
+                                            </div>
+                                        </div>
+
+                                        {/* Submit Button for Custom Quote */}
+                                        <div className="flex justify-center">
+                                            <button
+                                                type="submit"
+                                                disabled={isSubmitting}
+                                                className={`flex items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-colors ${
+                                                    isSubmitting
+                                                        ? 'bg-surface-hover text-body-subtle cursor-not-allowed'
+                                                        : 'bg-gold-400 text-body-inverse shadow-card hover:bg-gold-300'
+                                                }`}
+                                            >
+                                                {isSubmitting ? (
+                                                    <>
+                                                        <div className="border-body-inverse/40 h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
+                                                        <span>Sending&hellip;</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Send size={24} />
+                                                        <span>Request a custom quote</span>
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        {/* Main Quote Display */}
+                                        <div className="from-primary/10 via-primary_dark/15 to-primary/10 border-primary/30 mb-6 rounded-xl border bg-gradient-to-br p-6 text-center">
+                                            <div className="mb-2">
+                                                <div className="text-body-subtle mb-2 text-sm tracking-wider uppercase">
+                                                    Estimated Price Range
+                                                </div>
+                                                <div className="gradient-gold-main-text text-3xl font-bold">
+                                                    {formatPrice(quote.priceRange.min)} - {formatPrice(quote.priceRange.max)}
+                                                </div>
+                                            </div>
+                                            <div className="text-body-subtle mt-3 text-xs">Final pricing determined after consultation</div>
+                                        </div>
+
+                                        {/* Price Breakdown */}
+                                        <div className="bg-surface/70 border-line/50 mb-6 rounded-xl border p-5 backdrop-blur-sm">
+                                            <h4 className="text-secondary mb-4 text-center text-lg font-bold">Price Breakdown</h4>
+
+                                            <div className="space-y-3">
+                                                {/* Base Price - Different display for vacant vs occupied */}
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <span className="text-body-muted font-medium">
+                                                            {formData.stagingType === 'vacant' && quote.tierInfo
+                                                                ? `Base Package (${quote.tierInfo.sqftRange})`
+                                                                : `Base ${formData.stagingType} staging package`}
+                                                        </span>
+                                                        <div className="text-body-subtle text-sm">
+                                                            {formData.stagingType === 'vacant' && quote.tierInfo
+                                                                ? quote.tierInfo.includedRooms
+                                                                : 'Kitchen + entryway'}
+                                                        </div>
                                                     </div>
+                                                    <span className="text-body text-lg font-bold">{formatPrice(quote.basePrice)}</span>
                                                 </div>
-                                                <div className="text-body-muted text-sm">
-                                                    Please submit your information below and Mia will provide a personalized quote for your property.
-                                                </div>
-                                            </div>
 
-                                            {/* Submit Button for Custom Quote */}
-                                            <div className="flex justify-center">
-                                                <button
-                                                    type="submit"
-                                                    disabled={isSubmitting}
-                                                    className={`flex items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-colors ${
-                                                        isSubmitting
-                                                            ? 'cursor-not-allowed bg-surface-hover text-body-subtle'
-                                                            : 'bg-gold-400 text-body-inverse shadow-card hover:bg-gold-300'
-                                                    }`}
-                                                >
-                                                    {isSubmitting ? (
-                                                        <>
-                                                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-body-inverse/40 border-t-transparent" />
-                                                            <span>Sending&hellip;</span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <Send size={24} />
-                                                            <span>Request a custom quote</span>
-                                                        </>
-                                                    )}
-                                                </button>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            {/* Main Quote Display */}
-                                            <div className="mb-6 rounded-xl bg-gradient-to-br from-primary/10 via-primary_dark/15 to-primary/10 border border-primary/30 p-6 text-center">
-                                                <div className="mb-2">
-                                                    <div className="text-sm uppercase tracking-wider text-body-subtle mb-2">Estimated Price Range</div>
-                                                    <div className="text-3xl font-bold gradient-gold-main-text">
-                                                        {formatPrice(quote.priceRange.min)} - {formatPrice(quote.priceRange.max)}
-                                                    </div>
-                                                </div>
-                                                <div className="text-xs text-body-subtle mt-3">
-                                                    Final pricing determined after consultation
-                                                </div>
-                                            </div>
-
-                                            {/* Price Breakdown */}
-                                            <div className="mb-6 rounded-xl bg-surface/70 p-5 backdrop-blur-sm border border-line/50">
-                                                <h4 className="mb-4 text-center text-lg font-bold text-secondary">Price Breakdown</h4>
-
-                                                <div className="space-y-3">
-                                                    {/* Base Price - Different display for vacant vs occupied */}
-                                                    <div className="flex justify-between items-center">
+                                                {/* Living Areas - Always shown for both (never included in base) */}
+                                                {quote.livingAreaCount > 0 && (
+                                                    <div className="flex items-center justify-between">
                                                         <div>
-                                                            <span className="text-body-muted font-medium">
-                                                                {formData.stagingType === 'vacant' && quote.tierInfo
-                                                                    ? `Base Package (${quote.tierInfo.sqftRange})`
-                                                                    : `Base ${formData.stagingType} staging package`
-                                                                }
-                                                            </span>
-                                                            <div className="text-sm text-body-subtle">
-                                                                {formData.stagingType === 'vacant' && quote.tierInfo
-                                                                    ? quote.tierInfo.includedRooms
-                                                                    : 'Kitchen + entryway'
-                                                                }
+                                                            <span className="text-body-muted font-medium">Living Areas</span>
+                                                            <div className="text-body-subtle text-sm">
+                                                                {quote.livingAreaCount} × {formatPrice(quote.livingAreaRate)} each
                                                             </div>
                                                         </div>
-                                                        <span className="font-bold text-body text-lg">{formatPrice(quote.basePrice)}</span>
+                                                        <span className="text-body text-lg font-bold">
+                                                            {formatPrice(quote.livingAreaTotal)}
+                                                        </span>
                                                     </div>
+                                                )}
 
-                                                    {/* Living Areas - Always shown for both (never included in base) */}
-                                                    {quote.livingAreaCount > 0 && (
-                                                        <div className="flex justify-between items-center">
-                                                            <div>
-                                                                <span className="text-body-muted font-medium">Living Areas</span>
-                                                                <div className="text-sm text-body-subtle">
-                                                                    {quote.livingAreaCount} × {formatPrice(quote.livingAreaRate)} each
-                                                                </div>
+                                                {/* Dining Spaces - Always shown for both (never included in base) */}
+                                                {quote.diningSpaceCount > 0 && (
+                                                    <div className="flex items-center justify-between">
+                                                        <div>
+                                                            <span className="text-body-muted font-medium">Dining Spaces</span>
+                                                            <div className="text-body-subtle text-sm">
+                                                                {quote.diningSpaceCount} × {formatPrice(quote.diningSpaceRate)} each
                                                             </div>
-                                                            <span className="font-bold text-body text-lg">{formatPrice(quote.livingAreaTotal)}</span>
                                                         </div>
-                                                    )}
+                                                        <span className="text-body text-lg font-bold">
+                                                            {formatPrice(quote.diningSpaceTotal)}
+                                                        </span>
+                                                    </div>
+                                                )}
 
-                                                    {/* Dining Spaces - Always shown for both (never included in base) */}
-                                                    {quote.diningSpaceCount > 0 && (
-                                                        <div className="flex justify-between items-center">
-                                                            <div>
-                                                                <span className="text-body-muted font-medium">Dining Spaces</span>
-                                                                <div className="text-sm text-body-subtle">
-                                                                    {quote.diningSpaceCount} × {formatPrice(quote.diningSpaceRate)} each
-                                                                </div>
-                                                            </div>
-                                                            <span className="font-bold text-body text-lg">{formatPrice(quote.diningSpaceTotal)}</span>
+                                                {/* Extra Bedrooms - For vacant, only show extras beyond included */}
+                                                {formData.stagingType === 'vacant'
+                                                    ? quote.extraBedroomCount > 0 && (
+                                                          <div className="flex items-center justify-between">
+                                                              <div>
+                                                                  <span className="text-body-muted font-medium">Extra Bedrooms</span>
+                                                                  <div className="text-body-subtle text-sm">
+                                                                      {quote.extraBedroomCount} beyond included ×{' '}
+                                                                      {formatPrice(quote.bedroomRate)} each
+                                                                  </div>
+                                                              </div>
+                                                              <span className="text-body text-lg font-bold">
+                                                                  {formatPrice(quote.bedroomTotal)}
+                                                              </span>
+                                                          </div>
+                                                      )
+                                                    : quote.bedroomCount > 0 && (
+                                                          <div className="flex items-center justify-between">
+                                                              <div>
+                                                                  <span className="text-body-muted font-medium">Bedrooms</span>
+                                                                  <div className="text-body-subtle text-sm">
+                                                                      {quote.bedroomCount} × {formatPrice(quote.bedroomRate)} each
+                                                                  </div>
+                                                              </div>
+                                                              <span className="text-body text-lg font-bold">
+                                                                  {formatPrice(quote.bedroomTotal)}
+                                                              </span>
+                                                          </div>
+                                                      )}
+
+                                                {/* Extra Bathrooms - For vacant, only show extras beyond 2 included */}
+                                                {formData.stagingType === 'vacant'
+                                                    ? quote.extraBathroomCount > 0 && (
+                                                          <div className="flex items-center justify-between">
+                                                              <div>
+                                                                  <span className="text-body-muted font-medium">Extra Bathrooms</span>
+                                                                  <div className="text-body-subtle text-sm">
+                                                                      {quote.extraBathroomCount} beyond included ×{' '}
+                                                                      {formatPrice(quote.bathroomRate)} each
+                                                                  </div>
+                                                              </div>
+                                                              <span className="text-body text-lg font-bold">
+                                                                  {formatPrice(quote.bathroomTotal)}
+                                                              </span>
+                                                          </div>
+                                                      )
+                                                    : quote.bathroomCount > 0 && (
+                                                          <div className="flex items-center justify-between">
+                                                              <div>
+                                                                  <span className="text-body-muted font-medium">Bathrooms</span>
+                                                                  <div className="text-body-subtle text-sm">
+                                                                      {quote.bathroomCount} × {formatPrice(quote.bathroomRate)} each
+                                                                  </div>
+                                                              </div>
+                                                              <span className="text-body text-lg font-bold">
+                                                                  {formatPrice(quote.bathroomTotal)}
+                                                              </span>
+                                                          </div>
+                                                      )}
+
+                                                {/* Extra Offices - For vacant, only show extras beyond included */}
+                                                {formData.stagingType === 'vacant'
+                                                    ? quote.extraOfficeCount > 0 && (
+                                                          <div
+                                                              className={`flex items-center justify-between ${hasAdditionalItems ? 'border-line-strong/50 border-b pb-3' : ''}`}
+                                                          >
+                                                              <div>
+                                                                  <span className="text-body-muted font-medium">Extra Home Offices</span>
+                                                                  <div className="text-body-subtle text-sm">
+                                                                      {quote.extraOfficeCount} beyond included ×{' '}
+                                                                      {formatPrice(quote.officeRate)} each
+                                                                  </div>
+                                                              </div>
+                                                              <span className="text-body text-lg font-bold">
+                                                                  {formatPrice(quote.officeTotal)}
+                                                              </span>
+                                                          </div>
+                                                      )
+                                                    : quote.officeCount > 0 && (
+                                                          <div
+                                                              className={`flex items-center justify-between ${hasAdditionalItems ? 'border-line-strong/50 border-b pb-3' : ''}`}
+                                                          >
+                                                              <div>
+                                                                  <span className="text-body-muted font-medium">Home Offices</span>
+                                                                  <div className="text-body-subtle text-sm">
+                                                                      {quote.officeCount} × {formatPrice(quote.officeRate)} each
+                                                                  </div>
+                                                              </div>
+                                                              <span className="text-body text-lg font-bold">
+                                                                  {formatPrice(quote.officeTotal)}
+                                                              </span>
+                                                          </div>
+                                                      )}
+
+                                                {/* Additional Services */}
+                                                {quote.outdoorAdjustment > 0 && (
+                                                    <div className="flex items-center justify-between">
+                                                        <div>
+                                                            <span className="text-body-muted font-medium">Outdoor Staging</span>
+                                                            <div className="text-body-subtle text-sm">Patio, deck, yard areas</div>
                                                         </div>
-                                                    )}
+                                                        <span className="text-secondary text-lg font-medium">
+                                                            +{formatPrice(quote.outdoorAdjustment)}
+                                                        </span>
+                                                    </div>
+                                                )}
 
-                                                    {/* Extra Bedrooms - For vacant, only show extras beyond included */}
-                                                    {formData.stagingType === 'vacant' ? (
-                                                        quote.extraBedroomCount > 0 && (
-                                                            <div className="flex justify-between items-center">
-                                                                <div>
-                                                                    <span className="text-body-muted font-medium">Extra Bedrooms</span>
-                                                                    <div className="text-sm text-body-subtle">
-                                                                        {quote.extraBedroomCount} beyond included × {formatPrice(quote.bedroomRate)} each
-                                                                    </div>
-                                                                </div>
-                                                                <span className="font-bold text-body text-lg">{formatPrice(quote.bedroomTotal)}</span>
-                                                            </div>
-                                                        )
-                                                    ) : (
-                                                        quote.bedroomCount > 0 && (
-                                                            <div className="flex justify-between items-center">
-                                                                <div>
-                                                                    <span className="text-body-muted font-medium">Bedrooms</span>
-                                                                    <div className="text-sm text-body-subtle">
-                                                                        {quote.bedroomCount} × {formatPrice(quote.bedroomRate)} each
-                                                                    </div>
-                                                                </div>
-                                                                <span className="font-bold text-body text-lg">{formatPrice(quote.bedroomTotal)}</span>
-                                                            </div>
-                                                        )
-                                                    )}
-
-                                                    {/* Extra Bathrooms - For vacant, only show extras beyond 2 included */}
-                                                    {formData.stagingType === 'vacant' ? (
-                                                        quote.extraBathroomCount > 0 && (
-                                                            <div className="flex justify-between items-center">
-                                                                <div>
-                                                                    <span className="text-body-muted font-medium">Extra Bathrooms</span>
-                                                                    <div className="text-sm text-body-subtle">
-                                                                        {quote.extraBathroomCount} beyond included × {formatPrice(quote.bathroomRate)} each
-                                                                    </div>
-                                                                </div>
-                                                                <span className="font-bold text-body text-lg">{formatPrice(quote.bathroomTotal)}</span>
-                                                            </div>
-                                                        )
-                                                    ) : (
-                                                        quote.bathroomCount > 0 && (
-                                                            <div className="flex justify-between items-center">
-                                                                <div>
-                                                                    <span className="text-body-muted font-medium">Bathrooms</span>
-                                                                    <div className="text-sm text-body-subtle">
-                                                                        {quote.bathroomCount} × {formatPrice(quote.bathroomRate)} each
-                                                                    </div>
-                                                                </div>
-                                                                <span className="font-bold text-body text-lg">{formatPrice(quote.bathroomTotal)}</span>
-                                                            </div>
-                                                        )
-                                                    )}
-
-                                                    {/* Extra Offices - For vacant, only show extras beyond included */}
-                                                    {formData.stagingType === 'vacant' ? (
-                                                        quote.extraOfficeCount > 0 && (
-                                                            <div className={`flex justify-between items-center ${hasAdditionalItems ? 'border-b border-line-strong/50 pb-3' : ''}`}>
-                                                                <div>
-                                                                    <span className="text-body-muted font-medium">Extra Home Offices</span>
-                                                                    <div className="text-sm text-body-subtle">
-                                                                        {quote.extraOfficeCount} beyond included × {formatPrice(quote.officeRate)} each
-                                                                    </div>
-                                                                </div>
-                                                                <span className="font-bold text-body text-lg">{formatPrice(quote.officeTotal)}</span>
-                                                            </div>
-                                                        )
-                                                    ) : (
-                                                        quote.officeCount > 0 && (
-                                                            <div className={`flex justify-between items-center ${hasAdditionalItems ? 'border-b border-line-strong/50 pb-3' : ''}`}>
-                                                                <div>
-                                                                    <span className="text-body-muted font-medium">Home Offices</span>
-                                                                    <div className="text-sm text-body-subtle">
-                                                                        {quote.officeCount} × {formatPrice(quote.officeRate)} each
-                                                                    </div>
-                                                                </div>
-                                                                <span className="font-bold text-body text-lg">{formatPrice(quote.officeTotal)}</span>
-                                                            </div>
-                                                        )
-                                                    )}
-
-                                                    {/* Additional Services */}
-                                                    {quote.outdoorAdjustment > 0 && (
-                                                        <div className="flex justify-between items-center">
-                                                            <div>
-                                                                <span className="text-body-muted font-medium">Outdoor Staging</span>
-                                                                <div className="text-sm text-body-subtle">Patio, deck, yard areas</div>
-                                                            </div>
-                                                            <span className="font-medium text-secondary text-lg">
-                                                                +{formatPrice(quote.outdoorAdjustment)}
-                                                            </span>
+                                                {quote.multiFloorAdjustment > 0 && (
+                                                    <div className="flex items-center justify-between">
+                                                        <div>
+                                                            <span className="text-body-muted font-medium">Multi-Floor Fee</span>
+                                                            <div className="text-body-subtle text-sm">Additional story surcharge</div>
                                                         </div>
-                                                    )}
+                                                        <span className="text-secondary text-lg font-medium">
+                                                            +{formatPrice(quote.multiFloorAdjustment)}
+                                                        </span>
+                                                    </div>
+                                                )}
 
-                                                    {quote.multiFloorAdjustment > 0 && (
-                                                        <div className="flex justify-between items-center">
-                                                            <div>
-                                                                <span className="text-body-muted font-medium">Multi-Floor Fee</span>
-                                                                <div className="text-sm text-body-subtle">Additional story surcharge</div>
-                                                            </div>
-                                                            <span className="font-medium text-secondary text-lg">
-                                                                +{formatPrice(quote.multiFloorAdjustment)}
-                                                            </span>
+                                                {/* Large home fee - only for occupied */}
+                                                {quote.largeSquareFootageAdjustment > 0 && (
+                                                    <div className="flex items-center justify-between">
+                                                        <div>
+                                                            <span className="text-body-muted font-medium">Very Large Home Fee</span>
+                                                            <div className="text-body-subtle text-sm">Properties over 3,500 sq ft</div>
                                                         </div>
-                                                    )}
+                                                        <span className="text-secondary text-lg font-medium">
+                                                            +{formatPrice(quote.largeSquareFootageAdjustment)}
+                                                        </span>
+                                                    </div>
+                                                )}
 
-                                                    {/* Large home fee - only for occupied */}
-                                                    {quote.largeSquareFootageAdjustment > 0 && (
-                                                        <div className="flex justify-between items-center">
-                                                            <div>
-                                                                <span className="text-body-muted font-medium">Very Large Home Fee</span>
-                                                                <div className="text-sm text-body-subtle">Properties over 3,500 sq ft</div>
+                                                {quote.distanceAdjustment > 0 && (
+                                                    <div className="flex items-center justify-between">
+                                                        <div>
+                                                            <span className="text-body-muted font-medium">Travel Fee</span>
+                                                            <div className="text-body-subtle text-sm">
+                                                                {formData.stagingType === 'vacant'
+                                                                    ? `${formData.distanceFromDowntown} miles from Sacramento`
+                                                                    : 'Properties over 20 miles away'}
                                                             </div>
-                                                            <span className="font-medium text-secondary text-lg">
-                                                                +{formatPrice(quote.largeSquareFootageAdjustment)}
-                                                            </span>
                                                         </div>
-                                                    )}
-
-                                                    {quote.distanceAdjustment > 0 && (
-                                                        <div className="flex justify-between items-center">
-                                                            <div>
-                                                                <span className="text-body-muted font-medium">Travel Fee</span>
-                                                                <div className="text-sm text-body-subtle">
-                                                                    {formData.stagingType === 'vacant'
-                                                                        ? `${formData.distanceFromDowntown} miles from Sacramento`
-                                                                        : 'Properties over 20 miles away'
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                            <span className="font-medium text-secondary text-lg">
-                                                                +{formatPrice(quote.distanceAdjustment)}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                </div>
+                                                        <span className="text-secondary text-lg font-medium">
+                                                            +{formatPrice(quote.distanceAdjustment)}
+                                                        </span>
+                                                    </div>
+                                                )}
                                             </div>
+                                        </div>
 
-                                            {/* Disclaimer */}
-                                            <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
-                                                <p className="flex items-start gap-2 text-sm text-amber-200">
-                                                    <Info size={18} className="mt-0.5 flex-shrink-0 text-amber-400" />
-                                                    <span>
-                                                        <strong>Important:</strong> This is an estimate only. Final pricing will be confirmed after Mia reviews your property details and conducts a walkthrough consultation.
-                                                    </span>
-                                                </p>
-                                            </div>
+                                        {/* Disclaimer */}
+                                        <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
+                                            <p className="flex items-start gap-2 text-sm text-amber-200">
+                                                <Info size={18} className="mt-0.5 flex-shrink-0 text-amber-400" />
+                                                <span>
+                                                    <strong>Important:</strong> This is an estimate only. Final pricing will be confirmed
+                                                    after Mia reviews your property details and conducts a walkthrough consultation.
+                                                </span>
+                                            </p>
+                                        </div>
 
-                                            {/* Submit Button */}
-                                            <div className="flex justify-center">
-                                                <button
-                                                    type="submit"
-                                                    disabled={isSubmitting}
-                                                    className={`flex items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-colors ${
-                                                        isSubmitting
-                                                            ? 'cursor-not-allowed bg-surface-hover text-body-subtle'
-                                                            : 'bg-gold-400 text-body-inverse shadow-card hover:bg-gold-300'
-                                                    }`}
-                                                >
-                                                    {isSubmitting ? (
-                                                        <>
-                                                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-body-inverse/40 border-t-transparent" />
-                                                            <span>Sending&hellip;</span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <Send size={24} />
-                                                            <span>Send quote request</span>
-                                                        </>
-                                                    )}
-                                                </button>
-                                            </div>
-                                        </>
-                                    )}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                                        {/* Submit Button */}
+                                        <div className="flex justify-center">
+                                            <button
+                                                type="submit"
+                                                disabled={isSubmitting}
+                                                className={`flex items-center justify-center gap-3 rounded-xl px-8 py-4 text-lg font-bold transition-colors ${
+                                                    isSubmitting
+                                                        ? 'bg-surface-hover text-body-subtle cursor-not-allowed'
+                                                        : 'bg-gold-400 text-body-inverse shadow-card hover:bg-gold-300'
+                                                }`}
+                                            >
+                                                {isSubmitting ? (
+                                                    <>
+                                                        <div className="border-body-inverse/40 h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
+                                                        <span>Sending&hellip;</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Send size={24} />
+                                                        <span>Send quote request</span>
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
 
                 {/* Submit Messages */}

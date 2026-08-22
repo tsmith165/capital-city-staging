@@ -189,57 +189,57 @@ export async function readPostHogAnalytics(range: PostHogRange): Promise<PostHog
 
         const [metricResults, trendResults, pageResults, sourceResults, eventResults, valueResults, ctaResults, channelResults] =
             await Promise.all([
-            hogql(
-                projectId,
-                apiKey,
-                `SELECT count(), uniq(distinct_id), countIf(properties.$current_url LIKE '%/contact%')
+                hogql(
+                    projectId,
+                    apiKey,
+                    `SELECT count(), uniq(distinct_id), countIf(properties.$current_url LIKE '%/contact%')
                  FROM events WHERE ${where}`,
-            ),
-            hogql(
-                projectId,
-                apiKey,
-                `SELECT toDate(timestamp), count(), uniq(distinct_id)
+                ),
+                hogql(
+                    projectId,
+                    apiKey,
+                    `SELECT toDate(timestamp), count(), uniq(distinct_id)
                  FROM events WHERE ${where}
                  GROUP BY toDate(timestamp) ORDER BY toDate(timestamp) ASC`,
-            ),
-            hogql(
-                projectId,
-                apiKey,
-                `SELECT properties.$current_url, count()
+                ),
+                hogql(
+                    projectId,
+                    apiKey,
+                    `SELECT properties.$current_url, count()
                  FROM events WHERE ${where}
                  GROUP BY properties.$current_url ORDER BY count() DESC LIMIT 200`,
-            ),
-            hogql(
-                projectId,
-                apiKey,
-                `SELECT coalesce(nullIf(properties.$referring_domain, ''), 'Direct'), count()
+                ),
+                hogql(
+                    projectId,
+                    apiKey,
+                    `SELECT coalesce(nullIf(properties.$referring_domain, ''), 'Direct'), count()
                  FROM events WHERE ${where}
                  GROUP BY coalesce(nullIf(properties.$referring_domain, ''), 'Direct')
                  ORDER BY count() DESC LIMIT 12`,
-            ),
-            hogql(projectId, apiKey, `SELECT event, count() FROM events WHERE ${conversions} GROUP BY event`),
-            hogql(
-                projectId,
-                apiKey,
-                `SELECT sum(toFloat(properties.estimate))
+                ),
+                hogql(projectId, apiKey, `SELECT event, count() FROM events WHERE ${conversions} GROUP BY event`),
+                hogql(
+                    projectId,
+                    apiKey,
+                    `SELECT sum(toFloat(properties.estimate))
                  FROM events WHERE event = 'quote_submitted' AND ${RANGE_CONFIG[range].sql}`,
-            ),
-            hogql(
-                projectId,
-                apiKey,
-                `SELECT concat(toString(properties.cta), ' \u00b7 ', toString(properties.placement)), count()
+                ),
+                hogql(
+                    projectId,
+                    apiKey,
+                    `SELECT concat(toString(properties.cta), ' \u00b7 ', toString(properties.placement)), count()
                  FROM events WHERE event = 'cta_clicked' AND ${RANGE_CONFIG[range].sql}
                  GROUP BY concat(toString(properties.cta), ' \u00b7 ', toString(properties.placement))
                  ORDER BY count() DESC LIMIT 8`,
-            ),
-            hogql(
-                projectId,
-                apiKey,
-                `SELECT toString(properties.channel), count()
+                ),
+                hogql(
+                    projectId,
+                    apiKey,
+                    `SELECT toString(properties.channel), count()
                  FROM events WHERE event = 'contact_channel_clicked' AND ${RANGE_CONFIG[range].sql}
                  GROUP BY toString(properties.channel)`,
-            ),
-        ]);
+                ),
+            ]);
 
         const metricRow = rows(metricResults)[0] ?? [];
         const visitors = numberAt(metricRow, 1);

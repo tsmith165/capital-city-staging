@@ -56,7 +56,7 @@ export default function PortfolioLightbox({ images, index, projectName, onClose,
             role="dialog"
             aria-modal="true"
             aria-label={`${projectName}, image ${index + 1} of ${images.length}`}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-ink/90 backdrop-blur-sm"
+            className="bg-ink/90 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
         >
             <button type="button" aria-label="Close" tabIndex={-1} onClick={onClose} className="absolute inset-0 cursor-default" />
 
@@ -75,7 +75,7 @@ export default function PortfolioLightbox({ images, index, projectName, onClose,
                 type="button"
                 onClick={onClose}
                 aria-label="Close"
-                className="absolute top-4 right-4 grid h-11 w-11 place-items-center rounded-md border border-line-strong bg-surface-raised/90 text-body transition-colors hover:text-gold-300"
+                className="border-line-strong bg-surface-raised/90 text-body hover:text-gold-300 absolute top-4 right-4 grid h-11 w-11 place-items-center rounded-md border transition-colors"
             >
                 <X size={20} aria-hidden="true" />
             </button>
@@ -86,7 +86,7 @@ export default function PortfolioLightbox({ images, index, projectName, onClose,
                         type="button"
                         onClick={() => onStep(-1)}
                         aria-label="Previous image"
-                        className="absolute left-3 grid h-12 w-12 place-items-center rounded-full border border-line-strong bg-surface-raised/90 text-body transition-colors hover:text-gold-300 sm:left-6"
+                        className="border-line-strong bg-surface-raised/90 text-body hover:text-gold-300 absolute left-3 grid h-12 w-12 place-items-center rounded-full border transition-colors sm:left-6"
                     >
                         <ChevronLeft size={24} aria-hidden="true" />
                     </button>
@@ -94,12 +94,12 @@ export default function PortfolioLightbox({ images, index, projectName, onClose,
                         type="button"
                         onClick={() => onStep(1)}
                         aria-label="Next image"
-                        className="absolute right-3 grid h-12 w-12 place-items-center rounded-full border border-line-strong bg-surface-raised/90 text-body transition-colors hover:text-gold-300 sm:right-6"
+                        className="border-line-strong bg-surface-raised/90 text-body hover:text-gold-300 absolute right-3 grid h-12 w-12 place-items-center rounded-full border transition-colors sm:right-6"
                     >
                         <ChevronRight size={24} aria-hidden="true" />
                     </button>
 
-                    <p className="absolute bottom-5 rounded-full border border-line bg-surface-raised/90 px-3.5 py-1.5 text-xs font-semibold text-body-muted">
+                    <p className="border-line bg-surface-raised/90 text-body-muted absolute bottom-5 rounded-full border px-3.5 py-1.5 text-xs font-semibold">
                         {index + 1} / {images.length}
                     </p>
                 </>

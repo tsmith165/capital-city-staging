@@ -6,4 +6,4 @@ import { resendCoreTable, inventoryTable, extraImagesTable } from '@/db/schema';
 const sql = neon(process.env.NEON_DATABASE_URL!);
 const db = drizzle(sql);
 
-export { db, resendCoreTable, inventoryTable, extraImagesTable};
+export { db, resendCoreTable, inventoryTable, extraImagesTable };

@@ -8,5 +8,4 @@ export const PRIMARY_ACTION =
 export const SECONDARY_ACTION =
     'inline-flex items-center justify-center gap-2 rounded-md border border-line-strong bg-surface-raised/80 px-6 py-3 text-sm font-bold uppercase tracking-[0.06em] text-body backdrop-blur transition-colors hover:border-gold-400 hover:text-gold-300';
 
-export const QUIET_ACTION =
-    'inline-flex items-center gap-1.5 text-sm font-semibold text-gold-300 transition-colors hover:text-gold-200';
+export const QUIET_ACTION = 'inline-flex items-center gap-1.5 text-sm font-semibold text-gold-300 transition-colors hover:text-gold-200';

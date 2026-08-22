@@ -19,24 +19,24 @@ export default function About() {
                         alt="Mia Dofflemyer, founder of Capital City Staging"
                         width={936}
                         height={1248}
-                        className="h-auto w-full rounded-xl border border-line object-cover shadow-card"
+                        className="border-line shadow-card h-auto w-full rounded-xl border object-cover"
                         sizes="(min-width: 1024px) 340px, 100vw"
                     />
 
-                    <div className="mt-5 flex items-center gap-3 rounded-lg border border-line bg-surface-raised p-3.5">
+                    <div className="border-line bg-surface-raised mt-5 flex items-center gap-3 rounded-lg border p-3.5">
                         <Image
                             src="/logo/RESA_logo.png"
                             alt=""
                             aria-hidden="true"
                             width={1024}
                             height={512}
-                            className="h-9 w-auto shrink-0 rounded bg-body p-1"
+                            className="bg-body h-9 w-auto shrink-0 rounded p-1"
                         />
-                        <p className="text-xs leading-snug text-body-subtle">
+                        <p className="text-body-subtle text-xs leading-snug">
                             Certified through the{' '}
                             <Link
                                 href="https://www.realestatestagingassociation.com/"
-                                className="font-semibold text-gold-300 hover:text-gold-200"
+                                className="text-gold-300 hover:text-gold-200 font-semibold"
                             >
                                 Real Estate Staging Association
                             </Link>
@@ -45,31 +45,29 @@ export default function About() {
                 </div>
 
                 <div>
-                    <p className="text-xs font-bold tracking-[0.2em] text-forest-200 uppercase">Who you&rsquo;ll work with</p>
-                    <h2 className="mt-3 font-display text-3xl font-bold gradient-gold-main-text sm:text-4xl">Mia Dofflemyer</h2>
-                    <p className="mt-1.5 text-body-muted">Founder, Capital City Staging</p>
-                    <p className="text-sm text-body-subtle">Licensed California real estate agent since 2020</p>
+                    <p className="text-forest-200 text-xs font-bold tracking-[0.2em] uppercase">Who you&rsquo;ll work with</p>
+                    <h2 className="font-display gradient-gold-main-text mt-3 text-3xl font-bold sm:text-4xl">Mia Dofflemyer</h2>
+                    <p className="text-body-muted mt-1.5">Founder, Capital City Staging</p>
+                    <p className="text-body-subtle text-sm">Licensed California real estate agent since 2020</p>
 
-                    <div className="mt-6 space-y-4 text-body-muted">
+                    <div className="text-body-muted mt-6 space-y-4">
                         <p>
-                            I grew up in the valley, studied at UC Davis, and have spent the years since helping people in Sacramento
-                            buy and sell homes. Staging is the part I kept coming back to &mdash; it&rsquo;s what most reliably changes
-                            the outcome.
+                            I grew up in the valley, studied at UC Davis, and have spent the years since helping people in Sacramento buy
+                            and sell homes. Staging is the part I kept coming back to &mdash; it&rsquo;s what most reliably changes the
+                            outcome.
                         </p>
                         <p>
                             Selling a house is a transaction to everyone except the person who lived in it. I stage for the buyer&rsquo;s
                             first impression without forgetting whose home it still is.
                         </p>
-                        <p>
-                            You deal with me directly, from walkthrough to pickup. No account manager, no handoff.
-                        </p>
+                        <p>You deal with me directly, from walkthrough to pickup. No account manager, no handoff.</p>
                     </div>
 
-                    <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-line pt-6">
+                    <div className="border-line mt-7 flex flex-wrap items-center gap-x-6 gap-y-3 border-t pt-6">
                         <a
                             href={CONTACT_DETAILS.phoneHref}
                             onClick={() => track('contact_channel_clicked', { channel: 'phone', placement: 'about' })}
-                            className="inline-flex items-center gap-2 text-sm font-semibold text-body-muted transition-colors hover:text-gold-300"
+                            className="text-body-muted hover:text-gold-300 inline-flex items-center gap-2 text-sm font-semibold transition-colors"
                         >
                             <Phone size={16} className="text-forest-200" aria-hidden="true" />
                             {CONTACT_DETAILS.phone}
@@ -77,7 +75,7 @@ export default function About() {
                         <a
                             href={`mailto:${CONTACT_DETAILS.email}`}
                             onClick={() => track('contact_channel_clicked', { channel: 'email', placement: 'about' })}
-                            className="inline-flex items-center gap-2 break-all text-sm font-semibold text-body-muted transition-colors hover:text-gold-300"
+                            className="text-body-muted hover:text-gold-300 inline-flex items-center gap-2 text-sm font-semibold break-all transition-colors"
                         >
                             <Mail size={16} className="text-forest-200" aria-hidden="true" />
                             {CONTACT_DETAILS.email}

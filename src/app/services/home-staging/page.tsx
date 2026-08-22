@@ -59,23 +59,21 @@ export default function HomeStagingServices() {
             >
                 <h2>Who this is for</h2>
                 <p>
-                    Empty listings, new builds, and homes the sellers have moved out of. If a buyer is going to walk through
-                    bare rooms, or scroll past photographs of them, this is the service you want.
+                    Empty listings, new builds, and homes the sellers have moved out of. If a buyer is going to walk through bare rooms, or
+                    scroll past photographs of them, this is the service you want.
                 </p>
 
                 <h2>How it works</h2>
                 <ol>
                     <li>
-                        <strong>Walkthrough.</strong> Mia measures the rooms on site and asks what the listing is competing
-                        against.
+                        <strong>Walkthrough.</strong> Mia measures the rooms on site and asks what the listing is competing against.
                     </li>
                     <li>
-                        <strong>Plan and price.</strong> You get a room-by-room plan with the cost attached, before anything is
-                        rented or moved.
+                        <strong>Plan and price.</strong> You get a room-by-room plan with the cost attached, before anything is rented or
+                        moved.
                     </li>
                     <li>
-                        <strong>Install.</strong> Furniture, art and accessories go in ahead of the photography date, not after
-                        it.
+                        <strong>Install.</strong> Furniture, art and accessories go in ahead of the photography date, not after it.
                     </li>
                     <li>
                         <strong>Removal.</strong> Everything comes back out once the home closes.
@@ -91,8 +89,8 @@ export default function HomeStagingServices() {
 
                 <h2>Who you&rsquo;ll be working with</h2>
                 <p>
-                    Mia Dofflemyer, directly. She is a RESA-certified stager and has been a licensed California real estate
-                    agent since 2020. There is no account manager and no handoff between the walkthrough and the pickup.
+                    Mia Dofflemyer, directly. She is a RESA-certified stager and has been a licensed California real estate agent since
+                    2020. There is no account manager and no handoff between the walkthrough and the pickup.
                 </p>
             </ArticleShell>
         </PageLayout>

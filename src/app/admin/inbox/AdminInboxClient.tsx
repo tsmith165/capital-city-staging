@@ -24,10 +24,7 @@ const fullDate = new Intl.DateTimeFormat('en-US', {
 export default function AdminInboxClient() {
     const [filter, setFilter] = useState<InboxFilter>('unanswered');
 
-    const submissions = useQuery(
-        api.contactSubmissions.getSubmissions,
-        filter === 'all' ? {} : { responded: filter === 'answered' },
-    );
+    const submissions = useQuery(api.contactSubmissions.getSubmissions, filter === 'all' ? {} : { responded: filter === 'answered' });
     const setResponded = useMutation(api.contactSubmissions.setResponded);
     const deleteSubmission = useMutation(api.contactSubmissions.deleteSubmission);
 
@@ -66,7 +63,7 @@ export default function AdminInboxClient() {
                 {submissions === undefined ? (
                     <SkeletonTiles count={4} label="Loading messages" className="flex flex-col gap-3" />
                 ) : submissions.length === 0 ? (
-                    <div className="rounded-lg border border-line bg-surface-raised">
+                    <div className="border-line bg-surface-raised rounded-lg border">
                         <AdminEmpty>
                             {filter === 'unanswered'
                                 ? 'No unanswered messages. Everything has been replied to.'
@@ -80,24 +77,24 @@ export default function AdminInboxClient() {
                         {submissions.map((submission) => (
                             <li
                                 key={submission._id}
-                                className="flex flex-col gap-3 rounded-lg border border-line bg-surface-raised p-5 shadow-card"
+                                className="border-line bg-surface-raised shadow-card flex flex-col gap-3 rounded-lg border p-5"
                             >
                                 <div className="flex flex-wrap items-start justify-between gap-3">
                                     <div className="flex min-w-0 flex-col gap-1">
-                                        <strong className="font-display text-lg font-normal leading-tight text-body">
+                                        <strong className="font-display text-body text-lg leading-tight font-normal">
                                             {submission.name}
                                         </strong>
-                                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-body-muted">
+                                        <div className="text-body-muted flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
                                             <a
                                                 href={`mailto:${submission.email}`}
-                                                className="inline-flex items-center gap-1.5 transition-colors hover:text-gold-300"
+                                                className="hover:text-gold-300 inline-flex items-center gap-1.5 transition-colors"
                                             >
                                                 <Mail size={13} aria-hidden="true" /> {submission.email}
                                             </a>
                                             {submission.phone && (
                                                 <a
                                                     href={`tel:${submission.phone}`}
-                                                    className="inline-flex items-center gap-1.5 transition-colors hover:text-gold-300"
+                                                    className="hover:text-gold-300 inline-flex items-center gap-1.5 transition-colors"
                                                 >
                                                     <Phone size={13} aria-hidden="true" /> {submission.phone}
                                                 </a>
@@ -109,20 +106,18 @@ export default function AdminInboxClient() {
                                     </AdminStatus>
                                 </div>
 
-                                <p className="whitespace-pre-wrap text-sm leading-relaxed text-body-muted">{submission.message}</p>
+                                <p className="text-body-muted text-sm leading-relaxed whitespace-pre-wrap">{submission.message}</p>
 
-                                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
-                                    <small className="text-[11px] text-body-subtle">
+                                <div className="border-line flex flex-wrap items-center justify-between gap-3 border-t pt-3">
+                                    <small className="text-body-subtle text-[11px]">
                                         Received {fullDate.format(new Date(submission.createdAt))}
-                                        {submission.respondedAt
-                                            ? ` · answered ${fullDate.format(new Date(submission.respondedAt))}`
-                                            : ''}
+                                        {submission.respondedAt ? ` · answered ${fullDate.format(new Date(submission.respondedAt))}` : ''}
                                     </small>
                                     <div className="flex items-center gap-2">
                                         <button
                                             type="button"
                                             onClick={() => setResponded({ id: submission._id, responded: !submission.responded })}
-                                            className="inline-flex items-center gap-1.5 rounded-md border border-line px-3 py-1.5 text-xs font-bold text-body-muted transition-colors hover:bg-surface-overlay hover:text-body"
+                                            className="border-line text-body-muted hover:bg-surface-overlay hover:text-body inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-bold transition-colors"
                                         >
                                             {submission.responded ? (
                                                 <>
@@ -138,7 +133,7 @@ export default function AdminInboxClient() {
                                             type="button"
                                             onClick={() => handleDelete(submission._id, submission.name)}
                                             aria-label={`Delete message from ${submission.name}`}
-                                            className="inline-flex items-center gap-1.5 rounded-md border border-line px-3 py-1.5 text-xs font-bold text-body-muted transition-colors hover:border-danger/40 hover:bg-danger-soft hover:text-danger"
+                                            className="border-line text-body-muted hover:border-danger/40 hover:bg-danger-soft hover:text-danger inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-bold transition-colors"
                                         >
                                             <Trash2 size={13} aria-hidden="true" /> Delete
                                         </button>

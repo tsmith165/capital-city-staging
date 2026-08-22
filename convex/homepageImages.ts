@@ -54,19 +54,13 @@ export const getAvailableProjectImages = query({
       .withIndex("by_highlighted", (q) => q.eq("highlighted", true))
       .collect();
 
-    const sortedProjects = projects.sort(
-      (a, b) => (a.displayOrder || 999) - (b.displayOrder || 999)
-    );
+    const sortedProjects = projects.sort((a, b) => (a.displayOrder || 999) - (b.displayOrder || 999));
 
     // Get existing homepage images to detect duplicates
-    const existingHomepageImages = await ctx.db
-      .query("homepageImages")
-      .collect();
+    const existingHomepageImages = await ctx.db.query("homepageImages").collect();
 
     const existingProjectImageIds = new Set(
-      existingHomepageImages
-        .filter((img) => img.sourceProjectImageId)
-        .map((img) => img.sourceProjectImageId!.toString())
+      existingHomepageImages.filter((img) => img.sourceProjectImageId).map((img) => img.sourceProjectImageId!.toString()),
     );
 
     // Build result with images and alreadyOnHomepage flag
@@ -77,9 +71,7 @@ export const getAvailableProjectImages = query({
           .withIndex("by_project", (q) => q.eq("projectId", project._id))
           .collect();
 
-        const sortedImages = images.sort(
-          (a, b) => a.displayOrder - b.displayOrder
-        );
+        const sortedImages = images.sort((a, b) => a.displayOrder - b.displayOrder);
 
         return {
           projectId: project._id,
@@ -89,7 +81,7 @@ export const getAvailableProjectImages = query({
             alreadyOnHomepage: existingProjectImageIds.has(img._id.toString()),
           })),
         };
-      })
+      }),
     );
 
     return projectsWithImages;
@@ -124,9 +116,7 @@ export const addHomepageImage = mutation({
     }
 
     const existingImages = await ctx.db.query("homepageImages").collect();
-    const maxOrder = existingImages.length > 0
-      ? Math.max(...existingImages.map((img) => img.displayOrder))
-      : 0;
+    const maxOrder = existingImages.length > 0 ? Math.max(...existingImages.map((img) => img.displayOrder)) : 0;
 
     const imageId = await ctx.db.insert("homepageImages", {
       imagePath: args.imagePath,
@@ -167,15 +157,11 @@ export const addProjectImagesToHomepage = mutation({
     }
 
     const existingImages = await ctx.db.query("homepageImages").collect();
-    let maxOrder = existingImages.length > 0
-      ? Math.max(...existingImages.map((img) => img.displayOrder))
-      : 0;
+    let maxOrder = existingImages.length > 0 ? Math.max(...existingImages.map((img) => img.displayOrder)) : 0;
 
     // Track existing source project image IDs to skip duplicates
     const existingProjectImageIds = new Set(
-      existingImages
-        .filter((img) => img.sourceProjectImageId)
-        .map((img) => img.sourceProjectImageId!.toString())
+      existingImages.filter((img) => img.sourceProjectImageId).map((img) => img.sourceProjectImageId!.toString()),
     );
 
     let added = 0;

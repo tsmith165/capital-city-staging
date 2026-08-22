@@ -93,7 +93,7 @@ export default function CreateInventoryConvex() {
 
             setStatusMessage({ type: 'success', message: 'Inventory created successfully.' });
             handleResetInputs();
-            
+
             switch (action) {
                 case 'edit':
                     router.push(`/admin/edit?id=${nextOId}`);
@@ -127,9 +127,9 @@ export default function CreateInventoryConvex() {
     const isFormValid = imageUrl !== 'Not yet uploaded' && title !== 'Not yet uploaded' && !isSubmitting;
 
     return (
-        <div className="flex h-full w-full flex-col items-center justify-center bg-surface">
-            <div className="flex w-4/5 flex-col items-center justify-center rounded-lg bg-surface">
-                <div id="header" className="w-fit rounded-t-lg text-center text-4xl font-bold gradient-secondary-main-text">
+        <div className="bg-surface flex h-full w-full flex-col items-center justify-center">
+            <div className="bg-surface flex w-4/5 flex-col items-center justify-center rounded-lg">
+                <div id="header" className="gradient-secondary-main-text w-fit rounded-t-lg text-center text-4xl font-bold">
                     Create New Inventory
                 </div>
                 <div className="flex w-full flex-col items-center space-y-2 p-2">
@@ -162,7 +162,7 @@ export default function CreateInventoryConvex() {
                                 'relative rounded-md px-4 py-1 text-lg font-bold ' +
                                 (isFormValid
                                     ? ' bg-primary_dark text-body-muted hover:bg-primary hover:text-body-inverse'
-                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark hover:bg-stone-300 hover:text-red-600')
+                                    : 'text-secondary_dark cursor-not-allowed bg-stone-300 hover:bg-stone-300 hover:text-red-600')
                             }
                         >
                             {isSubmitting ? 'Creating...' : 'Create & Edit'}
@@ -175,7 +175,7 @@ export default function CreateInventoryConvex() {
                                 'relative rounded-md px-4 py-1 text-lg font-bold ' +
                                 (isFormValid
                                     ? ' bg-primary_dark text-body-muted hover:bg-primary hover:text-body-inverse'
-                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark hover:bg-stone-300 hover:text-red-600')
+                                    : 'text-secondary_dark cursor-not-allowed bg-stone-300 hover:bg-stone-300 hover:text-red-600')
                             }
                         >
                             {isSubmitting ? 'Creating...' : 'Create & Add Images'}
@@ -188,7 +188,7 @@ export default function CreateInventoryConvex() {
                                 'relative rounded-md px-4 py-1 text-lg font-bold ' +
                                 (isFormValid
                                     ? ' bg-primary_dark text-body-muted hover:bg-primary hover:text-body-inverse'
-                                    : 'cursor-not-allowed bg-stone-300 text-secondary_dark hover:bg-stone-300 hover:text-red-600')
+                                    : 'text-secondary_dark cursor-not-allowed bg-stone-300 hover:bg-stone-300 hover:text-red-600')
                             }
                         >
                             {isSubmitting ? 'Creating...' : 'Create & View'}

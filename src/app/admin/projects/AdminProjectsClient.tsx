@@ -74,7 +74,7 @@ export default function AdminProjectsClient() {
         return (
             <div className="container mx-auto p-4">
                 <div className="mb-6 flex items-center justify-between">
-                    <h1 className="text-3xl font-bold text-body">Manage Projects</h1>
+                    <h1 className="text-body text-3xl font-bold">Manage Projects</h1>
                     <SkeletonBlock className="h-10 w-40 rounded" />
                 </div>
                 <SkeletonTable headers={PROJECT_COLUMNS} rows={6} label="Loading projects" />
@@ -85,10 +85,10 @@ export default function AdminProjectsClient() {
     return (
         <div className="container mx-auto p-4">
             <div className="mb-6 flex items-center justify-between">
-                <h1 className="text-3xl font-bold text-body">Manage Projects</h1>
+                <h1 className="text-body text-3xl font-bold">Manage Projects</h1>
                 <Link
                     href="/admin/projects/new"
-                    className="rounded bg-primary px-4 py-2 text-white transition-colors hover:bg-primary_dark"
+                    className="bg-primary hover:bg-primary_dark rounded px-4 py-2 text-white transition-colors"
                 >
                     Create New Project
                 </Link>
@@ -96,47 +96,47 @@ export default function AdminProjectsClient() {
 
             {projects.length === 0 ? (
                 <div className="py-12 text-center">
-                    <p className="text-lg text-body-subtle">No projects yet.</p>
+                    <p className="text-body-subtle text-lg">No projects yet.</p>
                     <Link
                         href="/admin/projects/new"
-                        className="mt-4 inline-block rounded bg-primary px-6 py-3 text-white transition-colors hover:bg-primary_dark"
+                        className="bg-primary hover:bg-primary_dark mt-4 inline-block rounded px-6 py-3 text-white transition-colors"
                     >
                         Create Your First Project
                     </Link>
                 </div>
             ) : (
                 <div className="overflow-x-auto">
-                    <table className="min-w-full rounded-lg bg-surface-raised">
+                    <table className="bg-surface-raised min-w-full rounded-lg">
                         <thead>
                             <tr className="">
-                                <th className="px-4 py-3 text-center text-body">Order</th>
-                                <th className="px-4 py-3 text-left text-body">Name</th>
-                                <th className="px-4 py-3 text-left text-body">Status</th>
-                                <th className="px-4 py-3 text-left text-body">Address</th>
-                                <th className="px-4 py-3 text-left text-body">Started</th>
-                                <th className="px-4 py-3 text-center text-body">Highlighted</th>
-                                <th className="px-4 py-3 text-center text-body">Actions</th>
+                                <th className="text-body px-4 py-3 text-center">Order</th>
+                                <th className="text-body px-4 py-3 text-left">Name</th>
+                                <th className="text-body px-4 py-3 text-left">Status</th>
+                                <th className="text-body px-4 py-3 text-left">Address</th>
+                                <th className="text-body px-4 py-3 text-left">Started</th>
+                                <th className="text-body px-4 py-3 text-center">Highlighted</th>
+                                <th className="text-body px-4 py-3 text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="">
                             {projects.map((project, index) => (
-                                <tr key={project._id} className="border-t border-line text-body-muted">
+                                <tr key={project._id} className="border-line text-body-muted border-t">
                                     <td className="px-4 py-3 text-center">
                                         <div className="flex items-center justify-center">
                                             <button
                                                 onClick={() => handleMoveUp(project._id, index === 0)}
-                                                className="rounded p-1 text-body-subtle hover:text-body hover:bg-surface-overlay transition-colors"
+                                                className="text-body-subtle hover:text-body hover:bg-surface-overlay rounded p-1 transition-colors"
                                                 data-tooltip-id="move-up-tooltip"
-                                                data-tooltip-content={index === 0 ? "Move to Last" : "Move Up"}
+                                                data-tooltip-content={index === 0 ? 'Move to Last' : 'Move Up'}
                                             >
                                                 <ChevronUp size={16} />
                                             </button>
-                                            <span className="text-sm font-medium w-8 text-center">{index + 1}</span>
+                                            <span className="w-8 text-center text-sm font-medium">{index + 1}</span>
                                             <button
                                                 onClick={() => handleMoveDown(project._id, index === projects.length - 1)}
-                                                className="rounded p-1 text-body-subtle hover:text-body hover:bg-surface-overlay transition-colors"
+                                                className="text-body-subtle hover:text-body hover:bg-surface-overlay rounded p-1 transition-colors"
                                                 data-tooltip-id="move-down-tooltip"
-                                                data-tooltip-content={index === projects.length - 1 ? "Move to First" : "Move Down"}
+                                                data-tooltip-content={index === projects.length - 1 ? 'Move to First' : 'Move Down'}
                                             >
                                                 <ChevronDown size={16} />
                                             </button>
@@ -159,13 +159,15 @@ export default function AdminProjectsClient() {
                                         </span>
                                     </td>
                                     <td className="px-4 py-3">{project.address || '-'}</td>
-                                    <td className="px-4 py-3">{project.startDate ? new Date(project.startDate).toLocaleDateString() : '-'}</td>
+                                    <td className="px-4 py-3">
+                                        {project.startDate ? new Date(project.startDate).toLocaleDateString() : '-'}
+                                    </td>
                                     <td className="px-4 py-3 text-center">
                                         <button
                                             onClick={() => handleToggleHighlight(project._id)}
                                             className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
                                                 project.highlighted
-                                                    ? 'bg-primary text-white hover:bg-primary_dark'
+                                                    ? 'bg-primary hover:bg-primary_dark text-white'
                                                     : 'bg-surface-hover text-body-muted hover:bg-stone-500'
                                             }`}
                                         >
@@ -176,7 +178,7 @@ export default function AdminProjectsClient() {
                                         <div className="flex justify-center gap-2">
                                             <Link
                                                 href={`/admin/projects/${project._id}/edit`}
-                                                className="rounded p-2 text-blue-400 transition-colors hover:bg-surface-overlay hover:text-blue-300"
+                                                className="hover:bg-surface-overlay rounded p-2 text-blue-400 transition-colors hover:text-blue-300"
                                                 data-tooltip-id="edit-tooltip"
                                                 data-tooltip-content="Edit Project"
                                             >
@@ -184,7 +186,7 @@ export default function AdminProjectsClient() {
                                             </Link>
                                             <Link
                                                 href={`/admin/projects/${project._id}/inventory`}
-                                                className="rounded p-2 text-secondary_light transition-colors hover:bg-surface-overlay hover:text-secondary"
+                                                className="text-secondary_light hover:bg-surface-overlay hover:text-secondary rounded p-2 transition-colors"
                                                 data-tooltip-id="inventory-tooltip"
                                                 data-tooltip-content="Manage Inventory"
                                             >
@@ -192,7 +194,7 @@ export default function AdminProjectsClient() {
                                             </Link>
                                             <button
                                                 onClick={() => setShowDeleteConfirm(project._id)}
-                                                className="rounded p-2 text-red-400 transition-colors hover:bg-surface-overlay hover:text-red-300"
+                                                className="hover:bg-surface-overlay rounded p-2 text-red-400 transition-colors hover:text-red-300"
                                                 data-tooltip-id="delete-tooltip"
                                                 data-tooltip-content="Delete Project"
                                             >
@@ -200,12 +202,12 @@ export default function AdminProjectsClient() {
                                             </button>
                                         </div>
                                         {showDeleteConfirm === project._id && (
-                                            <div className="absolute left-1/2 top-full z-10 mt-2 min-w-64 -translate-x-1/2 transform rounded-lg border border-line-strong bg-surface-overlay p-4 shadow-lg">
-                                                <p className="mb-3 text-sm text-body">Are you sure you want to delete this project?</p>
+                                            <div className="border-line-strong bg-surface-overlay absolute top-full left-1/2 z-10 mt-2 min-w-64 -translate-x-1/2 transform rounded-lg border p-4 shadow-lg">
+                                                <p className="text-body mb-3 text-sm">Are you sure you want to delete this project?</p>
                                                 <div className="flex justify-center gap-2">
                                                     <button
                                                         onClick={() => setShowDeleteConfirm(null)}
-                                                        className="rounded bg-surface-hover px-3 py-1 text-sm text-body-muted transition-colors hover:bg-stone-500"
+                                                        className="bg-surface-hover text-body-muted rounded px-3 py-1 text-sm transition-colors hover:bg-stone-500"
                                                     >
                                                         Cancel
                                                     </button>

@@ -8,6 +8,13 @@
   "plugins": ["prettier-plugin-tailwindcss"],
   "overrides": [
     {
+      "comment": "Package managers rewrite package.json at 2-space; matching that avoids churn on every install.",
+      "files": "package.json",
+      "options": {
+        "tabWidth": 2
+      }
+    },
+    {
       "comment": "Convex sources follow Convex's own codegen style: 2-space, double-quoted.",
       "files": "convex/**/*.ts",
       "options": {

@@ -18,7 +18,7 @@ export default function SignUpPage() {
             footer={
                 <p>
                     Trying to book staging instead?{' '}
-                    <Link href="/contact" className="font-semibold text-gold-300 hover:text-gold-200">
+                    <Link href="/contact" className="text-gold-300 hover:text-gold-200 font-semibold">
                         Get a quote
                     </Link>
                     .

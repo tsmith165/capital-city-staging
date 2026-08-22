@@ -43,20 +43,14 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
             footer={
                 <p>
                     Trying to book staging instead?{' '}
-                    <Link href="/contact" className="font-semibold text-gold-300 hover:text-gold-200">
+                    <Link href="/contact" className="text-gold-300 hover:text-gold-200 font-semibold">
                         Get a quote
                     </Link>
                     .
                 </p>
             }
         >
-            <SignIn
-                path="/signin"
-                routing="path"
-                signUpUrl="/signup"
-                fallbackRedirectUrl={returnTo}
-                appearance={authAppearance}
-            />
+            <SignIn path="/signin" routing="path" signUpUrl="/signup" fallbackRedirectUrl={returnTo} appearance={authAppearance} />
         </AuthShell>
     );
 }

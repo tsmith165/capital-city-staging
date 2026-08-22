@@ -3,6 +3,7 @@
 This document tracks findings, issues, and insights discovered during the Convex refactor process.
 
 ## Current Status
+
 - Status: Not Started
 - Phase: Planning Complete
 - Last Updated: [Date will be added when work begins]
@@ -10,6 +11,7 @@ This document tracks findings, issues, and insights discovered during the Convex
 ## Findings Log
 
 ### [Date] - Initial Assessment
+
 - Current database uses PostgreSQL with Drizzle ORM
 - Existing inventory system has 28 fields per item
 - Portfolio currently uses hardcoded image array
@@ -20,74 +22,90 @@ This document tracks findings, issues, and insights discovered during the Convex
 ## Issues Encountered
 
 ### Database Migration Issues
-*Issues will be logged here as they occur*
 
-### Authentication Issues  
-*Issues will be logged here as they occur*
+_Issues will be logged here as they occur_
+
+### Authentication Issues
+
+_Issues will be logged here as they occur_
 
 ### File Upload Issues
-*Issues will be logged here as they occur*
+
+_Issues will be logged here as they occur_
 
 ### UI/UX Issues
-*Issues will be logged here as they occur*
+
+_Issues will be logged here as they occur_
 
 ---
 
 ## Performance Observations
 
 ### Query Performance
-*Performance metrics will be recorded here*
+
+_Performance metrics will be recorded here_
 
 ### Real-time Updates
-*Real-time sync observations will be recorded here*
+
+_Real-time sync observations will be recorded here_
 
 ### Image Loading
-*Image performance observations will be recorded here*
+
+_Image performance observations will be recorded here_
 
 ---
 
 ## Technical Insights
 
 ### Convex Learnings
-*Insights about working with Convex will be documented here*
+
+_Insights about working with Convex will be documented here_
 
 ### Migration Strategies
-*Effective migration approaches will be noted here*
+
+_Effective migration approaches will be noted here_
 
 ### Integration Patterns
-*Patterns for integrating with existing systems will be documented*
+
+_Patterns for integrating with existing systems will be documented_
 
 ---
 
 ## User Experience Findings
 
 ### Admin Interface
-*Feedback on admin functionality will be recorded here*
+
+_Feedback on admin functionality will be recorded here_
 
 ### Customer Experience
-*Customer-facing feature feedback will be documented here*
+
+_Customer-facing feature feedback will be documented here_
 
 ### Performance Impact
-*User-perceived performance changes will be noted here*
+
+_User-perceived performance changes will be noted here_
 
 ---
 
 ## Security Considerations
 
 ### Access Control
-*Security findings related to user permissions will be documented*
+
+_Security findings related to user permissions will be documented_
 
 ### Data Privacy
-*Privacy-related observations will be recorded*
+
+_Privacy-related observations will be recorded_
 
 ### File Security
-*File upload security findings will be noted*
+
+_File upload security findings will be noted_
 
 ---
 
 ## Next Steps / Action Items
 
-*Action items based on findings will be listed here as they arise*
+_Action items based on findings will be listed here as they arise_
 
 ---
 

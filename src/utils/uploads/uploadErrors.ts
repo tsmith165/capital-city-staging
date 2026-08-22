@@ -145,7 +145,9 @@ export async function formatUploadError(error: unknown): Promise<string> {
             lines.push(explainStatus(probe.status, probe.contentType, probe.bodyPreview));
         } else {
             lines.push('Upload failed: the upload API could not be reached');
-            lines.push('The request to /api/uploadthing did not return a readable response. Check your network connection and the server logs.');
+            lines.push(
+                'The request to /api/uploadthing did not return a readable response. Check your network connection and the server logs.',
+            );
         }
 
         lines.push(`UploadThing code: ${details.code}${details.httpStatus ? ` (${details.httpStatus})` : ''}`);

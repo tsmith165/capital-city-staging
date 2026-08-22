@@ -12,20 +12,14 @@ import InputTextbox from '@/components/inputs/InputTextbox';
 import InputSelect from '@/components/inputs/InputSelect';
 
 interface ImageUploadOverlayProps {
-    inventoryId: Id<"inventory">;
+    inventoryId: Id<'inventory'>;
     inventoryOId: number;
     mode: 'main' | 'extra';
     onClose: () => void;
     onSuccess: () => void;
 }
 
-const ImageUploadOverlay: React.FC<ImageUploadOverlayProps> = ({
-    inventoryId,
-    inventoryOId,
-    mode,
-    onClose,
-    onSuccess
-}) => {
+const ImageUploadOverlay: React.FC<ImageUploadOverlayProps> = ({ inventoryId, inventoryOId, mode, onClose, onSuccess }) => {
     const [imageUrl, setImageUrl] = useState('');
     const [title, setTitle] = useState('');
     const [selectedOption, setSelectedOption] = useState(mode);
@@ -40,34 +34,37 @@ const ImageUploadOverlay: React.FC<ImageUploadOverlayProps> = ({
     const updateInventory = useMutation(api.inventory.updateInventory);
     const addExtraImage = useMutation(api.inventory.addExtraImage);
 
-    const handleUploadComplete = useCallback((
-        fileName: string,
-        originalImageUrl: string,
-        smallImageUrl: string,
-        originalWidth: number,
-        originalHeight: number,
-        smallWidth: number,
-        smallHeight: number,
-    ) => {
-        console.log('Upload complete:', {
-            fileName,
-            originalImageUrl,
-            smallImageUrl,
-            originalWidth,
-            originalHeight,
-            smallWidth,
-            smallHeight,
-        });
+    const handleUploadComplete = useCallback(
+        (
+            fileName: string,
+            originalImageUrl: string,
+            smallImageUrl: string,
+            originalWidth: number,
+            originalHeight: number,
+            smallWidth: number,
+            smallHeight: number,
+        ) => {
+            console.log('Upload complete:', {
+                fileName,
+                originalImageUrl,
+                smallImageUrl,
+                originalWidth,
+                originalHeight,
+                smallWidth,
+                smallHeight,
+            });
 
-        setTitle(fileName.split('.')[0] || '');
-        setImageUrl(originalImageUrl);
-        setSmallImageUrl(smallImageUrl);
-        setWidth(originalWidth);
-        setHeight(originalHeight);
-        setSmallWidth(smallWidth);
-        setSmallHeight(smallHeight);
-        setStatusMessage(null);
-    }, []);
+            setTitle(fileName.split('.')[0] || '');
+            setImageUrl(originalImageUrl);
+            setSmallImageUrl(smallImageUrl);
+            setWidth(originalWidth);
+            setHeight(originalHeight);
+            setSmallWidth(smallWidth);
+            setSmallHeight(smallHeight);
+            setStatusMessage(null);
+        },
+        [],
+    );
 
     const resetInputs = useCallback(() => {
         setImageUrl('');
@@ -101,7 +98,7 @@ const ImageUploadOverlay: React.FC<ImageUploadOverlayProps> = ({
                         smallImagePath: smallImageUrl,
                         smallWidth: smallWidth,
                         smallHeight: smallHeight,
-                    }
+                    },
                 });
                 setStatusMessage({ type: 'success', message: 'Main image updated successfully!' });
             } else {
@@ -124,12 +121,11 @@ const ImageUploadOverlay: React.FC<ImageUploadOverlayProps> = ({
                 onSuccess();
                 onClose();
             }, 1000);
-
         } catch (error) {
             console.error('Error saving image:', error);
-            setStatusMessage({ 
-                type: 'error', 
-                message: error instanceof Error ? error.message : 'Failed to save image' 
+            setStatusMessage({
+                type: 'error',
+                message: error instanceof Error ? error.message : 'Failed to save image',
             });
         } finally {
             setIsSubmitting(false);
@@ -141,15 +137,15 @@ const ImageUploadOverlay: React.FC<ImageUploadOverlayProps> = ({
     return (
         <>
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
-                <div className="relative w-full max-w-4xl mx-4 max-h-[90vh] bg-surface rounded-lg shadow-2xl overflow-hidden">
+                <div className="bg-surface relative mx-4 max-h-[90vh] w-full max-w-4xl overflow-hidden rounded-lg shadow-2xl">
                     {/* Header */}
-                    <div className="flex items-center justify-between p-6 bg-surface-raised border-b border-line">
-                        <h2 className="text-2xl font-bold gradient-secondary-main-text">
+                    <div className="bg-surface-raised border-line flex items-center justify-between border-b p-6">
+                        <h2 className="gradient-secondary-main-text text-2xl font-bold">
                             {mode === 'main' ? 'Change Main Image' : 'Add Extra Image'}
                         </h2>
                         <button
                             onClick={onClose}
-                            className="p-2 rounded-full bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body transition-colors"
+                            className="bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body rounded-full p-2 transition-colors"
                             data-tooltip-id="close-btn"
                             data-tooltip-content="Close"
                         >
@@ -158,12 +154,12 @@ const ImageUploadOverlay: React.FC<ImageUploadOverlayProps> = ({
                     </div>
 
                     {/* Content */}
-                    <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="max-h-[calc(90vh-140px)] overflow-y-auto p-6">
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                             {/* Upload Section */}
                             <div className="space-y-6">
                                 <div>
-                                    <h3 className="text-lg font-semibold text-body mb-3">Upload Image</h3>
+                                    <h3 className="text-body mb-3 text-lg font-semibold">Upload Image</h3>
                                     <ResizeUploader
                                         handleUploadComplete={handleUploadComplete}
                                         handleResetInputs={resetInputs}
@@ -174,9 +170,9 @@ const ImageUploadOverlay: React.FC<ImageUploadOverlayProps> = ({
                                 <InputSelect
                                     idName="image_type"
                                     name="Image Type"
-                                    defaultValue={{ 
-                                        value: selectedOption, 
-                                        label: selectedOption === 'main' ? 'Main Image' : 'Extra Image' 
+                                    defaultValue={{
+                                        value: selectedOption,
+                                        label: selectedOption === 'main' ? 'Main Image' : 'Extra Image',
                                     }}
                                     select_options={[
                                         ['main', 'Main Image'],
@@ -185,29 +181,24 @@ const ImageUploadOverlay: React.FC<ImageUploadOverlayProps> = ({
                                     onChange={(e) => setSelectedOption(e.target.value as 'main' | 'extra')}
                                 />
 
-                                <InputTextbox 
-                                    idName="title" 
-                                    name="Title" 
-                                    value={title} 
-                                    onChange={(e) => setTitle(e.target.value)} 
-                                />
+                                <InputTextbox idName="title" name="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
                             </div>
 
                             {/* Preview Section */}
                             <div className="space-y-4">
-                                <h3 className="text-lg font-semibold text-body">Preview</h3>
-                                
-                                <div className="aspect-square bg-surface-raised rounded-lg overflow-hidden flex items-center justify-center">
+                                <h3 className="text-body text-lg font-semibold">Preview</h3>
+
+                                <div className="bg-surface-raised flex aspect-square items-center justify-center overflow-hidden rounded-lg">
                                     {imageUrl ? (
                                         <Image
                                             src={imageUrl}
                                             alt="Preview"
                                             width={width}
                                             height={height}
-                                            className="w-full h-full object-cover"
+                                            className="h-full w-full object-cover"
                                         />
                                     ) : (
-                                        <div className="text-center text-body-subtle">
+                                        <div className="text-body-subtle text-center">
                                             <Upload size={48} className="mx-auto mb-2 opacity-50" />
                                             <p>Upload an image to see preview</p>
                                         </div>
@@ -219,20 +210,25 @@ const ImageUploadOverlay: React.FC<ImageUploadOverlayProps> = ({
                         {/* Image Dimensions and Warnings */}
                         {imageUrl && imageUrl !== 'Not yet uploaded' && (
                             <div className="mt-6 space-y-4">
-                                <div className="grid grid-cols-2 gap-4 text-sm text-body-subtle bg-surface-raised p-4 rounded-lg">
+                                <div className="text-body-subtle bg-surface-raised grid grid-cols-2 gap-4 rounded-lg p-4 text-sm">
                                     <div>
-                                        <span className="block font-medium text-body-muted">Dimensions:</span>
-                                        <span>{width} × {height}px</span>
+                                        <span className="text-body-muted block font-medium">Dimensions:</span>
+                                        <span>
+                                            {width} × {height}px
+                                        </span>
                                     </div>
                                     <div>
-                                        <span className="block font-medium text-body-muted">Small:</span>
-                                        <span>{smallWidth} × {smallHeight}px</span>
+                                        <span className="text-body-muted block font-medium">Small:</span>
+                                        <span>
+                                            {smallWidth} × {smallHeight}px
+                                        </span>
                                     </div>
                                 </div>
 
                                 {width < 800 || height < 800 ? (
-                                    <div className="text-red-400 text-sm bg-red-900/20 p-3 rounded">
-                                        ⚠️ Warning: Image dimensions are less than 800px. Consider uploading a larger image for better quality.
+                                    <div className="rounded bg-red-900/20 p-3 text-sm text-red-400">
+                                        ⚠️ Warning: Image dimensions are less than 800px. Consider uploading a larger image for better
+                                        quality.
                                     </div>
                                 ) : null}
                             </div>
@@ -240,22 +236,22 @@ const ImageUploadOverlay: React.FC<ImageUploadOverlayProps> = ({
 
                         {/* Status Message */}
                         {statusMessage && (
-                            <div className={`mt-6 rounded-lg p-3 ${
-                                statusMessage.type === 'success' 
-                                    ? 'bg-green-900 text-green-300' 
-                                    : 'bg-red-900 text-red-300'
-                            }`}>
+                            <div
+                                className={`mt-6 rounded-lg p-3 ${
+                                    statusMessage.type === 'success' ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'
+                                }`}
+                            >
                                 {statusMessage.message}
                             </div>
                         )}
                     </div>
 
                     {/* Footer */}
-                    <div className="flex justify-end space-x-3 p-6 bg-surface-raised border-t border-line">
+                    <div className="bg-surface-raised border-line flex justify-end space-x-3 border-t p-6">
                         <button
                             onClick={onClose}
                             disabled={isSubmitting}
-                            className="px-4 py-2 bg-surface-hover hover:bg-stone-500 text-body-muted hover:text-body rounded-lg transition-colors disabled:opacity-50"
+                            className="bg-surface-hover text-body-muted hover:text-body rounded-lg px-4 py-2 transition-colors hover:bg-stone-500 disabled:opacity-50"
                             data-tooltip-id="cancel-btn"
                             data-tooltip-content="Cancel upload"
                         >
@@ -265,7 +261,7 @@ const ImageUploadOverlay: React.FC<ImageUploadOverlayProps> = ({
                         <button
                             onClick={handleSubmit}
                             disabled={!isFormValid || isSubmitting}
-                            className="px-6 py-2 bg-secondary hover:bg-secondary_light text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                            className="bg-secondary hover:bg-secondary_light flex items-center space-x-2 rounded-lg px-6 py-2 text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                             data-tooltip-id="save-btn"
                             data-tooltip-content={!isFormValid ? 'Please upload an image first' : 'Save image'}
                         >
@@ -284,7 +280,7 @@ const ImageUploadOverlay: React.FC<ImageUploadOverlayProps> = ({
                     </div>
                 </div>
             </div>
-            
+
             {/* Tooltips */}
             <Tooltip id="close-btn" />
             <Tooltip id="cancel-btn" />

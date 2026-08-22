@@ -46,8 +46,8 @@ export default function LocationPageTemplate({
                 aside={
                     <div className="space-y-12">
                         <ContactCallout heading={`Staging in ${locationName}`} body={contactText} />
-                        <nav aria-label="Other service areas" className="border-t border-line pt-8">
-                            <h2 className="font-display text-xl font-semibold text-gold-300">Our service areas</h2>
+                        <nav aria-label="Other service areas" className="border-line border-t pt-8">
+                            <h2 className="font-display text-gold-300 text-xl font-semibold">Our service areas</h2>
                             <ul className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
                                 {SERVICE_AREAS.map(({ slug, name }) => {
                                     const isCurrent = name === locationName;
@@ -58,8 +58,8 @@ export default function LocationPageTemplate({
                                                 aria-current={isCurrent ? 'page' : undefined}
                                                 className={
                                                     isCurrent
-                                                        ? 'text-sm font-semibold text-gold-300'
-                                                        : 'text-sm text-body-muted transition-colors hover:text-gold-300'
+                                                        ? 'text-gold-300 text-sm font-semibold'
+                                                        : 'text-body-muted hover:text-gold-300 text-sm transition-colors'
                                                 }
                                             >
                                                 {name}, CA
