@@ -6,6 +6,8 @@ import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 interface LightboxImage {
     _id: string;
+    /** Caption written on the project; describes the room better than an index can. */
+    title?: string;
     imagePath: string;
     width: number;
     height: number;
@@ -63,7 +65,7 @@ export default function PortfolioLightbox({ images, index, projectName, onClose,
             <Image
                 key={image._id}
                 src={image.imagePath}
-                alt={`${projectName}, image ${index + 1}`}
+                alt={image.title ?? `${projectName}, image ${index + 1}`}
                 width={image.width}
                 height={image.height}
                 sizes="90vw"

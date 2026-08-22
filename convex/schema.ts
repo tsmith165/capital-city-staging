@@ -86,6 +86,8 @@ export default defineSchema({
   projectImages: defineTable({
     projectId: v.id("projects"),
     ownerId: v.string(),
+    /* Caption shown under the photo and used as its alt text. Optional: existing rows predate it. */
+    title: v.optional(v.string()),
     imagePath: v.string(),
     width: v.number(),
     height: v.number(),

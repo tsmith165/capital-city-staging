@@ -33,34 +33,38 @@ export default function About() {
                             className="bg-body h-9 w-auto shrink-0 rounded p-1"
                         />
                         <p className="text-body-subtle text-xs leading-snug">
-                            Certified through the{' '}
                             <Link
                                 href="https://www.realestatestagingassociation.com/"
                                 className="text-gold-300 hover:text-gold-200 font-semibold"
                             >
-                                Real Estate Staging Association
+                                RESA Certified Professional Home Stager
                             </Link>
                         </p>
                     </div>
                 </div>
 
                 <div>
-                    <p className="text-forest-200 text-xs font-bold tracking-[0.2em] uppercase">Who you&rsquo;ll work with</p>
-                    <h2 className="font-display gradient-gold-main-text mt-3 text-3xl font-bold sm:text-4xl">Mia Dofflemyer</h2>
+                    <h2 className="font-display gradient-gold-main-text text-3xl font-bold sm:text-4xl">Mia Dofflemyer</h2>
                     <p className="text-body-muted mt-1.5">Founder, Capital City Staging</p>
-                    <p className="text-body-subtle text-sm">Licensed California real estate agent since 2020</p>
+                    <p className="text-body-subtle text-sm">Licensed Real Estate Professional &bull; Home Staging Expert</p>
 
                     <div className="text-body-muted mt-6 space-y-4">
                         <p>
-                            I grew up in the valley, studied at UC Davis, and have spent the years since helping people in Sacramento buy
-                            and sell homes. Staging is the part I kept coming back to &mdash; it&rsquo;s what most reliably changes the
-                            outcome.
+                            Hello! I&rsquo;m Mia Dofflemyer, the founder of Capital City Staging. Raised in the valley and educated at UC
+                            Davis, I later settled in Sacramento to pursue my passion for real estate.
                         </p>
                         <p>
-                            Selling a house is a transaction to everyone except the person who lived in it. I stage for the buyer&rsquo;s
-                            first impression without forgetting whose home it still is.
+                            Obtaining my license in 2020, I&rsquo;ve dedicated myself to assisting individuals in buying and selling homes
+                            ever since. My journey into real estate was driven by my love for home design and helping others.
                         </p>
-                        <p>You deal with me directly, from walkthrough to pickup. No account manager, no handoff.</p>
+                        <p>
+                            Through my experiences, I&rsquo;ve come to understand the crucial role that home staging plays in the selling
+                            process. With my combined passion for real estate and design, founding a staging business felt like a natural
+                            progression.
+                        </p>
+                        <p className="text-gold-300 font-semibold">
+                            Let me elevate the appeal of your home with my staging expertise, ensuring a swift sale at top value!
+                        </p>
                     </div>
 
                     <div className="border-line mt-7 flex flex-wrap items-center gap-x-6 gap-y-3 border-t pt-6">
@@ -86,9 +90,9 @@ export default function About() {
                         <Link
                             href="/contact"
                             className={PRIMARY_ACTION}
-                            onClick={() => track('cta_clicked', { cta: 'get_a_quote', placement: 'about' })}
+                            onClick={() => track('cta_clicked', { cta: 'send_a_message', placement: 'about' })}
                         >
-                            Get a free quote
+                            Send me a message
                             <ArrowRight size={16} aria-hidden="true" />
                         </Link>
                     </div>

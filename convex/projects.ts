@@ -258,6 +258,78 @@ export const addProjectImage = mutation({
 });
 
 // Delete project image
+/**
+ * Commit a whole batch of uploaded images in one transaction.
+ *
+ * The old flow inserted each image the moment it finished uploading, one mutation per file, so a
+ * ten-image drop was ten separate writes with no way to reorder, retitle, or back out of any of them
+ * first. Here nothing is written until she submits, and then it is all written or none of it is.
+ */
+export const addProjectImages = mutation({
+  args: {
+    projectId: v.id("projects"),
+    images: v.array(
+      v.object({
+        title: v.optional(v.string()),
+        imagePath: v.string(),
+        width: v.number(),
+        height: v.number(),
+        thumbnailPath: v.optional(v.string()),
+        thumbnailWidth: v.optional(v.number()),
+        thumbnailHeight: v.optional(v.number()),
+      }),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const admin = await requireAdmin(ctx);
+
+    const project = await ctx.db.get(args.projectId);
+    if (!project) throw new Error("Project not found");
+
+    /* New images land after whatever is already there, in the order she arranged them. */
+    const existing = await ctx.db
+      .query("projectImages")
+      .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
+      .collect();
+    const start = existing.reduce((highest, row) => Math.max(highest, row.displayOrder + 1), 0);
+
+    const ids = [];
+    for (const [index, image] of args.images.entries()) {
+      ids.push(
+        await ctx.db.insert("projectImages", {
+          projectId: args.projectId,
+          ownerId: admin.clerkId,
+          title: image.title?.trim() || undefined,
+          imagePath: image.imagePath,
+          width: image.width,
+          height: image.height,
+          thumbnailPath: image.thumbnailPath,
+          thumbnailWidth: image.thumbnailWidth,
+          thumbnailHeight: image.thumbnailHeight,
+          displayOrder: start + index,
+          createdAt: Date.now(),
+        }),
+      );
+    }
+
+    return { added: ids.length, ids };
+  },
+});
+
+/** Retitle an image that is already on the project. */
+export const updateProjectImage = mutation({
+  args: { imageId: v.id("projectImages"), title: v.string() },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const image = await ctx.db.get(args.imageId);
+    if (!image) throw new Error("Image not found");
+
+    await ctx.db.patch(args.imageId, { title: args.title.trim() || undefined });
+    return { success: true };
+  },
+});
+
 export const deleteProjectImage = mutation({
   args: { id: v.id("projectImages") },
   handler: async (ctx, args) => {
