@@ -22,6 +22,7 @@ import type * as homepageImages from "../homepageImages.js";
 import type * as inventory from "../inventory.js";
 import type * as inventoryInsights from "../inventoryInsights.js";
 import type * as inventoryRules from "../inventoryRules.js";
+import type * as payments from "../payments.js";
 import type * as projects from "../projects.js";
 import type * as users from "../users.js";
 
@@ -43,6 +44,7 @@ declare const fullApi: ApiFromModules<{
   inventory: typeof inventory;
   inventoryInsights: typeof inventoryInsights;
   inventoryRules: typeof inventoryRules;
+  payments: typeof payments;
   projects: typeof projects;
   users: typeof users;
 }>;

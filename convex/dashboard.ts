@@ -2,6 +2,7 @@ import { query } from "./_generated/server";
 import { isAdmin } from "./authz";
 import { availabilityByItem, isClosedStatus } from "./availability";
 import { attentionReasons, highestTier } from "./inventoryRules";
+import { isAwaitingPayment } from "./payments";
 
 /**
  * The figures behind the dashboard and the analytics page.
@@ -56,7 +57,7 @@ export const getDashboardSummary = query({
 
     const activeProjects = projects.filter((project) => project.status === "active");
     const completedProjects = projects.filter((project) => project.status === "completed");
-    const awaitingPayment = completedProjects.filter((project) => !project.paymentReceivedAt);
+    const awaitingPayment = completedProjects.filter(isAwaitingPayment);
 
     const startOfYear = new Date(new Date().getFullYear(), 0, 1).getTime();
     const revenueThisYear = completedProjects
@@ -163,7 +164,7 @@ export const getProjectsNeedingAttention = query({
           .collect();
 
         const awaitingCheckIn = isClosedStatus(project.status) && open.length > 0;
-        const awaitingPayment = project.status === "completed" && !project.paymentReceivedAt;
+        const awaitingPayment = isAwaitingPayment(project);
 
         return {
           _id: project._id,

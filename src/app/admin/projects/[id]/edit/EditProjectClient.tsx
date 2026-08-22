@@ -4,13 +4,14 @@ import { useState } from 'react';
 import { useMutation, useQuery } from 'convex/react';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
-import { ArrowLeft, Images, ListChecks, MapPin, SlidersHorizontal } from 'lucide-react';
+import { ArrowLeft, BadgeDollarSign, Images, ListChecks, MapPin, SlidersHorizontal } from 'lucide-react';
 
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import CheckInDialog from './CheckInDialog';
 import ProjectDetailsForm from './ProjectDetailsForm';
 import ProjectImagesSection from './ProjectImagesSection';
+import ProjectPaymentSection from './ProjectPaymentSection';
 import ProjectInventoryTab from './ProjectInventoryTab';
 import type { CommittedImage } from './images.types';
 import { CLOSING_STATUSES, type ProjectAssignmentLine, type ProjectFormState, type ProjectStatus } from './project.types';
@@ -28,6 +29,7 @@ const DETAILS_FORM_ID = 'project-details-form';
 
 const SECTIONS = [
     { id: 'details', label: 'Details', icon: SlidersHorizontal },
+    { id: 'payment', label: 'Payment', icon: BadgeDollarSign },
     { id: 'photos', label: 'Photos', icon: Images },
     { id: 'inventory', label: 'Inventory', icon: ListChecks },
 ] as const;
@@ -170,6 +172,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
     const openCount = assignments?.open.length ?? 0;
     const counts: Record<(typeof SECTIONS)[number]['id'], number | null> = {
         details: null,
+        payment: null,
         photos: images.length,
         inventory: openCount,
     };
@@ -240,6 +243,10 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
                     error={saveError}
                     saved={saved}
                 />
+            </section>
+
+            <section id="payment" className="scroll-mt-32">
+                <ProjectPaymentSection projectId={projectId} projectName={project.name} payment={project.payment} />
             </section>
 
             <section id="photos" className="scroll-mt-32">
