@@ -172,10 +172,13 @@ export async function readPostHogAnalytics(range: PostHogRange): Promise<PostHog
     const apiKey = process.env.POSTHOG_PERSONAL_API_KEY;
 
     if (!projectId || !apiKey) {
+        // Name only what is actually missing; telling someone to set a variable they have
+        // already set is how a five-minute fix turns into an afternoon.
+        const missing = [!projectId && 'POSTHOG_PROJECT_ID', !apiKey && 'POSTHOG_PERSONAL_API_KEY'].filter(Boolean);
+
         return {
             status: 'unconfigured',
-            message:
-                'Traffic and quote conversions are being recorded, but this page cannot read them back yet. Add a read-only PostHog personal API key as POSTHOG_PERSONAL_API_KEY and the project ID as POSTHOG_PROJECT_ID.',
+            message: `Traffic and quote conversions are being recorded, but this page cannot read them back yet. Set ${missing.join(' and ')} on the server. A read-only personal API key is enough.`,
         };
     }
 
