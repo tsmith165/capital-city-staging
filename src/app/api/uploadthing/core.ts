@@ -2,7 +2,22 @@ import { createUploadthing, type FileRouter } from 'uploadthing/next';
 import { getAuth } from '@clerk/nextjs/server';
 import { isClerkUserIdAdmin } from '@/utils/auth/ClerkUtils';
 
-const f = createUploadthing();
+/**
+ * Without an error formatter UploadThing collapses every server-side failure into a bare
+ * "Internal Server Error" on the client. Forwarding the code, message and cause makes an upload
+ * failure diagnosable from the browser without reading the server logs first.
+ */
+const f = createUploadthing({
+    errorFormatter: (err) => {
+        console.error(`[uploadthing] ${err.code}: ${err.message}`, err.cause ?? '');
+
+        return {
+            code: err.code,
+            message: err.message,
+            cause: err.cause instanceof Error ? err.cause.message : undefined,
+        };
+    },
+});
 
 export const ourFileRouter = {
     imageUploader: f({ image: { maxFileSize: '4MB', maxFileCount: 20 } })

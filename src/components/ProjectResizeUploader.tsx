@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { generateReactHelpers } from '@uploadthing/react';
 import type { OurFileRouter } from '@/app/api/uploadthing/core';
+import { reportUploadError } from '@/utils/uploads/uploadErrors';
 
 const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
@@ -83,7 +84,7 @@ const ProjectResizeUploader: React.FC<ProjectResizeUploaderProps> = ({
             setSelectedFileCount(0);
         },
         onUploadError: (error: Error) => {
-            alert(`ERROR! ${error.message}`);
+            reportUploadError(error, (message) => alert(message));
             setIsUploading(false);
             setUploadProgress(0);
             setLoadingState('Resizing Images');

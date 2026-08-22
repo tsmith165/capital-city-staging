@@ -2,6 +2,7 @@ import React, { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { generateReactHelpers } from '@uploadthing/react';
 import type { OurFileRouter } from '@/app/api/uploadthing/core';
+import { reportUploadError } from '@/utils/uploads/uploadErrors';
 
 const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
@@ -72,7 +73,7 @@ const ResizeUploader: React.FC<ResizeUploaderProps> = ({ handleUploadComplete, h
             setLoadingState('Resizing Image');
         },
         onUploadError: (error: Error) => {
-            alert(`ERROR! ${error.message}`);
+            reportUploadError(error, (message) => alert(message));
             setIsUploading(false);
             setUploadProgress(0);
             setLoadingState('');
