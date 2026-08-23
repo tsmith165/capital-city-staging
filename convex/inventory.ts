@@ -684,3 +684,252 @@ export const setInventoryDimensions = mutation({
     await ctx.db.patch(id, { ...dimensions, updatedAt: Date.now() });
   },
 });
+
+/**
+ * Everything the item editor needs, in one subscription.
+ *
+ * The editor used to stitch this together from four queries — the item, its neighbours, the most
+ * recent id, and nothing at all about whether the thing was out on a job. Availability belongs here:
+ * it is the number that decides whether lowering the count is safe.
+ */
+export const getInventoryEditor = query({
+  args: { oId: v.number() },
+  handler: async (ctx, args) => {
+    if (!(await isAdmin(ctx))) return null;
+
+    const catalog = await ctx.db.query("inventory").collect();
+    const item = catalog.find((row) => row.oId === args.oId);
+    if (!item) return null;
+
+    const [extraImages, availability] = await Promise.all([
+      ctx.db
+        .query("extraImages")
+        .withIndex("by_inventory", (q) => q.eq("inventoryId", item._id))
+        .collect(),
+      availabilityForItem(ctx, item._id),
+    ]);
+
+    /* Newest first, matching the order the catalog and the old prev/next arrows walked. */
+    const ordered = [...catalog].sort((a, b) => b.oId - a.oId);
+    const index = ordered.findIndex((row) => row.oId === args.oId);
+
+    return {
+      ...item,
+      extraImages: extraImages.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)),
+      availability,
+      attention: attentionReasons(item, availability),
+      newerOId: index > 0 ? ordered[index - 1].oId : null,
+      olderOId: index < ordered.length - 1 ? ordered[index + 1].oId : null,
+      position: index + 1,
+      total: ordered.length,
+      /* Existing values, so the editor can offer what is already in use before inventing a new one. */
+      categories: [...new Set(catalog.map((row) => row.category).filter(Boolean))].sort(),
+      locations: [...new Set(catalog.map((row) => row.location).filter(Boolean))].sort(),
+    };
+  },
+});
+
+/**
+ * One save for the whole item.
+ *
+ * The old editor had two: a title field that wrote on its own, and a form that also wrote the name,
+ * so whichever was submitted last won. It also ran every number through `parseInt`, which silently
+ * turned a $12.50 price into $12. Everything is validated here instead of trusted from the form.
+ *
+ * Lowering the count below what is physically at houses is refused: the catalog would then owe more
+ * units than it owns, and every availability figure downstream would go negative.
+ */
+export const updateInventoryDetails = mutation({
+  args: {
+    id: v.id("inventory"),
+    name: v.string(),
+    category: v.string(),
+    vendor: v.string(),
+    location: v.string(),
+    description: v.string(),
+    price: v.number(),
+    cost: v.number(),
+    count: v.number(),
+    realWidth: v.number(),
+    realHeight: v.number(),
+    realDepth: v.number(),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const { id, ...updates } = args;
+
+    const item = await ctx.db.get(id);
+    if (!item) throw new Error("Item not found");
+
+    if (!updates.name.trim()) throw new Error("An item needs a name");
+    if (!updates.category.trim()) throw new Error("An item needs a category");
+
+    for (const [field, value] of Object.entries(updates)) {
+      if (typeof value !== "number") continue;
+      if (!Number.isFinite(value) || value < 0) throw new Error(`${field} must be zero or more`);
+    }
+
+    const availability = await availabilityForItem(ctx, id);
+    const committed = availability.out + availability.awaitingCheckIn;
+    if (updates.count < committed) {
+      throw new Error(
+        `${committed} of these are at houses right now, so the count cannot go below ${committed} until they are checked in.`,
+      );
+    }
+
+    await ctx.db.patch(id, {
+      ...updates,
+      name: updates.name.trim(),
+      category: updates.category.trim(),
+      vendor: updates.vendor.trim(),
+      location: updates.location.trim(),
+      description: updates.description.trim(),
+      updatedAt: Date.now(),
+    });
+
+    return { success: true };
+  },
+});
+
+/** Retiring an item hides it from the catalog and the picker without losing its staging history. */
+export const setInventoryActive = mutation({
+  args: { id: v.id("inventory"), active: v.boolean() },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const item = await ctx.db.get(args.id);
+    if (!item) throw new Error("Item not found");
+
+    if (!args.active) {
+      const availability = await availabilityForItem(ctx, args.id);
+      if (availability.out + availability.awaitingCheckIn > 0) {
+        throw new Error("This item is still at a house. Check it in before retiring it.");
+      }
+    }
+
+    await ctx.db.patch(args.id, { active: args.active, updatedAt: Date.now() });
+    return { success: true };
+  },
+});
+
+/** Commits a whole batch of staged photos at once, in the order they were arranged. */
+export const addExtraImages = mutation({
+  args: {
+    inventoryId: v.id("inventory"),
+    images: v.array(
+      v.object({
+        title: v.optional(v.string()),
+        imagePath: v.string(),
+        width: v.number(),
+        height: v.number(),
+        smallImagePath: v.optional(v.string()),
+        smallWidth: v.optional(v.number()),
+        smallHeight: v.optional(v.number()),
+      }),
+    ),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const item = await ctx.db.get(args.inventoryId);
+    if (!item) throw new Error("Item not found");
+
+    const existing = await ctx.db
+      .query("extraImages")
+      .withIndex("by_inventory", (q) => q.eq("inventoryId", args.inventoryId))
+      .collect();
+
+    const start = existing.reduce((highest, row) => Math.max(highest, row.displayOrder + 1), 0);
+    const now = Date.now();
+
+    const ids = [];
+    for (const [offset, image] of args.images.entries()) {
+      ids.push(
+        await ctx.db.insert("extraImages", {
+          ...image,
+          inventoryId: args.inventoryId,
+          displayOrder: start + offset,
+          createdAt: now,
+        }),
+      );
+    }
+
+    return { added: ids.length, ids };
+  },
+});
+
+/** The caption under a photo, also its alt text. */
+export const updateExtraImage = mutation({
+  args: { imageId: v.id("extraImages"), title: v.string() },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const image = await ctx.db.get(args.imageId);
+    if (!image) throw new Error("Image not found");
+
+    await ctx.db.patch(args.imageId, { title: args.title.trim() || undefined });
+    return { success: true };
+  },
+});
+
+/** Rewrites the order of an item's extra photos from the arrangement on screen. */
+export const reorderInventoryImages = mutation({
+  args: { inventoryId: v.id("inventory"), imageIds: v.array(v.id("extraImages")) },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    for (const [order, imageId] of args.imageIds.entries()) {
+      const image = await ctx.db.get(imageId);
+      if (!image || image.inventoryId !== args.inventoryId) continue;
+      await ctx.db.patch(imageId, { displayOrder: order });
+    }
+
+    return { success: true };
+  },
+});
+
+/**
+ * Promotes one of the extra photos to be the item's main image.
+ *
+ * The main image lives on the inventory row and the rest live in their own table, which is why the
+ * old editor offered "Change Main" and "Add Extra" as different actions with different uploaders.
+ * They are one list to anyone using it, so this swaps the two rows rather than asking her to
+ * re-upload a photo the catalog already has.
+ */
+export const setMainImage = mutation({
+  args: { inventoryId: v.id("inventory"), imageId: v.id("extraImages") },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const [item, promoted] = await Promise.all([ctx.db.get(args.inventoryId), ctx.db.get(args.imageId)]);
+    if (!item) throw new Error("Item not found");
+    if (!promoted || promoted.inventoryId !== args.inventoryId) throw new Error("That photo is not on this item");
+
+    const now = Date.now();
+
+    await ctx.db.patch(args.inventoryId, {
+      imagePath: promoted.imagePath,
+      width: promoted.width,
+      height: promoted.height,
+      /* Extras predate the small variant, so fall back to the full image rather than storing an empty path. */
+      smallImagePath: promoted.smallImagePath ?? promoted.imagePath,
+      smallWidth: promoted.smallWidth ?? promoted.width,
+      smallHeight: promoted.smallHeight ?? promoted.height,
+      updatedAt: now,
+    });
+
+    /* The demoted main takes the promoted photo's slot, so the list length and order stay stable. */
+    await ctx.db.patch(args.imageId, {
+      imagePath: item.imagePath,
+      width: item.width,
+      height: item.height,
+      smallImagePath: item.smallImagePath,
+      smallWidth: item.smallWidth,
+      smallHeight: item.smallHeight,
+      title: undefined,
+    });
+
+    return { success: true };
+  },
+});
