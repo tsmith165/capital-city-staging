@@ -12,7 +12,6 @@ const locationData = {
         'Capital City Staging offers professional home staging services in Citrus Heights, enhancing your property’s appeal to attract more buyers.',
     whyStaging:
         'Citrus Heights boasts a vibrant real estate market. Our staging services help your home make a strong impression on potential buyers.',
-    services: ['Comprehensive Home Staging', 'Interior Decoration', 'Design Consultations', 'Customized Styling Plans'],
     contactText: 'Interested in staging your Citrus Heights home?',
 };
 

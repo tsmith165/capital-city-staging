@@ -7,6 +7,8 @@ import JsonLd from '@/components/seo/JsonLd';
 import { serviceSchema, SITE_URL } from '@/lib/structuredData';
 import { SERVICE_AREAS } from '@/components/layout/Footer.constants';
 
+import { LOCATION_SERVICES } from './locations.constants';
+
 interface LocationPageProps {
     locationName: string;
     pageSlug: string;
@@ -14,7 +16,6 @@ interface LocationPageProps {
     imageAlt: string;
     description: string;
     whyStaging: string;
-    services: string[];
     contactText: string;
 }
 
@@ -25,7 +26,6 @@ export default function LocationPageTemplate({
     imageAlt,
     description,
     whyStaging,
-    services,
     contactText,
 }: LocationPageProps) {
     return (
@@ -40,12 +40,12 @@ export default function LocationPageTemplate({
             />
             <ArticleShell
                 eyebrow="Service area"
-                title={`Professional Home Staging in ${locationName}, CA`}
+                title={`Home staging in ${locationName}, CA`}
                 lead={description}
                 image={{ src: imageUrl, alt: imageAlt, width: 1280, height: 720 }}
                 aside={
                     <div className="space-y-12">
-                        <ContactCallout heading={`Staging in ${locationName}`} body={contactText} />
+                        <ContactCallout heading={`Staging in ${locationName}`} body={contactText} action="Get a free quote" />
                         <nav aria-label="Other service areas" className="border-line border-t pt-8">
                             <h2 className="font-display text-gold-300 text-xl font-semibold">Our service areas</h2>
                             <ul className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -75,9 +75,9 @@ export default function LocationPageTemplate({
                 <h2>Why home staging in {locationName}?</h2>
                 <p>{whyStaging}</p>
 
-                <h2>Our {locationName} services include</h2>
+                <h2>What staging in {locationName} covers</h2>
                 <ul>
-                    {services.map((service) => (
+                    {LOCATION_SERVICES.map((service) => (
                         <li key={service}>{service}</li>
                     ))}
                 </ul>

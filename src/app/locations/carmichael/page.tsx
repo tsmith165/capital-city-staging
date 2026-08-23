@@ -12,7 +12,6 @@ const locationData = {
         'Capital City Staging offers professional home staging services in Carmichael, enhancing your property’s appeal to attract more buyers.',
     whyStaging:
         "Carmichael's charming neighborhoods benefit from staging that showcases each home's unique character. Our services help your property stand out.",
-    services: ['Comprehensive Home Staging', 'Interior Decoration', 'Design Consultations', 'Staging for Luxury Homes'],
     contactText: 'Interested in staging your Carmichael home?',
 };
 

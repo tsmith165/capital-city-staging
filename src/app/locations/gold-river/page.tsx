@@ -11,7 +11,6 @@ const locationData = {
     description:
         'Capital City Staging provides expert home staging services in Gold River, elevating your property’s appeal to attract discerning buyers.',
     whyStaging: 'Gold River’s upscale market demands exceptional presentation. Our staging services highlight your home’s luxury features.',
-    services: ['Luxury Home Staging', 'Interior Design and Styling', 'Custom Design Solutions', 'Photography Preparation'],
     contactText: 'Looking to enhance your Gold River property?',
 };
 

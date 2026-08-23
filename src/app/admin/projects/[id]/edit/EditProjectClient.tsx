@@ -154,7 +154,7 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
     if (!user) {
         return (
             <p className="text-body-muted p-6 text-sm">
-                <Link href="/sign-in" className="text-gold-300 hover:text-gold-200 font-bold">
+                <Link href="/signin" className="text-gold-300 hover:text-gold-200 font-bold">
                     Sign in
                 </Link>{' '}
                 to edit this project.

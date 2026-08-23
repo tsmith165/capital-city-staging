@@ -12,7 +12,6 @@ const locationData = {
         'Capital City Staging offers professional home staging services in Fair Oaks, helping your property attract more potential buyers.',
     whyStaging:
         'Fair Oaks’ charming community benefits from staging that highlights each home’s unique character. We make your property stand out.',
-    services: ['Full-Service Home Staging', 'Interior Decoration', 'Design Consultations', 'Personalized Styling Plans'],
     contactText: 'Ready to stage your Fair Oaks home?',
 };
 

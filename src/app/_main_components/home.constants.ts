@@ -4,6 +4,9 @@ export const HERO_PROOF = [
     { value: 'RESA', label: 'certified stager' },
 ] as const;
 
+/** The two figures above are quoted, so the hero says where they came from and links the detail. */
+export const HERO_PROOF_SOURCE = 'Real Estate Staging Association and National Association of Realtors surveys.';
+
 export const HERO_FALLBACK_IMAGES = [
     { src: '/portfolio/stock/staging-stock-3.jpg', width: 2560, height: 1695 },
     { src: '/portfolio/stock/staging-stock-7.jpg', width: 564, height: 705 },

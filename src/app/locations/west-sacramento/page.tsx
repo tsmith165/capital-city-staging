@@ -12,7 +12,6 @@ const locationData = {
         'Capital City Staging provides expert home staging services in West Sacramento, helping your property shine in a competitive market.',
     whyStaging:
         "West Sacramento's growing real estate scene demands properties that stand out. Our staging services highlight your home's best features to attract potential buyers.",
-    services: ['Vacant Home Staging', 'Occupied Home Staging', 'Interior Design Consultation', 'Customized Styling Solutions'],
     contactText: 'Ready to transform your West Sacramento property?',
 };
 

@@ -12,7 +12,6 @@ const locationData = {
         'Capital City Staging offers professional home staging services in Rancho Cordova, helping you present your property in the best possible light to attract potential buyers.',
     whyStaging:
         "Rancho Cordova's real estate market is dynamic and competitive. Our staging services ensure your home stands out, highlighting its best features to maximize appeal.",
-    services: ['Comprehensive Home Staging', 'Interior Decoration', 'Design Consultations', 'Customized Staging Plans'],
     contactText: 'Ready to enhance your Rancho Cordova property?',
 };
 

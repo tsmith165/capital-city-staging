@@ -12,7 +12,6 @@ const locationData = {
         'Capital City Staging offers professional home staging services in North Highlands, enhancing your property’s appeal to attract more buyers.',
     whyStaging:
         'North Highlands has a dynamic real estate market. Our staging services help your home stand out, making it more attractive to potential buyers.',
-    services: ['Full-Service Home Staging', 'Interior Design Consultation', 'Customized Styling', 'Market-Ready Preparation'],
     contactText: 'Looking to elevate your North Highlands property?',
 };
 
