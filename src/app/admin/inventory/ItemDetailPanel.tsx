@@ -2,8 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useQuery } from 'convex/react';
-import { ExternalLink, ImageOff, Pencil, X } from 'lucide-react';
+import { useMutation, useQuery } from 'convex/react';
+import { ChevronDown, ChevronUp, ExternalLink, ImageOff, Pencil, X } from 'lucide-react';
+import { useState } from 'react';
 
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
@@ -51,6 +52,21 @@ export default function ItemDetailPanel({
 }) {
     const detail = useQuery(api.inventory.getInventoryDetail, { id: itemId as Id<'inventory'> });
     const history = useQuery(api.assignments.getItemHistory, { inventoryId: itemId as Id<'inventory'> });
+    const movePosition = useMutation(api.inventory.moveInventoryPosition);
+    const [moveError, setMoveError] = useState<string | null>(null);
+    const [moving, setMoving] = useState(false);
+
+    async function move(direction: 'earlier' | 'later') {
+        setMoving(true);
+        setMoveError(null);
+        try {
+            await movePosition({ id: itemId as Id<'inventory'>, direction });
+        } catch (error) {
+            setMoveError(error instanceof Error ? error.message : 'Could not move this item');
+        } finally {
+            setMoving(false);
+        }
+    }
 
     const lifetimeEarned = (history ?? []).reduce((total, row) => total + row.quantity * row.pricePerItem, 0);
 
@@ -217,12 +233,42 @@ export default function ItemDetailPanel({
 
             {detail && (
                 <footer className="border-line shrink-0 border-t p-3">
-                    <Link
-                        href={`/admin/edit?id=${detail.oId}`}
-                        className="bg-gold-400 text-body-inverse hover:bg-gold-300 inline-flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-bold transition-colors"
-                    >
-                        <Pencil size={15} aria-hidden="true" /> Edit this item
-                    </Link>
+                    {moveError && (
+                        <p role="alert" className="text-danger mb-2 text-xs font-semibold">
+                            {moveError}
+                        </p>
+                    )}
+                    <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                            <span className="text-body-subtle text-[10px] font-extrabold tracking-[0.14em] uppercase">Catalog order</span>
+                            <div className="ml-auto flex items-center gap-1">
+                                <button
+                                    type="button"
+                                    onClick={() => void move('earlier')}
+                                    disabled={moving}
+                                    aria-label="Move earlier in the catalog"
+                                    className="border-line text-body hover:bg-surface-hover inline-flex h-8 w-8 items-center justify-center rounded-md border transition-colors disabled:opacity-40"
+                                >
+                                    <ChevronUp size={15} aria-hidden="true" />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => void move('later')}
+                                    disabled={moving}
+                                    aria-label="Move later in the catalog"
+                                    className="border-line text-body hover:bg-surface-hover inline-flex h-8 w-8 items-center justify-center rounded-md border transition-colors disabled:opacity-40"
+                                >
+                                    <ChevronDown size={15} aria-hidden="true" />
+                                </button>
+                            </div>
+                        </div>
+                        <Link
+                            href={`/admin/edit?id=${detail.oId}`}
+                            className="bg-gold-400 text-body-inverse hover:bg-gold-300 inline-flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-bold transition-colors"
+                        >
+                            <Pencil size={15} aria-hidden="true" /> Edit this item
+                        </Link>
+                    </div>
                 </footer>
             )}
         </>

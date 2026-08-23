@@ -39,3 +39,6 @@ CLAUDE.md
 
 # Local agent briefs and design notes
 _context/
+
+# Convex snapshot backups (contain customer data)
+_backups/

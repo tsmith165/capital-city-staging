@@ -16,7 +16,9 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "prettier": "prettier --write \"**/*.{js,jsx,json,md,ts,tsx}\"",
-    "sync-users": "tsx scripts/sync-clerk-users.ts"
+    "sync-users": "tsx scripts/sync-clerk-users.ts",
+    "backup": "./scripts/backup-convex.sh prod",
+    "backup:dev": "./scripts/backup-convex.sh dev"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.39.5",

@@ -154,29 +154,36 @@ export const createInventory = mutation({
 });
 
 /**
- * Swaps the catalog position of two items in one transaction.
+ * Moves one item one position toward the front or the back of the catalog.
  *
- * Ordering used to be two independent `updateInventory` calls that traded `oId` values. If the
- * second failed, both items ended up holding the same identifier and every lookup by `oId` after
- * that returned whichever one the query happened to reach first.
+ * The neighbour is resolved server-side inside the transaction. The old manage screen passed both
+ * ids from the client, which meant a stale list could swap an item against a neighbour that had
+ * already moved, silently reordering something the operator never touched.
  */
-export const swapInventoryOrder = mutation({
+export const moveInventoryPosition = mutation({
   args: {
-    firstId: v.id("inventory"),
-    secondId: v.id("inventory"),
+    id: v.id("inventory"),
+    direction: v.union(v.literal("earlier"), v.literal("later")),
   },
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
 
-    if (args.firstId === args.secondId) return;
+    const item = await ctx.db.get(args.id);
+    if (!item) throw new Error("That item no longer exists");
 
-    const first = await ctx.db.get(args.firstId);
-    const second = await ctx.db.get(args.secondId);
-    if (!first || !second) throw new Error("One of those items no longer exists");
+    const all = await ctx.db.query("inventory").collect();
+
+    // The catalog reads newest-first, so "earlier" means a higher oId.
+    const neighbour = all
+      .filter((other) => (args.direction === "earlier" ? other.oId > item.oId : other.oId < item.oId))
+      .sort((a, b) => (args.direction === "earlier" ? a.oId - b.oId : b.oId - a.oId))[0];
+
+    if (!neighbour) return { moved: false };
 
     const now = Date.now();
-    await ctx.db.patch(first._id, { oId: second.oId, updatedAt: now });
-    await ctx.db.patch(second._id, { oId: first.oId, updatedAt: now });
+    await ctx.db.patch(item._id, { oId: neighbour.oId, updatedAt: now });
+    await ctx.db.patch(neighbour._id, { oId: item.oId, updatedAt: now });
+    return { moved: true };
   },
 });
 
