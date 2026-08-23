@@ -49,7 +49,7 @@ export default function AdminInboxClient() {
                 <AdminHeading
                     eyebrow="Clients"
                     title="Inbox"
-                    description="Every quote request submitted through the contact form, saved here whether or not its notification email went out."
+                    description="Quote requests, including any whose notification email failed."
                 />
 
                 {error && (
@@ -82,10 +82,10 @@ export default function AdminInboxClient() {
                     <div className="border-line bg-surface-raised rounded-lg border">
                         <AdminEmpty>
                             {filter === 'unanswered'
-                                ? 'No unanswered messages. Everything has been replied to.'
+                                ? 'No messages need a reply.'
                                 : filter === 'answered'
                                   ? 'No answered messages yet.'
-                                  : 'No messages yet. Submissions from the contact form appear here.'}
+                                  : 'No messages yet.'}
                         </AdminEmpty>
                     </div>
                 ) : (

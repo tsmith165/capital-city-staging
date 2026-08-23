@@ -197,7 +197,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                 <AdminHeading
                     eyebrow={project.name}
                     title="Choose furniture"
-                    description="Tap items to build a list, adjust how many of each, then add the whole list to this house in one go."
+                    description="Pick items, set quantities, then add the list."
                     action={
                         <Link
                             href={`/admin/projects/${projectId}/edit`}

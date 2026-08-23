@@ -34,11 +34,7 @@ export default function AnalyticsClient({ range, traffic }: { range: PostHogRang
     return (
         <AdminShell title="Analytics">
             <div className="flex flex-col gap-8 p-5 sm:p-8">
-                <AdminHeading
-                    eyebrow="Insights"
-                    title="Analytics"
-                    description="How the business is performing, and how people are finding and moving through the website."
-                />
+                <AdminHeading eyebrow="Insights" title="Analytics" />
 
                 <section className="flex flex-col gap-4">
                     <h2 className="font-display text-body text-xl font-normal">Business</h2>
@@ -107,9 +103,7 @@ export default function AnalyticsClient({ range, traffic }: { range: PostHogRang
                             <div className="grid gap-5 xl:grid-cols-3">
                                 <AdminPanel eyebrow="Earning" title="Top earners">
                                     {insights.topEarners.length === 0 ? (
-                                        <AdminEmpty>
-                                            No assignment has carried a price yet, so nothing has recorded any rental value.
-                                        </AdminEmpty>
+                                        <AdminEmpty>No rental value recorded yet.</AdminEmpty>
                                     ) : (
                                         <BarList entries={insights.topEarners} format={(value) => money.format(value)} />
                                     )}

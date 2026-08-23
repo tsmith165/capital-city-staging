@@ -2,15 +2,16 @@ import { BarChart3, Boxes, Home, Inbox, LayoutDashboard, Sofa, Users, Wrench } f
 
 import type { AdminNavItem, AdminStatusTone } from './AdminShell.types';
 
+/** Labels only. The subtitles restated what each destination obviously is. */
 export const ADMIN_NAVIGATION: readonly AdminNavItem[] = [
-    { href: '/admin', label: 'Today', detail: 'What needs attention', icon: LayoutDashboard },
-    { href: '/admin/projects', label: 'Projects', detail: 'Staging jobs and revenue', icon: Home },
-    { href: '/admin/inventory', label: 'Inventory', detail: 'Furniture and decor catalog', icon: Sofa, badge: 'inventoryAttention' },
-    { href: '/admin/manage/homepage', label: 'Homepage', detail: 'Hero image rotation', icon: Boxes },
-    { href: '/admin/inbox', label: 'Inbox', detail: 'Quote requests and messages', icon: Inbox, badge: 'inbox' },
-    { href: '/admin/analytics', label: 'Analytics', detail: 'Traffic and engagement', icon: BarChart3 },
-    { href: '/admin/users', label: 'Users', detail: 'Accounts and roles', icon: Users },
-    { href: '/admin/tools', label: 'Tools', detail: 'Backups and data health', icon: Wrench },
+    { href: '/admin', label: 'Today', icon: LayoutDashboard },
+    { href: '/admin/projects', label: 'Projects', icon: Home },
+    { href: '/admin/inventory', label: 'Inventory', icon: Sofa, badge: 'inventoryAttention' },
+    { href: '/admin/manage/homepage', label: 'Homepage', icon: Boxes },
+    { href: '/admin/inbox', label: 'Inbox', icon: Inbox, badge: 'inbox' },
+    { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+    { href: '/admin/users', label: 'Users', icon: Users },
+    { href: '/admin/tools', label: 'Tools', icon: Wrench },
 ] as const;
 
 export const ADMIN_STATUS_TONE_CLASSES: Record<AdminStatusTone, string> = {

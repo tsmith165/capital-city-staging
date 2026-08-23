@@ -14,7 +14,7 @@ import { serviceSchema, SITE_URL } from '@/lib/structuredData';
 const TITLE = 'Occupied Home Staging in Sacramento';
 const HEADING = 'Occupied staging';
 const DESCRIPTION =
-    'Occupied home staging and decorating across Sacramento, Placer and Yolo counties. Mia Dofflemyer restyles the home you are still living in so it is ready to list.';
+    'Occupied home staging across Sacramento, Placer and Yolo counties. Mia Dofflemyer restyles the home you are still living in so it is ready to list.';
 
 export const metadata: Metadata = {
     title: TITLE,

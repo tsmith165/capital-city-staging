@@ -45,7 +45,7 @@ export default function CheckInWizardClient() {
                 <div className="flex flex-col gap-6 p-5 sm:p-8">
                     <SkeletonBlock className="h-8 w-64" />
                     <div className="border-line bg-surface-raised rounded-lg border">
-                        <SkeletonListRows rows={5} label="Finding inventory that never came back" />
+                        <SkeletonListRows rows={5} label="Loading check-ins" />
                     </div>
                 </div>
             </AdminShell>
@@ -68,7 +68,7 @@ export default function CheckInWizardClient() {
                         <p className="text-body-muted max-w-md text-sm">
                             {checkedInUnits > 0
                                 ? `${number.format(checkedInUnits)} units are back on the books. Availability across the catalog is now accurate.`
-                                : 'No finished job is holding inventory. From here on, marking a project completed offers to check its furniture in, so this should not build up again.'}
+                                : 'No finished job is holding inventory.'}
                         </p>
                         {skipped.size > 0 && (
                             <button
@@ -135,7 +135,7 @@ export default function CheckInWizardClient() {
                 <AdminHeading
                     eyebrow="Inventory"
                     title="Check furniture back in"
-                    description="These jobs finished while inventory was still assigned to them, so the catalog thinks the furniture is unavailable. Confirm one house at a time."
+                    description="Confirm returns one house at a time."
                     action={
                         <Link
                             href="/admin/inventory"

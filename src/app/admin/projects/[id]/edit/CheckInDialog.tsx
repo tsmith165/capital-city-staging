@@ -74,8 +74,8 @@ export default function CheckInDialog({
                             Is the furniture back?
                         </h2>
                         <p className="text-body-muted text-sm">
-                            {number.format(totalUnits)} {totalUnits === 1 ? 'unit is' : 'units are'} still assigned to this house. Checking
-                            them in puts them back on the books as free to stage.
+                            Checking in these {number.format(totalUnits)} {totalUnits === 1 ? 'unit' : 'units'} makes them available to
+                            stage again.
                         </p>
                     </div>
                     <button

@@ -25,11 +25,7 @@ export default function Tools({ activeTab }: { activeTab: string }) {
 
     return (
         <div className="flex flex-col gap-8">
-            <AdminHeading
-                eyebrow="Maintenance"
-                title="Tools"
-                description="Exports and data-health utilities. Anything that runs automatically is listed here too, so you are not left wondering where it went."
-            />
+            <AdminHeading title="Tools" description="Exports and catalog maintenance." />
 
             <div className="flex flex-col gap-4">
                 <nav className="flex flex-wrap gap-2" aria-label="Tools">
@@ -54,7 +50,6 @@ export default function Tools({ activeTab }: { activeTab: string }) {
                 </nav>
 
                 <AdminPanel eyebrow={tab.eyebrow} title={tab.title}>
-                    <p className="border-line text-body-muted border-b px-5 py-3.5 text-sm">{tab.description}</p>
                     <Panel />
                 </AdminPanel>
             </div>

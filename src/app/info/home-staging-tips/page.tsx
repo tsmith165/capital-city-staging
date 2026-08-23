@@ -29,18 +29,8 @@ export default function HomeStagingTips() {
                     width: article.imageWidth,
                     height: article.imageHeight,
                 }}
-                aside={
-                    <ContactCallout
-                        heading="Need professional help?"
-                        body="These tips get you started. Professional staging takes the property the rest of the way."
-                    />
-                }
+                aside={<ContactCallout heading="Want Mia's room-by-room plan?" body="Get a staging range for your property." />}
             >
-                <p>
-                    Preparing your home for sale can be daunting. We have compiled a list of expert tips to help you stage your home
-                    effectively and attract potential buyers.
-                </p>
-
                 <h3>1. Declutter your space</h3>
                 <p>
                     Remove unnecessary items to create a sense of space. A clutter-free home appears larger and lets buyers focus on the

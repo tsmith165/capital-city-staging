@@ -13,8 +13,7 @@ export const articles: Article[] = [
     {
         id: 'understanding-buyer-psychology',
         title: 'Understanding Buyer Psychology in Home Staging',
-        description:
-            "Learn how buyer psychology influences home staging strategies. Discover techniques to appeal to buyers' emotions and increase your property's marketability.",
+        description: 'How staging helps buyers picture a future in the home.',
         imageSrc: '/info/understanding-buyer-psychology.jpg',
         imageWidth: 1280,
         imageHeight: 960,
@@ -24,8 +23,7 @@ export const articles: Article[] = [
     {
         id: 'home-staging-tips',
         title: 'Home Staging Tips and Tricks',
-        description:
-            'Discover expert tips and tricks for staging your home to sell faster and for a higher price. Learn from the professionals at Capital City Staging.',
+        description: 'Eight practical fixes to make a home feel larger, brighter, and ready to photograph.',
         imageSrc: '/info/home-staging-tips.jpg',
         imageWidth: 720,
         imageHeight: 720,
@@ -35,8 +33,7 @@ export const articles: Article[] = [
     {
         id: 'home-staging-statistics',
         title: 'Home Staging Statistics',
-        description:
-            'Explore key statistics that demonstrate the effectiveness of home staging. Learn how staging influences sale price, time on market, and buyer perceptions.',
+        description: 'Sale-price, time-on-market, and buyer-perception figures behind staging.',
         imageSrc: '/info/home-staging-statistics.jpg',
         imageWidth: 960,
         imageHeight: 609,
@@ -46,8 +43,7 @@ export const articles: Article[] = [
     {
         id: 'cost-vs-value-analysis',
         title: 'Home Staging Cost vs. Value Analysis',
-        description:
-            'Understand the return on investment for home staging. Learn how staging costs compare to the increased value and faster sale of your property.',
+        description: 'Compare staging cost with price reductions, carrying costs, and sale proceeds.',
         imageSrc: '/info/cost-vs-value-analysis.jpg',
         imageWidth: 750,
         imageHeight: 500,
@@ -57,8 +53,7 @@ export const articles: Article[] = [
     {
         id: 'benefits-of-home-staging',
         title: 'The Benefits of Home Staging',
-        description:
-            'Discover how professional home staging can help sell your property faster and for a higher price. Learn the key benefits with Capital City Staging.',
+        description: 'Six ways staging changes photos, buyer interest, offers, and seller workload.',
         imageSrc: '/info/benefits-of-home-staging.jpg',
         imageWidth: 1280,
         imageHeight: 492,

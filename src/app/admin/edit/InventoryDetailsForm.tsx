@@ -89,7 +89,6 @@ export default function InventoryDetailsForm({
                                 <option key={category} value={category} />
                             ))}
                         </datalist>
-                        {dimensionsMatter && <span className="text-body-subtle text-xs">Measurements matter for this category.</span>}
                     </label>
 
                     <label className="flex flex-col gap-1.5">
@@ -205,11 +204,7 @@ export default function InventoryDetailsForm({
                             </label>
                         ))}
                     </div>
-                    {missingDimensions && (
-                        <p className="text-body-subtle text-xs">
-                            Without these, nobody can answer whether it fits the room they are staging.
-                        </p>
-                    )}
+                    {missingDimensions && <p className="text-body-subtle text-xs">Measurements help confirm whether it fits.</p>}
                 </fieldset>
 
                 {error && (

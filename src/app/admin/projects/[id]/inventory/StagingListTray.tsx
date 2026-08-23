@@ -79,9 +79,7 @@ export default function StagingListTray({
                         Adding now
                     </h3>
                     {touched.length === 0 ? (
-                        <p className="text-body-subtle px-4 py-6 text-center text-sm">
-                            Tap items in the grid to build a list for this house.
-                        </p>
+                        <p className="text-body-subtle px-4 py-6 text-center text-sm">Nothing selected.</p>
                     ) : (
                         <ul className="divide-line divide-y">
                             {touched.map(({ item, desired, delta }) => (

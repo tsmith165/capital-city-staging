@@ -65,10 +65,7 @@ export default function CatalogSidePanel({
         <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
             <House size={26} aria-hidden="true" className="text-body-subtle" />
             <strong className="font-display text-body text-base leading-tight font-normal">No house selected</strong>
-            <p className="text-body-muted max-w-[16rem] text-sm">
-                Choose a house at the top of the page and the whole catalog becomes a picker for it.
-            </p>
-            <p className="text-body-subtle max-w-[16rem] text-xs">Or tap any item to see where it is and what it has earned.</p>
+            <p className="text-body-muted max-w-[16rem] text-sm">Choose a house to build its staging list, or open an item for details.</p>
             <PackageSearch size={18} aria-hidden="true" className="text-body-subtle mt-1" />
         </div>
     );

@@ -31,17 +31,11 @@ export default function BenefitsOfHomeStaging() {
                 }}
                 aside={
                     <ContactCallout
-                        heading="Ready to experience the benefits?"
-                        body="Book a consultation and take the first step toward selling faster and for a higher price."
+                        heading="Get a staging estimate"
+                        body="See a price range for your property before booking a walkthrough."
                     />
                 }
             >
-                <p>
-                    Selling a home is a significant undertaking, and first impressions are crucial. Professional home staging is a powerful
-                    tool that can make your property more appealing to potential buyers. At Capital City Staging, we help you showcase your
-                    home&rsquo;s best features, ensuring it stands out in the competitive real estate market.
-                </p>
-
                 <h2>Key benefits of home staging</h2>
 
                 <h3>1. Sell your home faster</h3>
