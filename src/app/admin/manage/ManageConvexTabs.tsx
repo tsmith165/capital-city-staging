@@ -13,6 +13,7 @@ import { Tooltip } from 'react-tooltip';
 
 export default function ManageConvexTabs() {
     const [activeTab, setActiveTab] = useState('order');
+    const [error, setError] = useState<string | null>(null);
 
     // Convex queries
     const inventory = useQuery(api.inventory.getInventory, { active: true });
@@ -21,6 +22,7 @@ export default function ManageConvexTabs() {
 
     // Convex mutations
     const updateInventory = useMutation(api.inventory.updateInventory);
+    const swapOrder = useMutation(api.inventory.swapInventoryOrder);
 
     // Loading state
     if (!inventory || !archivedInventory || !allInventory) {
@@ -31,79 +33,35 @@ export default function ManageConvexTabs() {
         );
     }
 
-    const handleSetInactive = async (id: Id<'inventory'>) => {
+    const setActiveState = async (id: Id<'inventory'>, active: boolean) => {
+        setError(null);
         try {
-            await updateInventory({
-                id,
-                updates: { active: false },
-            });
-        } catch (error) {
-            console.error('Failed to archive item:', error);
+            await updateInventory({ id, updates: { active } });
+        } catch (caught) {
+            setError(caught instanceof Error ? caught.message : `Could not ${active ? 'restore' : 'archive'} that item.`);
         }
     };
 
-    const handleSetActive = async (id: Id<'inventory'>) => {
-        try {
-            await updateInventory({
-                id,
-                updates: { active: true },
-            });
-        } catch (error) {
-            console.error('Failed to activate item:', error);
-        }
-    };
+    const handleSetInactive = (id: Id<'inventory'>) => setActiveState(id, false);
+    const handleSetActive = (id: Id<'inventory'>) => setActiveState(id, true);
 
-    const handleMoveUp = async (currentIndex: number) => {
+    /* Ordering swaps two rows in one mutation, so a failure cannot leave two items sharing an id. */
+    const swapWith = async (currentIndex: number, targetIndex: number) => {
         if (!inventory) return;
 
-        const targetIndex = currentIndex === 0 ? inventory.length - 1 : currentIndex - 1;
-        const currentItem = inventory[currentIndex];
-        const targetItem = inventory[targetIndex];
-
+        setError(null);
         try {
-            // Store the original oId values
-            const currentOId = currentItem.oId;
-            const targetOId = targetItem.oId;
-
-            // Swap oId values
-            await updateInventory({
-                id: currentItem._id,
-                updates: { oId: targetOId },
-            });
-            await updateInventory({
-                id: targetItem._id,
-                updates: { oId: currentOId },
-            });
-        } catch (error) {
-            console.error('Failed to move item up:', error);
+            await swapOrder({ firstId: inventory[currentIndex]._id, secondId: inventory[targetIndex]._id });
+        } catch (caught) {
+            setError(caught instanceof Error ? caught.message : 'Could not reorder those items.');
         }
     };
 
-    const handleMoveDown = async (currentIndex: number) => {
-        if (!inventory) return;
+    const handleMoveUp = (currentIndex: number) =>
+        swapWith(currentIndex, currentIndex === 0 ? (inventory?.length ?? 1) - 1 : currentIndex - 1);
 
-        const targetIndex = currentIndex === inventory.length - 1 ? 0 : currentIndex + 1;
-        const currentItem = inventory[currentIndex];
-        const targetItem = inventory[targetIndex];
-
-        try {
-            // Store the original oId values
-            const currentOId = currentItem.oId;
-            const targetOId = targetItem.oId;
-
-            // Swap oId values
-            await updateInventory({
-                id: currentItem._id,
-                updates: { oId: targetOId },
-            });
-            await updateInventory({
-                id: targetItem._id,
-                updates: { oId: currentOId },
-            });
-        } catch (error) {
-            console.error('Failed to move item down:', error);
-        }
-    };
+    const handleMoveDown = (currentIndex: number) =>
+        swapWith(currentIndex, currentIndex === (inventory?.length ?? 1) - 1 ? 0 : currentIndex + 1);
 
     const renderInventoryItem = (item: any, index: number, isArchived: boolean = false) => (
         <div key={item._id} className="border-line hover:bg-surface-raised/50 flex items-center border-b py-3 transition-colors">
@@ -198,7 +156,7 @@ export default function ManageConvexTabs() {
                     onClick={() => setActiveTab('order')}
                     className={`rounded-t-lg px-4 py-2 font-medium transition-colors ${
                         activeTab === 'order'
-                            ? 'bg-surface-raised text-body border-secondary border-b-2'
+                            ? 'bg-surface-raised text-body border-gold-400 border-b-2'
                             : 'bg-surface-raised/50 text-body-subtle hover:bg-surface-raised hover:text-body'
                     }`}
                 >
@@ -208,13 +166,19 @@ export default function ManageConvexTabs() {
                     onClick={() => setActiveTab('archived')}
                     className={`rounded-t-lg px-4 py-2 font-medium transition-colors ${
                         activeTab === 'archived'
-                            ? 'bg-surface-raised text-body border-secondary border-b-2'
+                            ? 'bg-surface-raised text-body border-gold-400 border-b-2'
                             : 'bg-surface-raised/50 text-body-subtle hover:bg-surface-raised hover:text-body'
                     }`}
                 >
                     Archived ({archivedInventory.length})
                 </button>
             </div>
+
+            {error && (
+                <p role="alert" className="border-danger/40 bg-danger-soft text-danger mx-4 mt-3 rounded-md border px-4 py-2.5 text-sm">
+                    {error}
+                </p>
+            )}
 
             {/* Tab Content */}
             <div className="bg-surface-raised mx-4 mb-4 flex-grow overflow-y-auto rounded-b-lg p-4">

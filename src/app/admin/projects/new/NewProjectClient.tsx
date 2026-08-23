@@ -2,57 +2,61 @@
 
 import { useState } from 'react';
 import { useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
 import { useRouter } from 'next/navigation';
-import ProjectResizeUploader from '@/components/ProjectResizeUploader';
+import { X } from 'lucide-react';
 
-interface UploadedImage {
-    fileName: string;
-    originalImageUrl: string;
-    smallImageUrl: string;
-    originalWidth: number;
-    originalHeight: number;
-    smallWidth: number;
-    smallHeight: number;
-}
+import { api } from '@/convex/_generated/api';
+import { AdminHeading, AdminPanel } from '@/components/admin/AdminPrimitives';
+import ProjectDetailsForm from '@/components/admin/projects/ProjectDetailsForm';
+import type { ProjectFormState } from '@/components/admin/projects/project.types';
+import PendingPhotoTray, { pendingSettled, readyPending, revokePreviews } from '@/components/admin/images/PendingPhotoTray';
+import type { PendingImage } from '@/components/admin/images/images.types';
+
+/**
+ * Creating a job and its first photos.
+ *
+ * Both halves commit together in one mutation. The previous version wrote the project first and then
+ * looped one image write per photo, so a failure partway through left a real project on the list with
+ * some of its photos, and the natural retry made a second copy of the same house.
+ */
+
+const FORM_ID = 'new-project-form';
+
+const EMPTY_FORM: ProjectFormState = {
+    name: '',
+    status: 'draft',
+    address: '',
+    startDate: '',
+    endDate: '',
+    revenue: '',
+    notes: '',
+    highlighted: false,
+};
 
 export default function NewProjectClient() {
     const router = useRouter();
-    const createProject = useMutation(api.projects.createProject);
-    const addProjectImage = useMutation(api.projects.addProjectImage);
+    const createProject = useMutation(api.projects.createProjectWithImages);
 
-    const [formData, setFormData] = useState({
-        name: '',
-        status: 'draft' as const,
-        address: '',
-        startDate: '',
-        endDate: '',
-        revenue: '',
-        notes: '',
-    });
+    const [formData, setFormData] = useState<ProjectFormState>(EMPTY_FORM);
+    const [pending, setPending] = useState<PendingImage[]>([]);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const ready = readyPending(pending);
+    const settled = pendingSettled(pending);
 
-    const handleUploadComplete = (images: UploadedImage[]) => {
-        console.log('Images uploaded:', images);
-        setUploadedImages((prev) => [...prev, ...images]);
-    };
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        if (saving) return;
 
-    const handleResetImages = () => {
-        setUploadedImages([]);
-    };
+        if (!settled) {
+            setError('Some photos are still uploading.');
+            return;
+        }
 
-    const removeImage = (index: number) => {
-        setUploadedImages((prev) => prev.filter((_, i) => i !== index));
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-
+        setSaving(true);
+        setError(null);
         try {
-            // Create project
             const projectId = await createProject({
                 name: formData.name,
                 status: formData.status,
@@ -61,187 +65,72 @@ export default function NewProjectClient() {
                 endDate: formData.endDate ? new Date(formData.endDate).getTime() : undefined,
                 revenue: formData.revenue ? parseFloat(formData.revenue) : undefined,
                 notes: formData.notes || undefined,
+                images: ready.map((image) => ({
+                    title: image.title.trim() || undefined,
+                    imagePath: image.imagePath as string,
+                    width: image.width as number,
+                    height: image.height as number,
+                    thumbnailPath: image.thumbnailPath,
+                    thumbnailWidth: image.thumbnailWidth,
+                    thumbnailHeight: image.thumbnailHeight,
+                })),
             });
 
-            // Upload images if any
-            if (uploadedImages.length > 0) {
-                for (let i = 0; i < uploadedImages.length; i++) {
-                    const image = uploadedImages[i];
-                    await addProjectImage({
-                        projectId,
-                        imagePath: image.originalImageUrl,
-                        width: image.originalWidth,
-                        height: image.originalHeight,
-                        thumbnailPath: image.smallImageUrl,
-                        thumbnailWidth: image.smallWidth,
-                        thumbnailHeight: image.smallHeight,
-                        displayOrder: i,
-                    });
-                }
-            }
-
-            router.push('/admin/projects');
-        } catch (error) {
-            console.error('Error creating project:', error);
-            alert('Error creating project. Please try again.');
-        } finally {
-            setIsSubmitting(false);
+            revokePreviews(pending);
+            router.push(`/admin/projects/${projectId}/edit`);
+        } catch (caught) {
+            setError(caught instanceof Error ? caught.message : 'Could not create that project.');
+            setSaving(false);
         }
     };
 
     return (
-        <div className="container mx-auto max-w-7xl p-4">
-            <div className="flex gap-8">
-                {/* Left Column - Project Details Form (60%) */}
-                <div className="w-3/5">
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="bg-surface-raised rounded-lg p-6">
-                            <h2 className="text-body mb-6 text-2xl font-bold">New Project Details</h2>
+        <div className="flex flex-col gap-5 p-5 sm:p-8">
+            <AdminHeading eyebrow="Back office" title="New project" />
 
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="text-body mb-1 block text-sm font-medium">Project Name *</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
-                                        placeholder="Enter project name"
-                                    />
-                                </div>
+            <div className="grid grid-cols-1 gap-5 xl:grid-cols-[3fr_2fr]">
+                <ProjectDetailsForm
+                    formId={FORM_ID}
+                    formData={formData}
+                    onChange={(patch) => setFormData((current) => ({ ...current, ...patch }))}
+                    onSubmit={handleSubmit}
+                    saving={saving}
+                    error={error}
+                    saved={false}
+                    panelTitle="Details"
+                    submitLabel={
+                        ready.length > 0
+                            ? `Create project with ${ready.length} ${ready.length === 1 ? 'photo' : 'photos'}`
+                            : 'Create project'
+                    }
+                    savingLabel="Creating…"
+                    footNote=""
+                >
+                    <button
+                        type="button"
+                        onClick={() => {
+                            revokePreviews(pending);
+                            router.push('/admin/projects');
+                        }}
+                        className="border-line text-body-muted hover:bg-surface-hover hover:text-body inline-flex items-center gap-1.5 rounded-md border px-3.5 py-2.5 text-xs font-bold transition-colors"
+                    >
+                        <X size={13} aria-hidden="true" /> Cancel
+                    </button>
+                </ProjectDetailsForm>
 
-                                <div>
-                                    <label className="text-body mb-1 block text-sm font-medium">Status *</label>
-                                    <select
-                                        value={formData.status}
-                                        onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                                        className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
-                                    >
-                                        <option value="draft">Draft</option>
-                                        <option value="active">Active</option>
-                                        <option value="completed">Completed</option>
-                                        <option value="cancelled">Cancelled</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label className="text-body mb-1 block text-sm font-medium">Address</label>
-                                    <input
-                                        type="text"
-                                        value={formData.address}
-                                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                        className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
-                                        placeholder="Project address"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="text-body mb-1 block text-sm font-medium">Start Date</label>
-                                    <input
-                                        type="date"
-                                        value={formData.startDate}
-                                        onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                                        className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="text-body mb-1 block text-sm font-medium">End Date</label>
-                                    <input
-                                        type="date"
-                                        value={formData.endDate}
-                                        onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                                        className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="text-body mb-1 block text-sm font-medium">Revenue ($)</label>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        value={formData.revenue}
-                                        onChange={(e) => setFormData({ ...formData, revenue: e.target.value })}
-                                        className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
-                                        placeholder="Project revenue"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="text-body mb-1 block text-sm font-medium">Notes</label>
-                                    <textarea
-                                        value={formData.notes}
-                                        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                                        rows={2}
-                                        className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded border px-3 py-2 focus:outline-none"
-                                        placeholder="Project notes..."
-                                    />
-                                </div>
-                            </div>
-                            {/* Actions */}
-                            <div className="flex gap-4 pt-4">
-                                <button
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className="border-primary text-primary hover:bg-secondary hover:border-secondary hover:text-body-muted rounded-lg border-2 bg-transparent px-6 py-3 font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-                                >
-                                    {isSubmitting ? 'Creating...' : 'Create Project'}
-                                </button>
-
-                                <button
-                                    type="button"
-                                    onClick={() => router.push('/admin/projects')}
-                                    className="text-body-muted hover:bg-surface-overlay rounded-lg border-2 border-stone-300 bg-transparent px-6 py-3 font-medium transition-colors hover:border-red-500 hover:text-red-500"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-
-                {/* Right Column - Project Images (40%) */}
-                <div className="w-2/5">
-                    <div className="bg-surface-raised rounded-lg p-6">
-                        <h2 className="text-body mb-6 text-2xl font-bold">Project Images</h2>
-
-                        <div className="space-y-4">
-                            <ProjectResizeUploader
-                                onUploadComplete={handleUploadComplete}
-                                onResetInputs={handleResetImages}
-                                disabled={isSubmitting}
-                            />
-
-                            {uploadedImages.length > 0 && (
-                                <div>
-                                    <h3 className="text-body-muted mb-3 text-lg font-medium">Uploaded Images ({uploadedImages.length})</h3>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {uploadedImages.map((image, index) => (
-                                            <div key={index} className="group relative">
-                                                <img
-                                                    src={image.smallImageUrl}
-                                                    alt={`Project image ${index + 1}`}
-                                                    className="h-32 w-full rounded-lg object-cover"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeImage(index)}
-                                                    className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white opacity-0 transition-opacity group-hover:opacity-100"
-                                                >
-                                                    ×
-                                                </button>
-                                                <div className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs text-white">
-                                                    {image.originalWidth}×{image.originalHeight}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                <AdminPanel eyebrow="Photos" title={pending.length > 0 ? `Ready · ${ready.length} of ${pending.length}` : 'Photos'}>
+                    <div className="p-4">
+                        <PendingPhotoTray
+                            pending={pending}
+                            onPendingChange={(update) => setPending(update)}
+                            onFilesChosen={() => setError(null)}
+                            disabled={saving}
+                        />
+                        <p className="text-body-subtle mt-3 text-xs">
+                            Photos are attached when the project is created, in the order shown.
+                        </p>
                     </div>
-                </div>
+                </AdminPanel>
             </div>
         </div>
     );

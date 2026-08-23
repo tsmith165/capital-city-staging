@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useMutation, useQuery } from 'convex/react';
+import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { X, Package, Edit, Eye, Loader2, Upload, RotateCcw } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
@@ -43,7 +43,6 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({ onClose, onSu
 
     const router = useRouter();
     const createInventory = useMutation(api.inventory.createInventory);
-    const mostRecentOId = useQuery(api.inventory.getMostRecentOId);
 
     const handleUploadComplete = useCallback(
         (
@@ -105,20 +104,12 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({ onClose, onSu
     }, [previewUrl]);
 
     const handleCreateInventory = async (action: 'edit' | 'view' | 'stay') => {
-        if (mostRecentOId === undefined) {
-            setStatusMessage({ type: 'error', message: 'Unable to get next ID. Please try again.' });
-            return;
-        }
-
         setIsSubmitting(true);
         setStatusMessage(null);
 
         try {
-            const nextOId = (mostRecentOId || 0) + 1;
-
-            await createInventory({
-                oId: nextOId,
-                pId: nextOId,
+            /* The identifier comes back from the server; two of these open at once used to collide. */
+            const { oId } = await createInventory({
                 active: true,
                 name: title,
                 cost: cost,
@@ -142,7 +133,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({ onClose, onSu
             setStatusMessage({ type: 'success', message: 'Inventory created successfully!' });
 
             // Call onSuccess callback if provided
-            onSuccess?.(nextOId);
+            onSuccess?.(oId);
 
             // Close overlay after short delay for success message
             setTimeout(() => {
@@ -151,10 +142,10 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({ onClose, onSu
                 // Navigate if requested
                 switch (action) {
                     case 'edit':
-                        router.push(`/admin/edit?id=${nextOId}`);
+                        router.push(`/admin/edit?id=${oId}`);
                         break;
                     case 'view':
-                        router.push(`/admin/inventory?item=${nextOId}`);
+                        router.push(`/admin/inventory?item=${oId}`);
                         break;
                     case 'stay':
                         // Just refresh the current page

@@ -1,14 +1,19 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useMutation } from 'convex/react';
-import { CheckCircle2, ImagePlus, Loader2, Upload, X } from 'lucide-react';
+import { CheckCircle2, Loader2, X } from 'lucide-react';
 
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import { AdminPanel } from '@/components/admin/AdminPrimitives';
 import EditableImageCard from '@/components/admin/images/EditableImageCard';
-import { useImageUpload } from '@/components/admin/images/useImageUpload';
+import PendingPhotoTray, {
+    movePending as move,
+    pendingSettled,
+    readyPending,
+    revokePreviews,
+} from '@/components/admin/images/PendingPhotoTray';
 import type { PendingImage } from '@/components/admin/images/images.types';
 
 import type { EditorItem, EditorPhoto } from './inventory.editor.types';
@@ -27,14 +32,6 @@ import type { EditorItem, EditorPhoto } from './inventory.editor.types';
  * until the batch is committed.
  */
 
-function move<T>(items: T[], from: number, to: number) {
-    if (to < 0 || to >= items.length) return items;
-    const next = [...items];
-    const [lifted] = next.splice(from, 1);
-    next.splice(to, 0, lifted);
-    return next;
-}
-
 export default function InventoryPhotosSection({ item }: { item: EditorItem }) {
     const addImages = useMutation(api.inventory.addExtraImages);
     const updateImage = useMutation(api.inventory.updateExtraImage);
@@ -42,30 +39,15 @@ export default function InventoryPhotosSection({ item }: { item: EditorItem }) {
     const reorderImages = useMutation(api.inventory.reorderInventoryImages);
     const setMainImage = useMutation(api.inventory.setMainImage);
 
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const [pending, setPending] = useState<PendingImage[]>([]);
-    const [dragging, setDragging] = useState<{ list: 'pending' | 'committed'; index: number } | null>(null);
+    const [dragging, setDragging] = useState<number | null>(null);
     const [committing, setCommitting] = useState(false);
     const [flash, setFlash] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [dropActive, setDropActive] = useState(false);
     const [captionDrafts, setCaptionDrafts] = useState<Record<string, string>>({});
 
-    const { upload, progress, busy } = useImageUpload(
-        (incoming) =>
-            setPending((current) => {
-                const byKey = new Map(current.map((image) => [image.key, image]));
-                for (const image of incoming) {
-                    const existing = byKey.get(image.key);
-                    byKey.set(image.key, { ...existing, ...image, title: existing?.title || image.title });
-                }
-                return [...byKey.values()];
-            }),
-        (update) => setPending((current) => current.map((image) => (image.key === update.key ? { ...image, ...update } : image))),
-    );
-
-    const ready = pending.filter((image) => image.stage === 'ready');
-    const settled = pending.every((image) => image.stage === 'ready' || image.stage === 'failed');
+    const ready = readyPending(pending);
+    const settled = pendingSettled(pending);
 
     /* Position 0 is the item's own image; the rest are `extraImages` rows, in display order. */
     const photos: EditorPhoto[] = [
@@ -78,13 +60,6 @@ export default function InventoryPhotosSection({ item }: { item: EditorItem }) {
         })),
     ];
 
-    const handleFiles = (files: FileList | null) => {
-        if (!files || files.length === 0) return;
-        setFlash(null);
-        setError(null);
-        void upload(files);
-    };
-
     const handleCommit = async () => {
         if (ready.length === 0) return;
 
@@ -93,20 +68,18 @@ export default function InventoryPhotosSection({ item }: { item: EditorItem }) {
         try {
             const result = await addImages({
                 inventoryId: item._id as Id<'inventory'>,
-                images: pending
-                    .filter((image) => image.stage === 'ready')
-                    .map((image) => ({
-                        title: image.title.trim() || undefined,
-                        imagePath: image.imagePath as string,
-                        width: image.width as number,
-                        height: image.height as number,
-                        smallImagePath: image.thumbnailPath,
-                        smallWidth: image.thumbnailWidth,
-                        smallHeight: image.thumbnailHeight,
-                    })),
+                images: ready.map((image) => ({
+                    title: image.title.trim() || undefined,
+                    imagePath: image.imagePath as string,
+                    width: image.width as number,
+                    height: image.height as number,
+                    smallImagePath: image.thumbnailPath,
+                    smallWidth: image.thumbnailWidth,
+                    smallHeight: image.thumbnailHeight,
+                })),
             });
 
-            for (const image of pending) if (image.previewUrl) URL.revokeObjectURL(image.previewUrl);
+            revokePreviews(pending);
             setPending([]);
             setFlash(`${result.added} ${result.added === 1 ? 'photo' : 'photos'} added.`);
         } catch (caught) {
@@ -117,7 +90,7 @@ export default function InventoryPhotosSection({ item }: { item: EditorItem }) {
     };
 
     const discardPending = () => {
-        for (const image of pending) if (image.previewUrl) URL.revokeObjectURL(image.previewUrl);
+        revokePreviews(pending);
         setPending([]);
         setError(null);
     };
@@ -151,120 +124,28 @@ export default function InventoryPhotosSection({ item }: { item: EditorItem }) {
         }
     };
 
+    const runOrFail = async (action: Promise<unknown>, message = 'That change did not go through.') => {
+        setError(null);
+        try {
+            await action;
+        } catch (caught) {
+            setError(caught instanceof Error ? caught.message : message);
+        }
+    };
+
     return (
         <div className="flex flex-col gap-5">
             <AdminPanel eyebrow="Photos" title={pending.length > 0 ? `Ready to add · ${ready.length} of ${pending.length}` : 'Add photos'}>
                 <div className="p-4">
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={(event) => {
-                            handleFiles(event.target.files);
-                            event.target.value = '';
+                    <PendingPhotoTray
+                        pending={pending}
+                        onPendingChange={(update) => setPending(update)}
+                        onFilesChosen={() => {
+                            setFlash(null);
+                            setError(null);
                         }}
-                        className="sr-only"
-                    />
-
-                    <div
-                        onDragOver={(event) => {
-                            event.preventDefault();
-                            setDropActive(true);
-                        }}
-                        onDragLeave={() => setDropActive(false)}
-                        onDrop={(event) => {
-                            event.preventDefault();
-                            setDropActive(false);
-                            handleFiles(event.dataTransfer.files);
-                        }}
-                        className={`flex flex-col items-center gap-3 rounded-lg border-2 border-dashed px-5 py-8 text-center transition-colors ${
-                            dropActive ? 'border-gold-300 bg-gold-400/5' : 'border-line'
-                        }`}
-                    >
-                        <ImagePlus size={24} aria-hidden="true" className="text-body-subtle" />
-                        <div className="flex flex-col gap-1">
-                            <strong className="text-body text-sm font-bold">Drop photos here</strong>
-                            <span className="text-body-muted text-xs">
-                                They stay here until you add them, so you can caption and reorder first.
-                            </span>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={busy}
-                            className="border-line-strong text-body hover:bg-surface-hover inline-flex items-center gap-2 rounded-md border px-4 py-2.5 text-sm font-bold transition-colors disabled:opacity-50"
-                        >
-                            {busy ? (
-                                <Loader2 size={15} aria-hidden="true" className="animate-spin" />
-                            ) : (
-                                <Upload size={15} aria-hidden="true" />
-                            )}
-                            {busy ? `Uploading… ${progress}%` : 'Choose photos'}
-                        </button>
-                    </div>
-
-                    {busy && (
-                        <div
-                            role="progressbar"
-                            aria-valuenow={progress}
-                            aria-valuemin={0}
-                            aria-valuemax={100}
-                            aria-label="Upload progress"
-                            className="bg-surface mt-3 h-1.5 w-full overflow-hidden rounded-full"
-                        >
-                            <div className="bg-gold-400 h-full transition-[width] duration-300" style={{ width: `${progress}%` }} />
-                        </div>
-                    )}
-
-                    <p aria-live="polite" className="empty:hidden">
-                        {flash && (
-                            <span className="text-success mt-3 inline-flex items-center gap-1.5 text-sm font-bold">
-                                <CheckCircle2 size={14} aria-hidden="true" /> {flash}
-                            </span>
-                        )}
-                    </p>
-                    {error && (
-                        <p role="alert" className="border-danger/40 bg-danger-soft text-danger mt-3 rounded-md border px-4 py-2.5 text-sm">
-                            {error}
-                        </p>
-                    )}
-
-                    {pending.length > 0 && (
-                        <>
-                            <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 2xl:grid-cols-4">
-                                {pending.map((image, index) => (
-                                    <EditableImageCard
-                                        key={image.key}
-                                        src={image.imagePath ?? image.previewUrl}
-                                        title={image.title}
-                                        fileName={image.fileName}
-                                        stage={image.stage}
-                                        error={image.error}
-                                        position={index}
-                                        total={pending.length}
-                                        dragging={dragging?.list === 'pending' && dragging.index === index}
-                                        onTitleChange={(title) =>
-                                            setPending((current) => current.map((row) => (row.key === image.key ? { ...row, title } : row)))
-                                        }
-                                        onRemove={() => {
-                                            if (image.previewUrl) URL.revokeObjectURL(image.previewUrl);
-                                            setPending((current) => current.filter((row) => row.key !== image.key));
-                                        }}
-                                        onMove={(direction) => setPending((current) => move(current, index, index + direction))}
-                                        onDragStart={() => setDragging({ list: 'pending', index })}
-                                        onDragOver={(event) => event.preventDefault()}
-                                        onDrop={() => {
-                                            if (dragging?.list !== 'pending') return;
-                                            setPending((current) => move(current, dragging.index, index));
-                                            setDragging(null);
-                                        }}
-                                        onDragEnd={() => setDragging(null)}
-                                    />
-                                ))}
-                            </ul>
-
-                            <div className="border-line mt-4 flex flex-wrap items-center gap-2 border-t pt-4">
+                        actions={
+                            <>
                                 <button
                                     type="button"
                                     onClick={handleCommit}
@@ -283,8 +164,21 @@ export default function InventoryPhotosSection({ item }: { item: EditorItem }) {
                                     <X size={13} aria-hidden="true" /> Discard
                                 </button>
                                 <span className="text-body-subtle ml-auto text-xs">Nothing is saved until you add them.</span>
-                            </div>
-                        </>
+                            </>
+                        }
+                    />
+
+                    <p aria-live="polite" className="empty:hidden">
+                        {flash && (
+                            <span className="text-success mt-3 inline-flex items-center gap-1.5 text-sm font-bold">
+                                <CheckCircle2 size={14} aria-hidden="true" /> {flash}
+                            </span>
+                        )}
+                    </p>
+                    {error && (
+                        <p role="alert" className="border-danger/40 bg-danger-soft text-danger mt-3 rounded-md border px-4 py-2.5 text-sm">
+                            {error}
+                        </p>
                     )}
                 </div>
             </AdminPanel>
@@ -305,7 +199,7 @@ export default function InventoryPhotosSection({ item }: { item: EditorItem }) {
                             canRemove={!photo.isMain}
                             position={index}
                             total={photos.length}
-                            dragging={dragging?.list === 'committed' && dragging.index === index}
+                            dragging={dragging === index}
                             onTitleChange={(title) =>
                                 photo._id && setCaptionDrafts((current) => ({ ...current, [photo._id as string]: title }))
                             }
@@ -313,15 +207,19 @@ export default function InventoryPhotosSection({ item }: { item: EditorItem }) {
                                 if (!photo._id) return;
                                 const draft = captionDrafts[photo._id];
                                 if (draft === undefined || draft === photo.title) return;
-                                void updateImage({ imageId: photo._id as Id<'extraImages'>, title: draft });
+                                void runOrFail(
+                                    updateImage({ imageId: photo._id as Id<'extraImages'>, title: draft }),
+                                    'Could not save that caption.',
+                                );
                             }}
-                            onRemove={() => photo._id && void removeImage({ id: photo._id as Id<'extraImages'> })}
+                            confirmRemove="Delete this photo? It comes off the catalog and the public site straight away."
+                            onRemove={() => photo._id && void runOrFail(removeImage({ id: photo._id as Id<'extraImages'> }))}
                             onMove={(direction) => void commitOrder(index, index + direction)}
-                            onDragStart={() => setDragging({ list: 'committed', index })}
+                            onDragStart={() => setDragging(index)}
                             onDragOver={(event) => event.preventDefault()}
                             onDrop={() => {
-                                if (dragging?.list !== 'committed') return;
-                                void commitOrder(dragging.index, index);
+                                if (dragging === null) return;
+                                void commitOrder(dragging, index);
                                 setDragging(null);
                             }}
                             onDragEnd={() => setDragging(null)}

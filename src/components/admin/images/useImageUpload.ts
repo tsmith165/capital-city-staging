@@ -61,16 +61,29 @@ function measure(url: string): Promise<{ width: number; height: number }> {
 export function useImageUpload(onReady: (images: PendingImage[]) => void, onStageChange: (update: PendingImage) => void) {
     const [progress, setProgress] = useState(0);
     const [busy, setBusy] = useState(false);
-    /* Maps the upload response back to the cards already on screen, which are keyed client-side. */
-    const keysByFileName = useRef(new Map<string, string>());
+    /**
+     * Maps the upload response back to the cards already on screen. Two files can share a name —
+     * `IMG_0001.jpg` out of two different folders is the common case — so the batch index is folded
+     * into the name we upload under. Keying on the raw file name loses one card per collision and
+     * leaves the tray stuck waiting on an upload that already finished.
+     */
+    const cardsByUploadName = useRef(new Map<string, { key: string; fileName: string }>());
+
+    const failRemaining = useCallback(
+        (error: string) => {
+            for (const card of cardsByUploadName.current.values()) {
+                onStageChange({ key: card.key, stage: 'failed', error } as PendingImage);
+            }
+            cardsByUploadName.current.clear();
+        },
+        [onStageChange],
+    );
 
     const { startUpload } = useUploadThing('imageUploader', {
         onUploadProgress: setProgress,
         onUploadError: (error: Error) => {
             reportUploadError(error, () => {});
-            for (const key of keysByFileName.current.values()) {
-                onStageChange({ key, stage: 'failed', error: 'Upload failed' } as PendingImage);
-            }
+            failRemaining('Upload failed');
             setBusy(false);
             setProgress(0);
         },
@@ -81,15 +94,16 @@ export function useImageUpload(onReady: (images: PendingImage[]) => void, onStag
 
                 const ready: PendingImage[] = [];
                 for (const original of originals) {
-                    const key = keysByFileName.current.get(original.name);
-                    if (!key) continue;
+                    const card = cardsByUploadName.current.get(original.name);
+                    if (!card) continue;
+                    cardsByUploadName.current.delete(original.name);
 
                     const small = files.find((file) => file.name === `small-${original.name}`);
                     const [full, thumb] = await Promise.all([measure(original.url), small ? measure(small.url) : Promise.resolve(null)]);
 
                     ready.push({
-                        key,
-                        fileName: original.name,
+                        key: card.key,
+                        fileName: card.fileName,
                         title: '',
                         stage: 'ready',
                         imagePath: original.url,
@@ -102,8 +116,10 @@ export function useImageUpload(onReady: (images: PendingImage[]) => void, onStag
                 }
 
                 onReady(ready);
+                /* Anything storage never returned would otherwise sit on "Uploading" forever. */
+                failRemaining('Storage did not return this file');
             } finally {
-                keysByFileName.current.clear();
+                cardsByUploadName.current.clear();
                 setBusy(false);
                 setProgress(0);
             }
@@ -117,35 +133,41 @@ export function useImageUpload(onReady: (images: PendingImage[]) => void, onStag
 
             setBusy(true);
             setProgress(0);
-            keysByFileName.current.clear();
+            cardsByUploadName.current.clear();
 
             /* Every file gets a card immediately, so nothing about the batch is invisible. */
             const staged = files.map((file, index) => {
                 const key = `${file.name}-${index}-${file.size}`;
-                keysByFileName.current.set(file.name, key);
+                const uploadName = `${index}-${file.name}`;
+                cardsByUploadName.current.set(uploadName, { key, fileName: file.name });
                 return {
                     key,
+                    uploadName,
                     fileName: file.name,
                     title: '',
                     stage: 'resizing' as const,
                     previewUrl: URL.createObjectURL(file),
                 };
             });
-            onReady(staged);
+            onReady(staged.map(({ uploadName: _uploadName, ...card }) => card));
 
             const toUpload: File[] = [];
             for (const [index, file] of files.entries()) {
+                const { key, uploadName } = staged[index];
                 try {
                     const [full, small] = await Promise.all([resize(file, MAX_EDGE), resize(file, THUMBNAIL_EDGE)]);
-                    toUpload.push(new File([small], `small-${file.name}`, { type: small.type }), full);
-                    onStageChange({ key: staged[index].key, stage: 'uploading' } as PendingImage);
+                    toUpload.push(
+                        new File([small], `small-${uploadName}`, { type: small.type }),
+                        new File([full], uploadName, { type: full.type }),
+                    );
+                    onStageChange({ key, stage: 'uploading' } as PendingImage);
                 } catch (error) {
                     onStageChange({
-                        key: staged[index].key,
+                        key,
                         stage: 'failed',
                         error: error instanceof Error ? error.message : 'Could not prepare this file',
                     } as PendingImage);
-                    keysByFileName.current.delete(file.name);
+                    cardsByUploadName.current.delete(uploadName);
                 }
             }
 

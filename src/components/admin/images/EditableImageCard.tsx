@@ -24,6 +24,7 @@ export default function EditableImageCard({
     badge,
     lockedTitle,
     canRemove = true,
+    confirmRemove,
     onTitleChange,
     onTitleCommit,
     onRemove,
@@ -47,6 +48,8 @@ export default function EditableImageCard({
     /** Renders the caption as text instead of a field, where the caption is owned elsewhere. */
     lockedTitle?: string;
     canRemove?: boolean;
+    /** Asked before removing an image that is already live. Omitted while the image is still pending. */
+    confirmRemove?: string;
     onTitleChange: (title: string) => void;
     /** Fired on blur, for lists that write each edit straight through. */
     onTitleCommit?: () => void;
@@ -165,7 +168,10 @@ export default function EditableImageCard({
                     {canRemove && (
                         <button
                             type="button"
-                            onClick={onRemove}
+                            onClick={() => {
+                                if (confirmRemove && !window.confirm(confirmRemove)) return;
+                                onRemove();
+                            }}
                             aria-label={`Remove image ${position + 1}`}
                             className="border-line text-body-subtle hover:border-danger/50 hover:bg-danger-soft hover:text-danger ml-auto grid h-8 w-8 place-items-center rounded border transition-colors"
                         >

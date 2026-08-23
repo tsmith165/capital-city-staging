@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { isAdmin, requireAdmin } from "./authz";
 
 // Get or create user from Clerk ID
 export const getOrCreateUser = mutation({
@@ -51,43 +52,45 @@ export const getCurrentUser = query({
 // Get all users (admin only)
 export const getAllUsers = query({
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return [];
-
-    const currentUser = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .first();
-
-    if (!currentUser || currentUser.role !== "admin") {
-      throw new Error("Not authorized");
-    }
-
+    if (!(await isAdmin(ctx))) return [];
     return await ctx.db.query("users").order("desc").collect();
   },
 });
 
-// Update user role (admin only)
+/**
+ * Role is the authority for every Convex mutation, so an admin who demotes herself loses the
+ * data plane while Clerk still admits her to the shell, with no in-app way back. The two guards
+ * below are the recovery path: nobody can demote themselves, and the last admin cannot be
+ * demoted by anyone.
+ */
 export const updateUserRole = mutation({
   args: {
     userId: v.id("users"),
     role: v.union(v.literal("admin"), v.literal("customer")),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
+    const actor = await requireAdmin(ctx);
 
-    // Check if current user is admin
-    const currentUser = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .first();
+    const target = await ctx.db.get(args.userId);
+    if (!target) throw new Error("That user no longer exists");
 
-    if (!currentUser || currentUser.role !== "admin") {
-      throw new Error("Not authorized");
+    if (target.role === args.role) return;
+
+    if (args.role === "customer") {
+      if (target._id === actor._id) {
+        throw new Error("You cannot remove your own admin access. Ask another admin to do it.");
+      }
+
+      const admins = await ctx.db
+        .query("users")
+        .filter((q) => q.eq(q.field("role"), "admin"))
+        .collect();
+
+      if (admins.length <= 1) {
+        throw new Error("This is the only admin account. Promote someone else first.");
+      }
     }
 
-    // Update user role
     await ctx.db.patch(args.userId, {
       role: args.role,
       updatedAt: Date.now(),

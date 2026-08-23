@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
+import type { Id } from '@/convex/_generated/dataModel';
 import { sendContactFormEmail } from './actions';
 import { buildSubmissionRecord } from './contact_form.utils';
 import { calculateStagingQuote, formatPrice } from '@/utils/calculateQuote';
@@ -160,6 +161,8 @@ const Slider = ({
 
 const ContactForm = () => {
     const createSubmission = useMutation(api.contactSubmissions.createSubmission);
+    /* Survives a retry so one enquiry cannot become two rows in the inbox. */
+    const submissionIdRef = useRef<Id<'contactSubmissions'> | null>(null);
     const [mounted, setMounted] = useState(false);
     const [formData, setFormData] = useState<FormData>({
         name: '',
@@ -222,26 +225,36 @@ const ContactForm = () => {
             schema.parse(formData);
             setErrors({});
 
-            // Record the lead before attempting delivery. Email is rate limited and can fail
-            // outright, and a lost quote request is worse than a missing notification.
-            try {
-                await createSubmission({
-                    name: formData.name,
-                    email: formData.email,
-                    phone: formData.phone || undefined,
-                    message: buildSubmissionRecord(formData, quote),
-                });
-            } catch (persistError) {
-                console.error('Could not record the contact submission:', persistError);
+            /*
+             * Record the lead before attempting delivery. Email is rate limited and can fail
+             * outright, and a lost quote request is worse than a missing notification.
+             *
+             * The id is held across retries so a failed send followed by a second attempt updates
+             * nothing and inserts nothing — the same enquiry used to arrive twice in the inbox.
+             */
+            if (!submissionIdRef.current) {
+                try {
+                    submissionIdRef.current = await createSubmission({
+                        name: formData.name,
+                        email: formData.email,
+                        phone: formData.phone || undefined,
+                        message: buildSubmissionRecord(formData, quote),
+                    });
+                } catch (persistError) {
+                    console.error('Could not record the contact submission:', persistError);
+                }
             }
 
-            const response = await sendContactFormEmail({
-                ...formData,
-                quote: quote,
-            });
-
-            if (!response.success) {
-                throw new Error('Failed to submit form');
+            try {
+                const response = await sendContactFormEmail({ ...formData, quote });
+                if (!response.success) throw new Error('Failed to submit form');
+            } catch (sendError) {
+                /*
+                 * Delivery failed, but the enquiry itself is saved and shows up in the admin inbox.
+                 * Reporting failure here would be untrue and would invite a duplicate submission.
+                 */
+                if (!submissionIdRef.current) throw sendError;
+                console.error('Could not send the contact notification:', sendError);
             }
 
             track('quote_submitted', {
@@ -262,6 +275,7 @@ const ContactForm = () => {
 
             // Reset form
             setTimeout(() => {
+                submissionIdRef.current = null;
                 setFormData({
                     name: '',
                     email: '',

@@ -30,6 +30,7 @@ export default function ProjectPaymentSection({
 }) {
     const clearPayment = useMutation(api.projects.clearProjectPayment);
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     return (
         <>
@@ -71,13 +72,32 @@ export default function ProjectPaymentSection({
                         {payment.status !== 'unpaid' && (
                             <button
                                 type="button"
-                                onClick={() => void clearPayment({ projectId: projectId as Id<'projects'> })}
+                                onClick={async () => {
+                                    if (
+                                        !window.confirm(
+                                            'Clear the recorded payment for this project? The amount, date and method are removed.',
+                                        )
+                                    )
+                                        return;
+                                    setError(null);
+                                    try {
+                                        await clearPayment({ projectId: projectId as Id<'projects'> });
+                                    } catch (caught) {
+                                        setError(caught instanceof Error ? caught.message : 'Could not clear that payment.');
+                                    }
+                                }}
                                 className="border-line text-body-muted hover:bg-surface-hover hover:text-body inline-flex items-center gap-1.5 rounded-md border px-3.5 py-2.5 text-xs font-bold transition-colors"
                             >
                                 <Undo2 size={13} aria-hidden="true" /> Clear payment
                             </button>
                         )}
                     </div>
+
+                    {error && (
+                        <p role="alert" className="border-danger/40 bg-danger-soft text-danger rounded-md border px-4 py-2.5 text-sm">
+                            {error}
+                        </p>
+                    )}
                 </div>
             </AdminPanel>
 

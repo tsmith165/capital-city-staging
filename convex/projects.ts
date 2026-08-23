@@ -313,6 +313,78 @@ export const createProject = mutation({
   },
 });
 
+/**
+ * Creating a project and attaching its first photos is one business operation, so it is one
+ * transaction. Splitting it left a real project behind whenever an image write failed, and the
+ * obvious retry then created a second copy of the same house.
+ */
+export const createProjectWithImages = mutation({
+  args: {
+    name: v.string(),
+    status: v.union(v.literal("draft"), v.literal("active"), v.literal("completed"), v.literal("cancelled")),
+    startDate: v.optional(v.number()),
+    endDate: v.optional(v.number()),
+    revenue: v.optional(v.number()),
+    address: v.optional(v.string()),
+    notes: v.optional(v.string()),
+    images: v.array(
+      v.object({
+        title: v.optional(v.string()),
+        imagePath: v.string(),
+        width: v.number(),
+        height: v.number(),
+        thumbnailPath: v.optional(v.string()),
+        thumbnailWidth: v.optional(v.number()),
+        thumbnailHeight: v.optional(v.number()),
+      }),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const admin = await requireAdmin(ctx);
+
+    const name = args.name.trim();
+    if (!name) throw new Error("A project needs a name");
+
+    const projects = await ctx.db.query("projects").collect();
+    const maxOrder = projects.reduce((highest, project) => Math.max(highest, project.displayOrder || 0), 0);
+
+    const now = Date.now();
+    const projectId = await ctx.db.insert("projects", {
+      ownerId: admin.clerkId,
+      name,
+      status: args.status,
+      startDate: args.startDate,
+      endDate: args.endDate,
+      revenue: args.revenue,
+      address: args.address,
+      notes: args.notes,
+      highlighted: false,
+      inventoryAssigned: false,
+      displayOrder: maxOrder + 1,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    for (const [index, image] of args.images.entries()) {
+      await ctx.db.insert("projectImages", {
+        projectId,
+        ownerId: admin.clerkId,
+        title: image.title?.trim() || undefined,
+        imagePath: image.imagePath,
+        width: image.width,
+        height: image.height,
+        thumbnailPath: image.thumbnailPath,
+        thumbnailWidth: image.thumbnailWidth,
+        thumbnailHeight: image.thumbnailHeight,
+        displayOrder: index,
+        createdAt: now,
+      });
+    }
+
+    return projectId;
+  },
+});
+
 // Add image to project
 export const addProjectImage = mutation({
   args: {
