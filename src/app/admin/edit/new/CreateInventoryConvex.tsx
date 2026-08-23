@@ -1,207 +1,144 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useMutation, useQuery } from 'convex/react';
+import { useMutation } from 'convex/react';
+import { Loader2 } from 'lucide-react';
+
 import { api } from '@/convex/_generated/api';
-import ResizeUploader from '@/app/admin/edit/ResizeUploader';
-import InputTextbox from '@/components/inputs/InputTextbox';
+import { AdminHeading, AdminPanel } from '@/components/admin/AdminPrimitives';
+import PendingPhotoTray, { pendingSettled, readyPending, revokePreviews } from '@/components/admin/images/PendingPhotoTray';
+import type { PendingImage } from '@/components/admin/images/images.types';
+
+/**
+ * Adding one piece of furniture to the catalog.
+ *
+ * Deliberately short: a photo and a name is enough to have something to find, and everything that
+ * takes judgement — price, stock, measurements, category — belongs on the editor this hands off to.
+ * The identifier is allocated by the server, so two of these open at once cannot collide.
+ */
+
+const FIELD =
+    'border-line bg-surface text-body placeholder:text-body-subtle focus-visible:border-gold-300 w-full rounded-md border px-3 py-2.5 text-sm outline-none transition-colors';
 
 export default function CreateInventoryConvex() {
-    const [imageUrl, setImageUrl] = useState('Not yet uploaded');
-    const [width, setWidth] = useState(0);
-    const [height, setHeight] = useState(0);
-    const [title, setTitle] = useState('Not yet uploaded');
-    const [smallImageUrl, setSmallImageUrl] = useState('Not yet uploaded');
-    const [smallWidth, setSmallWidth] = useState(0);
-    const [smallHeight, setSmallHeight] = useState(0);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-
     const router = useRouter();
     const createInventory = useMutation(api.inventory.createInventory);
-    const mostRecentOId = useQuery(api.inventory.getMostRecentOId);
 
-    const handleUploadComplete = useCallback(
-        (
-            fileName: string,
-            originalImageUrl: string,
-            smallImageUrl: string,
-            originalWidth: number,
-            originalHeight: number,
-            smallWidth: number,
-            smallHeight: number,
-        ) => {
-            console.log(
-                'handleUploadComplete',
-                fileName,
-                originalImageUrl,
-                smallImageUrl,
-                originalWidth,
-                originalHeight,
-                smallWidth,
-                smallHeight,
-            );
-            setTitle(fileName.split('.')[0]);
-            setImageUrl(originalImageUrl);
-            setSmallImageUrl(smallImageUrl);
-            setWidth(originalWidth);
-            setHeight(originalHeight);
-            setSmallWidth(smallWidth);
-            setSmallHeight(smallHeight);
-            setStatusMessage(null);
+    const [pending, setPending] = useState<PendingImage[]>([]);
+    const [name, setName] = useState('');
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-            if (fileName) {
-                setTitle(fileName.split('.')[0]);
-            }
-        },
-        [],
-    );
+    const photo = readyPending(pending)[0];
+    const settled = pendingSettled(pending);
+    const canSubmit = Boolean(photo) && name.trim().length > 0 && settled && !saving;
+    const smallEdge = photo ? Math.min(photo.width ?? 0, photo.height ?? 0) : 0;
 
-    const handleCreateInventory = async (action: 'edit' | 'images' | 'view') => {
-        setIsSubmitting(true);
+    const create = async (destination: 'edit' | 'view') => {
+        if (!photo || !canSubmit) return;
+
+        setSaving(true);
+        setError(null);
         try {
-            if (mostRecentOId === undefined) {
-                setStatusMessage({ type: 'error', message: 'Unable to get next ID. Please try again.' });
-                return;
-            }
-
-            const nextOId = (mostRecentOId || 0) + 1;
-
-            await createInventory({
-                oId: nextOId,
-                pId: nextOId, // Use same value for pId
+            const { oId } = await createInventory({
                 active: true,
-                name: title,
+                name: name.trim(),
                 cost: 0,
                 price: 0,
                 vendor: '',
                 category: '',
                 description: '',
-                count: 0,
+                /* One unit until she says otherwise; zero would read as out of stock everywhere. */
+                count: 1,
                 location: '',
                 realWidth: 0,
                 realHeight: 0,
                 realDepth: 0,
-                imagePath: imageUrl,
-                width: width,
-                height: height,
-                smallImagePath: smallImageUrl,
-                smallWidth: smallWidth,
-                smallHeight: smallHeight,
+                imagePath: photo.imagePath as string,
+                width: photo.width as number,
+                height: photo.height as number,
+                smallImagePath: photo.thumbnailPath ?? (photo.imagePath as string),
+                smallWidth: photo.thumbnailWidth ?? (photo.width as number),
+                smallHeight: photo.thumbnailHeight ?? (photo.height as number),
             });
 
-            setStatusMessage({ type: 'success', message: 'Inventory created successfully.' });
-            handleResetInputs();
-
-            switch (action) {
-                case 'edit':
-                    router.push(`/admin/edit?id=${nextOId}`);
-                    break;
-                case 'images':
-                    router.push(`/admin/edit?id=${nextOId}`);
-                    break;
-                case 'view':
-                    router.push(`/admin/inventory?item=${nextOId}`);
-                    break;
-            }
-        } catch (error) {
-            console.error('Error creating inventory:', error);
-            setStatusMessage({ type: 'error', message: 'Failed to create inventory. Please try again.' });
-        } finally {
-            setIsSubmitting(false);
+            revokePreviews(pending);
+            router.push(destination === 'edit' ? `/admin/edit?id=${oId}` : `/admin/inventory?item=${oId}`);
+        } catch (caught) {
+            setError(caught instanceof Error ? caught.message : 'Could not create that item.');
+            setSaving(false);
         }
     };
 
-    const handleResetInputs = useCallback(() => {
-        setImageUrl('Not yet uploaded');
-        setWidth(0);
-        setHeight(0);
-        setTitle('Not yet uploaded');
-        setSmallImageUrl('Not yet uploaded');
-        setSmallWidth(0);
-        setSmallHeight(0);
-        setStatusMessage(null);
-    }, []);
-
-    const isFormValid = imageUrl !== 'Not yet uploaded' && title !== 'Not yet uploaded' && !isSubmitting;
-
     return (
-        <div className="bg-surface flex h-full w-full flex-col items-center justify-center">
-            <div className="bg-surface flex w-4/5 flex-col items-center justify-center rounded-lg">
-                <div id="header" className="gradient-secondary-main-text w-fit rounded-t-lg text-center text-4xl font-bold">
-                    Create New Inventory
-                </div>
-                <div className="flex w-full flex-col items-center space-y-2 p-2">
-                    <ResizeUploader
-                        handleUploadComplete={handleUploadComplete}
-                        handleResetInputs={handleResetInputs}
-                        backToEditLink={`/admin/inventory`}
-                    />
-                    <InputTextbox idName="title" name="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-                    <InputTextbox idName="image_path" name="Image Path" value={imageUrl} />
-                    <InputTextbox idName="px_width" name="Width (px)" value={width.toString()} />
-                    <InputTextbox idName="px_height" name="Height (px)" value={height.toString()} />
-                    <InputTextbox idName="small_image_path" name="Small Path" value={smallImageUrl} />
-                    <InputTextbox idName="small_px_width" name="Sm Width" value={smallWidth.toString()} />
-                    <InputTextbox idName="small_px_height" name="Sm Height" value={smallHeight.toString()} />
-                    {imageUrl !== '' && imageUrl !== null ? null : width < 800 && height < 800 ? (
-                        <div className="text-red-500">Warning: Image width and height are less than 800px.</div>
-                    ) : width < 800 ? (
-                        <div className="text-red-500">Warning: Image width is less than 800px.</div>
-                    ) : height < 800 ? (
-                        <div className="text-red-500">Warning: Image height is less than 800px.</div>
-                    ) : null}
+        <div className="flex flex-col gap-5 p-5 sm:p-8">
+            <AdminHeading eyebrow="Catalog" title="New item" />
 
-                    <div className="flex space-x-4">
-                        <button
-                            type="button"
-                            disabled={!isFormValid}
-                            onClick={() => handleCreateInventory('edit')}
-                            className={
-                                'relative rounded-md px-4 py-1 text-lg font-bold ' +
-                                (isFormValid
-                                    ? ' bg-primary_dark text-body-muted hover:bg-primary hover:text-body-inverse'
-                                    : 'text-secondary_dark cursor-not-allowed bg-stone-300 hover:bg-stone-300 hover:text-red-600')
-                            }
-                        >
-                            {isSubmitting ? 'Creating...' : 'Create & Edit'}
-                        </button>
-                        <button
-                            type="button"
-                            disabled={!isFormValid}
-                            onClick={() => handleCreateInventory('images')}
-                            className={
-                                'relative rounded-md px-4 py-1 text-lg font-bold ' +
-                                (isFormValid
-                                    ? ' bg-primary_dark text-body-muted hover:bg-primary hover:text-body-inverse'
-                                    : 'text-secondary_dark cursor-not-allowed bg-stone-300 hover:bg-stone-300 hover:text-red-600')
-                            }
-                        >
-                            {isSubmitting ? 'Creating...' : 'Create & Add Images'}
-                        </button>
-                        <button
-                            type="button"
-                            disabled={!isFormValid}
-                            onClick={() => handleCreateInventory('view')}
-                            className={
-                                'relative rounded-md px-4 py-1 text-lg font-bold ' +
-                                (isFormValid
-                                    ? ' bg-primary_dark text-body-muted hover:bg-primary hover:text-body-inverse'
-                                    : 'text-secondary_dark cursor-not-allowed bg-stone-300 hover:bg-stone-300 hover:text-red-600')
-                            }
-                        >
-                            {isSubmitting ? 'Creating...' : 'Create & View'}
-                        </button>
+            <div className="grid grid-cols-1 gap-5 xl:grid-cols-[3fr_2fr]">
+                <AdminPanel eyebrow="Photo" title="Main photo">
+                    <div className="p-4">
+                        <PendingPhotoTray
+                            pending={pending}
+                            onPendingChange={(update) => setPending(update)}
+                            onFilesChosen={() => setError(null)}
+                            disabled={saving}
+                        />
+                        {photo && smallEdge < 800 && (
+                            <p className="border-warning/40 bg-warning-soft text-warning mt-3 rounded-md border px-4 py-2.5 text-sm">
+                                This photo is {photo.width}×{photo.height}. Under 800px it will look soft on the public site.
+                            </p>
+                        )}
+                        {pending.length > 1 && (
+                            <p className="text-body-subtle mt-3 text-xs">
+                                The first photo becomes the main one. Add the rest in the editor.
+                            </p>
+                        )}
                     </div>
-                    {statusMessage && (
-                        <div
-                            className={`mt-4 rounded p-2 ${statusMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
-                        >
-                            {statusMessage.message}
+                </AdminPanel>
+
+                <AdminPanel eyebrow="Details" title="Name it">
+                    <div className="flex flex-col gap-4 p-4">
+                        <label className="flex flex-col gap-1.5">
+                            <span className="text-body-muted text-xs font-bold">Name *</span>
+                            <input
+                                type="text"
+                                value={name}
+                                onChange={(event) => setName(event.target.value)}
+                                placeholder="Grey linen sofa"
+                                className={FIELD}
+                            />
+                        </label>
+
+                        {error && (
+                            <p role="alert" className="border-danger/40 bg-danger-soft text-danger rounded-md border px-4 py-2.5 text-sm">
+                                {error}
+                            </p>
+                        )}
+
+                        <div className="border-line flex flex-wrap items-center gap-2 border-t pt-4">
+                            <button
+                                type="button"
+                                disabled={!canSubmit}
+                                onClick={() => create('edit')}
+                                className="bg-gold-400 text-body-inverse hover:bg-gold-300 inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {saving && <Loader2 size={15} aria-hidden="true" className="animate-spin" />}
+                                Create and edit
+                            </button>
+                            <button
+                                type="button"
+                                disabled={!canSubmit}
+                                onClick={() => create('view')}
+                                className="border-line text-body-muted hover:bg-surface-hover hover:text-body rounded-md border px-3.5 py-2.5 text-xs font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                Create and view in catalog
+                            </button>
                         </div>
-                    )}
-                </div>
+
+                        <p className="text-body-subtle text-xs">Price, stock, category and measurements are set in the editor.</p>
+                    </div>
+                </AdminPanel>
             </div>
         </div>
     );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { StagingItem, StagingLine, StagingSummary } from './staging.types';
 
@@ -14,9 +14,52 @@ import type { StagingItem, StagingLine, StagingSummary } from './staging.types';
  *
  * Nothing is written until commit. Staging a house is one decision made while walking a warehouse,
  * and the old design turned it into twenty separate transactions with no way to review or undo.
+ *
+ * The draft survives navigation and reload. Walking a warehouse means opening an item, checking a
+ * project, and coming back; holding the list in component state alone threw the whole pull list away
+ * every time, which is the one failure that makes the tool not worth using.
  */
-export function useStagingList<T extends StagingItem>(items: T[] | undefined) {
-    const [draft, setDraft] = useState<Record<string, number>>({});
+
+const STORAGE_PREFIX = 'ccs.staging-list';
+
+function readDraft(projectId: string | undefined): Record<string, number> {
+    if (!projectId || typeof window === 'undefined') return {};
+    try {
+        const raw = window.sessionStorage.getItem(`${STORAGE_PREFIX}:${projectId}`);
+        return raw ? (JSON.parse(raw) as Record<string, number>) : {};
+    } catch {
+        return {};
+    }
+}
+
+function writeDraft(projectId: string | undefined, draft: Record<string, number>) {
+    if (!projectId || typeof window === 'undefined') return;
+    try {
+        const key = `${STORAGE_PREFIX}:${projectId}`;
+        if (Object.keys(draft).length === 0) window.sessionStorage.removeItem(key);
+        else window.sessionStorage.setItem(key, JSON.stringify(draft));
+    } catch {
+        /* A full or blocked store is not worth failing a pull list over. */
+    }
+}
+
+export function useStagingList<T extends StagingItem>(items: T[] | undefined, projectId?: string) {
+    const [draft, setDraftState] = useState<Record<string, number>>({});
+    /* Restored after mount rather than during render: sessionStorage does not exist on the server. */
+    const restoredFor = useRef<string | null>(null);
+
+    useEffect(() => {
+        if (restoredFor.current === (projectId ?? null)) return;
+        restoredFor.current = projectId ?? null;
+        setDraftState(readDraft(projectId));
+    }, [projectId]);
+
+    const setDraft = (update: (current: Record<string, number>) => Record<string, number>) =>
+        setDraftState((current) => {
+            const next = update(current);
+            writeDraft(projectId, next);
+            return next;
+        });
 
     const toggle = (item: T) => {
         setDraft((current) => {
@@ -48,7 +91,7 @@ export function useStagingList<T extends StagingItem>(items: T[] | undefined) {
             return rest;
         });
 
-    const clear = () => setDraft({});
+    const clear = () => setDraft(() => ({}));
 
     const summary = useMemo<StagingSummary<T>>(() => {
         const source = items ?? [];

@@ -106,11 +106,15 @@ export const getInventoryItemByOId = query({
   },
 });
 
-// Create inventory item (admin only)
+/**
+ * Creates one catalog item and returns the identifier it was given.
+ *
+ * `oId` is allocated here rather than by the caller. Both creation surfaces used to read the
+ * highest existing id and add one, so two tabs open at the same time handed the same number to two
+ * different pieces of furniture, and every lookup by `oId` after that is ambiguous.
+ */
 export const createInventory = mutation({
   args: {
-    oId: v.number(),
-    pId: v.number(),
     active: v.boolean(),
     name: v.string(),
     cost: v.optional(v.number()),
@@ -131,28 +135,48 @@ export const createInventory = mutation({
     smallHeight: v.number(),
   },
   handler: async (ctx, args) => {
-    // Check admin permission
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
+    await requireAdmin(ctx);
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .first();
+    const existing = await ctx.db.query("inventory").collect();
+    const oId = existing.reduce((highest, item) => Math.max(highest, item.oId), 0) + 1;
 
-    if (!user || user.role !== "admin") {
-      throw new Error("Not authorized");
-    }
-
-    // Create inventory item
     const inventoryId = await ctx.db.insert("inventory", {
       ...args,
+      oId,
+      pId: oId,
       inUse: 0,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
 
-    return inventoryId;
+    return { inventoryId, oId };
+  },
+});
+
+/**
+ * Swaps the catalog position of two items in one transaction.
+ *
+ * Ordering used to be two independent `updateInventory` calls that traded `oId` values. If the
+ * second failed, both items ended up holding the same identifier and every lookup by `oId` after
+ * that returned whichever one the query happened to reach first.
+ */
+export const swapInventoryOrder = mutation({
+  args: {
+    firstId: v.id("inventory"),
+    secondId: v.id("inventory"),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    if (args.firstId === args.secondId) return;
+
+    const first = await ctx.db.get(args.firstId);
+    const second = await ctx.db.get(args.secondId);
+    if (!first || !second) throw new Error("One of those items no longer exists");
+
+    const now = Date.now();
+    await ctx.db.patch(first._id, { oId: second.oId, updatedAt: now });
+    await ctx.db.patch(second._id, { oId: first.oId, updatedAt: now });
   },
 });
 

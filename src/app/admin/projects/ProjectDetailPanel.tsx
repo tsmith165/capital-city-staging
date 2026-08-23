@@ -186,7 +186,20 @@ export default function ProjectDetailPanel({
                         {payment.status !== 'unpaid' && (
                             <button
                                 type="button"
-                                onClick={() => void clearPayment({ projectId: project._id as Id<'projects'> })}
+                                onClick={async () => {
+                                    if (
+                                        !window.confirm(
+                                            'Clear the recorded payment for this project? The amount, date and method are removed.',
+                                        )
+                                    )
+                                        return;
+                                    setError(null);
+                                    try {
+                                        await clearPayment({ projectId: project._id as Id<'projects'> });
+                                    } catch (caught) {
+                                        setError(caught instanceof Error ? caught.message : 'Could not clear that payment.');
+                                    }
+                                }}
                                 className="border-line text-body-muted hover:bg-surface-hover hover:text-body inline-flex items-center gap-1.5 rounded-md border px-3 py-2 text-xs font-bold transition-colors"
                             >
                                 <Undo2 size={12} aria-hidden="true" /> Clear

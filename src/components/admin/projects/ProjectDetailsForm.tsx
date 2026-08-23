@@ -32,6 +32,11 @@ export default function ProjectDetailsForm({
     saving,
     error,
     saved,
+    panelTitle = 'Project details',
+    submitLabel = 'Save details',
+    savingLabel = 'Saving…',
+    footNote = 'Photos and inventory save on their own.',
+    children,
 }: {
     formId: string;
     formData: ProjectFormState;
@@ -40,11 +45,17 @@ export default function ProjectDetailsForm({
     saving: boolean;
     error: string | null;
     saved: boolean;
+    panelTitle?: string;
+    submitLabel?: string;
+    savingLabel?: string;
+    footNote?: string;
+    /** Extra controls in the action row, such as a cancel link on the create page. */
+    children?: React.ReactNode;
 }) {
     const statusHint = STATUS_OPTIONS.find((option) => option.value === formData.status)?.hint;
 
     return (
-        <AdminPanel eyebrow="Details" title="Project details">
+        <AdminPanel eyebrow="Details" title={panelTitle}>
             <form id={formId} onSubmit={onSubmit} className="flex flex-col gap-4 p-4">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <label className="flex flex-col gap-1.5 md:col-span-2">
@@ -168,8 +179,9 @@ export default function ProjectDetailsForm({
                         className="bg-gold-400 text-body-inverse hover:bg-gold-300 inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {saving && <Loader2 size={15} aria-hidden="true" className="animate-spin" />}
-                        {saving ? 'Saving…' : 'Save details'}
+                        {saving ? savingLabel : submitLabel}
                     </button>
+                    {children}
                     <p aria-live="polite" className="empty:hidden">
                         {saved && !saving && (
                             <span className="text-success inline-flex items-center gap-1.5 text-sm font-bold">
@@ -177,7 +189,7 @@ export default function ProjectDetailsForm({
                             </span>
                         )}
                     </p>
-                    <span className="text-body-subtle ml-auto text-xs">Photos and inventory save on their own.</span>
+                    {footNote && <span className="text-body-subtle ml-auto text-xs">{footNote}</span>}
                 </div>
             </form>
         </AdminPanel>

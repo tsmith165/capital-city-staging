@@ -57,7 +57,7 @@ export default function InventoryConvexClient() {
         availability: (searchParams.get('availability') as AvailabilityFilter | null) ?? 'all',
     });
 
-    const { toggle, setQuantity, remove, clear, summary } = useStagingList(items ?? undefined);
+    const { toggle, setQuantity, remove, clear, summary } = useStagingList(items ?? undefined, projectId ?? undefined);
 
     const [showAddOverlay, setShowAddOverlay] = useState(false);
     const [detailId, setDetailId] = useState<string | null>(null);

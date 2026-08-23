@@ -9,12 +9,17 @@ import { ArrowLeft, BadgeDollarSign, Images, ListChecks, MapPin, SlidersHorizont
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import CheckInDialog from './CheckInDialog';
-import ProjectDetailsForm from './ProjectDetailsForm';
+import ProjectDetailsForm from '@/components/admin/projects/ProjectDetailsForm';
 import ProjectImagesSection from './ProjectImagesSection';
 import ProjectPaymentSection from './ProjectPaymentSection';
 import ProjectInventoryTab from './ProjectInventoryTab';
 import type { CommittedImage } from '@/components/admin/images/images.types';
-import { CLOSING_STATUSES, type ProjectAssignmentLine, type ProjectFormState, type ProjectStatus } from './project.types';
+import {
+    CLOSING_STATUSES,
+    type ProjectAssignmentLine,
+    type ProjectFormState,
+    type ProjectStatus,
+} from '@/components/admin/projects/project.types';
 
 /**
  * Editing one project.

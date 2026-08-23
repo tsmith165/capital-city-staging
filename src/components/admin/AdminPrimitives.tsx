@@ -6,24 +6,24 @@ import type { ReactNode } from 'react';
 import { ADMIN_STATUS_TONE_CLASSES } from './AdminShell.constants';
 import type { AdminStatusTone } from './AdminShell.types';
 
-/** Page-level heading. Every admin page opens with the same eyebrow / title / description block. */
+/** Page-level heading. Eyebrow and description are optional so a page only pays for copy it needs. */
 export function AdminHeading({
     eyebrow,
     title,
     description,
     action,
 }: {
-    eyebrow: string;
+    eyebrow?: string;
     title: string;
-    description: string;
+    description?: string;
     action?: ReactNode;
 }) {
     return (
         <header className="border-line flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex min-w-0 flex-col gap-1.5">
-                <span className="text-gold-300 text-[10px] font-extrabold tracking-[0.14em] uppercase">{eyebrow}</span>
+                {eyebrow && <span className="text-gold-300 text-[10px] font-extrabold tracking-[0.14em] uppercase">{eyebrow}</span>}
                 <h1 className="font-display text-body text-3xl leading-tight font-normal">{title}</h1>
-                <p className="text-body-muted max-w-2xl text-sm">{description}</p>
+                {description && <p className="text-body-muted max-w-2xl text-sm">{description}</p>}
             </div>
             {action}
         </header>

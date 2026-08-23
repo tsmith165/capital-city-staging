@@ -5,21 +5,27 @@ import { api } from '@/convex/_generated/api';
 import { useState } from 'react';
 
 import { SkeletonBlock, SkeletonTable } from '@/components/admin/AdminSkeleton';
+import { AdminHeading, AdminStatus } from '@/components/admin/AdminPrimitives';
+import type { Id } from '@/convex/_generated/dataModel';
 
-const USER_COLUMNS = ['Name', 'Email', 'Role', 'Clerk ID', 'Created', 'Actions'] as const;
+const USER_COLUMNS = ['Name', 'Email', 'Role', 'Created', 'Actions'] as const;
 
 export default function AdminUsersClient() {
     const users = useQuery(api.users.getAllUsers);
+    const me = useQuery(api.users.getCurrentUser);
     const updateUserRole = useMutation(api.users.updateUserRole);
     const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleRoleUpdate = async (userId: string, newRole: 'admin' | 'customer') => {
+    const adminCount = (users ?? []).filter((user) => user.role === 'admin').length;
+
+    const handleRoleUpdate = async (userId: Id<'users'>, newRole: 'admin' | 'customer') => {
         setUpdatingUserId(userId);
+        setError(null);
         try {
-            await updateUserRole({ userId: userId as any, role: newRole });
-        } catch (error) {
-            console.error('Error updating user role:', error);
-            alert('Error updating user role');
+            await updateUserRole({ userId, role: newRole });
+        } catch (cause) {
+            setError(cause instanceof Error ? cause.message : 'That role change did not go through.');
         } finally {
             setUpdatingUserId(null);
         }
@@ -27,103 +33,84 @@ export default function AdminUsersClient() {
 
     if (users === undefined) {
         return (
-            <div className="container mx-auto p-4">
-                <div className="mb-6 flex items-center justify-between">
-                    <h1 className="text-body text-3xl font-bold">Manage Users</h1>
-                    <SkeletonBlock className="h-3.5 w-28" />
-                </div>
+            <div className="flex flex-col gap-5 p-5 sm:p-8">
+                <AdminHeading title="Users" />
+                <SkeletonBlock className="h-3.5 w-28" />
                 <SkeletonTable headers={USER_COLUMNS} rows={6} label="Loading users" />
             </div>
         );
     }
 
     return (
-        <div className="container mx-auto p-4">
-            <div className="mb-6 flex items-center justify-between">
-                <h1 className="text-body text-3xl font-bold">Manage Users</h1>
-                <div className="text-body-subtle text-sm">Total users: {users.length}</div>
-            </div>
+        <div className="flex flex-col gap-5 p-5 sm:p-8">
+            <AdminHeading title="Users" description={`${users.length} ${users.length === 1 ? 'account' : 'accounts'}.`} />
+
+            {error && (
+                <p role="alert" className="border-danger bg-danger-soft text-danger rounded-lg border px-4 py-3 text-sm">
+                    {error}
+                </p>
+            )}
 
             {users.length === 0 ? (
-                <div className="py-12 text-center">
-                    <p className="text-body-subtle text-lg">No users found in Convex database.</p>
-                    <p className="text-body-subtle mt-2 text-sm">
-                        Users will be automatically synced when they sign in, or you can run the sync script.
-                    </p>
-                </div>
+                <p className="text-body-subtle py-12 text-center text-sm">No users yet.</p>
             ) : (
-                <div className="overflow-x-auto">
-                    <table className="bg-surface-raised min-w-full rounded-lg">
+                <div className="border-line bg-surface-raised overflow-x-auto rounded-lg border">
+                    <table className="min-w-full">
                         <thead>
                             <tr className="border-line border-b">
-                                <th className="text-body px-4 py-3 text-left">Name</th>
-                                <th className="text-body px-4 py-3 text-left">Email</th>
-                                <th className="text-body px-4 py-3 text-left">Role</th>
-                                <th className="text-body px-4 py-3 text-left">Clerk ID</th>
-                                <th className="text-body px-4 py-3 text-left">Created</th>
-                                <th className="text-body px-4 py-3 text-center">Actions</th>
+                                {USER_COLUMNS.map((column) => (
+                                    <th
+                                        key={column}
+                                        className={`text-body-subtle px-4 py-3 text-[10px] font-extrabold tracking-[0.14em] uppercase ${
+                                            column === 'Actions' ? 'text-right' : 'text-left'
+                                        }`}
+                                    >
+                                        {column}
+                                    </th>
+                                ))}
                             </tr>
                         </thead>
                         <tbody>
-                            {users.map((user) => (
-                                <tr key={user._id} className="border-line text-body-muted border-b">
-                                    <td className="px-4 py-3">{user.name || <span className="text-body-subtle italic">No name</span>}</td>
-                                    <td className="px-4 py-3 font-mono text-sm">{user.email}</td>
-                                    <td className="px-4 py-3">
-                                        <span
-                                            className={`rounded px-2 py-1 text-xs font-medium ${
-                                                user.role === 'admin' ? 'bg-red-600 text-white' : 'bg-secondary text-white'
-                                            }`}
-                                        >
-                                            {user.role}
-                                        </span>
-                                    </td>
-                                    <td className="text-body-subtle px-4 py-3 font-mono text-xs">{user.clerkId.substring(0, 20)}...</td>
-                                    <td className="px-4 py-3 text-sm">{new Date(user.createdAt).toLocaleDateString()}</td>
-                                    <td className="px-4 py-3 text-center">
-                                        <div className="flex justify-center gap-2">
+                            {users.map((user) => {
+                                const isMe = me?._id === user._id;
+                                const isLastAdmin = user.role === 'admin' && adminCount <= 1;
+                                /* Mirrors the server guard so the control that would lock Mia out is never live. */
+                                const lockedReason = isMe
+                                    ? 'You cannot remove your own admin access.'
+                                    : isLastAdmin
+                                      ? 'The only admin account. Promote someone else first.'
+                                      : null;
+                                const demoting = user.role === 'admin';
+
+                                return (
+                                    <tr key={user._id} className="border-line text-body-muted border-b last:border-b-0">
+                                        <td className="px-4 py-3 text-sm">
+                                            {user.name || <span className="text-body-subtle italic">No name</span>}
+                                            {isMe && <span className="text-body-subtle ml-2 text-xs">(you)</span>}
+                                        </td>
+                                        <td className="px-4 py-3 font-mono text-sm">{user.email}</td>
+                                        <td className="px-4 py-3">
+                                            <AdminStatus tone={user.role === 'admin' ? 'good' : 'neutral'}>{user.role}</AdminStatus>
+                                        </td>
+                                        <td className="px-4 py-3 text-sm">{new Date(user.createdAt).toLocaleDateString()}</td>
+                                        <td className="px-4 py-3 text-right">
                                             <button
-                                                onClick={() => handleRoleUpdate(user._id, user.role === 'admin' ? 'customer' : 'admin')}
-                                                disabled={updatingUserId === user._id}
-                                                className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
-                                                    user.role === 'admin'
-                                                        ? 'bg-secondary_light hover:bg-secondary text-white'
-                                                        : 'bg-red-600 text-white hover:bg-red-700'
-                                                } disabled:opacity-50`}
+                                                type="button"
+                                                onClick={() => handleRoleUpdate(user._id, demoting ? 'customer' : 'admin')}
+                                                disabled={updatingUserId === user._id || (demoting && lockedReason !== null)}
+                                                title={demoting ? (lockedReason ?? undefined) : undefined}
+                                                className="border-line bg-surface text-body hover:border-line-strong hover:bg-surface-hover rounded border px-3 py-1.5 text-xs font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-40"
                                             >
-                                                {updatingUserId === user._id
-                                                    ? 'Updating...'
-                                                    : user.role === 'admin'
-                                                      ? 'Make Customer'
-                                                      : 'Make Admin'}
+                                                {updatingUserId === user._id ? 'Saving' : demoting ? 'Make customer' : 'Make admin'}
                                             </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
             )}
-
-            {/* Instructions */}
-            <div className="bg-surface-raised mt-8 rounded-lg p-4">
-                <h3 className="text-body mb-2 text-lg font-bold">User Management Instructions</h3>
-                <div className="text-body-subtle space-y-2 text-sm">
-                    <p>
-                        <strong className="text-body-muted">Automatic Sync:</strong> New users are automatically created when they sign in
-                        via Clerk (webhook).
-                    </p>
-                    <p>
-                        <strong className="text-body-muted">Manual Sync:</strong> To sync existing Clerk users, run:{' '}
-                        <code className="bg-surface-overlay rounded px-1">pnpm run sync-users</code>
-                    </p>
-                    <p>
-                        <strong className="text-body-muted">Roles:</strong> Admin users can create/edit projects and manage inventory.
-                        Customers can only view their own projects.
-                    </p>
-                </div>
-            </div>
         </div>
     );
 }

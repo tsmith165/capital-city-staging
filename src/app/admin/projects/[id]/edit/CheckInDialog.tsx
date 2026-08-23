@@ -5,7 +5,7 @@ import { Loader2, Undo2, X } from 'lucide-react';
 
 import AssignmentRow from '@/components/admin/inventory/AssignmentRow';
 
-import type { ProjectAssignmentLine } from './project.types';
+import type { ProjectAssignmentLine } from '@/components/admin/projects/project.types';
 
 /**
  * The step between "mark this job finished" and the job actually being finished.

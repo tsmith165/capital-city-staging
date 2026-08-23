@@ -39,7 +39,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
 
     const items = data?.items as PickerItem[] | undefined;
     const { filters, update, visible, categories, locations, counts } = useInventoryFilters(items);
-    const { toggle, setQuantity, remove, clear, summary } = useStagingList(items);
+    const { toggle, setQuantity, remove, clear, summary } = useStagingList(items, projectId);
 
     const [expanded, setExpanded] = useState(false);
     const [problems, setProblems] = useState<LineProblem[]>([]);

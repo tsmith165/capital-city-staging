@@ -67,12 +67,13 @@ export default function AdminProjectsClient() {
 
     const totals = useMemo(() => {
         const rows = projects ?? [];
-        const outstanding = rows.reduce((total, project) => total + project.payment.outstanding, 0);
+        /* The money figure has to describe exactly the jobs it is counting, not every open balance. */
+        const owed = rows.filter((project) => project.status === 'completed' && project.payment.status !== 'paid');
         return {
             count: rows.length,
             active: rows.filter((project) => project.status === 'active').length,
-            owed: rows.filter((project) => project.status === 'completed' && project.payment.status !== 'paid').length,
-            outstanding,
+            owed: owed.length,
+            outstanding: owed.reduce((total, project) => total + project.payment.outstanding, 0),
         };
     }, [projects]);
 
