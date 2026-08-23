@@ -77,9 +77,7 @@ export default function DataHealth() {
             <div className="flex flex-col gap-2">
                 <h3 className="text-body text-sm font-bold">Recompute inventory counters</h3>
                 <p className="text-body-muted max-w-2xl text-sm">
-                    Every screen works out availability from the assignment records themselves, so this is not something you need to run to
-                    get correct numbers. It only tidies the stored <code>inUse</code> and <code>inventoryAssigned</code> fields, which
-                    drifted before availability was derived. Safe to run twice; the second run finds nothing.
+                    Optional cleanup for legacy counters. Availability is already accurate, and it is safe to run more than once.
                 </p>
             </div>
 

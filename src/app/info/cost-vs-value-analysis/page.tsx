@@ -29,12 +29,7 @@ export default function CostVsValueAnalysis() {
                     width: article.imageWidth,
                     height: article.imageHeight,
                 }}
-                aside={
-                    <ContactCallout
-                        heading="Ready to invest wisely?"
-                        body="We’ll walk you through the numbers for your property before you commit to anything."
-                    />
-                }
+                aside={<ContactCallout heading="Price your property" body="See a staging range before you commit to a walkthrough." />}
             >
                 <h2>The financial impact of home staging</h2>
                 <p>

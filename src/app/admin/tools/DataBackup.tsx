@@ -60,10 +60,7 @@ export default function DataBackup() {
                 </div>
             </dl>
 
-            <p className="text-body-muted max-w-prose text-sm">
-                One row per inventory item with every stored field, including items hidden from the public catalog. The file is built in
-                your browser and never leaves this machine.
-            </p>
+            <p className="text-body-muted max-w-prose text-sm">Includes every stored field and items hidden from the public catalog.</p>
 
             <div className="flex flex-wrap items-center gap-3">
                 <button

@@ -81,9 +81,7 @@ export default function ProjectWorkspacePanel({
                     )}
 
                     {touched.length === 0 ? (
-                        <p className="text-body-subtle px-4 py-6 text-center text-sm">
-                            Tap items in the grid to build a list for this house. Nothing is saved until you commit.
-                        </p>
+                        <p className="text-body-subtle px-4 py-6 text-center text-sm">Nothing selected.</p>
                     ) : (
                         <ul className="divide-line divide-y">
                             {touched.map(({ item, desired, delta }) => (

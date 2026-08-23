@@ -15,7 +15,7 @@ export default async function SignOutPage() {
 
     if (!user) {
         return (
-            <AuthShell eyebrow="Session" title="You are signed out" description="Nothing else is stored in this browser.">
+            <AuthShell eyebrow="Session" title="You are signed out">
                 <SignedOutNotice />
             </AuthShell>
         );
@@ -25,7 +25,7 @@ export default async function SignOutPage() {
     const isAdmin = await isClerkUserIdAdmin(user.id);
 
     return (
-        <AuthShell eyebrow="Session" title="Sign out" description="Confirm below, or head back to the console.">
+        <AuthShell eyebrow="Session" title="Sign out">
             <AccountSessionPanel email={email} isAdmin={isAdmin} />
         </AuthShell>
     );

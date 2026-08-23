@@ -53,7 +53,8 @@ export function AdminCard({
     icon: LucideIcon;
     label: string;
     headline: string;
-    description: string;
+    /** Optional: a headline that already states the situation does not need a second sentence. */
+    description?: string;
     href: string;
     linkLabel: string;
     tone?: AdminStatusTone;
@@ -65,7 +66,7 @@ export function AdminCard({
                 {label}
             </span>
             <h2 className="font-display text-body text-xl leading-snug font-normal">{headline}</h2>
-            <p className="text-body-muted text-sm">{description}</p>
+            {description && <p className="text-body-muted text-sm">{description}</p>}
             <div className="mt-auto flex items-center justify-between gap-3 pt-2">
                 <Link
                     href={href}

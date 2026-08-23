@@ -108,9 +108,7 @@ export default function AdminProjectsClient() {
         <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
             <FolderOpen size={26} aria-hidden="true" className="text-body-subtle" />
             <strong className="font-display text-body text-base leading-tight font-normal">No project selected</strong>
-            <p className="text-body-muted max-w-[16rem] text-sm">
-                Pick a project to see its money, its furniture and its photos, and to change the small things without opening it.
-            </p>
+            <p className="text-body-muted max-w-[16rem] text-sm">Select a project for payment, inventory, photos, and quick edits.</p>
         </div>
     );
 

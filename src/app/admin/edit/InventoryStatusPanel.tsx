@@ -126,8 +126,8 @@ export default function InventoryStatusPanel({ item }: { item: EditorItem }) {
                 <div className="flex flex-col gap-3 p-4">
                     <p className="text-body-muted text-sm">
                         {item.active
-                            ? 'Retiring hides it from the catalog and the picker. Its staging history stays intact, and it can come back.'
-                            : 'This item is hidden from the catalog and the picker. Nothing about its history was lost.'}
+                            ? 'Retiring hides it from the catalog and picker but keeps its history.'
+                            : 'Hidden from the catalog and picker; history is intact.'}
                     </p>
 
                     {error && (

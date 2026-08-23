@@ -6,7 +6,7 @@ import { ArrowLeft } from 'lucide-react';
 interface AuthShellProps {
     eyebrow: string;
     title: string;
-    description: string;
+    description?: string;
     children: ReactNode;
     footer?: ReactNode;
 }
@@ -34,7 +34,7 @@ export default function AuthShell({ eyebrow, title, description, children, foote
                 <div className="border-line bg-surface-raised shadow-card mt-8 rounded-xl border p-6 sm:p-8">
                     <p className="text-forest-200 text-xs font-semibold tracking-[0.2em] uppercase">{eyebrow}</p>
                     <h1 className="font-display text-gold-300 mt-2 text-2xl font-bold">{title}</h1>
-                    <p className="text-body-muted mt-2 text-sm leading-relaxed">{description}</p>
+                    {description ? <p className="text-body-muted mt-2 text-sm leading-relaxed">{description}</p> : null}
 
                     <div className="mt-7">{children}</div>
 

@@ -34,10 +34,7 @@ function RailContents() {
                 className="border-line text-body-muted hover:text-body mx-3 mt-auto mb-4 grid grid-cols-[24px_1fr] items-center gap-3 border-t px-3 pt-4 transition-colors"
             >
                 <ExternalLink size={17} aria-hidden="true" />
-                <span className="flex min-w-0 flex-col">
-                    <strong className="text-xs font-bold">View website</strong>
-                    <small className="text-body-subtle text-[10px]">Open the public site</small>
-                </span>
+                <strong className="truncate text-xs font-bold">View website</strong>
             </Link>
         </>
     );
@@ -78,12 +75,7 @@ export default function AdminShell({ title, children }: AdminShellProps) {
                         {menuOpen ? <X size={18} /> : <Menu size={18} />}
                     </button>
 
-                    <div className="flex min-w-0 flex-col">
-                        <span className="text-body-subtle text-[10px] font-extrabold tracking-[0.14em] uppercase">
-                            Capital City Staging
-                        </span>
-                        <strong className="font-display truncate text-lg leading-tight font-normal">{title}</strong>
-                    </div>
+                    <strong className="font-display min-w-0 truncate text-lg leading-tight font-normal">{title}</strong>
 
                     <Link
                         href="/"

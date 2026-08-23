@@ -187,11 +187,7 @@ export default function InventoryConvexClient() {
                 <AdminHeading
                     eyebrow="Inventory"
                     title="Catalog"
-                    description={
-                        staging
-                            ? 'Tap items to build a list for the selected house. Nothing is saved until you commit it.'
-                            : 'Everything you own, what is free to stage, and which house is holding the rest.'
-                    }
+                    description={staging ? 'Pick items for the selected house; save when the list is ready.' : undefined}
                     action={
                         <div className="flex shrink-0 flex-wrap items-center gap-2">
                             <ProjectPicker projects={projects} selectedId={projectId} onSelect={handleProjectChange} />
@@ -275,7 +271,7 @@ export default function InventoryConvexClient() {
                         <strong className="font-display text-body text-lg font-normal">Nothing matches those filters</strong>
                         <p className="text-body-muted max-w-sm text-sm">
                             {items.length === 0
-                                ? 'The catalog is empty. Add your first piece of furniture to get started.'
+                                ? 'The catalog is empty.'
                                 : 'Try a different category, or clear the filters to see everything.'}
                         </p>
                         {items.length === 0 && (

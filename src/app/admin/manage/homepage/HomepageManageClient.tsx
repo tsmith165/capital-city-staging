@@ -491,9 +491,7 @@ export default function HomepageManageClient() {
                         <div className="border-line flex flex-col items-center justify-center rounded-xl border-2 border-dashed py-16 text-center">
                             <ImageIcon size={64} className="mb-4 text-stone-600" />
                             <h3 className="text-body-muted text-xl font-semibold">No Homepage Images Yet</h3>
-                            <p className="text-body-subtle mt-2 max-w-md">
-                                Add images from your projects or upload new ones to create a stunning hero slideshow.
-                            </p>
+                            <p className="text-body-subtle mt-2 max-w-md">Add project photos or upload an image.</p>
                             <button
                                 onClick={() => setAddTab('projects')}
                                 className="bg-gold-400 text-body-inverse hover:bg-gold-300 mt-6 rounded-lg px-6 py-2.5 font-medium transition-colors"
@@ -608,9 +606,7 @@ export default function HomepageManageClient() {
                                     <Loader2 className="text-body-subtle h-6 w-6 animate-spin" />
                                 </div>
                             ) : availableProjects.length === 0 ? (
-                                <div className="text-body-subtle py-12 text-center">
-                                    No highlighted projects available. Mark projects as highlighted in the Projects admin page.
-                                </div>
+                                <div className="text-body-subtle py-12 text-center">No highlighted projects.</div>
                             ) : (
                                 <>
                                     {/* Project selector pills */}
@@ -638,9 +634,7 @@ export default function HomepageManageClient() {
                                     {currentProject && currentProject.images.length > 0 && (
                                         <div className="mb-4 flex items-center justify-between">
                                             <span className="text-body-subtle text-sm">
-                                                {selectedProjectImages.size > 0
-                                                    ? `${selectedProjectImages.size} selected`
-                                                    : 'Click images to select'}
+                                                {selectedProjectImages.size > 0 ? `${selectedProjectImages.size} selected` : ''}
                                             </span>
                                             <div className="flex gap-2">
                                                 <button
@@ -740,7 +734,6 @@ export default function HomepageManageClient() {
                                         value={uploadCaption}
                                         onChange={(e) => setUploadCaption(e.target.value)}
                                         className="border-line-strong bg-surface-overlay text-body focus:border-primary w-full rounded-lg border px-3 py-2 focus:outline-none"
-                                        placeholder="Enter a caption for this image..."
                                     />
                                 </div>
 
@@ -767,7 +760,7 @@ export default function HomepageManageClient() {
                                 ) : (
                                     <div className="text-body-subtle text-center">
                                         <Upload size={48} className="mx-auto mb-3 opacity-40" />
-                                        <p>Upload an image to see preview</p>
+                                        <p></p>
                                     </div>
                                 )}
                             </div>

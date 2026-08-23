@@ -438,7 +438,7 @@ const ContactForm = () => {
                         onChange={(e) => handleChange('message', e.target.value)}
                         rows={3}
                         className="border-line-strong bg-surface-overlay text-body placeholder-body-subtle focus:border-gold-400 w-full resize-none rounded-lg border px-4 py-3 transition-colors"
-                        placeholder="Tell us about your timeline, specific needs, or any questions you have..."
+                        placeholder="Timeline, rooms, access, and listing date."
                     />
                     {errors.message && (
                         <p id="contact-message-error" className="text-danger text-xs">
@@ -611,7 +611,7 @@ const ContactForm = () => {
                                 <div className="mb-6 text-center">
                                     <div className="mb-1 flex items-center justify-center gap-2">
                                         <Calculator className="text-primary" size={24} />
-                                        <h3 className="text-primary text-2xl font-bold">Your Estimated Quote</h3>
+                                        <h3 className="text-primary text-2xl font-bold">Estimated range</h3>
                                     </div>
                                 </div>
 
@@ -623,10 +623,6 @@ const ContactForm = () => {
                                                 <Phone className="mx-auto mb-3 text-amber-400" size={40} />
                                                 <div className="mb-2 text-xl font-bold text-amber-200">Custom Quote Required</div>
                                                 <div className="text-sm text-amber-200/80">{quote.customQuoteReason}</div>
-                                            </div>
-                                            <div className="text-body-muted text-sm">
-                                                Please submit your information below and Mia will provide a personalized quote for your
-                                                property.
                                             </div>
                                         </div>
 
@@ -660,14 +656,10 @@ const ContactForm = () => {
                                         {/* Main Quote Display */}
                                         <div className="from-primary/10 via-primary_dark/15 to-primary/10 border-primary/30 mb-6 rounded-xl border bg-gradient-to-br p-6 text-center">
                                             <div className="mb-2">
-                                                <div className="text-body-subtle mb-2 text-sm tracking-wider uppercase">
-                                                    Estimated Price Range
-                                                </div>
                                                 <div className="gradient-gold-main-text text-3xl font-bold">
                                                     {formatPrice(quote.priceRange.min)} - {formatPrice(quote.priceRange.max)}
                                                 </div>
                                             </div>
-                                            <div className="text-body-subtle mt-3 text-xs">Final pricing determined after consultation</div>
                                         </div>
 
                                         {/* Price Breakdown */}
@@ -876,10 +868,7 @@ const ContactForm = () => {
                                         <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
                                             <p className="flex items-start gap-2 text-sm text-amber-200">
                                                 <Info size={18} className="mt-0.5 flex-shrink-0 text-amber-400" />
-                                                <span>
-                                                    <strong>Important:</strong> This is an estimate only. Final pricing will be confirmed
-                                                    after Mia reviews your property details and conducts a walkthrough consultation.
-                                                </span>
+                                                <span>Final price follows Mia&rsquo;s walkthrough.</span>
                                             </p>
                                         </div>
 

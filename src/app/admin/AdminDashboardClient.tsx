@@ -63,7 +63,7 @@ export default function AdminDashboardClient() {
                     description={
                         attentionAreas > 0
                             ? `${attentionAreas} ${plural(attentionAreas, 'area needs', 'areas need')} attention before the day begins.`
-                            : 'Everything is in order. Nothing is waiting on you right now.'
+                            : 'Nothing needs attention.'
                     }
                     action={
                         <Link
@@ -99,7 +99,6 @@ export default function AdminDashboardClient() {
                                 ? `${summary.projects.awaitingPayment} ${plural(summary.projects.awaitingPayment, 'project is', 'projects are')} awaiting payment`
                                 : 'Payments are up to date'
                         }
-                        description="Completed jobs stay here until the payment is recorded against them."
                         href="/admin/projects"
                         linkLabel="Open projects"
                         tone={summary.projects.awaitingPayment ? 'warning' : 'good'}
@@ -112,7 +111,7 @@ export default function AdminDashboardClient() {
                                 ? `${summary.inventory.needsAttention} ${plural(summary.inventory.needsAttention, 'item needs', 'items need')} attention`
                                 : 'Catalog is complete'
                         }
-                        description="Items with no photo, or unpriced while out on a job. Prices can be fixed straight from the queue."
+                        description="Missing photos and live-job prices."
                         href="/admin/inventory/attention"
                         linkLabel="Open fix queue"
                         tone={summary.inventory.needsAttention ? 'warning' : 'good'}
@@ -125,7 +124,7 @@ export default function AdminDashboardClient() {
                                 ? `${summary.inbox.unanswered} new ${plural(summary.inbox.unanswered, 'message', 'messages')}`
                                 : 'Inbox is clear'
                         }
-                        description="Every quote request from the contact form is saved here, even if its email fails."
+                        description="Quote requests, including failed email notifications."
                         href="/admin/inbox"
                         linkLabel="Open inbox"
                         tone={summary.inbox.unanswered ? 'warning' : 'good'}
@@ -153,7 +152,7 @@ export default function AdminDashboardClient() {
                         value={`${number.format(summary.inventory.out)} units`}
                         hint={
                             summary.inventory.out === 0
-                                ? 'Nothing is at a house right now'
+                                ? ''
                                 : summary.projects.activeName
                                   ? `At ${summary.projects.activeName}`
                                   : `Across ${number.format(summary.inventory.outProjects)} houses`

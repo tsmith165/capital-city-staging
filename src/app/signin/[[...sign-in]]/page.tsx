@@ -39,7 +39,6 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
         <AuthShell
             eyebrow="Admin access"
             title="Sign in"
-            description="The admin console is where staging projects, inventory, the homepage and incoming enquiries are managed."
             footer={
                 <p>
                     Trying to book staging instead?{' '}

@@ -38,7 +38,7 @@ export function localBusinessSchema(): Record<string, unknown> {
             '@type': 'City',
             name: `${name}, CA`,
         })),
-        knowsAbout: ['Home staging', 'Vacant home staging', 'Occupied home staging', 'Home decorating', 'Real estate presentation'],
+        knowsAbout: ['Home staging', 'Vacant home staging', 'Occupied home staging', 'Real estate presentation'],
     };
 }
 

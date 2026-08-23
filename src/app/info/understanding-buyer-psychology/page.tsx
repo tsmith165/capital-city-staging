@@ -29,24 +29,8 @@ export default function UnderstandingBuyerPsychology() {
                     width: article.imageWidth,
                     height: article.imageHeight,
                 }}
-                aside={
-                    <ContactCallout
-                        heading="Ready to connect with buyers?"
-                        body="We build staging plans around the buyers your listing is actually competing for."
-                    />
-                }
+                aside={<ContactCallout heading="Stage for the right buyer" body="Get a plan built around your listing's competition." />}
             >
-                <p>
-                    Selling a home isn’t just about showcasing square footage; it’s about connecting with buyers emotionally. Understanding
-                    buyer psychology is what makes a staging strategy resonate and motivates an offer.
-                </p>
-
-                <h2>The role of emotions in buying decisions</h2>
-                <p>
-                    Buying a home is an emotional process. Buyers are not looking for a structure; they are looking for a place to build a
-                    future. Tapping into that creates a connection between the buyer and the property.
-                </p>
-
                 <h2>Key psychological principles in home staging</h2>
 
                 <h3>1. First impressions matter</h3>

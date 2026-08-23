@@ -37,7 +37,7 @@ export default function InventoryAttentionClient() {
                 <AdminHeading
                     eyebrow="Inventory"
                     title="Fix queue"
-                    description="Problems that cost money on a live job come first. Prices and measurements can be filled in right here without opening the editor."
+                    description="Fix live-job pricing first; handle photos and measurements later."
                     action={
                         <Link
                             href="/admin/inventory"
@@ -63,10 +63,6 @@ export default function InventoryAttentionClient() {
                     <div className="border-line bg-surface-raised flex flex-col items-center gap-3 rounded-lg border px-5 py-14 text-center">
                         <CheckCircle2 size={28} aria-hidden="true" className="text-success" />
                         <strong className="font-display text-body text-xl font-normal">Nothing needs fixing</strong>
-                        <p className="text-body-muted max-w-md text-sm">
-                            Every active item has a photo and a price, no item is assigned out more times than you own, and the furniture
-                            that needs measurements has them.
-                        </p>
                     </div>
                 ) : (
                     <>
