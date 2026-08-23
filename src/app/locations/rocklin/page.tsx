@@ -12,12 +12,6 @@ const locationData = {
         'Capital City Staging offers expert home staging services in Rocklin, enhancing your property’s appeal to attract potential buyers.',
     whyStaging:
         'Rocklin’s growing community values homes that are move-in ready. Our staging services help your property meet buyer expectations.',
-    services: [
-        'Vacant and Occupied Home Staging',
-        'Interior Design Consultation',
-        'Customized Styling Solutions',
-        'Photography Preparation',
-    ],
     contactText: 'Interested in staging your Rocklin home?',
 };
 

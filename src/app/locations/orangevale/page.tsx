@@ -12,7 +12,6 @@ const locationData = {
         'Capital City Staging provides expert home staging services in Orangevale, making your property more attractive to potential buyers.',
     whyStaging:
         'In Orangevale’s competitive market, effective staging is key to making your home memorable. We highlight your property’s best features.',
-    services: ['Vacant and Occupied Home Staging', 'Interior Design Consultation', 'Customized Styling', 'Market-Ready Preparation'],
     contactText: 'Interested in staging your Orangevale home?',
 };
 

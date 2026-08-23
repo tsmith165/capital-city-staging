@@ -12,7 +12,6 @@ const locationData = {
         'Capital City Staging offers luxury home staging services in Granite Bay, enhancing your property’s elegance to attract high-end buyers.',
     whyStaging:
         'Granite Bay’s prestigious market requires impeccable presentation. Our staging services showcase your home’s luxury and sophistication.',
-    services: ['Luxury Home Staging', 'Interior Design and Styling', 'Custom Design Solutions', 'Photography Preparation'],
     contactText: 'Looking to elevate your Granite Bay property?',
 };
 

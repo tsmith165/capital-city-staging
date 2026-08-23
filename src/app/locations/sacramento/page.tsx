@@ -12,7 +12,6 @@ const locationData = {
         'Capital City Staging offers premier home staging services in Sacramento, transforming properties to captivate potential buyers and sell faster.',
     whyStaging:
         "Sacramento's real estate market is thriving and competitive. Our professional staging services ensure your property stands out, highlighting its best features to attract more buyers.",
-    services: ['Full-Service Home Staging', 'Interior Decoration and Styling', 'Design Consultations', 'Personalized Staging Strategies'],
     contactText: 'Looking to stage your Sacramento home?',
 };
 

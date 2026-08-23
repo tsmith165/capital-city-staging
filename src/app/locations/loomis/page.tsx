@@ -12,7 +12,6 @@ const locationData = {
         'Capital City Staging provides professional home staging services in Loomis, enhancing your property’s appeal to attract more buyers.',
     whyStaging:
         'Loomis offers a unique blend of rural charm and upscale living. Our staging services highlight the best aspects of your home to captivate buyers.',
-    services: ['Full-Service Home Staging', 'Interior Decoration', 'Design Consultations', 'Personalized Styling Plans'],
     contactText: 'Ready to stage your Loomis home?',
 };
 

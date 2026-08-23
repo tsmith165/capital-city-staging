@@ -47,7 +47,7 @@ export default function Footer() {
                         Home staging
                     </Link>
                     <Link href="/services/home-decorating" className="hover:text-gold-300 text-sm transition-colors">
-                        Home decorating
+                        Occupied staging
                     </Link>
                     <Link href="/info" className="hover:text-gold-300 text-sm transition-colors">
                         Articles

@@ -9,7 +9,7 @@ import { api } from '@/convex/_generated/api';
 
 import { PRIMARY_ACTION, SECONDARY_ACTION } from '@/components/content/content.constants';
 import { track } from '@/lib/analytics';
-import { HERO_FALLBACK_IMAGES, HERO_PROOF, HERO_ROTATE_MS } from './home.constants';
+import { HERO_FALLBACK_IMAGES, HERO_PROOF, HERO_PROOF_SOURCE, HERO_ROTATE_MS } from './home.constants';
 
 type HomepageImage = { src: string; width: number; height: number };
 
@@ -114,6 +114,12 @@ export default function Home({ initialHomepageImages }: { initialHomepageImages?
                             </div>
                         ))}
                     </dl>
+                    <p className="text-body-subtle mt-3 text-[11px]">
+                        {HERO_PROOF_SOURCE}{' '}
+                        <Link href="/info/home-staging-statistics" className="hover:text-gold-300 underline transition-colors">
+                            See the figures
+                        </Link>
+                    </p>
                 </div>
             </div>
         </section>

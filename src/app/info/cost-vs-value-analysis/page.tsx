@@ -36,15 +36,12 @@ export default function CostVsValueAnalysis() {
                     />
                 }
             >
-                <p>
-                    One of the most common questions homeowners ask is whether the cost of home staging is worth the investment. This page
-                    covers how staging can provide a return by increasing your home&rsquo;s value and reducing time on the market.
-                </p>
-
                 <h2>The financial impact of home staging</h2>
                 <p>
-                    Staging is an investment rather than an expense. Staged homes often sell for 6 to 20% more than non-staged homes and
-                    spend 73% less time on the market. Those two factors together comfortably offset the initial cost.
+                    Staging is an investment rather than an expense. National surveys put staged homes at 6 to 20% above non-staged
+                    comparables and 73% less time on the market, and those two factors together generally offset the initial cost. Both
+                    figures are survey averages, so treat them as a reason to run the numbers on your own listing rather than a promise
+                    about it.
                 </p>
 
                 <h2>Breakdown of staging costs</h2>

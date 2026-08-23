@@ -10,15 +10,32 @@ import { articleMetadata } from '@/app/info/article.metadata';
 
 const article = getArticle('home-staging-statistics');
 
+/**
+ * Figures carry the report they came from, not just the organisation. A seller weighing several
+ * thousand dollars of staging against a price reduction is entitled to know which study is being
+ * quoted and how broadly it applies.
+ */
 const HEADLINE_STATS = [
-    { value: '73%', label: 'less time on the market for professionally staged homes', source: 'Real Estate Staging Association' },
-    { value: '6-20%', label: 'increase in the dollar value buyers offer', source: 'National Association of Realtors' },
+    {
+        value: '73%',
+        label: 'less time on the market for professionally staged homes',
+        source: 'Real Estate Staging Association, consumer survey',
+    },
+    {
+        value: '6-20%',
+        label: 'increase in the dollar value buyers offer',
+        source: 'National Association of Realtors, Profile of Home Staging',
+    },
     {
         value: '81%',
         label: 'of buyers find it easier to visualize a staged property as their home',
-        source: 'National Association of Realtors',
+        source: 'National Association of Realtors, Profile of Home Staging',
     },
-    { value: '586%', label: 'peak return on investment reported for staging', source: 'HomeGain Selling Survey' },
+    {
+        value: '586%',
+        label: 'peak return on investment, reported as a high in one survey rather than a typical result',
+        source: 'HomeGain selling survey, historical',
+    },
 ];
 
 export const metadata: Metadata = articleMetadata(
@@ -40,18 +57,8 @@ export default function HomeStagingStatistics() {
                     width: article.imageWidth,
                     height: article.imageHeight,
                 }}
-                aside={
-                    <ContactCallout
-                        heading="Ready to benefit from staging?"
-                        body="Let us show you what these numbers look like for your specific property."
-                    />
-                }
+                aside={<ContactCallout heading="Price your property" body="See a staging range before you commit to a walkthrough." />}
             >
-                <p>
-                    Understanding the impact of home staging on the real estate market helps you make informed decisions when selling. Here
-                    are the figures that matter most.
-                </p>
-
                 <div className="not-prose my-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {HEADLINE_STATS.map((stat) => (
                         <div key={stat.value} className="border-line bg-surface-raised shadow-raised rounded-xl border p-5">
@@ -61,6 +68,11 @@ export default function HomeStagingStatistics() {
                         </div>
                     ))}
                 </div>
+
+                <p className="text-body-subtle text-sm">
+                    These are national survey figures. Results vary by market, price band and property, and none of them is a forecast for a
+                    specific listing.
+                </p>
 
                 <h2>Online appeal</h2>
                 <p>

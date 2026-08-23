@@ -12,7 +12,6 @@ const locationData = {
         'Capital City Staging provides professional home staging services in Roseville, helping your property attract more buyers and sell faster.',
     whyStaging:
         'Roseville’s booming real estate market demands properties that stand out. Our staging services ensure your home makes a lasting impression.',
-    services: ['Full-Service Home Staging', 'Interior Decoration', 'Design Consultations', 'Customized Styling Plans'],
     contactText: 'Ready to enhance your Roseville home?',
 };
 
