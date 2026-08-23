@@ -23,14 +23,24 @@ const fullDate = new Intl.DateTimeFormat('en-US', {
 
 export default function AdminInboxClient() {
     const [filter, setFilter] = useState<InboxFilter>('unanswered');
+    const [error, setError] = useState<string | null>(null);
 
     const submissions = useQuery(api.contactSubmissions.getSubmissions, filter === 'all' ? {} : { responded: filter === 'answered' });
     const setResponded = useMutation(api.contactSubmissions.setResponded);
     const deleteSubmission = useMutation(api.contactSubmissions.deleteSubmission);
 
+    const runOrFail = async (action: Promise<unknown>, message: string) => {
+        setError(null);
+        try {
+            await action;
+        } catch (caught) {
+            setError(caught instanceof Error ? caught.message : message);
+        }
+    };
+
     const handleDelete = async (id: Id<'contactSubmissions'>, name: string) => {
         if (!window.confirm(`Delete the message from ${name}? This cannot be undone.`)) return;
-        await deleteSubmission({ id });
+        await runOrFail(deleteSubmission({ id }), 'Could not delete that message.');
     };
 
     return (
@@ -41,6 +51,12 @@ export default function AdminInboxClient() {
                     title="Inbox"
                     description="Every quote request submitted through the contact form, saved here whether or not its notification email went out."
                 />
+
+                {error && (
+                    <p role="alert" className="border-danger/40 bg-danger-soft text-danger rounded-md border px-4 py-2.5 text-sm">
+                        {error}
+                    </p>
+                )}
 
                 <div className="flex flex-wrap gap-2" role="group" aria-label="Filter messages">
                     {INBOX_FILTERS.map(({ value, label }) => (
@@ -116,7 +132,12 @@ export default function AdminInboxClient() {
                                     <div className="flex items-center gap-2">
                                         <button
                                             type="button"
-                                            onClick={() => setResponded({ id: submission._id, responded: !submission.responded })}
+                                            onClick={() =>
+                                                void runOrFail(
+                                                    setResponded({ id: submission._id, responded: !submission.responded }),
+                                                    'Could not update that message.',
+                                                )
+                                            }
                                             className="border-line text-body-muted hover:bg-surface-overlay hover:text-body inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-bold transition-colors"
                                         >
                                             {submission.responded ? (

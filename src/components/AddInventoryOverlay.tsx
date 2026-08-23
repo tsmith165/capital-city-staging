@@ -420,7 +420,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({ onClose, onSu
                                     <button
                                         onClick={() => handleCreateInventory('edit')}
                                         disabled={!isFormValid}
-                                        className="bg-secondary hover:bg-secondary_light text-body flex items-center space-x-2 rounded-lg px-4 py-2 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                                        className="border-line text-body hover:bg-surface-hover flex items-center space-x-2 rounded-lg border px-4 py-2 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                                         data-tooltip-id="create-edit-btn"
                                         data-tooltip-content="Create and go to edit page"
                                     >
@@ -440,7 +440,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({ onClose, onSu
                                     <button
                                         onClick={() => handleCreateInventory('view')}
                                         disabled={!isFormValid}
-                                        className="bg-primary hover:bg-primary_dark text-body-inverse hover:text-body-inverse flex items-center space-x-2 rounded-lg px-4 py-2 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                                        className="bg-gold-400 hover:bg-gold-300 text-body-inverse flex items-center space-x-2 rounded-lg px-4 py-2 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                                         data-tooltip-id="create-view-btn"
                                         data-tooltip-content="Create and view in inventory"
                                     >

@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useCallback } from 'react';
 import { X } from 'lucide-react';
+
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 
 /**
  * A detail column that is furniture on a wide screen and a slide-over on a narrow one.
@@ -25,16 +27,13 @@ export default function AdminSidePanel({
     onEscape?: () => void;
     children: React.ReactNode;
 }) {
-    useEffect(() => {
-        if (!open) return;
-        const onKeyDown = (event: KeyboardEvent) => {
-            if (event.key !== 'Escape') return;
-            if (onEscape) onEscape();
-            else onOpenChange(false);
-        };
-        document.addEventListener('keydown', onKeyDown);
-        return () => document.removeEventListener('keydown', onKeyDown);
-    }, [open, onEscape, onOpenChange]);
+    const close = useCallback(() => {
+        if (onEscape) onEscape();
+        else onOpenChange(false);
+    }, [onEscape, onOpenChange]);
+
+    /* Only the overlay traps focus. Above `xl` the panel is ordinary page furniture. */
+    const dialogRef = useDialogFocus<HTMLElement>(open, close);
 
     return (
         <>
@@ -47,9 +46,11 @@ export default function AdminSidePanel({
                         className="bg-ink/70 absolute inset-0"
                     />
                     <aside
+                        ref={dialogRef}
                         role="dialog"
                         aria-modal="true"
                         aria-label={label}
+                        tabIndex={-1}
                         className="border-line bg-surface-raised shadow-overlay relative flex h-full w-full max-w-md flex-col border-l"
                     >
                         <button

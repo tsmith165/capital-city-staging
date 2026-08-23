@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 
 interface LightboxImage {
     _id: string;
@@ -26,7 +28,8 @@ interface PortfolioLightboxProps {
  * backdrop used `bg-opacity-85`, which Tailwind v4 removed, so it rendered fully opaque.
  */
 export default function PortfolioLightbox({ images, index, projectName, onClose, onStep }: PortfolioLightboxProps) {
-    const closeRef = useRef<HTMLButtonElement>(null);
+    /* Escape and the arrow keys are handled below; this only traps Tab and restores focus on close. */
+    const dialogRef = useDialogFocus<HTMLDivElement>(true);
     const image = images[index];
 
     const handleKeyDown = useCallback(
@@ -39,8 +42,6 @@ export default function PortfolioLightbox({ images, index, projectName, onClose,
     );
 
     useEffect(() => {
-        closeRef.current?.focus();
-
         const previousOverflow = document.body.style.overflow;
         document.body.style.overflow = 'hidden';
         document.addEventListener('keydown', handleKeyDown);
@@ -55,8 +56,10 @@ export default function PortfolioLightbox({ images, index, projectName, onClose,
 
     return (
         <div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
+            tabIndex={-1}
             aria-label={`${projectName}, image ${index + 1} of ${images.length}`}
             className="bg-ink/90 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
         >
@@ -73,7 +76,6 @@ export default function PortfolioLightbox({ images, index, projectName, onClose,
             />
 
             <button
-                ref={closeRef}
                 type="button"
                 onClick={onClose}
                 aria-label="Close"

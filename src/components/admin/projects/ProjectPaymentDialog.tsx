@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useMutation } from 'convex/react';
 import { AlertCircle, Loader2, X } from 'lucide-react';
 
@@ -9,6 +9,7 @@ import type { Id } from '@/convex/_generated/dataModel';
 
 import { PAYMENT_METHODS, exactMoney, fromDateInput, toDateInput } from './payments.constants';
 import type { PaymentState } from './payments.types';
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 
 /**
  * What she is asked when a job gets marked paid.
@@ -53,16 +54,7 @@ export default function ProjectPaymentDialog({
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const closeRef = useRef<HTMLButtonElement>(null);
-
-    useEffect(() => {
-        closeRef.current?.focus();
-        const onKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') onClose();
-        };
-        document.addEventListener('keydown', onKeyDown);
-        return () => document.removeEventListener('keydown', onKeyDown);
-    }, [onClose]);
+    const dialogRef = useDialogFocus<HTMLDivElement>(true, onClose);
 
     /*
      * A partial payment adds to what has already been recorded; the field asks for this payment, not
@@ -103,9 +95,11 @@ export default function ProjectPaymentDialog({
             <button type="button" aria-label="Cancel" onClick={onClose} className="bg-ink/70 absolute inset-0" />
 
             <div
+                ref={dialogRef}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="payment-dialog-title"
+                tabIndex={-1}
                 className="border-line bg-surface-raised shadow-overlay relative flex max-h-[90dvh] w-full max-w-md flex-col overflow-y-auto rounded-lg border"
             >
                 <header className="border-line flex items-start justify-between gap-3 border-b px-5 py-4">
@@ -116,7 +110,6 @@ export default function ProjectPaymentDialog({
                         </h2>
                     </div>
                     <button
-                        ref={closeRef}
                         type="button"
                         onClick={onClose}
                         aria-label="Cancel"

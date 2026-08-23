@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown, Mail, Phone, X } from 'lucide-react';
 
 import { CONTACT_DETAILS, PRIMARY_CTA, PRIMARY_NAV, type NavItem } from '@/lib/menu_list';
 import { track } from '@/lib/analytics';
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 
 interface MobileNavPanelProps {
     open: boolean;
@@ -19,27 +20,19 @@ const PANEL_LINK_CLASSES = 'flex min-h-[52px] items-center rounded-md px-4 text-
 
 export default function MobileNavPanel({ open, onClose, isAdmin, activeId, onSectionClick }: MobileNavPanelProps) {
     const [expanded, setExpanded] = useState<string | null>(null);
-    const closeButtonRef = useRef<HTMLButtonElement>(null);
+    const dialogRef = useDialogFocus<HTMLDivElement>(open, onClose);
 
-    // Focus the close control and lock the page behind the panel while it is open.
+    // Lock the page behind the panel while it is open. Focus and Escape are handled by the hook.
     useEffect(() => {
         if (!open) return;
-
-        closeButtonRef.current?.focus();
 
         const previousOverflow = document.body.style.overflow;
         document.body.style.overflow = 'hidden';
 
-        const onKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') onClose();
-        };
-        document.addEventListener('keydown', onKeyDown);
-
         return () => {
             document.body.style.overflow = previousOverflow;
-            document.removeEventListener('keydown', onKeyDown);
         };
-    }, [open, onClose]);
+    }, [open]);
 
     if (!open) return null;
 
@@ -74,16 +67,17 @@ export default function MobileNavPanel({ open, onClose, isAdmin, activeId, onSec
             />
 
             <div
+                ref={dialogRef}
                 id="site-menu"
                 role="dialog"
                 aria-modal="true"
                 aria-label="Site menu"
+                tabIndex={-1}
                 className="border-line bg-surface shadow-overlay absolute inset-y-0 right-0 flex w-[min(88vw,360px)] flex-col border-l"
             >
                 <div className="border-line flex h-16 shrink-0 items-center justify-between border-b px-4">
                     <span className="text-body-subtle text-[13px] font-bold tracking-[0.12em] uppercase">Menu</span>
                     <button
-                        ref={closeButtonRef}
                         type="button"
                         onClick={onClose}
                         aria-label="Close menu"

@@ -6,7 +6,7 @@ import { api } from '@/convex/_generated/api';
 import { Id, Doc } from '@/convex/_generated/dataModel';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, EyeOff, Pencil, Trash2, Upload, Images, Check, ImageIcon, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Pencil, Trash2, Upload, Images, Check, ImageIcon, Loader2, MoveLeft, MoveRight } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
 import ProjectResizeUploader from '@/components/ProjectResizeUploader';
 
@@ -99,7 +99,7 @@ function LivePreviewStrip({ images }: { images: HomepageImageDoc[] }) {
                 {images.map((_: HomepageImageDoc, i: number) => (
                     <div
                         key={i}
-                        className={`h-2 w-2 rounded-full transition-colors ${i === currentIndex ? 'bg-primary' : 'bg-stone-500'}`}
+                        className={`h-2 w-2 rounded-full transition-colors ${i === currentIndex ? 'bg-gold-400' : 'bg-stone-500'}`}
                     />
                 ))}
             </div>
@@ -112,9 +112,11 @@ function LivePreviewStrip({ images }: { images: HomepageImageDoc[] }) {
 function HomepageImageCard({
     image,
     position,
+    total,
     onToggleActive,
     onRemove,
     onEditCaption,
+    onMove,
     onDragStart,
     onDragOver,
     onDrop,
@@ -122,9 +124,12 @@ function HomepageImageCard({
 }: {
     image: HomepageImageDoc;
     position: number;
+    total: number;
     onToggleActive: () => void;
     onRemove: () => void;
     onEditCaption: () => void;
+    /** Ordering has to be reachable without a mouse; drag alone excluded keyboard users entirely. */
+    onMove: (direction: -1 | 1) => void;
     onDragStart: (e: React.DragEvent<HTMLDivElement>) => void;
     onDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
     onDrop: (e: React.DragEvent<HTMLDivElement>) => void;
@@ -136,9 +141,9 @@ function HomepageImageCard({
             onDragStart={onDragStart}
             onDragOver={onDragOver}
             onDrop={onDrop}
-            className={`group bg-surface-raised hover:shadow-primary/5 relative cursor-grab overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl active:cursor-grabbing ${
+            className={`group bg-surface-raised relative cursor-grab overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl active:cursor-grabbing ${
                 !image.active ? 'opacity-50 grayscale' : ''
-            } ${isDragTarget ? 'ring-primary ring-2 ring-offset-2 ring-offset-stone-900' : ''}`}
+            } ${isDragTarget ? 'ring-gold-300 ring-2 ring-offset-2 ring-offset-stone-900' : ''}`}
         >
             {/* Image */}
             <div className="relative aspect-[16/10] overflow-hidden">
@@ -152,27 +157,41 @@ function HomepageImageCard({
                 />
 
                 {/* Position badge */}
-                <div className="bg-primary text-body-inverse absolute top-3 left-3 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold shadow-md">
+                <div className="bg-gold-400 text-body-inverse absolute top-3 left-3 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold shadow-md">
                     {position}
                 </div>
 
                 {/* Active/Inactive badge */}
                 <div
                     className={`absolute top-3 right-3 rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        image.active ? 'bg-secondary/90 text-white' : 'bg-surface-hover/90 text-body-muted'
+                        image.active ? 'bg-success-soft text-success' : 'bg-surface-hover/90 text-body-muted'
                     }`}
                 >
                     {image.active ? 'Active' : 'Inactive'}
                 </div>
 
                 {/* Hover overlay with actions */}
-                <div className="bg-surface/60 absolute inset-0 flex items-center justify-center gap-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                <div className="bg-surface/60 absolute inset-0 flex items-center justify-center gap-2 opacity-0 transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100">
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onMove(-1);
+                        }}
+                        disabled={position === 1}
+                        aria-label={`Move image ${position} earlier`}
+                        className="bg-surface-raised/90 text-body-muted hover:bg-surface-hover hover:text-body flex h-10 w-10 items-center justify-center rounded-full transition-colors disabled:opacity-30"
+                    >
+                        <MoveLeft size={18} aria-hidden="true" />
+                    </button>
+
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             onToggleActive();
                         }}
-                        className="bg-surface-raised/90 text-body-muted hover:bg-secondary flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:text-white"
+                        className="bg-surface-raised/90 text-body-muted hover:bg-surface-hover hover:text-body flex h-10 w-10 items-center justify-center rounded-full transition-colors"
+                        aria-label={image.active ? `Hide image ${position} from the homepage` : `Show image ${position} on the homepage`}
                         data-tooltip-id="homepage-tooltip"
                         data-tooltip-content={image.active ? 'Set Inactive' : 'Set Active'}
                     >
@@ -184,7 +203,8 @@ function HomepageImageCard({
                             e.stopPropagation();
                             onEditCaption();
                         }}
-                        className="bg-surface-raised/90 text-body-muted hover:bg-primary hover:text-body-inverse flex h-10 w-10 items-center justify-center rounded-full transition-colors"
+                        className="bg-surface-raised/90 text-body-muted hover:bg-gold-400 hover:text-body-inverse flex h-10 w-10 items-center justify-center rounded-full transition-colors"
+                        aria-label={`Edit the caption for image ${position}`}
                         data-tooltip-id="homepage-tooltip"
                         data-tooltip-content="Edit caption"
                     >
@@ -196,11 +216,25 @@ function HomepageImageCard({
                             e.stopPropagation();
                             onRemove();
                         }}
-                        className="bg-surface-raised/90 text-body-muted flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-red-600 hover:text-white"
+                        className="bg-surface-raised/90 text-body-muted hover:bg-danger-soft hover:text-danger flex h-10 w-10 items-center justify-center rounded-full transition-colors"
+                        aria-label={`Remove image ${position} from the homepage`}
                         data-tooltip-id="homepage-tooltip"
                         data-tooltip-content="Remove from homepage"
                     >
                         <Trash2 size={18} />
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onMove(1);
+                        }}
+                        disabled={position === total}
+                        aria-label={`Move image ${position} later`}
+                        className="bg-surface-raised/90 text-body-muted hover:bg-surface-hover hover:text-body flex h-10 w-10 items-center justify-center rounded-full transition-colors disabled:opacity-30"
+                    >
+                        <MoveRight size={18} aria-hidden="true" />
                     </button>
                 </div>
             </div>
@@ -238,6 +272,7 @@ export default function HomepageManageClient() {
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
     const [isAdding, setIsAdding] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [uploadCaption, setUploadCaption] = useState('');
     const [pendingUpload, setPendingUpload] = useState<{
         originalImageUrl: string;
@@ -261,15 +296,26 @@ export default function HomepageManageClient() {
         setCaptionInput(image.title || '');
     };
 
-    const saveCaption = async () => {
-        if (editingCaptionId) {
-            await updateHomepageImage({
-                id: editingCaptionId as Id<'homepageImages'>,
-                title: captionInput,
-            });
-            setEditingCaptionId(null);
-            setCaptionInput('');
+    const runOrFail = async (action: Promise<unknown>, message: string) => {
+        setError(null);
+        try {
+            await action;
+            return true;
+        } catch (caught) {
+            setError(caught instanceof Error ? caught.message : message);
+            return false;
         }
+    };
+
+    const saveCaption = async () => {
+        if (!editingCaptionId) return;
+        const ok = await runOrFail(
+            updateHomepageImage({ id: editingCaptionId as Id<'homepageImages'>, title: captionInput }),
+            'Could not save that caption.',
+        );
+        if (!ok) return;
+        setEditingCaptionId(null);
+        setCaptionInput('');
     };
 
     // ─── Drag and Drop ─────────────────────────────────────────────────
@@ -285,18 +331,24 @@ export default function HomepageManageClient() {
         setDragOverIndex(index);
     };
 
-    const handleDrop = (dropIndex: number) => async (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        if (draggedIndex === null || draggedIndex === dropIndex || !homepageImages) return;
+    const commitOrder = async (from: number, to: number) => {
+        if (!homepageImages || from === to || to < 0 || to >= homepageImages.length) return;
 
         const newOrder = [...homepageImages];
-        const [draggedItem] = newOrder.splice(draggedIndex, 1);
-        newOrder.splice(dropIndex, 0, draggedItem);
+        const [moved] = newOrder.splice(from, 1);
+        newOrder.splice(to, 0, moved);
 
-        await reorderHomepageImages({
-            imageIds: newOrder.map((img: HomepageImageDoc) => img._id),
-        });
+        await runOrFail(
+            reorderHomepageImages({ imageIds: newOrder.map((img: HomepageImageDoc) => img._id) }),
+            'Could not save that order.',
+        );
+    };
 
+    const handleDrop = (dropIndex: number) => async (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        if (draggedIndex === null) return;
+
+        await commitOrder(draggedIndex, dropIndex);
         setDraggedIndex(null);
         setDragOverIndex(null);
     };
@@ -309,7 +361,8 @@ export default function HomepageManageClient() {
     // ─── Remove Image ──────────────────────────────────────────────────
 
     const handleRemove = async (id: Id<'homepageImages'>) => {
-        await removeHomepageImage({ id });
+        if (!window.confirm('Remove this image from the homepage slideshow?')) return;
+        await runOrFail(removeHomepageImage({ id }), 'Could not remove that image.');
     };
 
     // ─── Add From Projects ─────────────────────────────────────────────
@@ -443,7 +496,7 @@ export default function HomepageManageClient() {
                             </p>
                             <button
                                 onClick={() => setAddTab('projects')}
-                                className="bg-primary text-body-inverse hover:bg-primary_dark mt-6 rounded-lg px-6 py-2.5 font-medium transition-colors"
+                                className="bg-gold-400 text-body-inverse hover:bg-gold-300 mt-6 rounded-lg px-6 py-2.5 font-medium transition-colors"
                             >
                                 Browse Project Images
                             </button>
@@ -455,9 +508,11 @@ export default function HomepageManageClient() {
                                     key={image._id}
                                     image={image}
                                     position={index + 1}
-                                    onToggleActive={() => toggleActive({ id: image._id })}
+                                    total={homepageImages.length}
+                                    onToggleActive={() => void runOrFail(toggleActive({ id: image._id }), 'Could not change that image.')}
                                     onRemove={() => handleRemove(image._id)}
                                     onEditCaption={() => startEditCaption(image)}
+                                    onMove={(direction) => void commitOrder(index, index + direction)}
                                     onDragStart={handleDragStart(index)}
                                     onDragOver={handleDragOver(index)}
                                     onDrop={handleDrop(index)}
@@ -467,9 +522,15 @@ export default function HomepageManageClient() {
                         </div>
                     )}
 
+                    {error && (
+                        <p role="alert" className="border-danger/40 bg-danger-soft text-danger mt-4 rounded-lg border px-4 py-2.5 text-sm">
+                            {error}
+                        </p>
+                    )}
+
                     {/* Warning when all images are inactive */}
                     {homepageImages.length > 0 && activeImages.length === 0 && (
-                        <div className="mt-4 rounded-lg border border-amber-600/50 bg-amber-900/20 p-3 text-sm text-amber-300">
+                        <div className="border-warning/40 bg-warning-soft text-warning mt-4 rounded-lg border p-3 text-sm">
                             All images are inactive. The homepage will display default fallback images.
                         </div>
                     )}
@@ -501,7 +562,7 @@ export default function HomepageManageClient() {
                                 </button>
                                 <button
                                     onClick={saveCaption}
-                                    className="bg-primary text-body-inverse hover:bg-primary_dark rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                                    className="bg-gold-400 text-body-inverse hover:bg-gold-300 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                                 >
                                     Save
                                 </button>
@@ -522,7 +583,7 @@ export default function HomepageManageClient() {
                         <button
                             onClick={() => setAddTab('projects')}
                             className={`flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                                addTab === 'projects' ? 'bg-primary text-body-inverse' : 'text-body-subtle hover:text-body'
+                                addTab === 'projects' ? 'bg-gold-400 text-body-inverse' : 'text-body-subtle hover:text-body'
                             }`}
                         >
                             <Images size={16} />
@@ -531,7 +592,7 @@ export default function HomepageManageClient() {
                         <button
                             onClick={() => setAddTab('upload')}
                             className={`flex flex-1 items-center justify-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-                                addTab === 'upload' ? 'bg-primary text-body-inverse' : 'text-body-subtle hover:text-body'
+                                addTab === 'upload' ? 'bg-gold-400 text-body-inverse' : 'text-body-subtle hover:text-body'
                             }`}
                         >
                             <Upload size={16} />
@@ -563,7 +624,7 @@ export default function HomepageManageClient() {
                                                 }}
                                                 className={`rounded-full border-2 px-4 py-1.5 text-sm font-medium transition-all ${
                                                     index === selectedProject
-                                                        ? 'border-secondary bg-secondary text-body'
+                                                        ? 'border-gold-300 bg-gold-400/10 text-body'
                                                         : 'border-line-strong text-body-subtle hover:border-primary hover:text-primary bg-transparent'
                                                 }`}
                                             >
@@ -594,7 +655,7 @@ export default function HomepageManageClient() {
                                                 <button
                                                     onClick={handleAddSelectedToHomepage}
                                                     disabled={selectedProjectImages.size === 0 || isAdding}
-                                                    className="bg-primary text-body-inverse hover:bg-primary_dark rounded px-4 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                                                    className="bg-gold-400 text-body-inverse hover:bg-gold-300 rounded px-4 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                                                 >
                                                     {isAdding ? (
                                                         <Loader2 size={14} className="inline animate-spin" />
@@ -636,7 +697,7 @@ export default function HomepageManageClient() {
 
                                                         {/* Selection check */}
                                                         {isSelected && (
-                                                            <div className="bg-primary text-body-inverse absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full">
+                                                            <div className="bg-gold-400 text-body-inverse absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full">
                                                                 <Check size={14} />
                                                             </div>
                                                         )}
@@ -686,7 +747,7 @@ export default function HomepageManageClient() {
                                 <button
                                     onClick={handleAddUploadedImage}
                                     disabled={!pendingUpload || isAdding}
-                                    className="bg-secondary hover:bg-secondary_light w-full rounded-lg py-2.5 font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="bg-gold-400 text-body-inverse hover:bg-gold-300 w-full rounded-lg py-2.5 font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     {isAdding ? <Loader2 size={18} className="mx-auto animate-spin" /> : 'Add to Homepage'}
                                 </button>
