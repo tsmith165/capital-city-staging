@@ -6,13 +6,13 @@ import { AlertCircle, Check, GripVertical, ImageOff, Loader2, MoveLeft, MoveRigh
 import { UPLOAD_STAGE_LABELS, type PendingImage } from './images.types';
 
 /**
- * One image, in either list.
+ * One image, in either list, on any surface that arranges photos.
  *
  * Pending and committed images differ only in when their edits land, so they are the same card. The
  * reorder controls are buttons as well as a drag handle: drag-only ordering cannot be operated from a
- * keyboard, and this is the control that decides what a client sees first on the public page.
+ * keyboard, and this is the control that decides which photo represents the thing everywhere else.
  */
-export default function ProjectImageCard({
+export default function EditableImageCard({
     src,
     title,
     fileName,
@@ -21,6 +21,9 @@ export default function ProjectImageCard({
     position,
     total,
     dragging,
+    badge,
+    lockedTitle,
+    canRemove = true,
     onTitleChange,
     onTitleCommit,
     onRemove,
@@ -39,6 +42,11 @@ export default function ProjectImageCard({
     position: number;
     total: number;
     dragging?: boolean;
+    /** Replaces the position number, for a slot that means something more than its index. */
+    badge?: string;
+    /** Renders the caption as text instead of a field, where the caption is owned elsewhere. */
+    lockedTitle?: string;
+    canRemove?: boolean;
     onTitleChange: (title: string) => void;
     /** Fired on blur, for lists that write each edit straight through. */
     onTitleCommit?: () => void;
@@ -79,8 +87,12 @@ export default function ProjectImageCard({
                     </span>
                 )}
 
-                <span className="bg-ink/80 text-body absolute top-2 left-2 grid h-6 min-w-6 place-items-center rounded-full px-1.5 text-[11px] font-bold backdrop-blur">
-                    {position + 1}
+                <span
+                    className={`absolute top-2 left-2 grid h-6 min-w-6 place-items-center rounded-full px-1.5 text-[11px] font-bold backdrop-blur ${
+                        badge ? 'bg-gold-400/90 text-body-inverse' : 'bg-ink/80 text-body'
+                    }`}
+                >
+                    {badge ?? position + 1}
                 </span>
 
                 {!busy && (
@@ -115,17 +127,21 @@ export default function ProjectImageCard({
             </div>
 
             <div className="flex flex-col gap-2 p-2.5">
-                <label className="flex flex-col gap-1">
-                    <span className="sr-only">Caption for image {position + 1}</span>
-                    <input
-                        type="text"
-                        value={title}
-                        onChange={(event) => onTitleChange(event.target.value)}
-                        onBlur={onTitleCommit}
-                        placeholder={fileName ?? 'Add a caption'}
-                        className="border-line bg-surface text-body placeholder:text-body-subtle focus-visible:border-gold-300 w-full rounded border px-2 py-1.5 text-xs outline-none"
-                    />
-                </label>
+                {lockedTitle === undefined ? (
+                    <label className="flex flex-col gap-1">
+                        <span className="sr-only">Caption for image {position + 1}</span>
+                        <input
+                            type="text"
+                            value={title}
+                            onChange={(event) => onTitleChange(event.target.value)}
+                            onBlur={onTitleCommit}
+                            placeholder={fileName ?? 'Add a caption'}
+                            className="border-line bg-surface text-body placeholder:text-body-subtle focus-visible:border-gold-300 w-full rounded border px-2 py-1.5 text-xs outline-none"
+                        />
+                    </label>
+                ) : (
+                    <p className="text-body-subtle truncate px-0.5 py-1.5 text-xs">{lockedTitle}</p>
+                )}
 
                 <div className="flex items-center gap-1">
                     <button
@@ -146,14 +162,16 @@ export default function ProjectImageCard({
                     >
                         <MoveRight size={13} aria-hidden="true" />
                     </button>
-                    <button
-                        type="button"
-                        onClick={onRemove}
-                        aria-label={`Remove image ${position + 1}`}
-                        className="border-line text-body-subtle hover:border-danger/50 hover:bg-danger-soft hover:text-danger ml-auto grid h-8 w-8 place-items-center rounded border transition-colors"
-                    >
-                        <Trash2 size={13} aria-hidden="true" />
-                    </button>
+                    {canRemove && (
+                        <button
+                            type="button"
+                            onClick={onRemove}
+                            aria-label={`Remove image ${position + 1}`}
+                            className="border-line text-body-subtle hover:border-danger/50 hover:bg-danger-soft hover:text-danger ml-auto grid h-8 w-8 place-items-center rounded border transition-colors"
+                        >
+                            <Trash2 size={13} aria-hidden="true" />
+                        </button>
+                    )}
                 </div>
             </div>
         </li>

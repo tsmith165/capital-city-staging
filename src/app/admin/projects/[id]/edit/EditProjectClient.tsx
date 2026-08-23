@@ -13,7 +13,7 @@ import ProjectDetailsForm from './ProjectDetailsForm';
 import ProjectImagesSection from './ProjectImagesSection';
 import ProjectPaymentSection from './ProjectPaymentSection';
 import ProjectInventoryTab from './ProjectInventoryTab';
-import type { CommittedImage } from './images.types';
+import type { CommittedImage } from '@/components/admin/images/images.types';
 import { CLOSING_STATUSES, type ProjectAssignmentLine, type ProjectFormState, type ProjectStatus } from './project.types';
 
 /**
