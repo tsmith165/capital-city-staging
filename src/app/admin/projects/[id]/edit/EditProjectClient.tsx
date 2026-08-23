@@ -20,6 +20,7 @@ import {
     type ProjectFormState,
     type ProjectStatus,
 } from '@/components/admin/projects/project.types';
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 
 /**
  * Editing one project.
@@ -98,6 +99,18 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
             highlighted: project.highlighted || false,
         });
     }
+
+    /* The form is dirty whenever what is on screen differs from what the last query returned. */
+    const dirty = Boolean(
+        project &&
+        (formData.name !== (project.name || '') ||
+            formData.status !== ((project.status as ProjectStatus) ?? 'draft') ||
+            formData.address !== (project.address || '') ||
+            formData.revenue !== (project.revenue ? project.revenue.toString() : '') ||
+            formData.notes !== (project.notes || '') ||
+            formData.highlighted !== (project.highlighted || false)),
+    );
+    useUnsavedChangesWarning(dirty);
 
     const save = async (checkInAssignmentIds?: string[]) => {
         setSaving(true);

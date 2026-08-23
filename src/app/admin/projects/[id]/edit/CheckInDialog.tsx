@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Loader2, Undo2, X } from 'lucide-react';
 
 import AssignmentRow from '@/components/admin/inventory/AssignmentRow';
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 
 import type { ProjectAssignmentLine } from '@/components/admin/projects/project.types';
 
@@ -41,13 +42,11 @@ export default function CheckInDialog({
 }) {
     const [excluded, setExcluded] = useState<Set<string>>(new Set());
 
-    useEffect(() => {
-        const onKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape' && !saving) onCancel();
-        };
-        document.addEventListener('keydown', onKeyDown);
-        return () => document.removeEventListener('keydown', onKeyDown);
+    /* Escape is ignored mid-save: the mutation is already in flight and cannot be taken back. */
+    const close = useCallback(() => {
+        if (!saving) onCancel();
     }, [onCancel, saving]);
+    const dialogRef = useDialogFocus<HTMLDivElement>(true, close);
 
     const included = lines.filter((line) => !excluded.has(line._id));
     const units = included.reduce((total, line) => total + line.quantity, 0);
@@ -59,9 +58,11 @@ export default function CheckInDialog({
             <button type="button" aria-label="Cancel" onClick={() => !saving && onCancel()} className="bg-ink/80 absolute inset-0" />
 
             <div
+                ref={dialogRef}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="check-in-title"
+                tabIndex={-1}
                 className="border-line bg-surface-raised shadow-overlay relative flex max-h-[88vh] w-full max-w-lg flex-col overflow-hidden rounded-lg border"
             >
                 <header className="border-line flex items-start gap-3 border-b px-5 py-4">

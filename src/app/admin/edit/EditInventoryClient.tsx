@@ -9,6 +9,7 @@ import { ArrowLeft, ChevronLeft, ChevronRight, Images, ImageOff, Plus, Settings2
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 import AddInventoryOverlay from '@/components/AddInventoryOverlay';
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 
 import InventoryDetailsForm from './InventoryDetailsForm';
 import InventoryPhotosSection from './InventoryPhotosSection';
@@ -72,6 +73,10 @@ export default function EditInventoryClient({ oId }: { oId: number }) {
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [addingNew, setAddingNew] = useState(false);
+
+    /* Dirty when the fields on screen differ from the item the last query returned. */
+    const dirty = Boolean(item && form && JSON.stringify(form) !== JSON.stringify(toForm(item)));
+    useUnsavedChangesWarning(dirty);
 
     if (item === undefined || (item && !form)) return <p className="text-body-muted p-6 text-sm">Loading item…</p>;
 

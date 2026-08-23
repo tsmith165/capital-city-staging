@@ -45,6 +45,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
     const [problems, setProblems] = useState<LineProblem[]>([]);
     const [committing, setCommitting] = useState(false);
     const [flash, setFlash] = useState<string | null>(null);
+    const [commitError, setCommitError] = useState<string | null>(null);
     const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
 
     const searchRef = useRef<HTMLInputElement>(null);
@@ -56,6 +57,7 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
 
         setCommitting(true);
         setFlash(null);
+        setCommitError(null);
         try {
             const result = await assignItems({
                 projectId: projectId as Id<'projects'>,
@@ -81,8 +83,9 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                 setExpanded(true);
             }
         } catch (error) {
+            /* A failure is not a confirmation; the success banner would have rendered this in green. */
             setProblems([]);
-            setFlash(error instanceof Error ? error.message : 'Could not save this list. Try again.');
+            setCommitError(error instanceof Error ? error.message : 'Could not save this list. Try again.');
         } finally {
             setCommitting(false);
         }
@@ -220,9 +223,14 @@ export default function ProjectInventoryClient({ projectId }: { projectId: strin
                 </div>
 
                 <p aria-live="polite" className="sr-only">
-                    {flash ?? ''}
+                    {commitError ?? flash ?? ''}
                 </p>
                 {flash && <p className="border-success/40 bg-success-soft text-success rounded-md border px-4 py-2.5 text-sm">{flash}</p>}
+                {commitError && (
+                    <p role="alert" className="border-danger/40 bg-danger-soft text-danger rounded-md border px-4 py-2.5 text-sm">
+                        {commitError}
+                    </p>
+                )}
 
                 {visible.length === 0 ? (
                     <div className="border-line bg-surface-raised flex flex-col items-center gap-3 rounded-lg border px-5 py-14 text-center">
