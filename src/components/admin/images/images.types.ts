@@ -1,4 +1,4 @@
-/** An upload in flight or finished, held in the browser until she commits the batch. */
+/** An upload in flight or finished, held in the browser until the batch is committed. */
 export interface PendingImage {
     /** Stable client-side key. Not a Convex id — nothing is written yet. */
     key: string;
@@ -17,7 +17,7 @@ export interface PendingImage {
     previewUrl?: string;
 }
 
-/** One image already attached to the project. */
+/** One image already written to whatever it belongs to. */
 export interface CommittedImage {
     _id: string;
     title?: string;

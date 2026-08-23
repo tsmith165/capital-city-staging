@@ -13,10 +13,10 @@ const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 /**
  * Selecting files, resizing them, and getting them to storage — reported the whole way.
  *
- * The old uploader did all of this behind a single button label and then wrote every image straight
- * onto the project, so a ten-image drop was silent until it was already irreversible. Here each file
+ * The uploaders this replaces did all of this behind a single button label and then wrote every image
+ * straight through, so a ten-image drop was silent until it was already irreversible. Here each file
  * appears the moment it is chosen, carries its own stage, and lands in a pending list that is not
- * written anywhere until she says so.
+ * written anywhere until it is committed.
  */
 
 const MAX_EDGE = 1920;
