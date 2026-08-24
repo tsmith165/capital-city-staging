@@ -25,7 +25,7 @@ export const SERVICES: ServiceSpec[] = [
     {
         id: 'occupied',
         title: 'Occupied staging',
-        href: '/services/home-decorating',
+        href: '/services/occupied-home-staging',
         summary: 'You’re still living there. We work with what you own, clear what’s in the way, and add only what’s missing.',
         bestFor: 'Sellers living in the home while it’s listed.',
         includedItems: [

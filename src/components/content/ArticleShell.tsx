@@ -43,8 +43,11 @@ export default function ArticleShell({ eyebrow, title, lead, image, children, as
                             width={image.width}
                             height={image.height}
                             className="h-auto w-full"
-                            sizes="(max-width: 896px) 100vw, 896px"
+                            // The frame is 896px wide at most and sits inside 24-32px of padding,
+                            // so 100vw asks for a rendition wider than the slot ever gets.
+                            sizes="(max-width: 640px) calc(100vw - 3rem), (max-width: 896px) calc(100vw - 4rem), 896px"
                             priority
+                            fetchPriority="high"
                         />
                     </div>
                 </div>

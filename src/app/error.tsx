@@ -12,7 +12,7 @@ import { AlertTriangle, RotateCcw } from 'lucide-react';
  */
 export default function RouteError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
     return (
-        <main className="bg-ink grid min-h-dvh place-items-center p-6">
+        <main id="main-content" tabIndex={-1} className="bg-ink grid min-h-dvh place-items-center p-6 focus:outline-none">
             <div className="border-line bg-surface-raised flex max-w-md flex-col gap-4 rounded-lg border p-6 text-center">
                 <AlertTriangle size={26} aria-hidden="true" className="text-warning mx-auto" />
                 <h1 className="font-display text-body text-2xl leading-tight font-normal">Something went wrong on this page</h1>

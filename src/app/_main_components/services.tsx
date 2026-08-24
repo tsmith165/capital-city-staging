@@ -39,7 +39,7 @@ export default function Services() {
 
                                 <p className="text-body-muted mt-4">{service.summary}</p>
 
-                                <p className="border-line bg-surface-overlay text-body-subtle mt-4 rounded-md border px-3.5 py-2.5 text-sm">
+                                <p className="border-line bg-surface-overlay text-body-muted mt-4 rounded-md border px-3.5 py-2.5 text-sm">
                                     <span className="text-body-muted font-semibold">Best for:</span> {service.bestFor}
                                 </p>
 

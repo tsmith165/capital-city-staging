@@ -21,7 +21,9 @@ interface InitialHomepageImage {
 
 export default function Home({ initialHomepageImages }: { initialHomepageImages?: InitialHomepageImage[] | null }) {
     const homepageImagesData = useQuery(api.homepageImages.getHomepageImages);
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    // `previous` is the slide fading out. It is null until the first rotation so a visitor who
+    // never waits eight seconds is not charged for a third image.
+    const [slide, setSlide] = useState<{ current: number; previous: number | null }>({ current: 0, previous: null });
 
     // Live Convex data once it arrives, the SSR preload before that, local stills as a last resort.
     const images: HomepageImage[] = useMemo(() => {
@@ -36,14 +38,16 @@ export default function Home({ initialHomepageImages }: { initialHomepageImages?
         if (images.length < 2) return;
 
         const interval = setInterval(() => {
-            setCurrentImageIndex((index) => (index + 1) % images.length);
+            setSlide(({ current }) => ({ previous: current, current: (current + 1) % images.length }));
         }, HERO_ROTATE_MS);
 
         return () => clearInterval(interval);
     }, [images.length]);
 
     // The list can shrink underneath us when an admin removes a homepage image.
-    const activeIndex = currentImageIndex % images.length;
+    const activeIndex = slide.current % images.length;
+    const nextIndex = (activeIndex + 1) % images.length;
+    const previousIndex = slide.previous === null ? null : slide.previous % images.length;
 
     return (
         <section className="min-section-viewport relative w-full overflow-hidden">
@@ -53,21 +57,30 @@ export default function Home({ initialHomepageImages }: { initialHomepageImages?
              * do at idle, and it moved the composition under the copy. It crossfades in place now.
              */}
             <div className="absolute inset-0">
-                {images.map((image, index) => (
-                    <Image
-                        key={image.src}
-                        src={image.src}
-                        width={image.width}
-                        height={image.height}
-                        alt=""
-                        aria-hidden="true"
-                        priority={index === 0}
-                        sizes="100vw"
-                        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
-                            index === activeIndex ? 'opacity-100' : 'opacity-0'
-                        }`}
-                    />
-                ))}
+                {/*
+                 * Only three of the nine slides are mounted: the one fading out, the one on screen,
+                 * and the one due next. Rendering the whole set meant every visitor downloaded nine
+                 * full-bleed images to look at one.
+                 */}
+                {images.map((image, index) => {
+                    if (index !== activeIndex && index !== nextIndex && index !== previousIndex) return null;
+                    return (
+                        <Image
+                            key={image.src}
+                            src={image.src}
+                            width={image.width}
+                            height={image.height}
+                            alt=""
+                            aria-hidden="true"
+                            priority={index === 0}
+                            fetchPriority={index === 0 ? 'high' : 'low'}
+                            sizes="100vw"
+                            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
+                                index === activeIndex ? 'opacity-100' : 'opacity-0'
+                            }`}
+                        />
+                    );
+                })}
             </div>
 
             {/* A readable ground for the copy rather than a radial vignette over the whole frame. */}

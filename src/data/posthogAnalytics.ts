@@ -22,7 +22,7 @@ const PAGE_LABELS: Record<string, string> = {
     '/contact': 'Contact and quote',
     '/info': 'Info hub',
     '/services/home-staging': 'Home staging service',
-    '/services/home-decorating': 'Home decorating service',
+    '/services/occupied-home-staging': 'Occupied staging service',
     '/profile': 'Profile',
 };
 

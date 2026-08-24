@@ -46,7 +46,7 @@ export const metadata: Metadata = articleMetadata(
 export default function HomeStagingStatistics() {
     return (
         <PageLayout page="home-staging-statistics">
-            <JsonLd data={articleSchema({ headline: article.title, description: article.description, path: article.url })} />
+            <JsonLd data={articleSchema(article)} />
             <ArticleShell
                 eyebrow="Resources"
                 title={article.title}

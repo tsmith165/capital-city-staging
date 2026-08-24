@@ -21,7 +21,7 @@ export default function Footer() {
                         className="h-11 w-auto object-contain"
                     />
                     <p className="max-w-xs text-sm leading-relaxed">
-                        Professional home staging and decorating across the greater Sacramento area, helping homes sell faster and for more.
+                        Professional home staging across the greater Sacramento area, helping homes sell faster and for more.
                     </p>
                     <div className="flex flex-col gap-2 text-sm">
                         <a
@@ -46,7 +46,7 @@ export default function Footer() {
                     <Link href="/services/home-staging" className="hover:text-gold-300 text-sm transition-colors">
                         Home staging
                     </Link>
-                    <Link href="/services/home-decorating" className="hover:text-gold-300 text-sm transition-colors">
+                    <Link href="/services/occupied-home-staging" className="hover:text-gold-300 text-sm transition-colors">
                         Occupied staging
                     </Link>
                     <Link href="/info" className="hover:text-gold-300 text-sm transition-colors">

@@ -18,7 +18,7 @@ export const metadata: Metadata = articleMetadata(
 export default function CostVsValueAnalysis() {
     return (
         <PageLayout page="cost-vs-value-analysis">
-            <JsonLd data={articleSchema({ headline: article.title, description: article.description, path: article.url })} />
+            <JsonLd data={articleSchema(article)} />
             <ArticleShell
                 eyebrow="Resources"
                 title={article.title}
