@@ -1,3 +1,4 @@
+import type { Id } from '@/convex/_generated/dataModel';
 import type { AttentionReason } from '@/app/admin/inventory/attention/attention.types';
 
 /** Availability for one item, as `availabilityForItem` returns it. */
@@ -53,8 +54,8 @@ export interface EditorItem {
     extraImages: EditorExtraImage[];
     availability: EditorAvailability;
     attention: AttentionReason[];
-    newerOId: number | null;
-    olderOId: number | null;
+    newerId: Id<'inventory'> | null;
+    olderId: Id<'inventory'> | null;
     position: number;
     total: number;
     categories: string[];

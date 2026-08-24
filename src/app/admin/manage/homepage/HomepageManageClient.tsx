@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { Id, Doc } from '@/convex/_generated/dataModel';
@@ -268,6 +269,7 @@ export default function HomepageManageClient() {
     const [selectedProject, setSelectedProject] = useState(0);
     const [selectedProjectImages, setSelectedProjectImages] = useState<Set<string>>(new Set());
     const [editingCaptionId, setEditingCaptionId] = useState<string | null>(null);
+    const captionDialogRef = useDialogFocus<HTMLDivElement>(editingCaptionId !== null, () => setEditingCaptionId(null));
     const [captionInput, setCaptionInput] = useState('');
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
@@ -411,6 +413,9 @@ export default function HomepageManageClient() {
                 projectImageIds: Array.from(selectedProjectImages) as Id<'projectImages'>[],
             });
             setSelectedProjectImages(new Set());
+        } catch (caught) {
+            /* Without this the rejection only stopped the spinner and became an unhandled promise. */
+            setError(caught instanceof Error ? caught.message : 'Could not add those photos to the homepage.');
         } finally {
             setIsAdding(false);
         }
@@ -450,6 +455,8 @@ export default function HomepageManageClient() {
             });
             setPendingUpload(null);
             setUploadCaption('');
+        } catch (caught) {
+            setError(caught instanceof Error ? caught.message : 'Could not add that image to the homepage.');
         } finally {
             setIsAdding(false);
         }
@@ -537,11 +544,18 @@ export default function HomepageManageClient() {
                 {/* ─── Caption Edit Modal ───────────────────────────────────── */}
                 {editingCaptionId && (
                     <div
+                        ref={captionDialogRef}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="caption-dialog-title"
+                        tabIndex={-1}
                         className="bg-surface/80 fixed inset-0 z-50 flex items-center justify-center"
                         onClick={() => setEditingCaptionId(null)}
                     >
                         <div onClick={(e) => e.stopPropagation()} className="bg-surface-raised w-full max-w-md rounded-xl p-6 shadow-2xl">
-                            <h3 className="text-body mb-4 text-lg font-semibold">Edit Caption</h3>
+                            <h3 id="caption-dialog-title" className="text-body mb-4 text-lg font-semibold">
+                                Edit Caption
+                            </h3>
                             <input
                                 type="text"
                                 value={captionInput}
@@ -669,15 +683,23 @@ export default function HomepageManageClient() {
                                                 const alreadyAdded = image.alreadyOnHomepage;
 
                                                 return (
-                                                    <div
+                                                    <button
                                                         key={image._id}
-                                                        onClick={() => !alreadyAdded && toggleProjectImageSelection(image._id.toString())}
-                                                        className={`relative cursor-pointer overflow-hidden rounded-lg transition-all duration-200 ${
+                                                        type="button"
+                                                        onClick={() => toggleProjectImageSelection(image._id.toString())}
+                                                        disabled={alreadyAdded}
+                                                        aria-pressed={isSelected}
+                                                        aria-label={
+                                                            alreadyAdded
+                                                                ? `${image.title ?? 'Project photo'} is already on the homepage`
+                                                                : `${image.title ?? 'Project photo'}${isSelected ? ', selected' : ''}`
+                                                        }
+                                                        className={`focus-visible:ring-gold-400 relative block w-full overflow-hidden rounded-lg transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none ${
                                                             alreadyAdded
                                                                 ? 'cursor-not-allowed opacity-40'
                                                                 : isSelected
-                                                                  ? 'ring-primary scale-[0.97] ring-2'
-                                                                  : 'hover:ring-2 hover:ring-stone-500'
+                                                                  ? 'ring-gold-400 scale-[0.97] cursor-pointer ring-2'
+                                                                  : 'cursor-pointer hover:ring-2 hover:ring-stone-500'
                                                         }`}
                                                     >
                                                         <Image
@@ -685,7 +707,8 @@ export default function HomepageManageClient() {
                                                             width={image.thumbnailWidth || image.width}
                                                             height={image.thumbnailHeight || image.height}
                                                             className="aspect-square w-full object-cover"
-                                                            alt="Project image"
+                                                            /* The button carries the name; a second one here would double it in the a11y tree. */
+                                                            alt=""
                                                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
                                                         />
 
@@ -704,7 +727,7 @@ export default function HomepageManageClient() {
                                                                 </span>
                                                             </div>
                                                         )}
-                                                    </div>
+                                                    </button>
                                                 );
                                             })}
                                         </div>

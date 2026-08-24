@@ -225,7 +225,7 @@ export default function AttentionFixRow({ item, onFixed }: { item: AttentionItem
             </span>
 
             <Link
-                href={`/admin/edit?id=${item.oId}`}
+                href={`/admin/edit?item=${item._id}`}
                 className="border-line text-body-muted hover:bg-surface-hover hover:text-body inline-flex shrink-0 items-center gap-1.5 self-start rounded-md border px-3 py-2 text-xs font-bold transition-colors"
             >
                 <Pencil size={13} aria-hidden="true" /> Full editor

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useMutation, useQuery } from 'convex/react';
 import { ExternalLink, Loader2, PackageOpen, Trash2, Undo2 } from 'lucide-react';
@@ -48,6 +49,21 @@ export default function ProjectWorkspacePanel({
         projectId: project._id as Id<'projects'>,
     });
     const checkIn = useMutation(api.assignments.checkInAssignments);
+    const [checkInError, setCheckInError] = useState<string | null>(null);
+    const [checkingIn, setCheckingIn] = useState<string | null>(null);
+
+    /* Check-in writes immediately from a row; a rejection here used to leave the row unchanged and silent. */
+    const runCheckIn = async (assignmentId: Id<'projectInventory'>) => {
+        setCheckInError(null);
+        setCheckingIn(assignmentId);
+        try {
+            await checkIn({ assignmentIds: [assignmentId] });
+        } catch (caught) {
+            setCheckInError(caught instanceof Error ? caught.message : 'Could not check that item back in.');
+        } finally {
+            setCheckingIn(null);
+        }
+    };
 
     const problemsById = new Map(problems.map((problem) => [problem.inventoryId, problem] as const));
     const touched = [...summary.adding, ...summary.changing, ...summary.removing];
@@ -135,6 +151,11 @@ export default function ProjectWorkspacePanel({
                         </div>
                     ) : (
                         <>
+                            {checkInError && (
+                                <p role="alert" className="text-danger border-line border-b px-4 py-2 text-xs font-semibold">
+                                    {checkInError}
+                                </p>
+                            )}
                             <ul className="divide-line divide-y">
                                 {onSite.map((line) => (
                                     <AssignmentRow
@@ -147,9 +168,10 @@ export default function ProjectWorkspacePanel({
                                         action={
                                             <button
                                                 type="button"
-                                                onClick={() => checkIn({ assignmentIds: [line._id as Id<'projectInventory'>] })}
+                                                onClick={() => void runCheckIn(line._id as Id<'projectInventory'>)}
+                                                disabled={checkingIn === line._id}
                                                 aria-label={`Check ${line.name} back in`}
-                                                className="border-line-strong text-body-muted hover:bg-surface-hover hover:text-body inline-flex items-center gap-1.5 rounded-md border px-2.5 py-2 text-xs font-bold transition-colors"
+                                                className="border-line-strong text-body-muted hover:bg-surface-hover hover:text-body inline-flex items-center gap-1.5 rounded-md border px-2.5 py-2 text-xs font-bold transition-colors disabled:opacity-50"
                                             >
                                                 <Undo2 size={13} aria-hidden="true" /> In
                                             </button>
