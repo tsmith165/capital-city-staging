@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import { adminMetadata } from '@/app/admin/admin.metadata';
 import AdminShell from '@/components/admin/AdminShell';
 
@@ -8,7 +10,9 @@ export const metadata = adminMetadata('Edit item', 'Edit a piece of Capital City
 export default function EditInventoryPage() {
     return (
         <AdminShell title="Edit item">
-            <EditInventoryEntry />
+            <Suspense>
+                <EditInventoryEntry />
+            </Suspense>
         </AdminShell>
     );
 }

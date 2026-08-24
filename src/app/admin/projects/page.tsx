@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import { adminMetadata } from '@/app/admin/admin.metadata';
 import AdminShell from '@/components/admin/AdminShell';
 
@@ -8,7 +10,9 @@ export const metadata = adminMetadata('Projects', 'Manage staging projects for C
 export default function AdminProjectsPage() {
     return (
         <AdminShell title="Projects">
-            <AdminProjectsClient />
+            <Suspense>
+                <AdminProjectsClient />
+            </Suspense>
         </AdminShell>
     );
 }

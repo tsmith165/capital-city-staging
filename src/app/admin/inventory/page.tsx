@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import { adminMetadata } from '@/app/admin/admin.metadata';
 import AdminShell from '@/components/admin/AdminShell';
 
@@ -8,7 +10,9 @@ export const metadata = adminMetadata('Inventory', 'Manage the Capital City Stag
 export default function InventoryPage() {
     return (
         <AdminShell title="Inventory">
-            <InventoryConvexClient />
+            <Suspense>
+                <InventoryConvexClient />
+            </Suspense>
         </AdminShell>
     );
 }
