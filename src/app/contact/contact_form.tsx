@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -168,7 +168,6 @@ const ContactForm = () => {
     const createSubmission = useMutation(api.contactSubmissions.createSubmission);
     /* Survives a retry so one enquiry cannot become two rows in the inbox. */
     const submissionIdRef = useRef<Id<'contactSubmissions'> | null>(null);
-    const [mounted, setMounted] = useState(false);
     const [formData, setFormData] = useState<FormData>({
         name: '',
         email: '',
@@ -189,10 +188,6 @@ const ContactForm = () => {
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
     const [showQuote] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     const handleChange = (field: keyof FormData, value: any) => {
         trackOnce('quote_started', { placement: 'contact_page' });
@@ -322,10 +317,6 @@ const ContactForm = () => {
             setIsSubmitting(false);
         }
     };
-
-    if (!mounted) {
-        return null;
-    }
 
     return (
         <div className="w-full space-y-8">
