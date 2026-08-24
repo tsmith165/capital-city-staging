@@ -14,6 +14,8 @@ export default clerkMiddleware(async (auth, req) => {
             return NextResponse.redirect(signIn);
         }
 
+        // One Clerk Backend API round trip per admin request. See DEPLOYMENTS.md, "Authentication",
+        // for why that is accepted for now and what replaces it.
         const hasAdminRole = await isClerkUserIdAdmin(userId);
         if (!hasAdminRole) {
             return NextResponse.redirect(new URL('/not-authorized', req.url));

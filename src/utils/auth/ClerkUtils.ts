@@ -22,6 +22,15 @@ async function captureClerkUserOrganizationMemberships(userId: string) {
     }
 }
 
+/**
+ * Resolves admin status by asking the Clerk Backend API for the user's organisation memberships.
+ *
+ * `src/proxy.ts` calls this for every request under `/admin`, so each admin page load and
+ * navigation costs a round trip to Clerk before anything renders. That is accepted at one operator
+ * — well inside the development instance's 100 requests per 10 seconds — but it is a latency cost
+ * on every request and the first limit that real load would reach. Moving the admin claim into the
+ * session token would keep the check at the edge. See DEPLOYMENTS.md, "Authentication".
+ */
 export async function isClerkUserIdAdmin(userId: string) {
     let isAdmin = false;
     if (userId) {

@@ -49,6 +49,11 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
                 </p>
             }
         >
+            {/*
+                `signUpUrl` leaves public sign-up reachable even though accounts do nothing for
+                customers. Kept for now; the two admin gates make it a quota concern rather than an
+                access one. See DEPLOYMENTS.md, "Authentication".
+            */}
             <SignIn path="/signin" routing="path" signUpUrl="/signup" fallbackRedirectUrl={returnTo} appearance={authAppearance} />
         </AuthShell>
     );

@@ -62,3 +62,64 @@ someone remembering to run the script.
 Compare the source and destination snapshots rather than trusting the import summary. For each
 table, both the row count and the set of `_id` values should match, and no `projectInventory` or
 `projectImages` row should reference a `projectId` that is absent from `projects`.
+
+## Authentication
+
+Production runs against a Clerk **development** instance (`immense-stinkbug-94.clerk.accounts.dev`,
+publishable key `pk_test_*`). This is a deliberate deferral, not an oversight. Moving to a Clerk
+production instance requires provisioning a production domain and SSO credentials, and the reasons
+to hurry do not currently apply.
+
+Admin access does not depend on which instance is in use. Two independent gates gate it, and both
+fail closed:
+
+1. `src/proxy.ts` requires Clerk membership in an organisation named `ADMIN` with the `org:admin`
+   role. Anyone else is redirected to `/not-authorized`.
+2. Convex `isAdmin` / `requireAdmin` in `convex/authz.ts` require `users.role === "admin"`. New
+   users are created as `"customer"` (`convex/users.ts`).
+
+A stranger who signs up gets neither, so test keys do not expose the console.
+
+### What the development instance does cost
+
+| Limit       | Development                                     | Production          |
+| ----------- | ----------------------------------------------- | ------------------- |
+| Users       | 100, and **not transferable between instances** | No cap              |
+| Backend API | 100 requests / 10s                              | 1000 requests / 10s |
+| Emails      | 100 / month                                     | Standard            |
+
+The usual reason to migrate early is the non-transferable user cap: accounts created on a
+development instance cannot be moved, so the longer it runs the more there is to lose. That does not
+apply here. There are three users, all admins, and no customer-facing account feature — `/profile`
+is a stub and `getUserProjects` in `convex/projects.ts` has no UI consumer. The debt is not growing.
+
+### Open sign-up
+
+`/signup` is publicly reachable and linked from the sign-in component via `signUpUrl="/signup"`,
+even though accounts do nothing for customers; leads arrive through the contact form. This is
+accepted for now.
+
+The risk is not privilege escalation, which the two gates above cover. It is the development
+instance's quotas: junk sign-ups consume the 100-user cap and the 100-emails-per-month allowance,
+and an exhausted email quota could stop Mia's own sign-in emails from sending. Unlikely, and
+annoying to diagnose if it happens.
+
+To close it without a deploy, set sign-up mode to restricted in the Clerk dashboard under
+Restrictions. To close it in code, remove `src/app/signup/` and drop `signUpUrl` from the `<SignIn />`
+element in `src/app/signin/[[...sign-in]]/page.tsx`.
+
+### `isClerkUserIdAdmin` calls the Clerk API on every admin request
+
+`src/utils/auth/ClerkUtils.ts` resolves admin status by fetching the user's organisation memberships
+from the Clerk Backend API, and `src/proxy.ts` calls it for every request whose path starts with
+`/admin`. Every admin page load and client-side navigation therefore costs a round trip to Clerk
+before anything renders.
+
+This is knowingly accepted at the current scale. One operator is nowhere near the development
+instance's 100 requests per 10 seconds, so it is a latency cost rather than a correctness problem.
+It is, however, the first thing that would hit a wall under real load, and it is the reason admin
+navigation feels slower than the rest of the site.
+
+The fix, when it is worth doing, is to stop asking Clerk on every request: put the admin claim in
+the session token via a Clerk JWT template or session claim and read it from `auth()`, which keeps
+the check local to the edge.
