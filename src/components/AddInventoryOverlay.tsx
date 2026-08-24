@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useMutation } from 'convex/react';
@@ -13,7 +14,7 @@ import InputSelect from '@/components/inputs/InputSelect';
 
 interface AddInventoryOverlayProps {
     onClose: () => void;
-    onSuccess?: (oId: number) => void;
+    onSuccess?: (inventoryId: string) => void;
     defaultAction?: 'edit' | 'view' | 'stay';
 }
 
@@ -109,7 +110,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({ onClose, onSu
 
         try {
             /* The identifier comes back from the server; two of these open at once used to collide. */
-            const { oId } = await createInventory({
+            const { inventoryId } = await createInventory({
                 active: true,
                 name: title,
                 cost: cost,
@@ -133,7 +134,7 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({ onClose, onSu
             setStatusMessage({ type: 'success', message: 'Inventory created successfully!' });
 
             // Call onSuccess callback if provided
-            onSuccess?.(oId);
+            onSuccess?.(inventoryId);
 
             // Close overlay after short delay for success message
             setTimeout(() => {
@@ -142,10 +143,10 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({ onClose, onSu
                 // Navigate if requested
                 switch (action) {
                     case 'edit':
-                        router.push(`/admin/edit?id=${oId}`);
+                        router.push(`/admin/edit?item=${inventoryId}`);
                         break;
                     case 'view':
-                        router.push(`/admin/inventory?item=${oId}`);
+                        router.push(`/admin/inventory?item=${inventoryId}`);
                         break;
                     case 'stay':
                         // Just refresh the current page
@@ -164,23 +165,36 @@ const AddInventoryOverlay: React.FC<AddInventoryOverlayProps> = ({ onClose, onSu
         }
     };
 
+    /* Open for as long as it is mounted; the parent unmounts it to close. */
+    const dialogRef = useDialogFocus<HTMLDivElement>(true, onClose);
+
     const isFormValid = imageUrl !== 'Not yet uploaded' && title !== 'Not yet uploaded' && !isSubmitting;
 
     return (
         <>
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75">
+            <div
+                ref={dialogRef}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="add-inventory-title"
+                tabIndex={-1}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/75"
+            >
                 <div className="bg-surface relative mx-4 max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-lg shadow-2xl">
                     {/* Header */}
                     <div className="bg-surface-raised border-line flex items-center justify-between border-b p-6">
-                        <h2 className="gradient-secondary-main-text text-2xl font-bold">Create New Inventory</h2>
+                        <h2 id="add-inventory-title" className="gradient-secondary-main-text text-2xl font-bold">
+                            Create New Inventory
+                        </h2>
                         <button
                             onClick={onClose}
                             disabled={isSubmitting}
+                            aria-label="Close"
                             className="bg-surface-overlay hover:bg-surface-hover text-body-muted hover:text-body rounded-full p-2 transition-colors disabled:opacity-50"
                             data-tooltip-id="close-btn"
                             data-tooltip-content="Close"
                         >
-                            <X size={24} />
+                            <X size={24} aria-hidden="true" />
                         </button>
                     </div>
 

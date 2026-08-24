@@ -41,7 +41,7 @@ export default function CreateInventoryConvex() {
         setSaving(true);
         setError(null);
         try {
-            const { oId } = await createInventory({
+            const { inventoryId } = await createInventory({
                 active: true,
                 name: name.trim(),
                 cost: 0,
@@ -64,7 +64,7 @@ export default function CreateInventoryConvex() {
             });
 
             revokePreviews(pending);
-            router.push(destination === 'edit' ? `/admin/edit?id=${oId}` : `/admin/inventory?item=${oId}`);
+            router.push(destination === 'edit' ? `/admin/edit?item=${inventoryId}` : `/admin/inventory?item=${inventoryId}`);
         } catch (caught) {
             setError(caught instanceof Error ? caught.message : 'Could not create that item.');
             setSaving(false);

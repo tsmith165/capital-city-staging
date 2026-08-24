@@ -60,8 +60,9 @@ export default function InventoryConvexClient() {
     const { toggle, setQuantity, remove, clear, summary } = useStagingList(items ?? undefined, projectId ?? undefined);
 
     const [showAddOverlay, setShowAddOverlay] = useState(false);
-    const [detailId, setDetailId] = useState<string | null>(null);
-    const [panelOpen, setPanelOpen] = useState(false);
+    /* `?item=` is how the creation flow hands the new item straight to its detail column. */
+    const [detailId, setDetailId] = useState<string | null>(searchParams.get('item'));
+    const [panelOpen, setPanelOpen] = useState(searchParams.get('item') !== null);
     const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
     const [problems, setProblems] = useState<LineProblem[]>([]);
     const [committing, setCommitting] = useState(false);
@@ -88,9 +89,13 @@ export default function InventoryConvexClient() {
     };
 
     const handleProjectChange = (nextProjectId: string | null) => {
+        /*
+         * No `clear()` here. Each house's pending list is persisted under its own key and restored
+         * by `useStagingList`, so switching away and back is how a half-built list survives a trip
+         * to another manifest. Clearing on switch wrote an empty draft over the list belonging to
+         * the house being left, because `clear` closes over the previous `projectId`.
+         */
         setProjectId(nextProjectId);
-        /* The pending list belongs to the house it was built for. */
-        clear();
         setProblems([]);
         setFlash(null);
         setCommitError(null);

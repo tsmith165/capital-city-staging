@@ -53,19 +53,23 @@ function toForm(item: EditorItem): InventoryFormState {
     };
 }
 
-export default function EditInventoryClient({ oId }: { oId: number }) {
-    const item = useQuery(api.inventory.getInventoryEditor, { oId }) as EditorItem | null | undefined;
+export default function EditInventoryClient({ id }: { id: Id<'inventory'> }) {
+    const item = useQuery(api.inventory.getInventoryEditor, { id }) as EditorItem | null | undefined;
     const saveItem = useMutation(api.inventory.updateInventoryDetails);
 
     const [form, setForm] = useState<InventoryFormState | null>(null);
     /*
-     * Seeded during render rather than in an effect, keyed on the item. This is a live subscription:
-     * it re-emits on every photo edit, and re-seeding on each of those would discard whatever was
-     * being typed at the time.
+     * Seeded during render rather than in an effect, keyed on the immutable `_id`. This is a live
+     * subscription: it re-emits on every photo edit, and re-seeding on each of those would discard
+     * whatever was being typed at the time.
+     *
+     * The key has to be `_id`, not `oId`. Reordering the catalog swaps `oId` between two rows, so a
+     * subscription keyed on it would quietly hand this editor a different record carrying the same
+     * number, leave the guard satisfied, and save the open draft onto that other item.
      */
-    const [seededFor, setSeededFor] = useState<number | null>(null);
-    if (item && seededFor !== item.oId) {
-        setSeededFor(item.oId);
+    const [seededFor, setSeededFor] = useState<string | null>(null);
+    if (item && seededFor !== item._id) {
+        setSeededFor(item._id);
         setForm(toForm(item));
     }
 
@@ -195,8 +199,8 @@ export default function EditInventoryClient({ oId }: { oId: number }) {
                         <span className="text-body-subtle px-1 text-xs tabular-nums">
                             {item.position} / {item.total}
                         </span>
-                        <NavArrow oId={item.newerOId} label="Newer item" icon={ChevronLeft} />
-                        <NavArrow oId={item.olderOId} label="Older item" icon={ChevronRight} />
+                        <NavArrow id={item.newerId} label="Newer item" icon={ChevronLeft} />
+                        <NavArrow id={item.olderId} label="Older item" icon={ChevronRight} />
                     </div>
                 </div>
             </header>
@@ -230,8 +234,8 @@ export default function EditInventoryClient({ oId }: { oId: number }) {
     );
 }
 
-function NavArrow({ oId, label, icon: Icon }: { oId: number | null; label: string; icon: typeof ChevronLeft }) {
-    if (!oId) {
+function NavArrow({ id, label, icon: Icon }: { id: Id<'inventory'> | null; label: string; icon: typeof ChevronLeft }) {
+    if (!id) {
         return (
             <span aria-hidden="true" className="border-line text-body-subtle grid h-7 w-7 place-items-center rounded border opacity-30">
                 <Icon size={13} />
@@ -241,7 +245,7 @@ function NavArrow({ oId, label, icon: Icon }: { oId: number | null; label: strin
 
     return (
         <Link
-            href={`/admin/edit?id=${oId}`}
+            href={`/admin/edit?item=${id}`}
             aria-label={label}
             className="border-line text-body-muted hover:bg-surface-hover hover:text-body grid h-7 w-7 place-items-center rounded border transition-colors"
         >

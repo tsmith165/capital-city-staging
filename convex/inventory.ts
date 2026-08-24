@@ -599,13 +599,32 @@ export const setInventoryDimensions = mutation({
  * recent id, and nothing at all about whether the thing was out on a job. Availability belongs here:
  * it is the number that decides whether lowering the count is safe.
  */
-export const getInventoryEditor = query({
+/**
+ * Resolves a catalog number to the immutable document id.
+ *
+ * `oId` doubles as display order, and reordering swaps it between two rows, so it is not a stable
+ * handle on a record. Links that still carry `?id=<oId>` resolve through this once and then hold
+ * the `_id`, which cannot change underneath an open editor.
+ */
+export const getInventoryIdByOId = query({
   args: { oId: v.number() },
+  handler: async (ctx, args) => {
+    if (!(await isAdmin(ctx))) return null;
+    const match = await ctx.db
+      .query("inventory")
+      .filter((q) => q.eq(q.field("oId"), args.oId))
+      .first();
+    return match ? match._id : null;
+  },
+});
+
+export const getInventoryEditor = query({
+  args: { id: v.id("inventory") },
   handler: async (ctx, args) => {
     if (!(await isAdmin(ctx))) return null;
 
     const catalog = await ctx.db.query("inventory").collect();
-    const item = catalog.find((row) => row.oId === args.oId);
+    const item = catalog.find((row) => row._id === args.id);
     if (!item) return null;
 
     const [extraImages, availability] = await Promise.all([
@@ -618,15 +637,15 @@ export const getInventoryEditor = query({
 
     /* Newest first, matching the order the catalog and the old prev/next arrows walked. */
     const ordered = [...catalog].sort((a, b) => b.oId - a.oId);
-    const index = ordered.findIndex((row) => row.oId === args.oId);
+    const index = ordered.findIndex((row) => row._id === args.id);
 
     return {
       ...item,
       extraImages: extraImages.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)),
       availability,
       attention: attentionReasons(item, availability),
-      newerOId: index > 0 ? ordered[index - 1].oId : null,
-      olderOId: index < ordered.length - 1 ? ordered[index + 1].oId : null,
+      newerId: index > 0 ? ordered[index - 1]._id : null,
+      olderId: index < ordered.length - 1 ? ordered[index + 1]._id : null,
       position: index + 1,
       total: ordered.length,
       /* Existing values, so the editor can offer what is already in use before inventing a new one. */

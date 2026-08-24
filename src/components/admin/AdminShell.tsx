@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ExternalLink, Menu, X } from 'lucide-react';
@@ -42,6 +43,11 @@ function RailContents() {
 
 export default function AdminShell({ title, children }: AdminShellProps) {
     const [menuOpen, setMenuOpen] = useState(false);
+    /*
+     * The rail renders before the header in DOM order, so opening it and pressing Tab used to walk
+     * forward past it into the page behind and skip every admin link. It is a modal dialog now.
+     */
+    const menuRef = useDialogFocus<HTMLDivElement>(menuOpen, () => setMenuOpen(false));
 
     return (
         <div className="bg-ink text-body grid h-[100dvh] w-full grid-cols-1 overflow-hidden lg:grid-cols-[260px_minmax(0,1fr)]">
@@ -50,7 +56,14 @@ export default function AdminShell({ title, children }: AdminShellProps) {
             </aside>
 
             {menuOpen && (
-                <div className="fixed inset-0 z-50 lg:hidden">
+                <div
+                    ref={menuRef}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Admin menu"
+                    tabIndex={-1}
+                    className="fixed inset-0 z-50 lg:hidden"
+                >
                     <button
                         type="button"
                         aria-label="Close menu"

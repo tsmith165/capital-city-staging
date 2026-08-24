@@ -263,7 +263,7 @@ export default function ItemDetailPanel({
                             </div>
                         </div>
                         <Link
-                            href={`/admin/edit?id=${detail.oId}`}
+                            href={`/admin/edit?item=${detail._id}`}
                             className="bg-gold-400 text-body-inverse hover:bg-gold-300 inline-flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-bold transition-colors"
                         >
                             <Pencil size={15} aria-hidden="true" /> Edit this item

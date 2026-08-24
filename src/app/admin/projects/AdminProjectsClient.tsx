@@ -49,6 +49,17 @@ export default function AdminProjectsClient() {
     const [payment, setPayment] = useState<MoneyFilter>('all');
     const [panelOpen, setPanelOpen] = useState(false);
     const [payingId, setPayingId] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    /* Reorder and highlight both write straight to Convex; without this a rejection was invisible. */
+    const runOrFail = async (action: Promise<unknown>, message: string) => {
+        setError(null);
+        try {
+            await action;
+        } catch (caught) {
+            setError(caught instanceof Error ? caught.message : message);
+        }
+    };
 
     const filtered = useMemo(() => {
         const term = search.trim().toLowerCase();
@@ -91,8 +102,15 @@ export default function AdminProjectsClient() {
         const args = { projectId: project._id as Id<'projects'> };
 
         /* The ends wrap, which is how a project gets to the front of the portfolio in one click. */
-        if (direction === -1) void (index === 0 ? moveToLast(args) : moveUp(args));
-        else void (index === all.length - 1 ? moveToFirst(args) : moveDown(args));
+        const action =
+            direction === -1
+                ? index === 0
+                    ? moveToLast(args)
+                    : moveUp(args)
+                : index === all.length - 1
+                  ? moveToFirst(args)
+                  : moveDown(args);
+        void runOrFail(action, 'Could not reorder that project.');
     };
 
     const panelBody = selected ? (
@@ -221,6 +239,11 @@ export default function AdminProjectsClient() {
                         </div>
                     ) : (
                         <>
+                            {error && (
+                                <p role="alert" className="text-danger border-line border-b px-4 py-2 text-xs font-semibold">
+                                    {error}
+                                </p>
+                            )}
                             {filtering && (
                                 <p className="border-line text-body-subtle flex items-center gap-1.5 border-b px-4 py-2 text-xs">
                                     <SlidersHorizontal size={11} aria-hidden="true" />
@@ -237,7 +260,12 @@ export default function AdminProjectsClient() {
                                         reorderable={!filtering}
                                         onSelect={() => select(project._id)}
                                         onMove={(direction) => handleMove(project, direction)}
-                                        onToggleHighlight={() => void toggleHighlight({ projectId: project._id as Id<'projects'> })}
+                                        onToggleHighlight={() =>
+                                            void runOrFail(
+                                                toggleHighlight({ projectId: project._id as Id<'projects'> }),
+                                                'Could not change what is highlighted.',
+                                            )
+                                        }
                                     />
                                 ))}
                             </ul>

@@ -47,6 +47,36 @@ const STATUS_TONES: Record<ProjectStatus, string> = {
     cancelled: 'border-danger/40 bg-danger-soft text-danger',
 };
 
+/**
+ * The single projection from a stored project to form state. Seeding and dirty detection both go
+ * through this so a field cannot be editable but excluded from the comparison.
+ */
+function toForm(project: {
+    name?: string;
+    status?: string;
+    address?: string;
+    startDate?: number | null;
+    endDate?: number | null;
+    revenue?: number | null;
+    notes?: string;
+    highlighted?: boolean;
+}): ProjectFormState {
+    return {
+        name: project.name || '',
+        /*
+         * This used to force every non-draft project back to 'draft' when the form loaded, so
+         * opening a completed job and saving it silently reopened it.
+         */
+        status: (project.status as ProjectStatus) ?? 'draft',
+        address: project.address || '',
+        startDate: project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
+        endDate: project.endDate ? new Date(project.endDate).toISOString().split('T')[0] : '',
+        revenue: project.revenue ? project.revenue.toString() : '',
+        notes: project.notes || '',
+        highlighted: project.highlighted || false,
+    };
+}
+
 export default function EditProjectClient({ projectId }: { projectId: string }) {
     const { user, isLoaded } = useUser();
 
@@ -84,32 +114,16 @@ export default function EditProjectClient({ projectId }: { projectId: string }) 
     const [seededFor, setSeededFor] = useState<string | null>(null);
     if (project && seededFor !== project._id) {
         setSeededFor(project._id);
-        setFormData({
-            name: project.name || '',
-            /*
-             * This used to force every non-draft project back to 'draft' when the form loaded, so
-             * opening a completed job and saving it silently reopened it.
-             */
-            status: (project.status as ProjectStatus) ?? 'draft',
-            address: project.address || '',
-            startDate: project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
-            endDate: project.endDate ? new Date(project.endDate).toISOString().split('T')[0] : '',
-            revenue: project.revenue ? project.revenue.toString() : '',
-            notes: project.notes || '',
-            highlighted: project.highlighted || false,
-        });
+        setFormData(toForm(project));
     }
 
-    /* The form is dirty whenever what is on screen differs from what the last query returned. */
-    const dirty = Boolean(
-        project &&
-        (formData.name !== (project.name || '') ||
-            formData.status !== ((project.status as ProjectStatus) ?? 'draft') ||
-            formData.address !== (project.address || '') ||
-            formData.revenue !== (project.revenue ? project.revenue.toString() : '') ||
-            formData.notes !== (project.notes || '') ||
-            formData.highlighted !== (project.highlighted || false)),
-    );
+    /*
+     * Dirty is a whole-form comparison against the same projection used to seed it. Listing the
+     * fields again by hand is what let start and end dates drift out: they were editable but absent
+     * from the comparison, so a date-only change looked clean and the unsaved-changes guard stayed
+     * off while the tab closed.
+     */
+    const dirty = Boolean(project && JSON.stringify(formData) !== JSON.stringify(toForm(project)));
     useUnsavedChangesWarning(dirty);
 
     const save = async (checkInAssignmentIds?: string[]) => {
