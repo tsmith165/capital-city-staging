@@ -6,6 +6,14 @@ import { openAssignments, syncItemCounter, syncProjectFlag } from "./availabilit
 import { paymentState } from "./payments";
 
 // Get highlighted projects for portfolio
+/**
+ * The homepage portfolio. This is the one project read that is reachable without auth, so it
+ * returns an explicit field list rather than the stored document.
+ *
+ * Spreading the project used to ship `address`, `revenue`, `inventoryRentalCost` and `ownerId`
+ * to anyone who called the deployment URL, which is public because it ships in the client
+ * bundle. The portfolio only ever renders a name and its photos.
+ */
 export const getHighlightedProjects = query({
   handler: async (ctx) => {
     const projects = await ctx.db
@@ -24,8 +32,18 @@ export const getHighlightedProjects = query({
           .collect();
 
         return {
-          ...project,
-          images: images.sort((a, b) => a.displayOrder - b.displayOrder),
+          _id: project._id,
+          name: project.name,
+          images: images
+            .sort((a, b) => a.displayOrder - b.displayOrder)
+            .map((image) => ({
+              _id: image._id,
+              imagePath: image.imagePath,
+              thumbnailPath: image.thumbnailPath,
+              title: image.title,
+              width: image.width,
+              height: image.height,
+            })),
         };
       }),
     );
