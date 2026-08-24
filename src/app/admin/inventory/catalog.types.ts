@@ -3,6 +3,7 @@ import type { StagingItem } from '@/components/admin/inventory/staging.types';
 /** One catalog row as `inventory.getCatalog` returns it, with availability already derived. */
 export interface CatalogItem extends StagingItem {
     oId: number;
+    createdAt: number;
     location: string;
     active: boolean;
     imagePath: string;

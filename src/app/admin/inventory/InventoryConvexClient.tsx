@@ -396,13 +396,7 @@ export default function InventoryConvexClient() {
 
             {lightbox && <PhotoLightbox src={lightbox.src} alt={lightbox.alt} onClose={() => setLightbox(null)} />}
 
-            {showAddOverlay && (
-                <AddInventoryOverlay
-                    onClose={() => setShowAddOverlay(false)}
-                    onSuccess={() => setShowAddOverlay(false)}
-                    defaultAction="stay"
-                />
-            )}
+            {showAddOverlay && <AddInventoryOverlay onClose={() => setShowAddOverlay(false)} />}
         </div>
     );
 }

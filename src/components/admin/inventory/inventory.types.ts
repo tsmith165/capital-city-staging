@@ -32,6 +32,7 @@ export interface FilterableItem {
     location?: string;
     price: number;
     oId: number;
+    createdAt: number;
     free: number;
     out: number;
     awaitingCheckIn: number;

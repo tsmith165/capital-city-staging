@@ -269,6 +269,7 @@ export const getPickerData = query({
         return {
           _id: item._id,
           oId: item.oId,
+          createdAt: item.createdAt,
           name: item.name,
           category: item.category,
           price: item.price,
