@@ -3,6 +3,7 @@ import type { StagingItem } from '@/components/admin/inventory/staging.types';
 /** One catalog row as the picker sees it, with availability already derived server-side. */
 export interface PickerItem extends StagingItem {
     oId: number;
+    createdAt: number;
     location: string;
     description: string;
     imagePath: string;

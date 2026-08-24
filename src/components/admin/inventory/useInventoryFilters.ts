@@ -34,7 +34,11 @@ function matchesAvailability(item: FilterableItem, filter: InventoryFilterState[
 }
 
 const SORTERS: Record<InventoryFilterState['sort'], (a: FilterableItem, b: FilterableItem) => number> = {
-    recent: (a, b) => b.oId - a.oId,
+    /*
+     * `createdAt`, not `oId`. The catalog number doubles as manual display order and reordering
+     * swaps it between two rows, so "Recently added" used to mean "wherever she dragged it".
+     */
+    recent: (a, b) => b.createdAt - a.createdAt,
     name: (a, b) => a.name.localeCompare(b.name),
     price: (a, b) => b.price - a.price,
     staged: (a, b) => (b.timesStaged ?? 0) - (a.timesStaged ?? 0),

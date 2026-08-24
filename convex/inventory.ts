@@ -503,6 +503,7 @@ export const getCatalog = query({
         return {
           _id: item._id,
           oId: item.oId,
+          createdAt: item.createdAt,
           name: item.name,
           category: item.category,
           location: item.location,

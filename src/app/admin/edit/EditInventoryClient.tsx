@@ -229,7 +229,7 @@ export default function EditInventoryClient({ id }: { id: Id<'inventory'> }) {
                 <InventoryStatusPanel item={item} />
             </section>
 
-            {addingNew && <AddInventoryOverlay onClose={() => setAddingNew(false)} onSuccess={() => setAddingNew(false)} />}
+            {addingNew && <AddInventoryOverlay onClose={() => setAddingNew(false)} />}
         </div>
     );
 }
