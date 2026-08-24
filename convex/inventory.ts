@@ -24,88 +24,6 @@ export const getAllInventory = query({
   },
 });
 
-// Get all inventory with filters
-export const getInventory = query({
-  args: {
-    category: v.optional(v.string()),
-    active: v.optional(v.boolean()),
-    search: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    let inventoryQuery = ctx.db.query("inventory");
-
-    if (args.active !== undefined) {
-      inventoryQuery = inventoryQuery.filter((q) => q.eq(q.field("active"), args.active));
-    }
-
-    if (args.category) {
-      inventoryQuery = inventoryQuery.filter((q) => q.eq(q.field("category"), args.category));
-    }
-
-    const inventory = await inventoryQuery.collect();
-
-    // Apply search filter if provided
-    let filtered = inventory;
-    if (args.search) {
-      const searchLower = args.search.toLowerCase();
-      filtered = inventory.filter(
-        (item) => item.name.toLowerCase().includes(searchLower) || item.description.toLowerCase().includes(searchLower),
-      );
-    }
-
-    // Sort by oId descending
-    return filtered.sort((a, b) => b.oId - a.oId);
-  },
-});
-
-// Get single inventory item with images
-export const getInventoryItem = query({
-  args: { id: v.id("inventory") },
-  handler: async (ctx, args) => {
-    const item = await ctx.db.get(args.id);
-    if (!item) return null;
-
-    const extraImages = await ctx.db
-      .query("extraImages")
-      .withIndex("by_inventory", (q) => q.eq("inventoryId", args.id))
-      .collect();
-
-    // Sort extra images by display order
-    extraImages.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
-
-    return {
-      ...item,
-      extraImages,
-    };
-  },
-});
-
-// Get single inventory item by original ID (oId)
-export const getInventoryItemByOId = query({
-  args: { oId: v.number() },
-  handler: async (ctx, args) => {
-    const item = await ctx.db
-      .query("inventory")
-      .filter((q) => q.eq(q.field("oId"), args.oId))
-      .first();
-
-    if (!item) return null;
-
-    const extraImages = await ctx.db
-      .query("extraImages")
-      .withIndex("by_inventory", (q) => q.eq("inventoryId", item._id))
-      .collect();
-
-    // Sort extra images by display order
-    extraImages.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
-
-    return {
-      ...item,
-      extraImages,
-    };
-  },
-});
-
 /**
  * Creates one catalog item and returns the identifier it was given.
  *
@@ -282,53 +200,11 @@ export const deleteInventory = mutation({
   },
 });
 
-/** Derived availability for one item, plus which houses are holding it. */
-export const getInventoryAvailability = query({
-  args: { id: v.id("inventory") },
-  handler: async (ctx, args) => {
-    const item = await ctx.db.get(args.id);
-    if (!item) return null;
-
-    return availabilityForItem(ctx, args.id);
-  },
-});
-
-// Get inventory categories
-export const getInventoryCategories = query({
-  handler: async (ctx) => {
-    const inventory = await ctx.db.query("inventory").collect();
-    const categories = [...new Set(inventory.map((item) => item.category))];
-    return categories.sort();
-  },
-});
-
-// Get adjacent inventory oIds for navigation
-export const getAdjacentInventoryOIds = query({
-  args: { oId: v.number() },
-  handler: async (ctx, args) => {
-    const inventory = await ctx.db.query("inventory").collect();
-
-    // Sort by oId descending (most recent first)
-    const sorted = inventory.sort((a, b) => b.oId - a.oId);
-
-    // Find current index
-    const currentIndex = sorted.findIndex((item) => item.oId === args.oId);
-
-    if (currentIndex === -1) {
-      return { nextOId: null, prevOId: null };
-    }
-
-    // Get adjacent oIds
-    const nextOId = currentIndex > 0 ? sorted[currentIndex - 1].oId : null;
-    const prevOId = currentIndex < sorted.length - 1 ? sorted[currentIndex + 1].oId : null;
-
-    return { nextOId, prevOId };
-  },
-});
-
 // Get most recent inventory oId
 export const getMostRecentOId = query({
   handler: async (ctx) => {
+    if (!(await isAdmin(ctx))) return null;
+
     const inventory = await ctx.db.query("inventory").collect();
 
     if (inventory.length === 0) return null;
