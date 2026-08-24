@@ -18,7 +18,7 @@ export const metadata: Metadata = articleMetadata(
 export default function UnderstandingBuyerPsychology() {
     return (
         <PageLayout page="understanding-buyer-psychology">
-            <JsonLd data={articleSchema({ headline: article.title, description: article.description, path: article.url })} />
+            <JsonLd data={articleSchema(article)} />
             <ArticleShell
                 eyebrow="Resources"
                 title={article.title}

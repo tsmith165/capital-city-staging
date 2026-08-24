@@ -7,9 +7,9 @@ import JsonLd from '@/components/seo/JsonLd';
 import { serviceSchema, SITE_URL } from '@/lib/structuredData';
 
 /*
- * This page keeps the /services/home-decorating URL it has always had, but the content is
- * occupied staging. It used to describe decorating a home you intend to keep living in, which is
- * not a service the business sells and not what the "Occupied staging" card links here for.
+ * This page used to describe decorating a home you intend to keep living in, which is not a
+ * service the business sells. The content is occupied staging, and as of 2026-08 the URL says so
+ * too. `/services/home-decorating` redirects here permanently (next.config.mjs).
  */
 const TITLE = 'Occupied Home Staging in Sacramento';
 const HEADING = 'Occupied staging';
@@ -20,12 +20,12 @@ export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
     keywords:
-        'occupied home staging Sacramento, home decorating Sacramento, Sacramento home staging, home styling, Capital City Staging, staging while living at home, real estate staging',
-    alternates: { canonical: `${SITE_URL}/services/home-decorating` },
+        'occupied home staging Sacramento, Sacramento home staging, staging while living at home, staging an occupied home, real estate staging, Capital City Staging',
+    alternates: { canonical: `${SITE_URL}/services/occupied-home-staging` },
     openGraph: {
         title: `${TITLE} | Capital City Staging`,
         description: DESCRIPTION,
-        url: `${SITE_URL}/services/home-decorating`,
+        url: `${SITE_URL}/services/occupied-home-staging`,
         images: [
             {
                 url: '/favicon/CCS_og_image.png',
@@ -41,12 +41,12 @@ export const metadata: Metadata = {
 
 export default function OccupiedStagingServices() {
     return (
-        <PageLayout page="home-decoration">
+        <PageLayout page="occupied-home-staging">
             <JsonLd
                 data={serviceSchema({
                     name: TITLE,
                     description: DESCRIPTION,
-                    image: `${SITE_URL}/services/home-decoration.jpg`,
+                    image: `${SITE_URL}/services/occupied-home-staging.jpg`,
                 })}
             />
             <ArticleShell
@@ -54,7 +54,7 @@ export default function OccupiedStagingServices() {
                 title={HEADING}
                 lead="You’re still living there. We work with what you own, clear what’s in the way, and add only what’s missing."
                 image={{
-                    src: '/services/home-decoration.jpg',
+                    src: '/services/occupied-home-staging.jpg',
                     alt: 'Occupied Home Staging in Sacramento',
                     width: 1280,
                     height: 720,

@@ -18,7 +18,11 @@ interface AuthShellProps {
  */
 export default function AuthShell({ eyebrow, title, description, children, footer }: AuthShellProps) {
     return (
-        <div className="bg-ink flex min-h-[100dvh] w-full flex-col items-center justify-center px-5 py-12">
+        <main
+            id="main-content"
+            tabIndex={-1}
+            className="bg-ink flex min-h-[100dvh] w-full flex-col items-center justify-center px-5 py-12 focus:outline-none"
+        >
             <div className="w-full max-w-md">
                 <Link href="/" className="mx-auto flex w-fit items-center justify-center" aria-label="Capital City Staging home">
                     <Image
@@ -49,6 +53,6 @@ export default function AuthShell({ eyebrow, title, description, children, foote
                     Back to capitalcitystaging.com
                 </Link>
             </div>
-        </div>
+        </main>
     );
 }

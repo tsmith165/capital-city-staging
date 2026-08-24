@@ -25,6 +25,10 @@ const nextConfig = {
         const alias = (sources, destination) => sources.map((source) => ({ source, destination, permanent: false }));
 
         return [
+            // The occupied-staging page lived at /services/home-decorating until 2026-08, and the
+            // URL advertised a service the business does not sell. Permanent: the old path is in
+            // the sitemap Google already crawled.
+            { source: '/services/home-decorating', destination: '/services/occupied-home-staging', permanent: true },
             ...alias(SIGN_IN_ALIASES, '/signin'),
             ...alias(SIGN_OUT_ALIASES, '/signout'),
             ...alias(SIGN_UP_ALIASES, '/signup'),

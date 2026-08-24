@@ -159,6 +159,11 @@ const Slider = ({
     );
 };
 
+const STAGING_TYPES = [
+    { value: 'vacant' as const, label: 'Vacant Home', Icon: Building },
+    { value: 'occupied' as const, label: 'Occupied Home', Icon: Users },
+];
+
 const ContactForm = () => {
     const createSubmission = useMutation(api.contactSubmissions.createSubmission);
     /* Survives a retry so one enquiry cannot become two rows in the inbox. */
@@ -543,39 +548,41 @@ const ContactForm = () => {
                                 formatValue={(value) => `${value} ${value === 1 ? 'Space' : 'Spaces'}`}
                             />
 
-                            {/* Staging Type Toggle Buttons */}
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2">
-                                    <Home className="text-primary" size={20} />
+                            {/*
+                             * Native radios rather than styled buttons: the selected state used to exist only
+                             * in colour, so a screen reader could not tell which staging type was chosen on
+                             * the business's only lead form. The inputs are visually hidden, which keeps the
+                             * appearance and gets group semantics and arrow-key navigation for free.
+                             */}
+                            <fieldset className="space-y-3">
+                                <legend className="mb-3 flex items-center gap-2">
+                                    <Home className="text-primary" size={20} aria-hidden="true" />
                                     <span className="text-body-muted font-medium">Staging Type</span>
-                                </div>
+                                </legend>
                                 <div className="flex gap-4">
-                                    <button
-                                        type="button"
-                                        onClick={() => handleChange('stagingType', 'vacant')}
-                                        className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 font-medium transition-all ${
-                                            formData.stagingType === 'vacant'
-                                                ? 'border-primary bg-primary text-body-muted'
-                                                : 'border-primary text-primary hover:bg-primary/70 hover:text-body-muted bg-transparent'
-                                        } border`}
-                                    >
-                                        <Building size={18} />
-                                        Vacant Home
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleChange('stagingType', 'occupied')}
-                                        className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 font-medium transition-all ${
-                                            formData.stagingType === 'occupied'
-                                                ? 'border-primary bg-primary text-body-muted'
-                                                : 'border-primary text-primary hover:bg-primary/70 hover:text-body-muted bg-transparent'
-                                        } border`}
-                                    >
-                                        <Users size={18} />
-                                        Occupied Home
-                                    </button>
+                                    {STAGING_TYPES.map(({ value, label, Icon }) => (
+                                        <label
+                                            key={value}
+                                            className={`border-primary has-[:focus-visible]:ring-gold-400 flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 py-3 font-medium transition-all has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-offset-1 ${
+                                                formData.stagingType === value
+                                                    ? 'bg-primary text-body-muted'
+                                                    : 'text-primary hover:bg-primary/70 hover:text-body-muted bg-transparent'
+                                            }`}
+                                        >
+                                            <input
+                                                type="radio"
+                                                name="stagingType"
+                                                value={value}
+                                                checked={formData.stagingType === value}
+                                                onChange={() => handleChange('stagingType', value)}
+                                                className="sr-only"
+                                            />
+                                            <Icon size={18} aria-hidden="true" />
+                                            {label}
+                                        </label>
+                                    ))}
                                 </div>
-                            </div>
+                            </fieldset>
                         </div>
 
                         {/* Toggle Options */}
@@ -905,9 +912,21 @@ const ContactForm = () => {
 
                 {/* Submit Messages */}
                 <div className="flex flex-col items-center">
+                    {/*
+                     * Both regions stay mounted. A live region inserted at the same moment as its content
+                     * is frequently not announced, and the visible message is animated in, so it cannot
+                     * carry the region itself. Success is polite, a delivery failure is not.
+                     */}
+                    <div role="status" aria-live="polite" className="sr-only">
+                        {submitMessage?.type === 'success' ? submitMessage.message : ''}
+                    </div>
+                    <div role="alert" className="sr-only">
+                        {submitMessage?.type === 'error' ? submitMessage.message : ''}
+                    </div>
                     <AnimatePresence>
                         {submitMessage && (
                             <motion.div
+                                aria-hidden="true"
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}

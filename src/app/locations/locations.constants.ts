@@ -5,7 +5,7 @@
  * interior decoration, custom design solutions, luxury staging and photography preparation. The
  * business sells two things — vacant staging and occupied staging — so a prospect could arrive
  * asking for work that was never on offer. One list, shared by every city, matching the canonical
- * service pages at `/services/home-staging` and `/services/home-decorating`.
+ * service pages at `/services/home-staging` and `/services/occupied-home-staging`.
  */
 export const LOCATION_SERVICES = [
     'Vacant home staging',

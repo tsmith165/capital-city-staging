@@ -99,7 +99,9 @@ export default function AdminShell({ title, children }: AdminShellProps) {
                     </Link>
                 </header>
 
-                <div className="min-h-0 overflow-y-auto">{children}</div>
+                <main id="main-content" tabIndex={-1} className="min-h-0 overflow-y-auto focus:outline-none">
+                    {children}
+                </main>
             </div>
         </div>
     );
